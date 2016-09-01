@@ -1,2 +1,8 @@
 *.o
 *.pyc
+
+S_default.dat
+S_source.hh
+build
+trick
+makefile
