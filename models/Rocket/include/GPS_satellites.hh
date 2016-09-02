@@ -25,8 +25,8 @@ class GPS_Satellites {
     double sv_init_data[48]; /* ** (--)       GPS sv position when init */
 
     double radius;           /* ** (m)        GPS Satellite Orbit radius */
-    double velocity;         /* ** (m/s)      GPS Satellite Orbit velocity */
-    double inclniation;      /* ** (r)        GPS Satellite Orbit inclination*/
+    double angular_velocity; /* ** (m/s)      GPS Satellite Orbit velocity */
+    double inclination;      /* ** (r)        GPS Satellite Orbit inclination*/
 };
 
 #endif  // __GPS_SAT_HH__

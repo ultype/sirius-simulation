@@ -2,14 +2,15 @@
 #include "trick_utils/math/include/quat_macros.h"
 #include "trick_utils/math/include/matrix_macros.h"
 #include "trick_utils/math/include/trick_math_proto.h"
-#include "trick/clock_proto.h"
+#include "sim_services/include/simtime.h"
+
+#include "global_constants.hh"
 
 void GPS_Satellites::default_data(){
     //Setup Orbit related constants
     radius = 26560000;
 
-    //XXX: Store as constant, GM = 3.9860044e14
-    velocity = sqrt(3.9860044e14 / pow(radius, 3));
+    angular_velocity = sqrt(GM / pow(radius, 3));
     inclination = 0.95686;
 }
 
