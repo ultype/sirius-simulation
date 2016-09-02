@@ -4,23 +4,17 @@
 PURPOSE:
       (Describe the lovely mother Earth)
 LIBRARY DEPENDENCY:
-    ((../src/Planet.cpp))
+    ((../src/Earth.cpp))
 PROGRAMMERS:
       (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
 
-#define EARTH_MASS 5.9721986e24
-#define EARTH_RADIUS 6367500.0
-
 class Earth {
     public:
-    Earth();
+    Earth() {};
 
-    static double radius;  /* (m)        Mean radius of Earth */
-    static double mass;    /* (kg)       Earth Mass */
-
+    const static double radius;  /* (m)        Mean radius of Earth */
+    const static double mass;    /* (kg)       Earth Mass */
 };
-
-
 
 #endif

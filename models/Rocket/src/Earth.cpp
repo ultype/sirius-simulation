@@ -1,7 +1,6 @@
-#include  "earth.hh"
+#include "earth.hh"
+#include "global_constants.hh"
 
-Earth::Earth() {
-    mass = 5.973332e24;
-    radius = 6370987.308;
-}
+const double Earth::mass = 5.973332e24;
+const double Earth::radius = 6370987.308;
 
