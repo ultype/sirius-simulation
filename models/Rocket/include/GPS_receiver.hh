@@ -32,6 +32,7 @@ class GPS_Receiver {
     /* Internal variables */
     bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
     double gps_epoch;           /* ** (s)       GPS update epoch time since launch */
+    double time_gps;            /* ** (s)       GPS time passed */
     Matrix FF = Matrix(8, 8);   /* ** (--) */
     Matrix PHI = Matrix(8, 8);  /* ** (--) */
     //XXX: use C array, for check-pointing and variable server
@@ -44,6 +45,8 @@ class GPS_Receiver {
     Matrix PP7 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 7st row */
     Matrix PP8 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 8st row */
 
+    double slotsum;         /* ** (--)      Sum of stored slot numbers of quadriga */
+
     /* XXX: GPS Executing Parameter */
     /* These will be affected by S_define */
     double int_step;        /* *i (m)       GPS executing integration time */
@@ -55,6 +58,10 @@ class GPS_Receiver {
 
     double ucfreq_noise;    /* *i (m/s)     User clock frequency error XXX: MARKOV */
     double ucbias_error;    /* *io (m)      User clock bias error XXX: GAUSS */
+
+    double PR_BIAS[4];      /* *i (m)       Pseudo-range bias GAUSS */
+    double PR_NOISE[4];     /* *i (m)       Pseudo-range bias MARKOV */
+    double DR_NOISE[4];     /* *i (m/s)     Delta-range noise MARKOV */
 
     /* GPS EKF Parameters */
     double uctime_cor;      /* *i (s)       User clock correlation time constant */
@@ -84,6 +91,28 @@ class GPS_Receiver {
     double std_pos;         /* *o (m)        std deviation of position from p matrix */
     double std_vel;         /* *o (m)        std deviation of velocity from p matrix */
     double std_ucbias;      /* *o (m)        std deviation of user clock bias from p matrix */
+
+    double lat1;            /* *o (d)        Quadriga 1st lat */
+    double lat2;            /* *o (d)        Quadriga 2nd lat */
+    double lat3;            /* *o (d)        Quadriga 3rd lat */
+    double lat4;            /* *o (d)        Quadriga 4th lat */
+    double lon1;            /* *o (d)        Quadriga 1st lon */
+    double lon2;            /* *o (d)        Quadriga 2nd lon */
+    double lon3;            /* *o (d)        Quadriga 3rd lon */
+    double lon4;            /* *o (d)        Quadriga 4th lon */
+    double alt1;            /* *o (m)        Quadriga 1st alt */
+    double alt2;            /* *o (m)        Quadriga 2nd alt */
+    double alt3;            /* *o (m)        Quadriga 3rd alt */
+    double alt4;            /* *o (m)        quadriga 4th alt */
+
+    double position_state[3];  /* *o (m)        Position state (inertial coor) */
+    double velocity_state[3];  /* *o (m)        Velocity state (inertial coor) */
+    double clock_state[3];     /* *o (--)       CLock state */
+
+    double gps_pos_meas;    /* *o (m)        */
+    double gps_vel_meas;    /* *o (m)        */
+    double state_pos;    /* *o (m)        */
+    double state_vel;    /* *o (m)        */
 };
 
 #endif  // __GPS_R_HH__
