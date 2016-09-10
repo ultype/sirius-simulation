@@ -265,6 +265,75 @@ void GPS_Receiver::get_quadriga(){
     }  // end of picking quadriga from 4 or more visible SVs
 }
 
+void GPS_Receiver::filter_extrapolation(){
+    Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
+    Matrix QQ(8, 8);  // local
+
+    Matrix VEC1 = PP1.vec9_mat33();
+    Matrix VEC2 = PP2.vec9_mat33();
+    Matrix VEC3 = PP3.vec9_mat33();
+    Matrix VEC4 = PP4.vec9_mat33();
+    Matrix VEC5 = PP5.vec9_mat33();
+    Matrix VEC6 = PP6.vec9_mat33();
+    Matrix VEC7 = PP7.vec9_mat33();
+    Matrix VEC8 = PP8.vec9_mat33();
+    for (int n = 0; n < 8; n++) {
+        // VECx, x=0...7, is the x-th row of PP (8th element is zero)
+        PP.assign_loc(0, n, VEC1.get_loc(n, 0));
+        PP.assign_loc(1, n, VEC2.get_loc(n, 0));
+        PP.assign_loc(2, n, VEC3.get_loc(n, 0));
+        PP.assign_loc(3, n, VEC4.get_loc(n, 0));
+        PP.assign_loc(4, n, VEC5.get_loc(n, 0));
+        PP.assign_loc(5, n, VEC6.get_loc(n, 0));
+        PP.assign_loc(6, n, VEC7.get_loc(n, 0));
+        PP.assign_loc(7, n, VEC8.get_loc(n, 0));
+    }
+
+    //*** user-clock frequency and bias error growth between updates ***
+    // integrating 'ucfreq_noise' Markov process to
+    //  obtain user-clock bias error 'ucbias_error' (trapezoidal
+    //  integration)
+    // user-clock bias is updated at filter update epoch
+    ucfreq_error = ucfreq_noise;
+    ucbias_error = ucbias_error + (ucfreq_error + ucfreqm) * (int_step / 2);
+    ucfreqm = ucfreq_error;
+
+    //*** filter extrapolation ***
+    // dynamic error covariance matrix
+    for (int i = 0; i < 3; i++) {
+        QQ.assign_loc(i, i, pow(qpos * (1 + factq), 2));
+        QQ.assign_loc(i + 3, i + 3, pow(qvel * (1 + factq), 2));
+    }
+    QQ.assign_loc(6, 6, pow(qclockb * (1 + factq), 2));
+    QQ.assign_loc(7, 7, pow(qclockf * (1 + factq), 2));
+
+    // covariance estimate extrapolation
+    PP = PHI * (PP + QQ * (int_step / 2)) * ~PHI + QQ * (int_step / 2);
+    // diagnostics: st. deviations of the diagonals of the covariance matrix
+    std_pos = sqrt(PP.get_loc(0, 0));
+    std_vel = sqrt(PP.get_loc(3, 3));
+    std_ucbias = sqrt(PP.get_loc(6, 6));
+
+    for (int n = 0; n < 8; n++) {
+        VEC1.assign_loc(n, 0, PP.get_loc(0, n));
+        VEC2.assign_loc(n, 0, PP.get_loc(1, n));
+        VEC3.assign_loc(n, 0, PP.get_loc(2, n));
+        VEC4.assign_loc(n, 0, PP.get_loc(3, n));
+        VEC5.assign_loc(n, 0, PP.get_loc(4, n));
+        VEC6.assign_loc(n, 0, PP.get_loc(5, n));
+        VEC7.assign_loc(n, 0, PP.get_loc(6, n));
+        VEC8.assign_loc(n, 0, PP.get_loc(7, n));
+    }
+    PP1 = VEC1.mat33_vec9();
+    PP2 = VEC2.mat33_vec9();
+    PP3 = VEC3.mat33_vec9();
+    PP4 = VEC4.mat33_vec9();
+    PP5 = VEC5.mat33_vec9();
+    PP6 = VEC6.mat33_vec9();
+    PP7 = VEC7.mat33_vec9();
+    PP8 = VEC8.mat33_vec9();
+}
+
 void GPS_Receiver::measure(){
 
 }
