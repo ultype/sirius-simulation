@@ -20,6 +20,62 @@ void GPS_Receiver::initialize(Rocket& rkt, GPS_Satellites& sats, INS& i){
     rocket = &rkt;
     gps_sats = &sats;
     ins = &i;
+
+
+    Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
+
+    for (int i = 0; i < 3; i++) {
+        PP.assign_loc(i, i, pow(ppos * (1 + factp), 2));
+        PP.assign_loc(i + 3, i + 3, pow(pvel * (1 + factp), 2));
+    }
+    PP.assign_loc(6, 6, pow(pclockb * (1 + factp), 2));
+    PP.assign_loc(7, 7, pow(pclockf * (1 + factp), 2));
+
+    // fundamental dynamic matrix of filter - constant throughout
+    FF.assign_loc(0, 3, 1);
+    FF.assign_loc(1, 4, 1);
+    FF.assign_loc(2, 5, 1);
+    FF.assign_loc(6, 7, 1);
+    FF.assign_loc(7, 7, -1 / uctime_cor);
+
+    // state transition matrix - constant throughout
+    Matrix EYE(8, 8);
+    PHI = EYE.identity() + FF * int_step + FF * FF * (int_step * int_step / 2);
+
+    // setting inital acquisition flag
+    gps_acq = false;
+
+    // initializing update clock
+    gps_epoch = get_rettime();
+
+    // assembling covariance matrix from saved 3x3 matrices
+    Matrix VEC1 = PP1.vec9_mat33();
+    Matrix VEC2 = PP2.vec9_mat33();
+    Matrix VEC3 = PP3.vec9_mat33();
+    Matrix VEC4 = PP4.vec9_mat33();
+    Matrix VEC5 = PP5.vec9_mat33();
+    Matrix VEC6 = PP6.vec9_mat33();
+    Matrix VEC7 = PP7.vec9_mat33();
+    Matrix VEC8 = PP8.vec9_mat33();
+    // decomposing covariance matrix for saving as 3x3 matrices
+    for (int n = 0; n < 8; n++) {
+        VEC1.assign_loc(n, 0, PP.get_loc(0, n));
+        VEC2.assign_loc(n, 0, PP.get_loc(1, n));
+        VEC3.assign_loc(n, 0, PP.get_loc(2, n));
+        VEC4.assign_loc(n, 0, PP.get_loc(3, n));
+        VEC5.assign_loc(n, 0, PP.get_loc(4, n));
+        VEC6.assign_loc(n, 0, PP.get_loc(5, n));
+        VEC7.assign_loc(n, 0, PP.get_loc(6, n));
+        VEC8.assign_loc(n, 0, PP.get_loc(7, n));
+    }
+    PP1 = VEC1.mat33_vec9();
+    PP2 = VEC2.mat33_vec9();
+    PP3 = VEC3.mat33_vec9();
+    PP4 = VEC4.mat33_vec9();
+    PP5 = VEC5.mat33_vec9();
+    PP6 = VEC6.mat33_vec9();
+    PP7 = VEC7.mat33_vec9();
+    PP8 = VEC8.mat33_vec9();
 }
 
 void GPS_Receiver::get_quadriga(){
@@ -207,4 +263,8 @@ void GPS_Receiver::get_quadriga(){
                 vel * (cos(gps_sats->sv_data[ii][1]) * sin_incl);
         }
     }  // end of picking quadriga from 4 or more visible SVs
+}
+
+void GPS_Receiver::measure(){
+
 }

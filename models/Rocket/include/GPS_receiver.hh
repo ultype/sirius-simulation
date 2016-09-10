@@ -22,20 +22,56 @@ class GPS_Receiver {
 
     void get_quadriga();
 
-    void
+    void measure();
 
     Rocket *rocket;
     GPS_Satellites *gps_sats;
     INS *ins;
 
-    bool gps_acq;            /* ** (--)       GPS Signal Acquired? */
+    /* Internal variables */
+    bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
+    double gps_epoch;           /* ** (s)       GPS update epoch time since launch */
+    Matrix FF = Matrix(8, 8);   /* ** (--) */
+    Matrix PHI = Matrix(8, 8);  /* ** (--) */
+    //XXX: use C array, for check-pointing and variable server
+    Matrix PP1 = Matrix(3, 3);  /* ** (--) Covariance Matrix 1st row */
+    Matrix PP2 = Matrix(3, 3);  /* ** (--) Covariance Matrix 2st row */
+    Matrix PP3 = Matrix(3, 3);  /* ** (--) Covariance Matrix 3st row */
+    Matrix PP4 = Matrix(3, 3);  /* ** (--) Covariance Matrix 4st row */
+    Matrix PP5 = Matrix(3, 3);  /* ** (--) Covariance Matrix 5st row */
+    Matrix PP6 = Matrix(3, 3);  /* ** (--) Covariance Matrix 6st row */
+    Matrix PP7 = Matrix(3, 3);  /* ** (--) Covariance Matrix 7st row */
+    Matrix PP8 = Matrix(3, 3);  /* ** (--) Covariance Matrix 8st row */
 
-    double del_rearth;       /* *i (m)        GPS Receiver LOS Minimum distance */
+    /* XXX: GPS Executing Parameter */
+    /* These will be affected by S_define */
+    double int_step;        /* *i (m)       GPS executing integration time */
 
-    double gdop;             /* *o (m)        Geometric dillution of precision of quadriga */
-    double slot[4];          /* *o (--)       SV slot#  of quadriga */
-    double ssii_quad[16];    /* *o (m)        Best quadriga inertial coordinates and their slot# */
-    double vsii_quad[12];    /* *o (m/s)      Best quadriga inertial velocities */
+    /* GPS Device parameters */
+    double del_rearth;      /* *i (m)       GPS Receiver LOS Minimum distance */
+    double gps_acqtime;     /* *i (s)       Time to Acquire GPS Signal */
+    double gps_step;        /* *i (s)       GPS Update Interval */
+
+    /* GPS EKF Parameters */
+    double uctime_cor;      /* *i (s)       User clock correlation time constant */
+    double ppos;            /* *i (m)       Init 1sig pos values of state cov matrix */
+    double pvel;            /* *i (m/s)     Init 1sig vel values of state cov matrix */
+    double pclockb;         /* *i (m)       Init 1sig clock bias error of state cov matrix */
+    double pclockf;         /* *i (m/s)     Init 1sig clock freq error of state cov matrix */
+    double qpos;            /* *i (m)       1sig pos values of process cov matrix */
+    double qvel;            /* *i (m/s)     1sig vel values of process cov matrix */
+    double qclockb;         /* *i (m)       1sig clock bias error of process cov matrix */
+    double qclockf;         /* *i (m/s)     1sig clock freq error of process cov matrix */
+    double rpos;            /* *i (m)       1sig pos value of meas cov matrix */
+    double rvel;            /* *i (m/s)     1sig vel value of meas cov matrix */
+    double factp;           /* *i (--)      Factor to modifiy initial P-matrix P(1+factp) */
+    double factq;           /* *i (--)      Factor to modifiy the Q-matrix Q(1+factq) */
+    double factr;           /* *i (--)      Factor to modifiy the R-matrix R(1+factr) */
+
+    double gdop;            /* *o (m)        Geometric dillution of precision of quadriga */
+    double slot[4];         /* *o (--)       SV slot#  of quadriga */
+    double ssii_quad[16];   /* *o (m)        Best quadriga inertial coordinates and their slot# */
+    double vsii_quad[12];   /* *o (m/s)      Best quadriga inertial velocities */
 
 };
 
