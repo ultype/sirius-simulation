@@ -31,7 +31,8 @@ void GPS_Satellites::propagate_sv(){
         }
     }
     // propagating the argument of latitude in time
+    time = get_rettime();
     for (int i = 0; i < 24; i++) {
-        sv_data[i][1] = sv_data[i][1] + (almanac_time + get_rettime()) * angular_velocity;
+        sv_data[i][1] = sv_data[i][1] + (almanac_time + time) * angular_velocity;
     }
 }
