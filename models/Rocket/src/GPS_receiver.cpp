@@ -16,10 +16,10 @@
 void GPS_Receiver::default_data(){
 }
 
-void GPS_Receiver::initialize(Rocket& rkt, GPS_Satellites& sats, INS& i){
-    rocket = &rkt;
-    gps_sats = &sats;
-    ins = &i;
+void GPS_Receiver::initialize(Rocket* rkt, GPS_Satellites* sats, INS* i, double int_step){
+    rocket = rkt;
+    gps_sats = sats;
+    ins = i;
 
 
     Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
@@ -265,7 +265,7 @@ void GPS_Receiver::get_quadriga(){
     }  // end of picking quadriga from 4 or more visible SVs
 }
 
-void GPS_Receiver::filter_extrapolation(){
+void GPS_Receiver::filter_extrapolation(double int_step){
     Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
     Matrix QQ(8, 8);  // local
 
@@ -532,22 +532,6 @@ void GPS_Receiver::measure(){
 
     // clock error bias update
     ucbias_error = ucbias_error - XH.get_loc(6, 0);
-
-    /*/diagnostic print-out - start
-    std::cout<<" *** Update Epoch ***\n";
-    std::cout<<"Position and velocity measurement ZZ \n";
-    ZZ.print();
-    std::cout<<" Observation matrix HH = \n";
-    HH.print();
-    std::cout<<" Meas. cov. matrix RR = \n";
-    RR.print();
-    std::cout<<" Kalman gain KK = \n";
-    KK.print();
-    std::cout<<" State XH = \n";
-    XH.print();
-    std::cout<<"Updated covariance matrix PP = \n";
-    PP.print();
-    //diagnostic print-out - end*/
 
     // diagnostics of 1st SV of quadriga saved to plot file
     gps_pos_meas = ZZ.get_loc(0, 0);

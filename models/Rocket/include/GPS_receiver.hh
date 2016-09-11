@@ -18,11 +18,11 @@ class GPS_Receiver {
     GPS_Receiver() {}
 
     void default_data();
-    void initialize(Rocket&, GPS_Satellites&, INS&);
+    void initialize(Rocket*, GPS_Satellites*, INS*, double);
 
     void get_quadriga();
 
-    void filter_extrapolation();
+    void filter_extrapolation(double);
     void measure();
 
     Rocket *rocket;
@@ -49,7 +49,6 @@ class GPS_Receiver {
 
     /* XXX: GPS Executing Parameter */
     /* These will be affected by S_define */
-    double int_step;        /* *i (m)       GPS executing integration time */
 
     /* GPS Device parameters */
     double del_rearth;      /* *i (m)       GPS Receiver LOS Minimum distance */
