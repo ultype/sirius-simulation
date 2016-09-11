@@ -10,12 +10,63 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/Earth.hh"
 ##include "Rocket/include/GPS_Satellites.hh"
 ##include "Rocket/include/GPS_Receiver.hh"
+##include "Rocket/include/Rocket.hh"
+##include "Rocket/include/INS.hh"
 
-class RocketSimObject : public Trick::SimObject {
+class GPS_SAT_SimObject : public Trick::SimObject {
     public:
-        RocketSimObject() {
+        GPS_Satellites sats;
+
+        GPS_SAT_SimObject() {
+            ("default_data") sats.default_data();
+            ("initialization") sats.initialize();
+            (0.001, "scheduled") sats.propagate_sv();       
+        }
+};
+
+class GPSR_SimObject : public Trick::SimObject {
+    public:
+        GPS_Satellites* gps_sats;
+        Rocket* rkt;
+        INS* ins;
+
+        GPS_Receiver gpsr;
+
+        GPSR_SimObject() {
+            ("default_data") gpsr.default_data();
+            ("initialization") gpsr.initialize(rkt, gps_sats, ins, 0.001);
+            (0.001, "scheduled") gpsr.get_quadriga();
+            (0.001, "scheduled") gpsr.filter_extrapolation(0.001);
+            (0.001, "scheduled") gpsr.measure();
+        }
+};
+
+class INS_SimObject : public Trick::SimObject {
+    public:
+        INS ins;
+
+        INS_SimObject() {
 
         }
 };
 
-RocketSimObject rkt;
+class Rocket_SimObject : public Trick::SimObject {
+    public:
+        Rocket rkt;
+
+        Rocket_SimObject() {
+
+        }
+};
+
+GPS_SAT_SimObject gps_sats;
+Rocket_SimObject rkt;
+GPSR_SimObject gpsr;
+INS_SimObject ins;
+
+void create_connections() {
+    gpsr.ins = &ins.ins;
+    gpsr.rkt = &rkt.rkt;
+    gpsr.gps_sats = &gps_sats.sats;
+
+}
