@@ -8,8 +8,8 @@ LIBRARY DEPENDENCIES:
 
 #include "sim_objects/default_trick_sys.sm"
 ##include "Rocket/include/Earth.hh"
-##include "Rocket/include/GPS_Satellites.hh"
-##include "Rocket/include/GPS_Receiver.hh"
+##include "Rocket/include/GPS_satellites.hh"
+##include "Rocket/include/GPS_receiver.hh"
 ##include "Rocket/include/Newton.hh"
 ##include "Rocket/include/Euler.hh"
 ##include "Rocket/include/INS.hh"
@@ -25,52 +25,41 @@ class GPS_SAT_SimObject : public Trick::SimObject {
         }
 };
 
-class GPSR_SimObject : public Trick::SimObject {
+class Rocket_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites* gps_sats;
-        Newton* ntn;
-        _Euler_* elr;
-        INS* ins;
+
+        Environment env;
+        Newton newton;
+        _Euler_ euler;
+        
+        Kinematics kinematics;
+        Propulsion pls;
+        Forces force;
 
         GPS_Receiver gpsr;
+        INS ins;
 
-        GPSR_SimObject() {
+        Rocket_SimObject() {
             ("default_data") gpsr.default_data();
-            ("initialization") gpsr.initialize(ntn, elr, gps_sats, ins, 0.001);
+
+            ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
+            ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
+            ("initialization") kinematics.initialize(&newton, &env, &euler);
+            
+            (0.001, "scheduled") newton.calculate(0.001);
+            (0.001, "scheduled") kinematics.calculate(0.001);
+
             (0.001, "scheduled") gpsr.get_quadriga();
             (0.001, "scheduled") gpsr.filter_extrapolation(0.001);
             (0.001, "scheduled") gpsr.measure();
-        }
-};
-
-class INS_SimObject : public Trick::SimObject {
-    public:
-        INS ins;
-
-        INS_SimObject() {
-
-        }
-};
-
-class Rocket_SimObject : public Trick::SimObject {
-    public:
-        Newton ntn;
-        _Euler_ elr;
-
-        Rocket_SimObject() {
 
         }
 };
 
 GPS_SAT_SimObject gps_sats;
 Rocket_SimObject rkt;
-GPSR_SimObject gpsr;
-INS_SimObject ins;
 
 void create_connections() {
-    gpsr.ins = &ins.ins;
-    gpsr.ntn = &rkt.ntn;
-    gpsr.elr = &rkt.elr;
-    gpsr.gps_sats = &gps_sats.sats;
-
+    rkt.gps_sats = &gps_sats.sats;
 }
