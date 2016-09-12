@@ -22,7 +22,7 @@ class Environment{
         double vsound;      /* *io (m/s)        Sonic speed */
         double vmach;       /* *io (--)         Mach number */
         double pdynmc;      /* *io (pa)         Dynamic pressure */
-        double tempk;       /* *io (k)          Atmospheric temperature */
+        double tempk;       /* *io (K)          Atmospheric temperature */
         double gravg[3];    /* *io (m/s2)       Gravity acceleration in geocentric coord */
         double grav;        /* *io (m/s2)       Magnitude of gravity acceleration */
         double dvae;        /* *io (m/s)        Madnitude of constant air speed */
