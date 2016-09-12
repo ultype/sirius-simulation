@@ -9,15 +9,17 @@
 #include "utility_header.hh"
 
 #include "GPS_satellites.hh"
-#include "Rocket.hh"
+#include "Newton.hh"
+#include "Euler.hh"
 #include "Earth.hh"
 #include "Ins.hh"
 
 void GPS_Receiver::default_data(){
 }
 
-void GPS_Receiver::initialize(Rocket* rkt, GPS_Satellites* sats, INS* i, double int_step){
-    rocket = rkt;
+void GPS_Receiver::initialize(Newton* ntn, _Euler_* elr, GPS_Satellites* sats, INS* i, double int_step){
+    newton = ntn;
+    euler = elr;
     gps_sats = sats;
     ins = i;
 
@@ -111,7 +113,7 @@ void GPS_Receiver::get_quadriga(){
     Matrix SBII(3, 1);
     int visible_count(0);
 
-    SBII.build_vec3(rocket->IPos[0], rocket->IPos[1], rocket->IPos[2]);
+    SBII.build_vec3(newton->IPos[0], newton->IPos[1], newton->IPos[2]);
 
     for (i = 0; i < 24; i++) {
         SSII[0] = ssii[i][0];
@@ -433,9 +435,9 @@ void GPS_Receiver::measure(){
         Matrix SBII(3, 1);
         Matrix VBII(3, 1);
         Matrix WBII(3, 1);
-        SBII.build_vec3(rocket->IPos[0], rocket->IPos[1], rocket->IPos[2]);
-        VBII.build_vec3(rocket->IVel[0], rocket->IVel[1], rocket->IVel[2]);
-        WBII.build_vec3(rocket->IW[0], rocket->IW[1], rocket->IW[2]);
+        SBII.build_vec3(newton->IPos[0], newton->IPos[1], newton->IPos[2]);
+        VBII.build_vec3(newton->IVel[0], newton->IVel[1], newton->IVel[2]);
+        WBII.build_vec3(euler->wbii[0], euler->wbii[1], euler->wbii[2]);
 
         Matrix SBIIC(3, 1);
         Matrix VBIIC(3, 1);

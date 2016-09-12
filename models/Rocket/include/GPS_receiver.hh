@@ -9,7 +9,8 @@ PROGRAMMERS:
       (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
 
-#include "Rocket.hh"
+#include "Newton.hh"
+#include "Euler.hh"
 #include "Ins.hh"
 #include "GPS_satellites.hh"
 
@@ -18,14 +19,15 @@ class GPS_Receiver {
     GPS_Receiver() {}
 
     void default_data();
-    void initialize(Rocket*, GPS_Satellites*, INS*, double);
+    void initialize(Newton*, _Euler_*, GPS_Satellites*, INS*, double);
 
     void get_quadriga();
 
     void filter_extrapolation(double);
     void measure();
 
-    Rocket *rocket;
+    Newton *newton;
+    _Euler_ *euler;
     GPS_Satellites *gps_sats;
     INS *ins;
 
@@ -33,8 +35,9 @@ class GPS_Receiver {
     bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
     double gps_epoch;           /* ** (s)       GPS update epoch time since launch */
     double time_gps;            /* ** (s)       GPS time passed */
-    Matrix FF = Matrix(8, 8);   /* ** (--) */
-    Matrix PHI = Matrix(8, 8);  /* ** (--) */
+    Matrix FF = Matrix(8, 8);   /* ** (--)      Constant*/
+    Matrix PHI = Matrix(8, 8);  /* ** (--)      Constant*/
+
     //XXX: use C array, for check-pointing and variable server
     Matrix PP1 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 1st row */
     Matrix PP2 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 2st row */
