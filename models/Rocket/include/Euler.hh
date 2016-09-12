@@ -11,9 +11,9 @@ PROGRAMMERS:
 #include "global_constants.hh"
 #include "utility_header.hh"
 
-class Euler {
+class _Euler_ {
     public:
-        Euler(){};
+        _Euler_(){};
 
 /***********************************Variables describtion******************************/
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
