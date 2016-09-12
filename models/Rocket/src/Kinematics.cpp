@@ -6,51 +6,54 @@
 #include "sim_services/include/simtime.h"
 
 
-void Kinematics::init_kinematics(double time, double int_step, Newton& newt){
-    Newton=&newt;
+void Kinematics::init_kinematics(Newton *newt, Environment *env, _Euler_ *eul){
+    newton = newt;
+    environment = env;
+    euler = eul;
 
-    double lonx=Newton->lonx;
-    double latx=Newton->latx;
-    double alt=Newton->alt;
-    double dvbe=Newton->dvbe;
+    double lonx=newton->lonx;
+    double latx=newton->latx;
+    double alt=newton->alt;
+    double dvbe=newton->dvbe;
     Matrix TDI(3,3);
+    Matrix TBD(3,3);
+    Matrix TBI(3,3);
 
     TBD=mat3tr(psibdx*RAD,thtbdx*RAD,phibdx*RAD);
-    TDI=cad_tdi84(lonx*RAD,latx*RAD,alt,time);
+    TDI=cad_tdi84(lonx*RAD,latx*RAD,alt,get_rettime());
     TBI=TBD*TDI;
-    //update Matrix variables
-    for(i=0;i<9;i++){
-        tbd[i]=TBD.get_loc((int) i/3,i%3);
-    }
-    for(i=0;i<9;i++){
-        tbi[i]=TBI.get_loc((int) i/3,i%3);
-    }
 
+    TBD.fill(tbd);
+    TBI.fill(tbi);
 }
 
-void Kinematics::kinematics(double int_step, Environment& env, Euler& eul, Newton& newt){
-    Environment=&env;
-    Euler=&eul;
-    Newton=&newt;
+void Kinematics::calculate_kinematics(double int_step){
 
     Matrix UNIT(3,3); UNIT.identity();
     double cthtbd(0);
     double phip(0);
+    Matrix TBD(3,3);
 
-    double dvba=Environment->dvba;
-    double lonx=Newton->lonx;
-    double latx=Newton->latx;
-    double alt=Newton->alt;
+    double dvba=environment->dvba;
+    double lonx=newton->lonx;
+    double latx=newton->latx;
+    double alt=newton->alt;
 
     Matrix WBIB(3,1);
     Matrix VBED(3,1);
     Matrix VAED(3,1);
     Matrix VBII(3,1);
 
-    WBIB.build_vec3(Euler->wbib[0],Euler->wbib[1],Euler->wbib[2]);
-    VBED.build_vec3(Newton->vbed[0],Newton->vbed[1],Newton->vbed[2]);
-    VAED.build_vec3(Environment->vaed[0],Environment->vaed[1],Environment->vaed[2]);
-    VBII.build_vec3(Newton->IVel[0],Newton->IVel[1],Newton->IVel[2]);
+    WBIB.build_vec3(euler->wbib);
+    VBED.build_vec3(newton->vbed);
+    VAED.build_vec3(environment->vaed);
+    VBII.build_vec3(newton->IVel);
+
+    Matrix TBI(3,3);
+    Matrix TBID(3,3);
+
+    TBI.build_mat33(tbi);
+    TBID.build_mat33(tbid);
 
     //*integrating direction cosine matrix
     Matrix TBID_NEW=~WBIB.skew_sym()*TBI;
@@ -67,8 +70,9 @@ void Kinematics::kinematics(double int_step, Environment& env, Euler& eul, Newto
     double e3=EE.get_loc(2,2);
     ortho_error=sqrt(e1*e1+e2*e2+e3*e3);
 
-    //Euler angles
-    Matrix TDI=cad_tdi84(lonx*RAD,latx*RAD,alt,time);
+    //_Euler_ angles
+    // XXX: Timing might make the position skew
+    Matrix TDI = cad_tdi84(lonx*RAD,latx*RAD,alt,get_rettime());
     TBD=TBI*~TDI;
     double tbd13=TBD.get_loc(0,2);
     double tbd11=TBD.get_loc(0,0);
@@ -76,7 +80,7 @@ void Kinematics::kinematics(double int_step, Environment& env, Euler& eul, Newto
     double tbd12=TBD.get_loc(0,1);
     double tbd23=TBD.get_loc(1,2);
 
-    //*geodetic Euler angles
+    //*geodetic _Euler_ angles
     //pitch angle: 'thtbd'
     //note: when |tbd13| >= 1, thtbd = +- pi/2, but cos(thtbd) is
     //      forced to be a small positive number to prevent division by zero
@@ -144,14 +148,7 @@ void Kinematics::kinematics(double int_step, Environment& env, Euler& eul, Newto
     betaix=betai*DEG;
 
     //update Matrix variables
-    for(i=0;i<9;i++){
-        tbi[i]=TBI.get_loc((int) i/3,i%3);
-    }
-    for(i=0;i<9;i++){
-        tbid[i]=TBID.get_loc((int) i/3,i%3);
-    }
-    for(i=0;i<9;i++){
-        tbd[i]=TBD.get_loc((int) i/3,i%3);
-    }
-
+    TBI.fill(tbi);
+    TBID.fill(tbid);
+    TBD.fill(tbd);
 }

@@ -11,27 +11,34 @@ PROGRAMMERS:
 #include "global_constants.hh"
 #include "utility_header.hh"
 
-class kinematics{
+#include "Newton.hh"
+#include "Euler.hh"
+
+class Newton;
+
+class Kinematics{
     public:
+        Newton *newton;
+        Environment *environment;
+        _Euler_* euler;
+
         Kinematics(){};
 
-        void init_kinematics(double time, double int_step, Newton &newt);
+        void init_kinematics(Newton* newt, Environment* env, _Euler_* eul);
+        void calculate_kinematics(double int_step);
 
-        Matrix TBD(3,3);
-        Matrix TBI(3,3);
-        Matrix TBID(3,3);
 /***********************************Variables describtion******************************/
         //double time;        /* *io (s)     simulation time */
-        double tbd[9];      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
-        double tbi[9];      /* *io (--)    Transformation Matrix of body coord wrt inertia coord */
-        double tbid[9];     /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
+        double tbd[3][3];      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
+        double tbi[3][3];      /* *io (--)    Transformation Matrix of body coord wrt inertia coord */
+        double tbid[3][3];     /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
         double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/
         double psibd;       /* *io (r)     Yaw angle of Vehicle wrt geodetic coord */
         double thtbd;       /* *io (r)     Pitch angle of Vehicle wrt geodetic coord */
         double phibd;       /* *io (r)     Roll angle of Vehicle wrt geodetic coord */
         double psibdx;      /* *io (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
         double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
-        dobule phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
+        double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
         double alppx;       /* *io (d)     Total angle of attack */
         double phipx;       /* *io (d)     Aerodynamic roll angle*/
         double alphax;      /* *io (d)     Angle of attack */
