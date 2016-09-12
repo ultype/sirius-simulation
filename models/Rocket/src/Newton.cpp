@@ -7,10 +7,10 @@
 
 #include "utility_header.hh"
 
-void Newton::default_newton(){
+void Newton::default_data(){
 }
 
-void Newton::initialize_newton(Kinematics *kine, _Euler_ *elr, Environment *env, Propulsion *prop, Forces *forc){
+void Newton::initialize(Kinematics *kine, _Euler_ *elr, Environment *env, Propulsion *prop, Forces *forc){
     kinematics = kine;
     euler = elr;
     environment = env;
@@ -77,7 +77,7 @@ void Newton::initialize_newton(Kinematics *kine, _Euler_ *elr, Environment *env,
     TGI.fill(tgi);
 }
 
-void Newton::newton(double int_step){
+void Newton::calculate(double int_step){
     double lon(0);
     double lat(0);
 

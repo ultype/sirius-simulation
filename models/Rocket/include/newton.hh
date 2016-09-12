@@ -32,9 +32,9 @@ class Newton {
     Propulsion *propulsion;
     Forces *forces;
 
-    void default_newton();
-    void initialize_newton(Kinematics *kine, _Euler_ *elr, Environment *Env, Propulsion *Prop, Forces *forc);
-    void newton(double int_step);
+    void default_data();
+    void initialize(Kinematics *kine, _Euler_ *elr, Environment *Env, Propulsion *Prop, Forces *forc);
+    void calculate(double int_step);
 
     /* Input data */
 /***********************************************Variables description******************************************/
