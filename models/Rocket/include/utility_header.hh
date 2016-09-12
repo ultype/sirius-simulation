@@ -105,6 +105,7 @@ public:
     /// Builds a 3x1 vector from three parameters
     /// Example: VEC.build_vec3(v1,v2,v3)
     Matrix &build_vec3(const double &v1, const double &v2, const double &v3);
+    Matrix &build_vec3(const double v[3]);
 
     /// Builds a 3x3 matrix from nine paramters arranged in rows
     /// Example: MAT.build_mat33(v11,v12,v13,v21,v22,v23,v31,v32,v33)
@@ -117,6 +118,13 @@ public:
                         const double &v31,
                         const double &v32,
                         const double &v33);
+
+    /// Builds a 3x3 matrix from double array[3][3]
+    Matrix &build_mat33(const double v[][3]);
+
+    // Fill in the Matrix data into intrinsic array;
+    Matrix &fill(double v[3]);
+    Matrix &fill(double m[][3]);
 
     /** Calculates Cartesian vector from polar coordinates.
      *  |V1|             | cos(elevation)*cos(azimuth)|

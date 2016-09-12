@@ -54,6 +54,7 @@
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <fstream>
+#include <cstring>
 #include <cmath>
 #include <stdlib.h>
 #include <assert.h>
@@ -215,6 +216,16 @@ Matrix &Matrix::build_vec3(const double &v1, const double &v2, const double &v3)
     return *this;
 }
 
+
+Matrix &Matrix::build_vec3(const double v[3])
+{
+    num_row = 3;
+    num_col = 3;
+
+    memcpy(pbody, v, sizeof(double) * 3);
+
+    return *this;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Builds a 3x3 matrix from nine paramters arranged in rows
 // Example: MAT.build_mat33(v11,v12,v13,v21,v22,v23,v31,v32,v33);
@@ -240,6 +251,30 @@ Matrix &Matrix::build_mat33(const double &v11,
     *(pbody + 6) = v31;
     *(pbody + 7) = v32;
     *(pbody + 8) = v33;
+
+    return *this;
+}
+
+Matrix &Matrix::build_mat33(const double v[][3])
+{
+    num_row = 3;
+    num_col = 3;
+
+    memcpy(pbody, (const double*) v, sizeof(double) * 9);
+
+    return *this;
+}
+
+Matrix &Matrix::fill(double v[3])
+{
+    memcpy(v, pbody, sizeof(double) * 3);
+
+    return *this;
+}
+
+Matrix &Matrix::fill(double m[][3])
+{
+    memcpy((double*) m, pbody, sizeof(double) * 9);
 
     return *this;
 }
