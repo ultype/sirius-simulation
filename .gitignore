@@ -7,6 +7,13 @@ S_main_Darwin_13.exe
 S_sie.resource
 S_default.dat
 S_source.hh
+RUN_test/S_job_execution
+RUN_test/S_run_summary
+RUN_test/log_gps_Sat.trk
+RUN_test/send_hs
+
+DP_Product/*.*
+
 build
 trick
 makefile
