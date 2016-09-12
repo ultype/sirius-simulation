@@ -6,7 +6,7 @@
 #include "sim_services/include/simtime.h"
 
 
-void Kinematics::init_kinematics(Newton *newt, Environment *env, _Euler_ *eul){
+void Kinematics::initialize(Newton *newt, Environment *env, _Euler_ *eul){
     newton = newt;
     environment = env;
     euler = eul;
@@ -27,7 +27,7 @@ void Kinematics::init_kinematics(Newton *newt, Environment *env, _Euler_ *eul){
     TBI.fill(tbi);
 }
 
-void Kinematics::calculate_kinematics(double int_step){
+void Kinematics::calculate(double int_step){
 
     Matrix UNIT(3,3); UNIT.identity();
     double cthtbd(0);
