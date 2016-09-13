@@ -12,7 +12,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/GPS_receiver.hh"
 ##include "Rocket/include/Newton.hh"
 ##include "Rocket/include/Euler.hh"
-##include "Rocket/include/INS.hh"
+##include "Rocket/include/Ins.hh"
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
