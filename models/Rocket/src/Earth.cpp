@@ -1,4 +1,4 @@
-#include "earth.hh"
+#include "Earth.hh"
 #include "global_constants.hh"
 
 const double Earth::mass = 5.973332e24;

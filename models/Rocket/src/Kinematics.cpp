@@ -1,4 +1,4 @@
-#include "kinematics.hh"
+#include "Kinematics.hh"
 #include "trick_utils/math/include/quat_macros.h"
 #include "trick_utils/math/include/matrix_macros.h"
 #include "trick_utils/math/include/vector_macros.h"
