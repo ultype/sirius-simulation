@@ -14,6 +14,8 @@ PROGRAMMERS:
 #include "Ins.hh"
 #include "GPS_satellites.hh"
 
+class INS;
+
 class GPS_Receiver {
     public:
     GPS_Receiver() {}
