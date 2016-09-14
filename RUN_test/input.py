@@ -20,6 +20,7 @@ rkt.newton.beta0x     = 0    #Initial sideslip angle - deg  module newton
 #propulsion
 
 #INS
+rkt.ins.mins   = 1
 #INS Acceleration
 rkt.ins.efspb  = [0, 0, 0]
 rkt.ins.ewalka = [0, 0, 0]
