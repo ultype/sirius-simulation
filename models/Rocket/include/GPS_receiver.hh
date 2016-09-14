@@ -82,6 +82,7 @@ class GPS_Receiver {
     double factr;           /* *i (--)      Factor to modifiy the R-matrix R(1+factr) */
 
     /* GPS Outputs */
+    int gps_update;       /* *o (--)       GPS update? > 0 updated */
     double gdop;            /* *o (m)        Geometric dillution of precision of quadriga */
     double slot[4];         /* *o (--)       SV slot#  of quadriga */
     double ssii_quad[16];   /* *o (m)        Best quadriga inertial coordinates and their slot# */
