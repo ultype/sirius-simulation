@@ -9,6 +9,14 @@ PROGRAMMERS:
       (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
 
+#include "Newton.hh"
+#include "Euler.hh"
+#include "Environment.hh"
+#include "Kinematics.hh"
+#include "GPS_receiver.hh"
+
+class GPS_Receiver;
+
 class INS {
     public:
     INS() {}
@@ -16,7 +24,16 @@ class INS {
     void default_data();
     void initialize();
 
+    void ins_accl();
+    void ins_gyro(double int_step);
+    void ins_grav();
+    void update(double int_step);
 
+    Newton *newton;
+    _Euler_ *euler;
+    Environment *enviroment;
+    Kinematics *kinematics;
+    GPS_Receiver *gpsr;
 
     double IPos[3];     /* *i   (m)     Body in Inertial Coordinate */
     double IVel[3];     /* *i   (m)     Body in Inertial Coordinate */
@@ -35,15 +52,15 @@ class INS {
     double ewbib[3];    /* *i   (r/s)   Error in angular vel of body wrt earth */
     double ewalkg[3];   /* *i   (r/s0.5) Random walk */
     double eunbg[3];    /* *i   (r)     Gyro cluster misalignment */
-    double emisg[3]     /* *i   (r)     Gyro misalignmt */
-    double escalg[3]    /* *i   (--)    Gyro scale factor */
-    double ebiasg[3]    /* *i   (r/s)   Gyro bias */
+    double emisg[3];    /* *i   (r)     Gyro misalignmt */
+    double escalg[3];   /* *i   (--)    Gyro scale factor */
+    double ebiasg[3];   /* *i   (r/s)   Gyro bias */
 
     /* grav */
     double egravi[3];   /* *i   (--)    error by gravity */
 
     int mins;           /* *io  (--)    INS mode. =0:ideal INS; =1:with INS error */
-    double frax_algnmnt /* *io  (--)    Fractn to mod initial INS err state: XXO=XXO(1+frax) */
+    double frax_algnmnt;/* *io  (--)    Fractn to mod initial INS err state: XXO=XXO(1+frax) */
     double vbiic[3];    /* *io  (m/s)   Computed body vel in earth coor */
     double sbiic[3];    /* *io  (m)     Computed pos of body wrt earth reference point*/
     double wbici[3];    /* *io  (r/s)   Computed inertial body rate in inert coordinate */
@@ -59,14 +76,14 @@ class INS {
     double altc;        /* *io  (m)     INS derived altitude */
     double vbecd[3];    /* *io  (m/s)   Geodetic velocity */
     double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
-    double TDCI[3][3];  /* *io  (--)    Comp T.M. of geodetic wrt inertial */
-    double thtvdcx      /* *io  (d)     INS computed vertical flight path angle */
+    double tdci[3][3];  /* *io  (--)    Comp T.M. of geodetic wrt inertial */
+    double thtvdcx;     /* *io  (d)     INS computed vertical flight path angle */
     double psivdcx;     /* *io  (d)     INS computed heading angle */
-    double FSPCB[3];    /* *io  (N/kg)  Computed specific force on body */
+    double fspcb[3];    /* *io  (N/kg)  Computed specific force on body */
     double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
     double alphacx;     /* *io  (d)     INS computed angle of attack */
     double phipcx;      /* *io  (d)     INS computed aero roll angle */
-    double ricicd[3];   /* *io  (r)     INS tilt error derivative */
+    double ricid[3];   /* *io  (r)     INS tilt error derivative */
     double rici[3];     /* *io  (r)     INS tilt error */
     double evbid[3];    /* *io  (m/s)   INS vel error derivative */
     double evbi[3];     /* *io  (m/s)   INS vel error */
@@ -75,7 +92,6 @@ class INS {
     double ins_pos_err; /* *io  (m)     INS absolute postion error */
     double ins_vel_err; /* *io  (m/s)   INS absolute velocity error */
     double ins_tilt_err;/* *io  (r)     INS absolute tilt error */
-
 };
 
 #endif  // __INS_HH__
