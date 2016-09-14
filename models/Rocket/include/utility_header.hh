@@ -84,6 +84,9 @@ public:
     Matrix(int row_size, int col_size);
     /// copy constructor
     Matrix(const Matrix &MAT);
+
+    Matrix(const double v[3]);
+    Matrix(const double v[][3]);
     /// deconstructor
     ~Matrix();
 

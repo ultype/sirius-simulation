@@ -108,6 +108,34 @@ Matrix::Matrix(const Matrix &MAT)
         *(pbody + i) = (*(MAT.pbody + i));
 }
 
+Matrix::Matrix(const double v[3])
+{
+    num_row = 3;
+    num_col = 1;
+    pbody = NULL;
+
+    // allocating memory
+    num_elem = num_row * num_col;
+    pbody = new double[num_elem];
+    assert(pbody && " *** Error: matrix memory allocation failed *** ");
+
+    memcpy(pbody, (const double*) v, sizeof(double) * 3);
+}
+
+Matrix::Matrix(const double v[][3])
+{
+    num_row = 3;
+    num_col = 3;
+    pbody = NULL;
+
+    // allocating memory
+    num_elem = num_row * num_col;
+    pbody = new double[num_elem];
+    assert(pbody && " *** Error: matrix memory allocation failed *** ");
+
+    memcpy(pbody, (const double*) v, sizeof(double) * 9);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,7 +248,7 @@ Matrix &Matrix::build_vec3(const double &v1, const double &v2, const double &v3)
 Matrix &Matrix::build_vec3(const double v[3])
 {
     num_row = 3;
-    num_col = 3;
+    num_col = 1;
 
     memcpy(pbody, v, sizeof(double) * 3);
 
