@@ -1,9 +1,9 @@
 *.o
 *.pyc
+*.exe
 
 *.DS_Store
 
-S_main_Darwin_13.exe
 S_sie.resource
 S_default.dat
 S_source.hh
