@@ -43,9 +43,10 @@ class Rocket_SimObject : public Trick::SimObject {
         Rocket_SimObject() {
             ("default_data") gpsr.default_data();
 
-            ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
             ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
             ("initialization") kinematics.initialize(&newton, &env, &euler);
+            ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
+            ("initialization") ins.initialize(&newton, &euler, &env, &kinematics, &gpsr);
             
             (0.001, "scheduled") newton.calculate(0.001);
             (0.001, "scheduled") kinematics.calculate(0.001);
@@ -53,6 +54,12 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") gpsr.get_quadriga();
             (0.001, "scheduled") gpsr.filter_extrapolation(0.001);
             (0.001, "scheduled") gpsr.measure();
+
+
+            (0.001, "scheduled") ins.ins_accl();
+            (0.001, "scheduled") ins.ins_gyro(0.001);
+            (0.001, "scheduled") ins.ins_grav();
+            (0.001, "scheduled") ins.update(0.001);
 
         }
 };
