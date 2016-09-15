@@ -35,10 +35,6 @@ class INS {
     Kinematics *kinematics;
     GPS_Receiver *gpsr;
 
-    double IPos[3];     /* *i   (m)     Body in Inertial Coordinate */
-    double IVel[3];     /* *i   (m)     Body in Inertial Coordinate */
-    double IW[3];       /* *i   (m)     Body in Inertial Coordinate */
-
     /* Accelmeter */
     double efspb[3];    /* *i   (N/kg)  Error in specific force on body in body coordinate */
     double ewalka[3];   /* *i   (m/s2)  Acceleration random noise */

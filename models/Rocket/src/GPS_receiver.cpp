@@ -441,12 +441,9 @@ void GPS_Receiver::measure(){
         VBII.build_vec3(newton->IVel[0], newton->IVel[1], newton->IVel[2]);
         WBII.build_vec3(euler->wbii[0], euler->wbii[1], euler->wbii[2]);
 
-        Matrix SBIIC(3, 1);
-        Matrix VBIIC(3, 1);
-        Matrix WBICI(3, 1);
-        SBII.build_vec3(ins->IPos[0], ins->IPos[1], ins->IPos[2]);
-        VBII.build_vec3(ins->IVel[0], ins->IVel[1], ins->IVel[2]);
-        WBICI.build_vec3(ins->IW[0], ins->IW[1], ins->IW[2]);
+        Matrix SBIIC(ins->sbiic);
+        Matrix VBIIC(ins->vbiic);
+        Matrix WBICI(ins->wbici);
 
         // calculating true range to SV
         Matrix SSBI(3, 1);
