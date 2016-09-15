@@ -31,7 +31,7 @@ class INS {
 
     Newton *newton;
     _Euler_ *euler;
-    Environment *enviroment;
+    Environment *environment;
     Kinematics *kinematics;
     GPS_Receiver *gpsr;
 
