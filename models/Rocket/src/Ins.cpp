@@ -213,22 +213,6 @@ void INS::update(double int_step){
 
     Matrix WBICI(wbici);
     // Matrix WBICB(3,1);
-    double dvbec(0);
-    double thtvdcx(0);
-    double psivdcx(0);
-    double psibdcx(0);
-    double thtbdcx(0);
-    double phibdcx(0);
-    double alphacx(0);
-    double betacx(0);
-    double loncx(0), latcx(0), altc(0);
-    double alppcx(0), phipcx(0);
-    double ppcx(0), qqcx(0), rrcx(0);
-    double dbic(0);
-    double ins_pos_err(0);
-    double ins_vel_err(0);
-    double ins_tilt_err(0);
-
     // localizing module-variables
     // input data
     // initialization
