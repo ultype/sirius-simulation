@@ -30,13 +30,11 @@ void TVC::initialize(Environment *env, Kinematics *kins, Control *con, Propulsio
 void TVC::actuate(double int_step){
     // local variables
     double eta(0), zet(0);
+    double etac(0), zetc(0);
 
     // local module-variables
     Matrix FPB(3, 1);
     Matrix FMPB(3, 1);
-    double etax(0), zetx(0);
-    double etacx(0), zetcx(0);
-    double etac(0), zetc(0);
 
     // input from other modules
     double pdynmc = environment->pdynmc;
