@@ -78,8 +78,13 @@ class INS {
     double fspcb[3];    /* *io  (N/kg)  Computed specific force on body */
     double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
     double alphacx;     /* *io  (d)     INS computed angle of attack */
+    double betacx;      /* *io  (d)     INS computed sideslip angle */
+    double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
+    double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
+    double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
+    double alppcx;      /* *io  (d)     INS computed total angle of attack */
     double phipcx;      /* *io  (d)     INS computed aero roll angle */
-    double ricid[3];   /* *io  (r)     INS tilt error derivative */
+    double ricid[3];    /* *io  (r)     INS tilt error derivative */
     double rici[3];     /* *io  (r)     INS tilt error */
     double evbid[3];    /* *io  (m/s)   INS vel error derivative */
     double evbi[3];     /* *io  (m/s)   INS vel error */
