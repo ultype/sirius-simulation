@@ -17,7 +17,14 @@ void INS::default_data(){
 // 030604 Created by Peter H Zipfel
 // 081118 Improved initialization, PZi
 ///////////////////////////////////////////////////////////////////////////////
-void INS::initialize(){
+void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps){
+
+    newton = ntn;
+    euler = elr;
+    environment = env;
+    kinematics = kins;
+    gpsr = gps;
+
     // local module-variables
     Matrix ESBI(3, 1);
     Matrix EVBI(3, 1);

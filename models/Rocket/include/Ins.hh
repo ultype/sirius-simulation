@@ -22,7 +22,7 @@ class INS {
     INS() {}
 
     void default_data();
-    void initialize();
+    void initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps);
 
     void ins_accl();
     void ins_gyro(double int_step);
