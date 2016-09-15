@@ -252,8 +252,8 @@ void INS::update(double int_step){
     Matrix EGRAVI(egravi);
     Matrix EUG(eug);
     Matrix EWG(ewg);
-    Matrix EFSPB(EFSPB);
-    Matrix WBICB(WBICB);
+    Matrix EFSPB(efspb);
+    Matrix WBICB(wbicb);
     // state variables
     Matrix RICID(ricid);
     Matrix RICI(rici);
