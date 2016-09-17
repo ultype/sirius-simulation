@@ -20,7 +20,7 @@ PROGRAMMERS:
 
 class Kinematics;
 
-class Propulsion{ public: double vmass; double xcg; double thrust;};
+class Propulsion{ public: double vmass; double xcg; double thrust; double mprop;};
 
 class Newton {
     public:
