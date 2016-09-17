@@ -57,10 +57,12 @@ class Rocket_SimObject : public Trick::SimObject {
 
         Rocket_SimObject() {
             ("default_data") gpsr.default_data();
+            ("default_data") guidance.default_data();
 
             ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
             ("initialization") kinematics.initialize(&newton, &env, &euler);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
+            ("initialization") guidance.initialize(&ins, &newton, &propulsion);
             ("initialization") control.initialize(&ins, &newton, &env, &propulsion, &aerodynamics);
             ("initialization") ins.initialize(&newton, &euler, &env, &kinematics, &gpsr);
             ("initialization") tvc.initialize(&env, &kinematics, &control, &propulsion);
@@ -74,6 +76,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") gpsr.filter_extrapolation(0.001);
             (0.001, "scheduled") gpsr.measure();
 
+            (0.001, "scheduled") guidance.guidance(0.001);
             (0.001, "scheduled") control.control(0.001);
 
             (0.001, "scheduled") ins.ins_accl();
