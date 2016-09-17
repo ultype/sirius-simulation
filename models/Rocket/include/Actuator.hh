@@ -15,6 +15,7 @@ PROGRAMMERS:
 #include "Kinematics.hh"
 #include "Ins.hh"
 #include "Tvc.hh"
+#include "Control.hh"
 
 class Actuator {
     public:

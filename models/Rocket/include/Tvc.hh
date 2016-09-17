@@ -14,12 +14,7 @@ PROGRAMMERS:
 #include "Environment.hh"
 #include "Kinematics.hh"
 #include "GPS_receiver.hh"
-
-class Control {
-    public:
-    double delecx;
-    double delrcx;
-};
+#include "Control.hh"
 
 class TVC {
     public:
