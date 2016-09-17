@@ -16,6 +16,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/Tvc.hh"
 ##include "Rocket/include/Rcs.hh"
 ##include "Rocket/include/Actuator.hh"
+##include "Rocket/include/Control.hh"
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
@@ -58,6 +59,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
             ("initialization") kinematics.initialize(&newton, &env, &euler);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
+            ("initialization") control.initialize(&ins, &newton, &env, &propulsion);
             ("initialization") ins.initialize(&newton, &euler, &env, &kinematics, &gpsr);
             ("initialization") tvc.initialize(&env, &kinematics, &control, &propulsion);
             ("initialization") rcs.initialize(&ins, &guidance, &propulsion);
@@ -70,6 +72,8 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") gpsr.filter_extrapolation(0.001);
             (0.001, "scheduled") gpsr.measure();
 
+            (0.001, "scheduled") control.control(0.001);
+
             (0.001, "scheduled") ins.ins_accl();
             (0.001, "scheduled") ins.ins_gyro(0.001);
             (0.001, "scheduled") ins.ins_grav();
@@ -80,7 +84,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") rcs.actuate();
             (0.001, "scheduled") rcs.rcs_schmitt_thrust();
 
-            (0.001, "scheduled") actuator.actuate();
+            (0.001, "scheduled") actuator.actuate(0.001);
 
         }
 };
