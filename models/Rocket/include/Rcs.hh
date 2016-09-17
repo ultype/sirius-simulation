@@ -15,13 +15,7 @@ PROGRAMMERS:
 #include "Kinematics.hh"
 #include "Ins.hh"
 #include "Tvc.hh"
-
-class Guidance {
-    public:
-    double alphacomx;
-    double betacomx;
-    double utbc[3];
-};
+#include "Guidance.hh"
 
 class RCS {
     public:
