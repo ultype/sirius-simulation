@@ -17,6 +17,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/Rcs.hh"
 ##include "Rocket/include/Actuator.hh"
 ##include "Rocket/include/Control.hh"
+##include "Rocket/include/Guidance.hh"
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
@@ -41,6 +42,7 @@ class Rocket_SimObject : public Trick::SimObject {
         Propulsion pls;
         Forces force;
 
+        AeroDynamics aerodynamics;
         Propulsion propulsion;
 
         GPS_Receiver gpsr;
@@ -59,7 +61,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
             ("initialization") kinematics.initialize(&newton, &env, &euler);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
-            ("initialization") control.initialize(&ins, &newton, &env, &propulsion);
+            ("initialization") control.initialize(&ins, &newton, &env, &propulsion, &aerodynamics);
             ("initialization") ins.initialize(&newton, &euler, &env, &kinematics, &gpsr);
             ("initialization") tvc.initialize(&env, &kinematics, &control, &propulsion);
             ("initialization") rcs.initialize(&ins, &guidance, &propulsion);

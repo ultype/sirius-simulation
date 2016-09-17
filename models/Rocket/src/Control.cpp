@@ -3,11 +3,12 @@
 void Control::default_data(){
 }
 
-void Control::initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp){
+void Control::initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero){
     ins = i;
     environment = env;
     newton = ntn;
     propulsion = plp;
+    aerodynamics = aero;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

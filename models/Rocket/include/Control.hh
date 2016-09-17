@@ -32,7 +32,7 @@ class Control {
     Control() {}
 
     void default_data();
-    void initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp);
+    void initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero);
 
     void control(double int_step);
     double control_normal_accel(double ancomx, double int_step);
