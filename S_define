@@ -18,6 +18,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/Actuator.hh"
 ##include "Rocket/include/Control.hh"
 ##include "Rocket/include/Guidance.hh"
+##include "Rocket/include/Force.hh"
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:

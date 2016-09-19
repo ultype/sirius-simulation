@@ -10,11 +10,14 @@ PROGRAMMERS:
 *******************************************************************************/
 #include "global_constants.hh"
 #include "utility_header.hh"
-
+#include "Environment.hh"
+#include "Kinematics.hh"
+#include "Newton.hh"
 class _Euler_ {
     public:
         _Euler_(){};
-
+        // void initialization(Kinematics* kine, Propulsion* prop, Forces* forc);
+        // void euler(double int_step);
 /***********************************Variables describtion******************************/
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */
