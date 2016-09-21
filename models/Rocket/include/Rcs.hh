@@ -10,12 +10,10 @@ PROGRAMMERS:
 *******************************************************************************/
 
 #include "Newton.hh"
-#include "Euler.hh"
-#include "Environment.hh"
-#include "Kinematics.hh"
 #include "Ins.hh"
 #include "Tvc.hh"
 #include "Guidance.hh"
+class Guidance;
 
 class RCS {
     public:

@@ -77,7 +77,7 @@ void Newton::initialize(Kinematics *kine, _Euler_ *elr, Environment *env, Propul
     TGI.fill(tgi);
 }
 
-void Newton::calculate(double int_step){
+void Newton::calculate_newton(double int_step){
     double lon(0);
     double lat(0);
 

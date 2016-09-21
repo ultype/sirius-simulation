@@ -12,6 +12,9 @@ PROGRAMMERS:
 #include "Newton.hh"
 #include "Environment.hh"
 #include "Ins.hh"
+#include "Propulsion.hh"
+class Propulsion;
+
 
 class Guidance {
     public:

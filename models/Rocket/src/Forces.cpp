@@ -1,47 +1,50 @@
-#include "forces.hh"
+#include "Force.hh"
 #include "trick_utils/math/include/quat_macros.h"
 #include "trick_utils/math/include/matrix_macros.h"
 #include "trick_utils/math/include/vector_macros.h"
 #include "trick_utils/math/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
-void Forces::init_force(Environment* env, Propulsion* prop, RCS* rcs
-    , AeroDynamic* aero, TVC* tvc)
+void Forces::init_force(Environment* env, Propulsion* prop, RCS* rc
+    , AeroDynamics* aero, TVC* tv)
 {
-    Environment=env;
-    Propulsion=prop;
-    RCS=rcs;
-    Aerodynamic=aero;
-    TVC=tvc;
+    environment=env;
+    propulsion=prop;
+    rcs=rc;
+    Aerodynamics=aero;
+    tvc=tv;
 }
 void Forces::forces()
 {
 
 
     /*****************input from another module*******************/
-    double pdynmc=Environment->pdynmc;
-    double mprop=Propulsion->mprop;
-    double thrust=Propulsion->thrust;
-    double mrcs_moment=RCS->mrcs_moment;
-    double mrcs_force=RCS->mrcs_force;
-    double refa=Aerodynamic->refa;
-    double refd=Aerodynamic->refd;
-    double cy=Aerodynamic->cy;
-    double cll=Aerodynamic->cll;
-    double clm=Aerodynamic->clm;
-    double cln=Aerodynamic->cln;
-    double cx=Aerodynamic->cx;
-    double cz=Aerodynamic->cz;
-    int mtvc=TVC->mtvc;
+    double pdynmc=environment->pdynmc;
+    double mprop=propulsion->mprop;
+    double thrust=propulsion->thrust;
+    double mrcs_moment=rcs->mrcs_moment;
+    double mrcs_force=rcs->mrcs_force;
+    double refa=Aerodynamics->refa;
+    double refd=Aerodynamics->refd;
+    double cy=Aerodynamics->cy;
+    double cll=Aerodynamics->cll;
+    double clm=Aerodynamics->clm;
+    double cln=Aerodynamics->cln;
+    double cx=Aerodynamics->cx;
+    double cz=Aerodynamics->cz;
+    int mtvc=tvc->mtvc;
 
     Matrix FMRCS(3,1);
     Matrix FARCS(3,1);
     Matrix FPB(3,1);
     Matrix FMPB(3,1);
+    Matrix FAPB(3,1);
+    Matrix FAP(3,1);
+    Matrix FMB(3,1);
 
-    FMRCS.build_vec3(RCS->fmrcs[0],RCS->fmrcs[1],RCS->fmrcs[2]);
-    FARCS.build_vec3(RCS->farcs[0],RCS->farcs[1],RCS->farcs[2]);
-    FPB.build_vec3(TVC->fpb[0],TVC->fpb[1],TVC->fpb[2]);
-    FMPB.build_vec3(TVC->fmpb[0],TVC->fmpb[1],TVC->fmpb[2]);
+    FMRCS.build_vec3(rcs->fmrcs[0],rcs->fmrcs[1],rcs->fmrcs[2]);
+    FARCS.build_vec3(rcs->farcs[0],rcs->farcs[1],rcs->farcs[2]);
+    FPB.build_vec3(tvc->fpb[0],tvc->fpb[1],tvc->fpb[2]);
+    FMPB.build_vec3(tvc->fmpb[0],tvc->fmpb[1],tvc->fmpb[2]);
     /*************************************************************/
 
     //total non-gravitational forces
@@ -76,13 +79,13 @@ void Forces::forces()
 
 
     /***********update matrix variable***********/
-    for(i=0;i<3;i++){
+    for(int i=0;i<3;i++){
         fapb[i]=FAPB.get_loc(i,0);
     }
-    for(i=0;i<3;i++){
+    for(int i=0;i<3;i++){
         fmb[i]=FMB.get_loc(i,0);
     }
-    for(i=0;i<3;i++){
+    for(int i=0;i<3;i++){
         fap[i]=FAP.get_loc(i,0);
     }
     /*******************************************/

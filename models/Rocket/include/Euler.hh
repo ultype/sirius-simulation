@@ -13,11 +13,22 @@ PROGRAMMERS:
 #include "Environment.hh"
 #include "Kinematics.hh"
 #include "Newton.hh"
+#include "Force.hh"
+#include "Propulsion.hh"
+
+class Propulsion;
+class Kinematics;
+class Forces;
+
 class _Euler_ {
     public:
         _Euler_(){};
-        // void initialization(Kinematics* kine, Propulsion* prop, Forces* forc);
-        // void euler(double int_step);
+         void initialization(Kinematics* kine, Propulsion* prop, Forces* forc);
+         void euler(double int_step);
+
+         Kinematics *kinematics;
+         Propulsion *propulsion;
+         Forces *force;
 /***********************************Variables describtion******************************/
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */

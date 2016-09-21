@@ -16,6 +16,9 @@ PROGRAMMERS:
 #include "GPS_receiver.hh"
 #include "Control.hh"
 
+class Propulsion;
+class Kinematics;
+class Control;
 class TVC {
     public:
     TVC() {}

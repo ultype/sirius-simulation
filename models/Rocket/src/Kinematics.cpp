@@ -27,7 +27,7 @@ void Kinematics::initialize(Newton *newt, Environment *env, _Euler_ *eul){
     TBI.fill(tbi);
 }
 
-void Kinematics::calculate(double int_step){
+void Kinematics::calculate_kinematics(double int_step){
 
     Matrix UNIT(3,3); UNIT.identity();
     double cthtbd(0);

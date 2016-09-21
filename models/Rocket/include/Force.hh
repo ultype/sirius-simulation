@@ -16,12 +16,25 @@ PROGRAMMERS:
 #include "Kinematics.hh"
 #include "Newton.hh"
 #include "Control.hh"
+#include "Propulsion.hh"
+class Propulsion;
+class AeroDynamics;
+class RCS;
+class TVC;
+
+
 class Forces{
     public:
         Forces(){};
-    //     void init_force(Environment* env, Propulsion* prop, RCS* rcs
-    // , AeroDynamic* aero, TVC* tvc);
-    //     void forces();
+         void init_force(Environment* env, Propulsion* prop, RCS* rcs
+       , AeroDynamics* aero, TVC* tvc);
+         void forces();
+
+         Environment *environment;
+         Propulsion *propulsion;
+         RCS *rcs;
+         AeroDynamics *Aerodynamics;
+         TVC *tvc;
 /***********************************Variables describtion******************************/
         double fapb[3];         /* *io (N)      Aerodynamic and propulsion forces in body axes */
         double fmb[3];          /* *io (N*m)    Aerodynamic and propulsion moment in body axes */

@@ -12,6 +12,9 @@ PROGRAMMERS:
 #include "Newton.hh"
 #include "Environment.hh"
 #include "Ins.hh"
+#include "Propulsion.hh"
+
+class Newton;
 
 class AeroDynamics {
     public:
@@ -25,6 +28,14 @@ class AeroDynamics {
     double dnr;
     double dndr;
     double dnd;
+    double refa;
+    double refd;
+    double cy;
+    double cll;
+    double clm;
+    double cln;
+    double cx;
+    double cz;
 };
 
 class Control {

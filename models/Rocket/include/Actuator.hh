@@ -10,11 +10,6 @@ PROGRAMMERS:
 *******************************************************************************/
 
 #include "Newton.hh"
-#include "Euler.hh"
-#include "Environment.hh"
-#include "Kinematics.hh"
-#include "Ins.hh"
-#include "Tvc.hh"
 #include "Control.hh"
 
 class Actuator {

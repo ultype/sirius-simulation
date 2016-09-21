@@ -1,7 +1,8 @@
-
-# execfile("Modified_data/realtime.py")
-# execfile("Modified_data/GPS_Satellite.dr")
-
+#execfile("Modified_data/realtime.py")
+#execfile("Modified_data/GPS_Satellite.dr")
+trick.exec_set_enable_freeze(True)
+trick.exec_set_freeze_command(True)
+trick.sim_control_panel_set_enabled(True)
 #SLV
 rkt.newton.lonx       = 121.1    #Vehicle longitude - deg  module newton
 rkt.newton.latx       = 22.68    #Vehicle latitude - deg  module newton
@@ -18,6 +19,17 @@ rkt.newton.beta0x     = 0    #Initial sideslip angle - deg  module newton
 #aerodynamics
 
 #propulsion
+rkt.propulsion.mprop  = 3   #'int' =0:none; =3 input; =4 LTG control  module propulsion
+rkt.propulsion.vmass0 = 13821
+rkt.propulsion.fmass0 = 8888.9
+rkt.propulsion.xcg_0  = 12.032
+rkt.propulsion.xcg_1  = 7.965
+rkt.propulsion.moi_roll_0 = 2426.8
+rkt.propulsion.moi_roll_1 = 914.5
+rkt.propulsion.moi_trans_0 = 244537.9
+rkt.propulsion.moi_trans_1 = 87392.2
+rkt.propulsion.spi = 255.0
+rkt.propulsion.fuel_flow_rate = 88.89
 
 #INS
 rkt.ins.mins   = 1
@@ -43,6 +55,38 @@ rkt.ins.egravi = [0, 0, 0]
 
 #GPS
 gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps
+gps_sats.sats.sv_data = [
+        [5.63, -1.600],  # A-plane, slot #1
+        [5.63, 2.115],   #              #2
+        [5.63, -2.309],  #              #3
+        [5.63, 0.319],   #              #4
+
+        [0.40, 1.063],   # B-plane, slot #5
+        [0.40, -1.342],  #              #6
+        [0.40, 0.543],   #              #7
+        [0.40, 2.874],   #              #8
+
+        [1.45, 1.705],   # C-plane, slot #9
+        [1.45, -2.841],  #              #10
+        [1.45, -2.321],  #              #11
+        [1.45, -0.640],  #              #12
+
+        [2.45, 1.941],   # D-plane, slot #13
+        [2.45, -0.147],  #              #14
+        [2.45, 1.690],   #              #15
+        [2.45, 0.409],   #              #16
+
+        [3.48, -0.571],  # E-plane, slot #17
+        [3.48, -2.988],  #              #18
+        [3.48, 0.858],   #              #19
+        [3.48, 2.705],   #              #20
+
+        [4.59, -0.7180],  # F-plane,slot #21
+        [4.59, 2.666],    #             #22
+        [4.59, -2.977],   #             #23
+        [4.59, -0.2090]   #             #24
+    ]
+rkt.gpsr.slot = [0, 0, 0, 0];  #/< SV slot#  of quadriga
 
 rkt.gpsr.del_rearth        = 2317000    #Delta to Earth's radius for GPS clear LOS signal reception - m  module gps
 rkt.gpsr.gps_acqtime       = 10    #Acquisition time for GPS signal - s  module gps
@@ -55,4 +99,19 @@ rkt.gpsr.PR_BIAS           = [0, 0, 0, 0] #Pseudo-range bias - m GAUSS  module g
 rkt.gpsr.PR_NOISE          = [0.25, 0.25, 0.25, 0.25] #Pseudo-range noise - m MARKOV  module gps
 rkt.gpsr.DR_NOISE          = [0.03, 0.03, 0.03, 0.03] #Delta-range noise - m/s MARKOV  module gps
 
-trick.stop(180)
+rkt.gpsr.uctime_cor = 100  #User clock correlation time constant - s=module gps
+rkt.gpsr.ppos        = 5  #Init 1sig pos values of state cov matrix - m=module gps
+rkt.gpsr.pvel        = 0.2  #Init 1sig vel values of state cov matrix - m/s=module gps
+rkt.gpsr.pclockb     = 3  #Init 1sig clock bias error of state cov matrix - m=module gps
+rkt.gpsr.pclockf     = 1  #Init 1sig clock freq error of state cov matrix - m/s=module gps
+rkt.gpsr.qpos        = 0.1  #1sig pos values of process cov matrix - m=module gps
+rkt.gpsr.qvel        = 0.01  #1sig vel values of process cov matrix - m/s=module gps
+rkt.gpsr.qclockb     = 0.5  #1sig clock bias error of process cov matrix - m=module gps
+rkt.gpsr.qclockf     = 0.1  #1sig clock freq error of process cov matrix - m/s=module gps
+rkt.gpsr.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
+rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
+rkt.gpsr.factp       = 0  #Factor to modifiy initial P-matrix P(1+factp)=module gps
+rkt.gpsr.factq       = 0  #Factor to modifiy the Q-matrix Q(1+factq)=module gps
+rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
+
+trick.stop(10)

@@ -16,7 +16,9 @@ PROGRAMMERS:
 #include "GPS_receiver.hh"
 
 class GPS_Receiver;
-
+class Newton;
+class Kinematics;
+class _Euler_;
 class INS {
     public:
     INS() {}

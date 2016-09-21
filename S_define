@@ -19,6 +19,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/Control.hh"
 ##include "Rocket/include/Guidance.hh"
 ##include "Rocket/include/Force.hh"
+##include "Rocket/include/Propulsion.hh"
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
@@ -27,7 +28,7 @@ class GPS_SAT_SimObject : public Trick::SimObject {
         GPS_SAT_SimObject() {
             ("default_data") sats.default_data();
             ("initialization") sats.initialize();
-            (0.001, "scheduled") sats.propagate_sv();       
+            (0.001, "scheduled") sats.propagate_sv();
         }
 };
 
@@ -38,7 +39,7 @@ class Rocket_SimObject : public Trick::SimObject {
         Environment env;
         Newton newton;
         _Euler_ euler;
-        
+
         Kinematics kinematics;
         Propulsion pls;
         Forces force;
@@ -59,9 +60,9 @@ class Rocket_SimObject : public Trick::SimObject {
         Rocket_SimObject() {
             ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
-
-            ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
             ("initialization") kinematics.initialize(&newton, &env, &euler);
+            ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
+            ("initialization") euler.initialization(&kinematics, &propulsion, &force);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
             ("initialization") guidance.initialize(&ins, &newton, &propulsion);
             ("initialization") control.initialize(&ins, &newton, &env, &propulsion, &aerodynamics);
@@ -69,28 +70,30 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") tvc.initialize(&env, &kinematics, &control, &propulsion);
             ("initialization") rcs.initialize(&ins, &guidance, &propulsion);
             ("initialization") actuator.initialize(&control);
-            
-            (0.001, "scheduled") newton.calculate(0.001);
-            (0.001, "scheduled") kinematics.calculate(0.001);
 
-            (0.001, "scheduled") gpsr.get_quadriga();
-            (0.001, "scheduled") gpsr.filter_extrapolation(0.001);
-            (0.001, "scheduled") gpsr.measure();
 
-            (0.001, "scheduled") guidance.guidance(0.001);
-            (0.001, "scheduled") control.control(0.001);
+            (0.001, "scheduled") kinematics.calculate_kinematics(0.001);
 
+            (0.001, "scheduled") propulsion.calculate_propulsion(0.001);
+
+            (0.1, "scheduled") gpsr.get_quadriga();
+            (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
+            (0.1, "scheduled") gpsr.measure();
             (0.001, "scheduled") ins.ins_accl();
             (0.001, "scheduled") ins.ins_gyro(0.001);
             (0.001, "scheduled") ins.ins_grav();
-            (0.001, "scheduled") ins.update(0.001);
-            
+            (0.05, "scheduled") ins.update(0.05);
+
+            (0.001, "scheduled") guidance.guidance(0.001);
+            (0.05, "scheduled") control.control(0.05);
+
             (0.001, "scheduled") tvc.actuate(0.001);
-
-            (0.001, "scheduled") rcs.actuate();
-            (0.001, "scheduled") rcs.rcs_schmitt_thrust();
-
+            (0.05, "scheduled") rcs.actuate();
+            (0.05, "scheduled") rcs.rcs_schmitt_thrust();
             (0.001, "scheduled") actuator.actuate(0.001);
+            (0.001, "scheduled") force.forces();
+            (0.001, "scheduled") newton.calculate_newton(0.001);
+            (0.001, "scheduled") euler.euler(0.001);
 
         }
 };

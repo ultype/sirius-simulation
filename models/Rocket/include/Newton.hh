@@ -14,13 +14,13 @@ PROGRAMMERS:
 
 #include "Environment.hh"
 #include "Kinematics.hh"
-//#include "Propulsion.hh"
+#include "Propulsion.hh"
 #include "Force.hh"
 #include "Euler.hh"
 
 class Kinematics;
 
-class Propulsion{ public: double vmass; double xcg; double thrust; double mprop; double fmassr;};
+class Propulsion;
 
 class Newton {
     public:
@@ -34,7 +34,7 @@ class Newton {
 
     void default_data();
     void initialize(Kinematics *kine, _Euler_ *elr, Environment *Env, Propulsion *Prop, Forces *forc);
-    void calculate(double int_step);
+    void calculate_newton(double int_step);
 
     /* Input data */
 /***********************************************Variables description******************************************/

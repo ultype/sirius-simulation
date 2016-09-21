@@ -25,7 +25,7 @@ class Kinematics{
         Kinematics(){};
 
         void initialize(Newton* newt, Environment* env, _Euler_* eul);
-        void calculate(double int_step);
+        void calculate_kinematics(double int_step);
 
 /***********************************Variables describtion******************************/
         //double time;        /* *io (s)     simulation time */
