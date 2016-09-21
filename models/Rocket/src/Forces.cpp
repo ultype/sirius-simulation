@@ -79,14 +79,8 @@ void Forces::forces()
 
 
     /***********update matrix variable***********/
-    for(int i=0;i<3;i++){
-        fapb[i]=FAPB.get_loc(i,0);
-    }
-    for(int i=0;i<3;i++){
-        fmb[i]=FMB.get_loc(i,0);
-    }
-    for(int i=0;i<3;i++){
-        fap[i]=FAP.get_loc(i,0);
-    }
+    FAPB.fill(fapb);
+    FMB.fill(fmb);
+    FAP.fill(fap);
     /*******************************************/
 }

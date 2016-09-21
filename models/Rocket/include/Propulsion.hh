@@ -12,6 +12,8 @@ PROGRAMMERS:
 #include "utility_header.hh"
 #include "Environment.hh"
 
+class Environment;
+
 class Propulsion{
     public:
         Propulsion(){};

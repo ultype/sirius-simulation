@@ -15,6 +15,8 @@ PROGRAMMERS:
 #include "Propulsion.hh"
 
 class Newton;
+class Environment;
+class Propulsion;
 
 class AeroDynamics {
     public:

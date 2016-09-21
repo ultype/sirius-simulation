@@ -15,6 +15,8 @@ PROGRAMMERS:
 #include "Euler.hh"
 
 class Newton;
+class Environment;
+class _Euler_;
 
 class Kinematics{
     public:

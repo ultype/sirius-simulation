@@ -1,8 +1,9 @@
 #execfile("Modified_data/realtime.py")
-#execfile("Modified_data/GPS_Satellite.dr")
+execfile("Modified_data/rocket.dr")
 trick.exec_set_enable_freeze(True)
 trick.exec_set_freeze_command(True)
 trick.sim_control_panel_set_enabled(True)
+
 #SLV
 rkt.newton.lonx       = 121.1    #Vehicle longitude - deg  module newton
 rkt.newton.latx       = 22.68    #Vehicle latitude - deg  module newton
@@ -15,7 +16,7 @@ rkt.kinematics.psibdx = 90    #Yawing angle of veh wrt geod coord - deg  module 
 rkt.newton.alpha0x    = 0    #Initial angle-of-attack - deg  module newton
 rkt.newton.beta0x     = 0    #Initial sideslip angle - deg  module newton
 #environment
-
+rkt.env.gravg = [0,0,9.81]
 #aerodynamics
 
 #propulsion
@@ -114,4 +115,4 @@ rkt.gpsr.factp       = 0  #Factor to modifiy initial P-matrix P(1+factp)=module 
 rkt.gpsr.factq       = 0  #Factor to modifiy the Q-matrix Q(1+factq)=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 
-trick.stop(10)
+trick.stop(18)

@@ -61,6 +61,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize(&newton, &env, &euler);
+            ("initialization") env.initialize(&newton, &aerodynamics, &kinematics);
             ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
             ("initialization") euler.initialization(&kinematics, &propulsion, &force);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
@@ -70,27 +71,28 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") tvc.initialize(&env, &kinematics, &control, &propulsion);
             ("initialization") rcs.initialize(&ins, &guidance, &propulsion);
             ("initialization") actuator.initialize(&control);
-
+            ("initialization") propulsion.initialize(&env);
+            ("initialization") force.init_force(&env, &propulsion, &rcs, &aerodynamics, &tvc);
 
             (0.001, "scheduled") kinematics.calculate_kinematics(0.001);
 
             (0.001, "scheduled") propulsion.calculate_propulsion(0.001);
 
-            (0.1, "scheduled") gpsr.get_quadriga();
-            (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
-            (0.1, "scheduled") gpsr.measure();
-            (0.001, "scheduled") ins.ins_accl();
-            (0.001, "scheduled") ins.ins_gyro(0.001);
-            (0.001, "scheduled") ins.ins_grav();
-            (0.05, "scheduled") ins.update(0.05);
+            // (0.1, "scheduled") gpsr.get_quadriga();
+            // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
+            // (0.1, "scheduled") gpsr.measure();
+            // (0.001, "scheduled") ins.ins_accl();
+            // (0.001, "scheduled") ins.ins_gyro(0.001);
+            // (0.001, "scheduled") ins.ins_grav();
+            // (0.05, "scheduled") ins.update(0.05);
 
-            (0.001, "scheduled") guidance.guidance(0.001);
-            (0.05, "scheduled") control.control(0.05);
+            // (0.001, "scheduled") guidance.guidance(0.001);
+            // (0.05, "scheduled") control.control(0.05);
 
-            (0.001, "scheduled") tvc.actuate(0.001);
-            (0.05, "scheduled") rcs.actuate();
-            (0.05, "scheduled") rcs.rcs_schmitt_thrust();
-            (0.001, "scheduled") actuator.actuate(0.001);
+            // (0.001, "scheduled") tvc.actuate(0.001);
+            // (0.05, "scheduled") rcs.actuate();
+            // (0.05, "scheduled") rcs.rcs_schmitt_thrust();
+            // (0.001, "scheduled") actuator.actuate(0.001);
             (0.001, "scheduled") force.forces();
             (0.001, "scheduled") newton.calculate_newton(0.001);
             (0.001, "scheduled") euler.euler(0.001);

@@ -19,6 +19,10 @@ class GPS_Receiver;
 class Newton;
 class Kinematics;
 class _Euler_;
+class Environment;
+
+
+
 class INS {
     public:
     INS() {}

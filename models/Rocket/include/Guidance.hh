@@ -14,7 +14,7 @@ PROGRAMMERS:
 #include "Ins.hh"
 #include "Propulsion.hh"
 class Propulsion;
-
+class Environment;
 
 class Guidance {
     public:

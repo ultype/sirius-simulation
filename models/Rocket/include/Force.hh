@@ -21,7 +21,7 @@ class Propulsion;
 class AeroDynamics;
 class RCS;
 class TVC;
-
+class Environment;
 
 class Forces{
     public:
