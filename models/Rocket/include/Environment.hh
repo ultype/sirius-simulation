@@ -21,7 +21,7 @@ class Environment{
         Newton *newton;
         Kinematics *kinematics;
         AeroDynamics *aerodynamics;
-        Datadeck weathertable;
+        Datadeck weathertable; /* ** (--) Weather Deck */
 
 
         void initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine);
