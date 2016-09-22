@@ -41,7 +41,6 @@ class Rocket_SimObject : public Trick::SimObject {
         _Euler_ euler;
 
         Kinematics kinematics;
-        Propulsion pls;
         Forces force;
 
         AeroDynamics aerodynamics;
@@ -62,7 +61,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize(&newton, &env, &euler);
             ("initialization") env.initialize(&newton, &aerodynamics, &kinematics);
-            ("initialization") newton.initialize(&kinematics, &euler, &env, &pls, &force);
+            ("initialization") newton.initialize(&kinematics, &euler, &env, &propulsion, &force);
             ("initialization") euler.initialization(&kinematics, &propulsion, &force);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
             ("initialization") guidance.initialize(&ins, &newton, &propulsion);
