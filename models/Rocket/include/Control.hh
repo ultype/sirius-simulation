@@ -13,32 +13,12 @@ PROGRAMMERS:
 #include "Environment.hh"
 #include "Ins.hh"
 #include "Propulsion.hh"
+#include "Aerodynamics.hh"
 
 class Newton;
 class Environment;
 class Propulsion;
-
-class AeroDynamics {
-    public:
-    double gymax;
-    double dla;
-    double dma;
-    double dmq;
-    double dmde;
-    double dyb;
-    double dnb;
-    double dnr;
-    double dndr;
-    double dnd;
-    double refa;
-    double refd;
-    double cy;
-    double cll;
-    double clm;
-    double cln;
-    double cx;
-    double cz;
-};
+class AeroDynamics;
 
 class Control {
     public:

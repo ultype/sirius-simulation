@@ -16,21 +16,27 @@ rkt.kinematics.psibdx = 90    #Yawing angle of veh wrt geod coord - deg  module 
 rkt.newton.alpha0x    = 0    #Initial angle-of-attack - deg  module newton
 rkt.newton.beta0x     = 0    #Initial sideslip angle - deg  module newton
 #environment
-rkt.env.gravg = [0,0,9.81]
+rkt.env.mair = 0              #mair =|matmo|mturb|mwind|
+rkt.env.gravg = [0,0,9.81]    #Gravity acceleration in geocentric coord
 #aerodynamics
-
+rkt.aerodynamics.maero = 13      #=11: last stage; =12: 2 stages; =13: 3 stages
+rkt.aerodynamics.xcg_ref = 9.632   #Reference cg location from nose - m
+rkt.aerodynamics.refa = 2.36       #Reference area for aero coefficients - m^2
+rkt.aerodynamics.refd = 1.7334     #Reference length for aero coefficients - m
+rkt.aerodynamics.alplimx = 20      #Alpha limiter for vehicle - deg
+rkt.aerodynamics.alimitx = 5       #Structural  limiter for vehicle
 #propulsion
 rkt.propulsion.mprop  = 3   #'int' =0:none; =3 input; =4 LTG control  module propulsion
-rkt.propulsion.vmass0 = 13821
-rkt.propulsion.fmass0 = 8888.9
-rkt.propulsion.xcg_0  = 12.032
-rkt.propulsion.xcg_1  = 7.965
-rkt.propulsion.moi_roll_0 = 2426.8
-rkt.propulsion.moi_roll_1 = 914.5
-rkt.propulsion.moi_trans_0 = 244537.9
-rkt.propulsion.moi_trans_1 = 87392.2
-rkt.propulsion.spi = 255.0
-rkt.propulsion.fuel_flow_rate = 88.89
+rkt.propulsion.vmass0 = 13821       #vehicle initial mass
+rkt.propulsion.fmass0 = 8888.9      #vehicle initail fuel mass
+rkt.propulsion.xcg_0  = 12.032      #vehicle initial xcg
+rkt.propulsion.xcg_1  = 7.965       #vehicle final xcg
+rkt.propulsion.moi_roll_0 = 2426.8  #vehicle initial moi in roll direction
+rkt.propulsion.moi_roll_1 = 914.5   #vehicle final moi in roll direction
+rkt.propulsion.moi_trans_0 = 244537.9   #vehicle initial transverse moi
+rkt.propulsion.moi_trans_1 = 87392.2    #vehicle final transverse moi
+rkt.propulsion.spi = 255.0          #Specific impusle
+rkt.propulsion.fuel_flow_rate = 88.89  #fuel flow rate
 
 #INS
 rkt.ins.mins   = 1
@@ -115,4 +121,4 @@ rkt.gpsr.factp       = 0  #Factor to modifiy initial P-matrix P(1+factp)=module 
 rkt.gpsr.factq       = 0  #Factor to modifiy the Q-matrix Q(1+factq)=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 
-trick.stop(18)
+trick.stop(180)

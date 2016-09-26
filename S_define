@@ -20,6 +20,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket/include/Guidance.hh"
 ##include "Rocket/include/Force.hh"
 ##include "Rocket/include/Propulsion.hh"
+##include "Rocket/include/Aerodynamics.hh"
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
@@ -61,6 +62,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize(&newton, &env, &euler);
             ("initialization") env.initialize(&newton, &aerodynamics, &kinematics);
+            ("initialization") aerodynamics.initialize(&kinematics, &env, &propulsion, &euler, &newton, &tvc);
             ("initialization") newton.initialize(&kinematics, &euler, &env, &propulsion, &force);
             ("initialization") euler.initialization(&kinematics, &propulsion, &force);
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
@@ -74,9 +76,9 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") force.init_force(&env, &propulsion, &rcs, &aerodynamics, &tvc);
 
             (0.001, "scheduled") kinematics.calculate_kinematics(0.001);
-
+	        (0.001, "scheduled") env.calculate_env(0.001,env.weathertable);
             (0.001, "scheduled") propulsion.calculate_propulsion(0.001);
-
+            (0.001, "scheduled") aerodynamics.calculate_aero(0.001,aerodynamics.aerotable);
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();

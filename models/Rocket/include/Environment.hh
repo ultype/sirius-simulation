@@ -12,7 +12,7 @@ PROGRAMMERS:
 #include "utility_header.hh"
 #include "Newton.hh"
 #include "Kinematics.hh"
-#include "Control.hh"
+#include "Aerodynamics.hh"
 
 class Environment{
 
@@ -51,7 +51,7 @@ class Environment{
 //030507 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 /***********************************Variables describtion******************************/
-        int mair;           /* *io (--)         "mair =|matmo|mturb|mwind|"*/
+        int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
         double press;       /* *io (pa)         Atmospheric pressure */
         double rho;         /* *io (kg/m3)      Atmospheric Density */
         double vsound;      /* *io (m/s)        Sonic speed */
@@ -80,4 +80,4 @@ class Environment{
         double twind;       /* *io (s)          Wind smoothing time constant - sec*/
 };
 
-#endif  // __kinematics_HH__
+#endif  // __environment_HH__
