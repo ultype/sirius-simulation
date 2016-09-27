@@ -8,7 +8,7 @@ trick.sim_control_panel_set_enabled(True)
 rkt.newton.lonx       = 121.1    #Vehicle longitude - deg  module newton
 rkt.newton.latx       = 22.68    #Vehicle latitude - deg  module newton
 rkt.newton.alt        = 100    #Vehicle altitude - m  module newton
-rkt.newton.dvbe       = 1    #Vehicle geographic speed - m/s  module newton
+rkt.newton.dvbe       = 2    #Vehicle geographic speed - m/s  module newton
 
 rkt.kinematics.phibdx = 0    #Rolling angle of veh wrt geod coord - deg  module kinematics
 rkt.kinematics.thtbdx = 90    #Pitching angle of veh wrt geod coord - deg  module kinematics
