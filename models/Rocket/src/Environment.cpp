@@ -22,7 +22,7 @@ void Environment::calculate_env(double int_step,Datadeck &weathertable)
     Matrix VAED(3,1);
     Matrix VAEDS(3,1);
     Matrix VAEDSD(3,1);
-    Matrix VBED(3,1);
+    Matrix VBED(newton->vbed);
     Matrix SBII(3,1);
     SBII.build_vec3(newton->IPos[0],newton->IPos[1],newton->IPos[2]);
     double alt=newton->alt;
