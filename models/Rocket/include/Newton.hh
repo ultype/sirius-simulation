@@ -35,7 +35,7 @@ class Newton {
     void default_data();
     void initialize(Kinematics *kine, _Euler_ *elr, Environment *Env, Propulsion *Prop, Forces *forc);
     void calculate_newton(double int_step);
-
+    void orbital(Matrix &SBII, Matrix &VBII, double &dbi);
     /* Input data */
 /***********************************************Variables description******************************************/
     double alpha0x;     /* *i (d)      Initial angle-of-attack */
@@ -70,6 +70,15 @@ class Newton {
     double aero_loss;   /* *io (m/s)    Velocity loss caused by aerodynamic drag */
     double gravity_loss;/* *io (m/s)    Velocity loss caused by gravity */
     double gravity_loss2;/* *io (m/s)   Velocity loss caused by gravity */
+    double inclination; /* *io (deg)    Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object*/
+    double eccentricity;/* *io (--)     Determines the amount by which its orbit around another body deviates from a perfect circle*/
+    double semi_major; /* *io (m)      the major axis of an ellipse is its longest diameter*/
+    double ha;          /* *io (m)      Orbital Apogee*/
+    double hp;          /* *io (m)      Orbital Perigee*/
+    double lon_anodex;  /* *o (deg)     The longitude of the ascending node (☊ or Ω) is one of the orbital elements used to specify the orbit of an object in space. It is the angle from a reference direction, called the origin of longitude, to the direction of the ascending node, measured in a reference plane*/
+    double arg_perix;   /* *o (deg)     The argument of periapsis (also called argument of perifocus or argument of pericenter), symbolized as ω, is one of the orbital elements of an orbiting body. Parametrically, ω is the angle from the body's ascending node to its periapsis, measured in the direction of motion*/
+    double true_anomx;  /* *o (deg)     In celestial mechanics, true anomaly is an angular parameter that defines the position of a body moving along a Keplerian orbit. It is the angle between the direction of periapsis and the current position of the body, as seen from the main focus of the ellipse (the point around which the object orbits)*/
+    double ref_alt;     /* *io (m)      */
 /*************************************************************************************************************/
 
 

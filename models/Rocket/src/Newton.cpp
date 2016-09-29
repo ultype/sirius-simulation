@@ -151,6 +151,8 @@ void Newton::calculate_newton(double int_step){
     gndtrkmx=0.001*grndtrck;
     gndtrnmx=NMILES*grndtrck;
 
+    orbital(SBII,VBII,dbi);
+
     SBII.fill(IPos);
     VBII.fill(IVel);
     ABII.fill(IAccl);
@@ -159,4 +161,15 @@ void Newton::calculate_newton(double int_step){
     TDI.fill(tdi);
     TGI.fill(tgi);
     TVD.fill(tvd);
+}
+
+
+void Newton::orbital(Matrix &SBII, Matrix &VBII, double &dbi)
+{
+    //calculate orbital elements
+    int cadorbin_flag=cad_orb_in(semi_major, eccentricity, inclination, lon_anodex, arg_perix, true_anomx, SBII, VBII);
+    ha=(1.+eccentricity)*semi_major-REARTH;
+    hp=(1.-eccentricity)*semi_major-REARTH;
+    ref_alt = dbi-REARTH;
+
 }
