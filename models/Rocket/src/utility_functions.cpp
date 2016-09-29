@@ -59,6 +59,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "utility_header.hh"
+#include <iomanip>
 //#include "global_header.hh"
 
 
@@ -158,7 +159,7 @@ void Matrix::print()
     // outside loop rows, inside loop columns
     for (int i = 0; i < num_row; i++) {
         for (int j = 0; j < num_col; j++) {
-            std::cout << *pbody << "\t";
+            std::cout<<setprecision(12)<< *pbody << "\t";
             pbody++;
         }
         std::cout << '\n';

@@ -51,6 +51,7 @@ void _Euler_::euler(double int_step)
     IBBB.build_mat33(propulsion->ibbb[0][0],propulsion->ibbb[0][1],propulsion->ibbb[0][2],
                         propulsion->ibbb[1][0],propulsion->ibbb[1][1],propulsion->ibbb[1][2],
                         propulsion->ibbb[2][0],propulsion->ibbb[2][1],propulsion->ibbb[2][2]);
+    WBIB.build_vec3(wbib[0],wbib[1],wbib[2]);
     /***********************************************************************************************/
     //integrating the angular velocity acc wrt the inertial frame in body coord
 
