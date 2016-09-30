@@ -71,7 +71,8 @@ void Propulsion::calculate_propulsion(double int_step)
             mprop=0;
             thrust=0;
         }
+        IBBB.fill(ibbb);
     }
 
-    IBBB.fill(ibbb);
+
 }

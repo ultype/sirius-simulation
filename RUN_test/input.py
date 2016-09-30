@@ -121,4 +121,4 @@ rkt.gpsr.factp       = 0  #Factor to modifiy initial P-matrix P(1+factp)=module 
 rkt.gpsr.factq       = 0  #Factor to modifiy the Q-matrix Q(1+factq)=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 
-trick.stop(50)
+trick.stop(150)
