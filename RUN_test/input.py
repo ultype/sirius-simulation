@@ -1,9 +1,27 @@
 #execfile("Modified_data/realtime.py")
 execfile("Modified_data/rocket.dr")
-trick.exec_set_enable_freeze(True)
-trick.exec_set_freeze_command(True)
-trick.sim_control_panel_set_enabled(True)
-
+#trick.exec_set_enable_freeze(True)
+#trick.exec_set_freeze_command(True)
+#trick.sim_control_panel_set_enabled(True)
+#speration_1 = trick.new_event("speration_1")
+#speration_1.set_cycle(0.001)
+#speration_1.condition(0, """trick.exec_get_sim_time() > 101.0""")
+#speration_1.action(0, """rkt.aerodynamics.refa = 1.13\
+#			 , rkt.propulsion.aexit = 0\
+#			 , rkt.aerodynamics.xcg_ref = 3.429\
+#			 , rkt.propulsion.vmass0 = 3893\
+#			 , rkt.propulsion.fmass0 = 2963\
+#			 , rkt.propulsion.fmasse = 0\
+#			 , rkt.propulsion.xcg_0 = 5.829\
+#			 , rkt.propulsion.xcg_1 = 4.683\
+#			 , rkt.propulsion.moi_roll_0 = 615.2\
+#			 , rkt.propulsion.moi_roll_1 = 151.0\
+#			 , rkt.propulsion.moi_trans_0 = 7407.4\
+#			 , rkt.propulsion.moi_trans_1 = 3752.1\
+#			 , rkt.propulsion.spi = 290\
+#			 , rkt.propulsion.fuel_flow_rate = 29.63""")
+#trick.add_event(speration_1)
+#speration_1.activate()
 #SLV
 rkt.newton.lonx       = 120.893501    #Vehicle longitude - deg  module newton
 rkt.newton.latx       = 22.138917    #Vehicle latitude - deg  module newton
@@ -11,7 +29,7 @@ rkt.newton.alt        = 100    #Vehicle altitude - m  module newton
 rkt.newton.dvbe       = 2    #Vehicle geographic speed - m/s  module newton
 
 rkt.kinematics.phibdx = 0    #Rolling angle of veh wrt geod coord - deg  module kinematics
-rkt.kinematics.thtbdx = 90    #Pitching angle of veh wrt geod coord - deg  module kinematics
+rkt.kinematics.thtbdx = 86.62    #Pitching angle of veh wrt geod coord - deg  module kinematics
 rkt.kinematics.psibdx = 90    #Yawing angle of veh wrt geod coord - deg  module kinematics
 rkt.newton.alpha0x    = 0    #Initial angle-of-attack - deg  module newton
 rkt.newton.beta0x     = 0    #Initial sideslip angle - deg  module newton
@@ -39,7 +57,7 @@ rkt.propulsion.fuel_flow_rate = 88.89  #fuel flow rate
 rkt.propulsion.aexit = 0.258242843 #nozzle exhaust area
 rkt.propulsion.payload = 87 #payload mass
 #INS
-rkt.ins.mins   = 0
+rkt.ins.mins   = 1
 #INS Acceleration
 rkt.ins.efspb  = [0, 0, 0]
 rkt.ins.ewalka = [0, 0, 0]
@@ -120,5 +138,21 @@ rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
 rkt.gpsr.factp       = 0  #Factor to modifiy initial P-matrix P(1+factp)=module gps
 rkt.gpsr.factq       = 0  #Factor to modifiy the Q-matrix Q(1+factq)=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
+#RCS thruster
+rkt.rcs.mrcs_moment = 20 #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
+rkt.rcs.roll_mom_max = 100 #RCS rolling moment max value - Nm  module rcs
+rkt.rcs.pitch_mom_max = 200000  #RCS pitching moment max value - Nm  module rcs
+rkt.rcs.yaw_mom_max = 200000  #RCS yawing moment max value - Nm  module rcs
+rkt.rcs.dead_zone = 0.1   #Dead zone of Schmitt trigger - deg  module rcs
+rkt.rcs.hysteresis = 0.1    #Hysteresis of Schmitt trigger - deg  module rcs
+rkt.rcs.rcs_tau = 1   #Slope of the switching function - sec  module rcs
+rkt.rcs.thtbdcomx = 0    #Pitch angle command - deg  module rcs
+rkt.rcs.psibdcomx = -85  #Yaw angle command - deg  module rcs
+rkt.rcs.rcs_thrust = 100   #rcs thrust - N  module rcs
+rkt.rcs.rcs_pos = 1.66507   #rcs thruster's postion from nose - m  module rcs
+rkt.rcs.rocket_r = 0.68  #rocket's radius - m  module rcs
+#Guidance
+rkt.guidance.alphacomx = 0   #Alpha command - deg  module guidance
+rkt.guidance.betacomx = 0    #Beta command - deg  module guidance
 
-trick.stop(150)
+trick.stop(50)

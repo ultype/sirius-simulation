@@ -37,9 +37,9 @@ void RCS::actuate(){
     // local variables
 
     // local module-variables
-    double e_roll(0);
-    double e_pitch(0);
-    double e_yaw(0);
+    // double e_roll(0);
+    // double e_pitch(0);
+    // double e_yaw(0);
 
     Matrix UTBC(guidance->utbc);
 
@@ -47,48 +47,7 @@ void RCS::actuate(){
     // decoding rcs_mom flag
     int rcs_type = mrcs_moment / 10;
     int rcs_mode = (mrcs_moment % 10);
-    /**********************************
-    //proportional moment thrusters
-    if(rcs_type==1){
 
-        //gain calculations
-        double rgain_roll=2*rcs_zeta*rcs_freq*IBBB.get_loc(0,0);
-        double rgain_pitch=2*rcs_zeta*rcs_freq*IBBB.get_loc(1,1);
-        double rgain_yaw=2*rcs_zeta*rcs_freq*IBBB.get_loc(2,2);
-        double pgain=rcs_freq/(2*rcs_zeta);
-
-        //roll angle control (always)
-        e_roll=rgain_roll*(pgain*(phibdcomx-phibdcx)-ppcx);
-        FMRCS[0]=rcs_prop(e_roll,roll_mom_max);
-
-        //geodetic Euler angle control
-        if(rcs_mode==1){
-            e_pitch=rgain_pitch*(pgain*(thtbdcomx-thtbdcx)-qqcx);
-            e_yaw=rgain_yaw*(pgain*(psibdcomx-psibdcx)-rrcx);
-        }
-        //vector directional control
-        else if(rcs_mode==2){
-            e_pitch=rgain_pitch*(pgain*(-UTBC[2])*DEG-qqcx);//DEG is used,
-    because all angle var. are in deg
-            e_yaw=rgain_yaw*(pgain*(UTBC[1])*DEG-rrcx);
-        }
-        //moments generated about the two transverse principle axes wrt the c.m
-        FMRCS[1]=rcs_prop(e_pitch,pitch_mom_max);
-        FMRCS[2]=rcs_prop(e_yaw,yaw_mom_max);
-    }
-    //Proportional side force thrusters
-    if(mrcs_force==1){
-
-        //acceleration control
-        double ay=FSPCB[1];
-        e_right=acc_gain*(aycomx*AGRAV-ay);
-        FARCS[1]=rcs_prop(e_right,side_force_max);
-
-        double az=FSPCB[2];
-        e_down=acc_gain*(azcomx*AGRAV-az);
-        FARCS[2]=rcs_prop(e_down,side_force_max);
-    }
-    *************************************************************************/
     // on-off moment thrusters (Schmitt trigger)
     if (rcs_type == 2) {
         // roll angle control (always)

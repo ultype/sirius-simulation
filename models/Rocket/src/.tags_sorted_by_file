@@ -1,0 +1,174 @@
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+actuate	Actuator.cpp	/^void Actuator::actuate(double int_step){$/;"	f	class:Actuator
+actuator_0th	Actuator.cpp	/^Matrix Actuator::actuator_0th(Matrix ACTCZ, double dlimx, double dlimx_min, int num_fins){$/;"	f	class:Actuator
+actuator_scnd	Actuator.cpp	/^Matrix Actuator::actuator_scnd(Matrix ACTCZ, double dlimx, double dlimx_min, int num_fins, double int_step) {$/;"	f	class:Actuator
+default_data	Actuator.cpp	/^void Actuator::default_data(){$/;"	f	class:Actuator
+initialize	Actuator.cpp	/^void Actuator::initialize(Control *con){$/;"	f	class:Actuator
+aerodynamics_der	Aerodynamics.cpp	/^void AeroDynamics::aerodynamics_der()$/;"	f	class:AeroDynamics
+calculate_aero	Aerodynamics.cpp	/^void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)$/;"	f	class:AeroDynamics
+initialize	Aerodynamics.cpp	/^void AeroDynamics::initialize(Kinematics *kine, Environment *env, Propulsion *prop, _Euler_ *eul, Newton *newt, TVC *t)$/;"	f	class:AeroDynamics
+control	Control.cpp	/^void Control::control(double int_step){$/;"	f	class:Control
+control_normal_accel	Control.cpp	/^double Control::control_normal_accel(double ancomx, double int_step){$/;"	f	class:Control
+control_pitch_rate	Control.cpp	/^double Control::control_pitch_rate(double qqdx){$/;"	f	class:Control
+control_yaw_accel	Control.cpp	/^double Control::control_yaw_accel(double alcomx, double int_step){$/;"	f	class:Control
+default_data	Control.cpp	/^void Control::default_data(){$/;"	f	class:Control
+initialize	Control.cpp	/^void Control::initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero){$/;"	f	class:Control
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+mass	Earth.cpp	/^const double Earth::mass = 5.973332e24;$/;"	m	class:Earth	file:
+radius	Earth.cpp	/^const double Earth::radius = 6370987.308;$/;"	m	class:Earth	file:
+calculate_env	Environment.cpp	/^void Environment::calculate_env(double int_step,Datadeck &weathertable)$/;"	f	class:Environment
+environment_dryden	Environment.cpp	/^Matrix Environment::environment_dryden(double dvba,double int_step)$/;"	f	class:Environment
+initialize	Environment.cpp	/^void Environment::initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine)$/;"	f	class:Environment
+euler	Euler.cpp	/^void _Euler_::euler(double int_step)$/;"	f	class:_Euler_
+initialization	Euler.cpp	/^void _Euler_::initialization(Kinematics* kine, Propulsion* prop, Forces* forc)$/;"	f	class:_Euler_
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+forces	Forces.cpp	/^void Forces::forces()$/;"	f	class:Forces
+init_force	Forces.cpp	/^void Forces::init_force(Environment* env, Propulsion* prop, RCS* rc$/;"	f	class:Forces
+default_data	GPS_receiver.cpp	/^void GPS_Receiver::default_data(){$/;"	f	class:GPS_Receiver
+filter_extrapolation	GPS_receiver.cpp	/^void GPS_Receiver::filter_extrapolation(double int_step){$/;"	f	class:GPS_Receiver
+get_quadriga	GPS_receiver.cpp	/^void GPS_Receiver::get_quadriga(){$/;"	f	class:GPS_Receiver
+initialize	GPS_receiver.cpp	/^void GPS_Receiver::initialize(Newton* ntn, _Euler_* elr, GPS_Satellites* sats, INS* i, double int_step){$/;"	f	class:GPS_Receiver
+measure	GPS_receiver.cpp	/^void GPS_Receiver::measure(){$/;"	f	class:GPS_Receiver
+default_data	GPS_satellites.cpp	/^void GPS_Satellites::default_data(){$/;"	f	class:GPS_Satellites
+initialize	GPS_satellites.cpp	/^void GPS_Satellites::initialize(){$/;"	f	class:GPS_Satellites
+propagate_sv	GPS_satellites.cpp	/^void GPS_Satellites::propagate_sv(){$/;"	f	class:GPS_Satellites
+default_data	Guidance.cpp	/^void Guidance::default_data(){$/;"	f	class:Guidance
+guidance	Guidance.cpp	/^void Guidance::guidance(double int_step)$/;"	f	class:Guidance
+guidance_ltg	Guidance.cpp	/^Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)$/;"	f	class:Guidance
+guidance_ltg_crct	Guidance.cpp	/^void Guidance::guidance_ltg_crct(Matrix &SDII,$/;"	f	class:Guidance
+guidance_ltg_igrl	Guidance.cpp	/^void Guidance::guidance_ltg_igrl(double &s_igrl,$/;"	f	class:Guidance
+guidance_ltg_pdct	Guidance.cpp	/^void Guidance::guidance_ltg_pdct(Matrix &SPII,$/;"	f	class:Guidance
+guidance_ltg_tgo	Guidance.cpp	/^void Guidance::guidance_ltg_tgo(double &tgop,$/;"	f	class:Guidance
+guidance_ltg_trate	Guidance.cpp	/^void Guidance::guidance_ltg_trate(Matrix &ULAM,$/;"	f	class:Guidance
+guidance_ltg_trate_rtgo	Guidance.cpp	/^void Guidance::guidance_ltg_trate_rtgo(Matrix &RGO,$/;"	f	class:Guidance
+initialize	Guidance.cpp	/^void Guidance::initialize(INS *i, Newton *ntn, Propulsion *plp){$/;"	f	class:Guidance
+default_data	Ins.cpp	/^void INS::default_data(){$/;"	f	class:INS
+initialize	Ins.cpp	/^void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps){$/;"	f	class:INS
+ins_accl	Ins.cpp	/^void INS::ins_accl()$/;"	f	class:INS
+ins_grav	Ins.cpp	/^void INS::ins_grav()$/;"	f	class:INS
+ins_gyro	Ins.cpp	/^void INS::ins_gyro(double int_step)$/;"	f	class:INS
+update	Ins.cpp	/^void INS::update(double int_step){$/;"	f	class:INS
+calculate_kinematics	Kinematics.cpp	/^void Kinematics::calculate_kinematics(double int_step){$/;"	f	class:Kinematics
+initialize	Kinematics.cpp	/^void Kinematics::initialize(Newton *newt, Environment *env, _Euler_ *eul){$/;"	f	class:Kinematics
+calculate_newton	Newton.cpp	/^void Newton::calculate_newton(double int_step){$/;"	f	class:Newton
+default_data	Newton.cpp	/^void Newton::default_data(){$/;"	f	class:Newton
+initialize	Newton.cpp	/^void Newton::initialize(Kinematics *kine, _Euler_ *elr, Environment *env, Propulsion *prop, Forces *forc){$/;"	f	class:Newton
+orbital	Newton.cpp	/^void Newton::orbital(Matrix &SBII, Matrix &VBII, double &dbi)$/;"	f	class:Newton
+calculate_propulsion	Propulsion.cpp	/^void Propulsion::calculate_propulsion(double int_step)$/;"	f	class:Propulsion
+initialize	Propulsion.cpp	/^void Propulsion::initialize(Environment *env)$/;"	f	class:Propulsion
+actuate	Rcs.cpp	/^void RCS::actuate(){$/;"	f	class:RCS
+default_data	Rcs.cpp	/^void RCS::default_data(){$/;"	f	class:RCS
+initialize	Rcs.cpp	/^void RCS::initialize(INS *i, Guidance *guia, Propulsion *plp){$/;"	f	class:RCS
+rcs_schmitt	Rcs.cpp	/^int RCS::rcs_schmitt(double input_new, double input, double dead_zone, double hysteresis) {$/;"	f	class:RCS
+rcs_schmitt_thrust	Rcs.cpp	/^void RCS::rcs_schmitt_thrust() {$/;"	f	class:RCS
+default_data	Rocket.cpp	/^void Rocket::default_data(){$/;"	f	class:Rocket
+initialize	Rocket.cpp	/^void Rocket::initialize(){$/;"	f	class:Rocket
+actuate	Tvc.cpp	/^void TVC::actuate(double int_step){$/;"	f	class:TVC
+default_data	Tvc.cpp	/^void TVC::default_data(){$/;"	f	class:TVC
+initialize	Tvc.cpp	/^void TVC::initialize(Environment *env, Kinematics *kins, Control *con, Propulsion *plp){$/;"	f	class:TVC
+tvc_scnd	Tvc.cpp	/^void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double int_step){$/;"	f	class:TVC
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+Matrix	utility_functions.cpp	/^Matrix::Matrix()$/;"	f	class:Matrix
+Matrix	utility_functions.cpp	/^Matrix::Matrix(const Matrix &MAT)$/;"	f	class:Matrix
+Matrix	utility_functions.cpp	/^Matrix::Matrix(const double v[3])$/;"	f	class:Matrix
+Matrix	utility_functions.cpp	/^Matrix::Matrix(const double v[][3])$/;"	f	class:Matrix
+Matrix	utility_functions.cpp	/^Matrix::Matrix(int row_size, int col_size)$/;"	f	class:Matrix
+_CRT_SECURE_NO_DEPRECATE	utility_functions.cpp	55;"	d	file:
+absolute	utility_functions.cpp	/^double Matrix::absolute()$/;"	f	class:Matrix
+adjoint	utility_functions.cpp	/^Matrix Matrix::adjoint()$/;"	f	class:Matrix
+angle	utility_functions.cpp	/^double angle(Matrix VEC1, Matrix VEC2)$/;"	f
+assign_loc	utility_functions.cpp	/^void Matrix::assign_loc(const int &r, const int &c, const double &val)$/;"	f	class:Matrix
+atmosphere76	utility_functions.cpp	/^void atmosphere76(double &rho, double &press, double &tempk, const double balt)$/;"	f
+build_mat33	utility_functions.cpp	/^Matrix &Matrix::build_mat33(const double &v11,$/;"	f	class:Matrix
+build_mat33	utility_functions.cpp	/^Matrix &Matrix::build_mat33(const double v[][3])$/;"	f	class:Matrix
+build_vec3	utility_functions.cpp	/^Matrix &Matrix::build_vec3(const double &v1, const double &v2, const double &v3)$/;"	f	class:Matrix
+build_vec3	utility_functions.cpp	/^Matrix &Matrix::build_vec3(const double v[3])$/;"	f	class:Matrix
+cad_distance	utility_functions.cpp	/^double cad_distance(const double &lon1,$/;"	f
+cad_geo84_in	utility_functions.cpp	/^void cad_geo84_in(double &lon,$/;"	f
+cad_geo84vel_in	utility_functions.cpp	/^void cad_geo84vel_in(double &dvbe,$/;"	f
+cad_geoc_in	utility_functions.cpp	/^void cad_geoc_in(double &lonc,$/;"	f
+cad_geoc_ine	utility_functions.cpp	/^Matrix cad_geoc_ine(Matrix SBIE)$/;"	f
+cad_grav84	utility_functions.cpp	/^Matrix cad_grav84(Matrix SBII, const double &time)$/;"	f
+cad_in_geo84	utility_functions.cpp	/^Matrix cad_in_geo84(const double lon,$/;"	f
+cad_in_geoc	utility_functions.cpp	/^Matrix cad_in_geoc(const double &lon,$/;"	f
+cad_in_orb	utility_functions.cpp	/^int cad_in_orb(Matrix &SBII,$/;"	f
+cad_kepler	utility_functions.cpp	/^int cad_kepler(Matrix &SPII,$/;"	f
+cad_kepler1	utility_functions.cpp	/^int cad_kepler1(Matrix &SPII,$/;"	f
+cad_orb_in	utility_functions.cpp	/^int cad_orb_in(double &semi,$/;"	f
+cad_tdi84	utility_functions.cpp	/^Matrix cad_tdi84(const double &lon,$/;"	f
+cad_tei	utility_functions.cpp	/^Matrix cad_tei(const double &time)$/;"	f
+cad_tge	utility_functions.cpp	/^Matrix cad_tge(const double &lon, const double &lat)$/;"	f
+cad_tgi84	utility_functions.cpp	/^Matrix cad_tgi84(const double &lon,$/;"	f
+cad_tip	utility_functions.cpp	/^Matrix cad_tip(const double &incl,$/;"	f
+cadkepler1_ucs	utility_functions.cpp	/^void cadkepler1_ucs(double &c, double &s, const double &z)$/;"	f
+cart_from_pol	utility_functions.cpp	/^Matrix &Matrix::cart_from_pol(const double &magnitude,$/;"	f	class:Matrix
+cholesky	utility_functions.cpp	/^Matrix Matrix::cholesky()$/;"	f	class:Matrix
+col_vec	utility_functions.cpp	/^Matrix Matrix::col_vec(const int &col)$/;"	f	class:Matrix
+determinant	utility_functions.cpp	/^double Matrix::determinant()$/;"	f	class:Matrix
+diamat_vec	utility_functions.cpp	/^Matrix Matrix::diamat_vec()$/;"	f	class:Matrix
+diavec_mat	utility_functions.cpp	/^Matrix Matrix::diavec_mat()$/;"	f	class:Matrix
+dimension	utility_functions.cpp	/^void Matrix::dimension(int row, int col)$/;"	f	class:Matrix
+ellipse	utility_functions.cpp	/^Matrix Matrix::ellipse()$/;"	f	class:Matrix
+exponential	utility_functions.cpp	/^double exponential(double density)$/;"	f
+fill	utility_functions.cpp	/^Matrix &Matrix::fill(double m[][3])$/;"	f	class:Matrix
+fill	utility_functions.cpp	/^Matrix &Matrix::fill(double v[3])$/;"	f	class:Matrix
+find_index	utility_functions.cpp	/^int Datadeck::find_index(int max,double value,double *list)$/;"	f	class:Datadeck
+gauss	utility_functions.cpp	/^double gauss(double mean, double sig)$/;"	f
+get_cols	utility_functions.cpp	/^int Matrix::get_cols()$/;"	f	class:Matrix
+get_index	utility_functions.cpp	/^int Matrix::get_index(const int &row, const int &col)$/;"	f	class:Matrix
+get_loc	utility_functions.cpp	/^double Matrix::get_loc(const int &r, const int &c)$/;"	f	class:Matrix
+get_pbody	utility_functions.cpp	/^double *Matrix::get_pbody()$/;"	f	class:Matrix
+get_rows	utility_functions.cpp	/^int Matrix::get_rows()$/;"	f	class:Matrix
+identity	utility_functions.cpp	/^Matrix &Matrix::identity()$/;"	f	class:Matrix
+integrate	utility_functions.cpp	/^Matrix integrate(Matrix &DYDX_NEW,$/;"	f
+integrate	utility_functions.cpp	/^double integrate(const double &dydx_new,$/;"	f
+interpolate	utility_functions.cpp	/^double Datadeck::interpolate(int ind1,int ind2,int slot,double val)$/;"	f	class:Datadeck
+interpolate	utility_functions.cpp	/^double Datadeck::interpolate(int ind10,int ind11,int ind20,int ind21,int ind30,int ind31,$/;"	f	class:Datadeck
+interpolate	utility_functions.cpp	/^double Datadeck::interpolate(int ind10,int ind11,int ind20,int ind21,int slot,double value1,$/;"	f	class:Datadeck
+inverse	utility_functions.cpp	/^Matrix Matrix::inverse()$/;"	f	class:Matrix
+look_up	utility_functions.cpp	/^double Datadeck::look_up(string name,double value1)$/;"	f	class:Datadeck
+look_up	utility_functions.cpp	/^double Datadeck::look_up(string name,double value1,double value2)$/;"	f	class:Datadeck
+look_up	utility_functions.cpp	/^double Datadeck::look_up(string name,double value1,double value2,double value3)$/;"	f	class:Datadeck
+markov	utility_functions.cpp	/^double markov(double sigma,$/;"	f
+mat2tr	utility_functions.cpp	/^Matrix mat2tr(const double &psivg, const double &thtvg)$/;"	f
+mat33_vec9	utility_functions.cpp	/^Matrix Matrix::mat33_vec9()$/;"	f	class:Matrix
+mat3tr	utility_functions.cpp	/^Matrix mat3tr(const double &psi, const double &tht, const double &phi)$/;"	f
+ones	utility_functions.cpp	/^Matrix &Matrix::ones()$/;"	f	class:Matrix
+operator !=	utility_functions.cpp	/^bool Matrix::operator!=(const Matrix &B)$/;"	f	class:Matrix
+operator %	utility_functions.cpp	/^Matrix Matrix::operator%(const Matrix &B)$/;"	f	class:Matrix
+operator *	utility_functions.cpp	/^Matrix Matrix::operator*(const Matrix &B)$/;"	f	class:Matrix
+operator *	utility_functions.cpp	/^Matrix Matrix::operator*(const double &b)$/;"	f	class:Matrix
+operator *=	utility_functions.cpp	/^Matrix &Matrix::operator*=(const Matrix &B)$/;"	f	class:Matrix
+operator *=	utility_functions.cpp	/^Matrix &Matrix::operator*=(const double &b)$/;"	f	class:Matrix
+operator +	utility_functions.cpp	/^Matrix Matrix::operator+(const Matrix &B)$/;"	f	class:Matrix
+operator +	utility_functions.cpp	/^Matrix Matrix::operator+(const double &b)$/;"	f	class:Matrix
+operator +=	utility_functions.cpp	/^Matrix &Matrix::operator+=(const Matrix &B)$/;"	f	class:Matrix
+operator +=	utility_functions.cpp	/^Matrix &Matrix::operator+=(const double &b)$/;"	f	class:Matrix
+operator -	utility_functions.cpp	/^Matrix Matrix::operator-(const Matrix &B)$/;"	f	class:Matrix
+operator -	utility_functions.cpp	/^Matrix Matrix::operator-(const double &b)$/;"	f	class:Matrix
+operator -=	utility_functions.cpp	/^Matrix &Matrix::operator-=(const Matrix &B)$/;"	f	class:Matrix
+operator -=	utility_functions.cpp	/^Matrix &Matrix::operator-=(const double &b)$/;"	f	class:Matrix
+operator /	utility_functions.cpp	/^Matrix Matrix::operator\/(const double &b)$/;"	f	class:Matrix
+operator =	utility_functions.cpp	/^Matrix &Matrix::operator=(const Matrix &B)$/;"	f	class:Matrix
+operator ==	utility_functions.cpp	/^bool Matrix::operator==(const Matrix &B)$/;"	f	class:Matrix
+operator []	utility_functions.cpp	/^double &Matrix::operator[](const int &r)$/;"	f	class:Matrix
+operator ^	utility_functions.cpp	/^double Matrix::operator^(const Matrix &B)$/;"	f	class:Matrix
+operator ~	utility_functions.cpp	/^Matrix Matrix::operator~()$/;"	f	class:Matrix
+pol_from_cart	utility_functions.cpp	/^Matrix Matrix::pol_from_cart()$/;"	f	class:Matrix
+print	utility_functions.cpp	/^void Matrix::print()$/;"	f	class:Matrix
+rayleigh	utility_functions.cpp	/^double rayleigh(double mode)$/;"	f
+read_tables	utility_functions.cpp	/^void read_tables(char *file_name,Datadeck &datatable)$/;"	f
+row_vec	utility_functions.cpp	/^Matrix Matrix::row_vec(const int &row)$/;"	f	class:Matrix
+sign	utility_functions.cpp	/^int sign(const double &variable)$/;"	f
+skew_sym	utility_functions.cpp	/^Matrix Matrix::skew_sym()$/;"	f	class:Matrix
+sub_matrix	utility_functions.cpp	/^Matrix Matrix::sub_matrix(const int &row, const int &col)$/;"	f	class:Matrix
+trans	utility_functions.cpp	/^Matrix Matrix::trans()$/;"	f	class:Matrix
+uniform	utility_functions.cpp	/^double uniform(double min, double max)$/;"	f
+unituni	utility_functions.cpp	/^double unituni()$/;"	f
+univec3	utility_functions.cpp	/^Matrix Matrix::univec3()$/;"	f	class:Matrix
+us76_nasa2002	utility_functions.cpp	/^int us76_nasa2002(double z,  \/* altitude (km)        *\/$/;"	f
+vec9_mat33	utility_functions.cpp	/^Matrix Matrix::vec9_mat33()$/;"	f	class:Matrix
+zero	utility_functions.cpp	/^Matrix &Matrix::zero()$/;"	f	class:Matrix
+~Matrix	utility_functions.cpp	/^Matrix::~Matrix()$/;"	f	class:Matrix
