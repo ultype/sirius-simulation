@@ -52,6 +52,7 @@ void _Euler_::euler(double int_step)
                         propulsion->ibbb[1][0],propulsion->ibbb[1][1],propulsion->ibbb[1][2],
                         propulsion->ibbb[2][0],propulsion->ibbb[2][1],propulsion->ibbb[2][2]);
     WBIB.build_vec3(wbib[0],wbib[1],wbib[2]);
+    WBIBD.build_vec3(wbibd);
     /***********************************************************************************************/
     //integrating the angular velocity acc wrt the inertial frame in body coord
 
