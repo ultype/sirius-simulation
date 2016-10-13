@@ -2,11 +2,12 @@ Thread information
 Trick::Threads (Child_0)
     process_type = scheduled
     trigger type = mutex
-    number of scheduled jobs = 13
+    number of scheduled jobs = 19
     from Trick::ThreadBase
-    pthread_id = 0x7fff78588300
-    process_id = 42900
+    pthread_id = 139691272173376
+    process_id = 19832
     rt_priority = 0
+    cpus = none assigned
 
 Job information
 Enabled | PID |Class                    | Phase |  Start   |  Cycle   |   Stop   | ID  | Job Name
@@ -88,9 +89,15 @@ Thread 0:
       1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.17 | rkt.env.calculate_env
       1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.18 | rkt.propulsion.calculate_propulsion
       1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.19 | rkt.aerodynamics.calculate_aero
-      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.20 | rkt.force.forces
-      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.21 | rkt.newton.calculate_newton
-      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.22 | rkt.euler.euler
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.20 | rkt.ins.ins_gyro
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.21 | rkt.ins.ins_accl
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.22 | rkt.ins.ins_grav
+      1 |   0 |scheduled                | 60000 | 0.000000 |     0.05 |    1e+37 | 23.23 | rkt.ins.update
+      1 |   0 |scheduled                | 60000 | 0.000000 |     0.05 |    1e+37 | 23.24 | rkt.rcs.actuate
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.25 | rkt.rcs.rcs_schmitt_thrust
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.26 | rkt.force.forces
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.27 | rkt.newton.calculate_newton
+      1 |   0 |scheduled                | 60000 | 0.000000 |    0.001 |    1e+37 | 23.28 | rkt.euler.euler
       1 |   0 |automatic_last           | 60000 | 0.000000 |        1 |    1e+37 | 11.11 | trick_vs.vs.copy_data_scheduled
       1 |   0 |system_checkpoint        | 0     | 0.000000 |        1 |    1e+37 |  4.04 | trick_cpr.cpr.write_checkpoint
       1 |   0 |system_checkpoint        | 0     | 0.000000 |        1 |    1e+37 |  4.06 | trick_cpr.cpr.safestore_checkpoint

@@ -76,9 +76,9 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") force.init_force(&env, &propulsion, &rcs, &aerodynamics, &tvc);
 
             (0.001, "scheduled") kinematics.calculate_kinematics(0.001);
-	        (0.001, "scheduled") env.calculate_env(0.001,env.weathertable);
+	        //(0.001, "scheduled") env.calculate_env(0.001,env.weathertable);
             (0.001, "scheduled") propulsion.calculate_propulsion(0.001);
-            (0.001, "scheduled") aerodynamics.calculate_aero(0.001,aerodynamics.aerotable);
+            //(0.001, "scheduled") aerodynamics.calculate_aero(0.001,aerodynamics.aerotable);
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();
@@ -91,8 +91,8 @@ class Rocket_SimObject : public Trick::SimObject {
             // (0.05, "scheduled") control.control(0.05);
 
             // (0.001, "scheduled") tvc.actuate(0.001);
-            //(0.05, "scheduled") rcs.actuate();
-            //(0.001, "scheduled") rcs.rcs_schmitt_thrust();
+            (0.05, "scheduled") rcs.actuate();
+            (0.001, "scheduled") rcs.rcs_schmitt_thrust();
             // (0.001, "scheduled") actuator.actuate(0.001);
             (0.001, "scheduled") force.forces();
             (0.001, "scheduled") newton.calculate_newton(0.001);

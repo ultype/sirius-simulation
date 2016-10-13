@@ -18,7 +18,7 @@ void INS::default_data(){
 // 081118 Improved initialization, PZi
 ///////////////////////////////////////////////////////////////////////////////
 void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps){
-    srand(0);
+    
     newton = ntn;
     euler = elr;
     environment = env;
@@ -81,7 +81,7 @@ void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *ki
             GAUSS_INIT.assign_loc(r, 0, gauss(0, 1));
         }
         // forming stochastic initial state vector
-        Matrix XX_INIT = APP_INIT ;//* GAUSS_INIT;
+        Matrix XX_INIT = APP_INIT * GAUSS_INIT;
         XX_INIT *= (1 + frax_algnmnt);
 
         // forming subvectors for initialization and converting tilt to radians
