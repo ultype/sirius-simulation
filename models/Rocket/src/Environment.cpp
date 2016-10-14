@@ -20,8 +20,8 @@ void Environment::calculate_env(double int_step,Datadeck &weathertable)
     double dvw(0);
     Matrix GRAVG(3,1);
     Matrix VAED(3,1);
-    Matrix VAEDS(3,1);
-    Matrix VAEDSD(3,1);
+    Matrix VAEDS(vaeds);
+    Matrix VAEDSD(vaedsd);
     Matrix VBED(newton->vbed);
     Matrix SBII(3,1);
     SBII.build_vec3(newton->IPos[0],newton->IPos[1],newton->IPos[2]);

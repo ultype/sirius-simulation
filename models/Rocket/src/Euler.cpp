@@ -40,18 +40,14 @@ void _Euler_::euler(double int_step)
     Matrix WBIB(3,1);
 
     //input data from other module
-    TBI.build_mat33(kinematics->tbi[0][0],kinematics->tbi[0][1],kinematics->tbi[0][2],
-                        kinematics->tbi[1][0],kinematics->tbi[1][1],kinematics->tbi[1][2],
-                        kinematics->tbi[2][0],kinematics->tbi[2][1],kinematics->tbi[2][2]);
+    TBI.build_mat33(kinematics->tbi);
     //body rate wrt Earth frame in body coordinates
     WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
     //body rate wrt ineritial frame in body coordinates
     WEII.build_vec3(0,0,WEII3);
-    FMB.build_vec3(force->fmb[0],force->fmb[1],force->fmb[2]);
-    IBBB.build_mat33(propulsion->ibbb[0][0],propulsion->ibbb[0][1],propulsion->ibbb[0][2],
-                        propulsion->ibbb[1][0],propulsion->ibbb[1][1],propulsion->ibbb[1][2],
-                        propulsion->ibbb[2][0],propulsion->ibbb[2][1],propulsion->ibbb[2][2]);
-    WBIB.build_vec3(wbib[0],wbib[1],wbib[2]);
+    FMB.build_vec3(force->fmb);
+    IBBB.build_mat33(propulsion->ibbb);
+    WBIB.build_vec3(wbib);
     WBIBD.build_vec3(wbibd);
     /***********************************************************************************************/
     //integrating the angular velocity acc wrt the inertial frame in body coord

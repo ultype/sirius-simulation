@@ -6,14 +6,14 @@ trick.sim_control_panel_set_enabled(True)
 ##########################################################
 #Event0:rcs_on
 rcs_on = trick.new_event("rcs_on")
-rcs_on.set_cycle(0.001)
+rcs_on.set_cycle(0.05)
 rcs_on.condition(0, "trick.exec_get_sim_time() > 5.0")
 rcs_on.action(0, "rkt.rcs.mrcs_moment = 20")
 trick.add_event(rcs_on)
 rcs_on.activate()
 #Event1:Stage 2 ignition
 speration_1 = trick.new_event("speration_1")
-speration_1.set_cycle(0.001)
+speration_1.set_cycle(0.05)
 speration_1.condition(0, "trick.exec_get_sim_time() > 101.0")
 speration_1.action(0, "rkt.aerodynamics.refa = 1.13")
 speration_1.action(1, "rkt.propulsion.aexit = 0")
@@ -39,7 +39,7 @@ speration_1.activate()
 ###############################################################
 #Event2:Fairing speration
 speration_2=trick.new_event("speration_2")
-speration_2.set_cycle(0.001)
+speration_2.set_cycle(0.05)
 speration_2.condition(0, "trick.exec_get_sim_time() > 170.0")
 speration_2.action(0, "rkt.propulsion.vmass0 = 3863")
 speration_2.action(1, "trick.add_event(speration_3)")
@@ -47,7 +47,7 @@ speration_2.action(2, "speration_3.activate()")
 ##############################################################
 #Event3:Stage 3 ignition
 speration_3=trick.new_event("speration_3")
-speration_3.set_cycle(0.001)
+speration_3.set_cycle(0.05)
 speration_3.condition(0, "rkt.newton.thtvdx < 3.73")
 speration_3.action(0, "rkt.rcs.rcs_thrust = 10")
 speration_3.action(1, "rkt.aerodynamics.xcg_ref = 3.2489")
@@ -69,10 +69,11 @@ speration_3.action(16, "rkt.propulsion.mprop = 3")
 speration_3.action(17, "trick.add_event(speration_4)")
 speration_3.action(18, "speration_4.activate()")
 speration_3.action(19, "rkt.aerodynamics.maero = 11")
+speration_3.action(20, "rkt.rcs.mrcs_moment = 23")
 #############################################################
 #Event4:MECO
 speration_4=trick.new_event("speration_4")
-speration_4.set_cycle(0.001)
+speration_4.set_cycle(0.05)
 speration_4.condition(0, "rkt.newton.dvbi > 7613.5")
 speration_4.action(0, "rkt.propulsion.mprop = 0")
 speration_4.action(1, "rkt.propulsion.vmass0 = 0")
