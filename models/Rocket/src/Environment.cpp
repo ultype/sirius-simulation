@@ -19,7 +19,7 @@ void Environment::calculate_env(double int_step,Datadeck &weathertable)
 {
     double dvw(0);
     Matrix GRAVG(3,1);
-    Matrix VAED(3,1);
+    Matrix VAED(vaed);
     Matrix VAEDS(vaeds);
     Matrix VAEDSD(vaedsd);
     Matrix VBED(newton->vbed);
