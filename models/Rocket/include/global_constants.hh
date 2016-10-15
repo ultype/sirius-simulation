@@ -21,7 +21,7 @@ ICG: (No)
 
 /// physical constants
 /**@{*/
-double const REARTH = 6370987.308;  ///< mean earth radius - m
+double const REARTH = 6378000;  ///< mean earth radius - m
 double const WEII3 = 7.292115e-5;   ///< angular rotation of earth - rad/s
 double const AGRAV =
     9.80675445;              ///< standard value of gravity acceleration - m/s^2

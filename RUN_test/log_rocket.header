@@ -24,3 +24,9 @@ log_rocket	double	    kg	rkt.propulsion.vmass
 log_rocket	double	     N	rkt.propulsion.thrust
 log_rocket	double	    pa	rkt.aerodynamics.environment[0].pdynmc
 log_rocket	double	 kg/m3	rkt.aerodynamics.environment[0].rho
+log_rocket	double	     m	rkt.newton.ref_alt
+log_rocket	double	     m	rkt.newton.hp
+log_rocket	double	     m	rkt.newton.ha
+log_rocket	double	     1	rkt.newton.inclination
+log_rocket	double	    kg	rkt.propulsion.fmassr
+log_rocket	double	   m/s	rkt.propulsion.thrust_delta_v

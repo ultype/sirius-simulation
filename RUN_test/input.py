@@ -1,8 +1,8 @@
 #execfile("Modified_data/realtime.py")
 execfile("Modified_data/rocket.dr")
-trick.exec_set_enable_freeze(True)
-trick.exec_set_freeze_command(True)
-trick.sim_control_panel_set_enabled(True)
+#trick.exec_set_enable_freeze(True)
+#trick.exec_set_freeze_command(True)
+#trick.sim_control_panel_set_enabled(True)
 ##########################################################
 #Event0:rcs_on
 rcs_on = trick.new_event("rcs_on")
@@ -79,12 +79,12 @@ speration_4.action(0, "rkt.propulsion.mprop = 0")
 speration_4.action(1, "rkt.propulsion.vmass0 = 0")
 #############################################################
 #Realtime setting
-trick.exec_set_thread_cpu_affinity(0,0)
-trick.exec_set_thread_priority(0,1)
-trick.frame_log_on()
-trick.real_time_enable()
-trick.exec_set_software_frame(0.01)
-trick.itimer_enable()
+# trick.exec_set_thread_cpu_affinity(0,0)
+# trick.exec_set_thread_priority(0,1)
+# trick.frame_log_on()
+# trick.real_time_enable()
+# trick.exec_set_software_frame(0.01)
+# trick.itimer_enable()
 ##############################################################
 
 #SLV
