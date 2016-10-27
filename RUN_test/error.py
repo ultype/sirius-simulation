@@ -1,6 +1,6 @@
 import csv
 import argparse
-import matplotlib
+#import matplotlib.pyplot as plt
 
 def toFloat(str):
     try:
@@ -67,5 +67,6 @@ try:
                     except ZeroDivisionError:
                         outputArray[-1].append('DivByZero')
             writer.writerows(outputArray)
+
 except IOError as e:
     print(e)
