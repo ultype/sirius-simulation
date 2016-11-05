@@ -12,7 +12,7 @@ void Environment::initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine)
 
     dvba=newton->dvbe;
 
-    read_tables("weather_table.txt",weathertable);
+    read_tables("auxiliary/weather_table.txt",weathertable);
 }
 
 void Environment::calculate_env(double int_step,Datadeck &weathertable)

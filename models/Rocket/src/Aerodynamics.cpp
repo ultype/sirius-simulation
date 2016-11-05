@@ -9,7 +9,7 @@ void AeroDynamics::initialize(Kinematics *kine, Environment *env, Propulsion *pr
     newton = newt;
     tvc = t;
 
-    read_tables("aero_table.txt",aerotable);
+    read_tables("auxiliary/aero_table.txt",aerotable);
 }
 
 void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
