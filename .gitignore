@@ -1,24 +1,26 @@
 ._*
-
-
+*.DS_Store
+*.sublime-project
+*.sublime-workspace
 
 *.o
 *.pyc
 *.exe
 
-*.DS_Store
-
+makefile
+S_job_execution
+S_run_summary
+send_hs
+varserver_log
 S_sie.resource
 S_default.dat
 S_source.hh
+
 RUN_test/S_job_execution
 RUN_test/S_run_summary
 RUN_test/log_gps_Sat.trk
 RUN_test/send_hs
 
 DP_Product/*.*
-*.sublime-project
-*.sublime-workspace
 build
 trick
-makefile
