@@ -1,4 +1,6 @@
 #execfile("Modified_data/realtime.py")
+#execfile("Modified_data/rocket.dr")
+execfile("Modified_data/rocket_csv.dr")
 execfile("Modified_data/rocket.dr")
 #trick.exec_set_enable_freeze(True)
 #trick.exec_set_freeze_command(True)
