@@ -20,8 +20,10 @@ build
 trick
 DP_Product/
 
-RUN_test/S_job_execution
-RUN_test/S_run_summary
-RUN_test/*.trk
-RUN_test/*.csv
-RUN_test/*.header
+*/S_job_execution
+*/S_run_summary
+*/*.trk
+*/*.csv
+*/*.header
+
+!RUN_test/golden.csv
