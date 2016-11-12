@@ -31,4 +31,7 @@ Use the comparison tool to compare the result
 ```
 Examine the resulting file result.csv, which contains the % error between each data points. It should display all zeros.
 
+= Document =
+The UML of rocket components are in ./docs/Rocket.mdj
+Please use 'StarUML'(staruml.io) to check it out.
 
