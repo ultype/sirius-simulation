@@ -1,0 +1,32 @@
+digraph{
+    con [label="Control"]
+    act [label="Actuator"]
+    aer [label="AeroDynamics"]
+    kin [label="Kinetics"]
+    env [label="Environment"]
+    pro [label="Propulsion"]
+    eul [label="Euler"]
+    for [label="Forces"]
+    grc [label="GPS Receiver"]
+    gst [label="GPS Satellites"]
+    ins [label="INS"]
+    gui [label="Guidance"]
+    new [label="Newton"]
+    rcs [label="RCS"]
+    tvc [label="TVC"]
+    
+    con -> act
+    {kin,env,pro,eul,new,tvc}->aer
+    {ins,env,new,pro,aer}->con
+    {kin,new}->env
+    {kin,for,pro}->eul
+    {env,pro,rcs,aer,tvc}->for
+    {ins,eul,new,gst}->grc
+    {ins,new,pro}->gui
+    {new,eul,env,kin,grc}->ins
+    {new,env,eul}->kin
+    {kin,env,pro,for}->new
+    env->pro
+    {ins,gui,pro}->rcs
+    {env,pro,con,kin}->tvc
+  }
