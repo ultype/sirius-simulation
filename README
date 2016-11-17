@@ -31,7 +31,20 @@ Use the comparison tool to compare the result
 ```
 Examine the resulting file result.csv, which contains the % error between each data points. It should display all zeros.
 
-= Document =
-The UML of rocket components are in ./docs/Rocket.mdj
-Please use 'StarUML'(staruml.io) to check it out.
+= Documents =
+== Dependencies ==
+ - StarUML: staruml.io
+ - Graphviz: install via apt-get
+
+== Component Diagram ==
+The UML of rocket components is in ./docs/Rocket.mdj
+Please use 'StarUML' to view it
+
+== Component Topology ==
+With graphviz installed
+```
+cd docs
+dot topology.dot -Tpng > topology.png
+```
+Then you can use a typical image viewer to view it.
 
