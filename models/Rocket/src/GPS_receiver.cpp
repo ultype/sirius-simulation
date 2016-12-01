@@ -81,6 +81,18 @@ void GPS_Receiver::initialize(Newton* ntn, _Euler_* elr, GPS_Satellites* sats, I
     PP8 = VEC8.mat33_vec9();
 }
 
+void GPS_Receiver::update_markov(double int_step){
+    int i;
+
+    ucfreq_noise = markov(ucfreq_noise_sigma, ucfreq_noise_bcor, get_rettime(), int_step, ucfreq_noise);
+    for(i = 0; i < 4; i++){
+        PR_NOISE[i] = markov(PR_NOISE_sigma[i], PR_NOISE_bcor[i], get_rettime(), int_step, PR_NOISE[i]);
+    }
+    for(i = 0; i < 4; i++){
+        DR_NOISE[i] = markov(DR_NOISE_sigma[i], DR_NOISE_bcor[i], get_rettime(), int_step, DR_NOISE[i]);
+    }
+}
+
 void GPS_Receiver::get_quadriga(){
     int i(0);
     int j(0);

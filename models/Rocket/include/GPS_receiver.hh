@@ -24,6 +24,7 @@ class GPS_Receiver {
 
     void default_data();
     void initialize(Newton*, _Euler_*, GPS_Satellites*, INS*, double);
+    void update_markov(double);
 
     void get_quadriga();
 
@@ -62,12 +63,20 @@ class GPS_Receiver {
     double gps_acqtime;     /* *i (s)       Time to Acquire GPS Signal */
     double gps_step;        /* *i (s)       GPS Update Interval */
 
-    double ucfreq_noise;    /* *i (m/s)     User clock frequency error XXX: MARKOV */
-    double ucbias_error;    /* *io (m)      User clock bias error XXX: GAUSS */
+    double ucfreq_noise;    /* *i (m/s)     User clock frequency error */
+    double ucfreq_noise_sigma;  /* *i (--)     User clock frequency error sigma of markov variable */
+    double ucfreq_noise_bcor;   /* *i (--)     User clock frequency error bcor of markov variable */
+    double ucbias_error;    /* *io (m)      User clock bias error */
 
     double PR_BIAS[4];      /* *i (m)       Pseudo-range bias GAUSS */
-    double PR_NOISE[4];     /* *i (m)       Pseudo-range bias MARKOV */
-    double DR_NOISE[4];     /* *i (m/s)     Delta-range noise MARKOV */
+
+    double PR_NOISE[4];     /* *i (m)       Pseudo-range bias */
+    double PR_NOISE_sigma[4];    /* *i (--)       Pseudo-range bias sigma */
+    double PR_NOISE_bcor[4];     /* *i (--)       Pseudo-range bias bcor */
+
+    double DR_NOISE[4];     /* *i (m/s)     Delta-range noise */
+    double DR_NOISE_sigma[4];    /* *i (--)     Delta-range noise sigma */
+    double DR_NOISE_bcor[4];     /* *i (--)     Delta-range noise bcor */
 
     /* GPS EKF Parameters */
     double uctime_cor;      /* *i (s)       User clock correlation time constant */
