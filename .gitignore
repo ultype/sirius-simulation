@@ -26,4 +26,6 @@ DP_Product/
 */*.csv
 */*.header
 
+MONTE_RUN_test
+
 !RUN_test/golden.csv
