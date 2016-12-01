@@ -19,9 +19,16 @@ Execute in shell at repo root
 ## Golden Model
 Execute in shell at repo root
 ```
-    ./S_main_<platform>.exe RUN_test/input.py
+    ./S_main_<platform>.exe RUN_test/golden/golden.py
 ```
-Result will be stored in RUN_test Directory
+Result will be stored in RUN_test/golden Directory
+
+## Monte Carol
+Execute in shell at repo root
+```
+    ./S_main_<platform>.exe RUN_test/monte/monte.py
+```
+Result will be stored in RUN_test/monte Directory
 
 # Tests
 Build and Run Golden Model
