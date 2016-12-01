@@ -26,6 +26,10 @@ DP_Product/
 */*.csv
 */*.header
 
-MONTE_RUN_test
+MONTE_RUN_golden/RUN_*
+MONTE_RUN_golden/monte_header
+MONTE_RUN_golden/monte_runs
+MONTE_RUN_golden/run_summary
 
-!RUN_test/golden.csv
+
+!RUN_golden/golden.csv

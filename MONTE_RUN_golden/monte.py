@@ -1,32 +1,25 @@
 import time
 
 #execfile("Modified_data/realtime.py")
-#execfile("Modified_data/rocket.dr")
+execfile("Modified_data/pr_noise.dr")
 execfile("Modified_data/test.dr")
 #trick.exec_set_enable_freeze(True)
 #trick.exec_set_freeze_command(True)
 #trick.sim_control_panel_set_enabled(True)
 
 ##########MONTE CORAL############
+RUN_NUM = 20
+RUNNER = 20
+
 trick.mc_set_enabled(1)
-trick.mc_set_num_runs(5)
+trick.mc_set_num_runs(RUN_NUM)
 trick.mc_set_timeout(1200)
 
-slave0 = trick.MonteSlave("localhost")
-slave0.thisown = 0 # tell Python not to free the underlying C++ class when the wrapper is garbage collected
-trick_mc.mc.add_slave(slave0)
-slave1 = trick.MonteSlave("localhost")
-slave1.thisown = 0 # tell Python not to free the underlying C++ class when the wrapper is garbage collected
-trick_mc.mc.add_slave(slave1)
-slave2 = trick.MonteSlave("localhost")
-slave2.thisown = 0 # tell Python not to free the underlying C++ class when the wrapper is garbage collected
-trick_mc.mc.add_slave(slave2)
-slave3 = trick.MonteSlave("localhost")
-slave3.thisown = 0 # tell Python not to free the underlying C++ class when the wrapper is garbage collected
-trick_mc.mc.add_slave(slave3)
-slave4 = trick.MonteSlave("localhost")
-slave4.thisown = 0 # tell Python not to free the underlying C++ class when the wrapper is garbage collected
-trick_mc.mc.add_slave(slave4)
+slave = []
+for i in range(0, RUNNER):
+    slave.append(trick.MonteSlave("localhost"))
+    slave[i].thisown = 0 # tell Python not to free the underlying C++ class when the wrapper is garbage collected
+    trick_mc.mc.add_slave(slave[i])
 
 ##########################################################
 #Event0:rcs_on
