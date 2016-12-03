@@ -1,9 +1,9 @@
 #execfile("Modified_data/realtime.py")
 #execfile("Modified_data/rocket.dr")
 execfile("Modified_data/test.dr")
-trick.exec_set_enable_freeze(True)
-trick.exec_set_freeze_command(True)
-trick.sim_control_panel_set_enabled(True)
+#trick.exec_set_enable_freeze(True)
+#trick.exec_set_freeze_command(True)
+#trick.sim_control_panel_set_enabled(True)
 ##########################################################
 #Event0:rcs_on
 rcs_on = trick.new_event("rcs_on")
