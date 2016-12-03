@@ -1,5 +1,5 @@
 golden:
     script:
-        trick-CP
-        ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
-        diff -s RUN_golden/golden.csv RUN_golden/log_rocket_csv.csv
+        - trick-CP
+        - ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
+        - diff -s RUN_golden/golden.csv RUN_golden/log_rocket_csv.csv
