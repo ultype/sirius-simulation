@@ -49,14 +49,14 @@ try:
                         buf = []
                         for num in row:
                             buf.append(num)
-                    plotArray[0].append(buf[7])
-                    plotArray[1].append(buf[8])
+                    plotArray[0].append(toFloat(buf[7]))
+                    plotArray[1].append(toFloat(buf[8]))
             except:
                 print('JJGG')
         print(plotArray[0])
         print(plotArray[1])
-        plt.plot(plotArray[0],plotArray[1])
-        plt.axis([plotArray[0][0]-1000000,plotArray[0][0]+1000000,plotArray[1][0]-1000000,plotArray[1][0]+1000000])
+        plt.plot(plotArray[0],plotArray[1],"o")
+        #plt.axis([plotArray[0][0]-1000000,plotArray[0][0]+1000000,plotArray[1][0]-1000000,plotArray[1][0]+1000000])
         plt.xlabel('x(m)')
         plt.ylabel('y(m)')
         plt.show()
