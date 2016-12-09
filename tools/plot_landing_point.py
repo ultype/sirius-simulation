@@ -12,10 +12,12 @@ parser = argparse.ArgumentParser(
     description='Read some csv and output landing point.'
 )
 parser.add_argument('golden', help='Input the file position of golden file.')
-parser.add_argument('target', help='Input the file position of target folder.\n\
-                                    Format: RUN_XXXXX')
+parser.add_argument('target',
+    help='Input the file position of target folder.\n\
+          Default: ../MONTE_RUN_monte/,
+    default='../MONTE_RUN_monte/')
 parser.add_argument('number',
-                    help='Input the number of input file',
+                    help='Input the number of input file.',
                     default='20',
                     type=int)
 
@@ -38,9 +40,11 @@ try:
             goldenFinal.append(num)
 
         plotArray = [[goldenFinal[7]],[goldenFinal[8]]]
-
+        test = 0
         for i in range(0,args.number):
-            text = '../MONTE_RUN_monte/RUN_' + ('00000' + str(i))[-5:] + '/log_rocket_csv.csv'
+            print(test)
+            test += 1
+            text = args.target + 'RUN_' + ('00000' + str(i))[-5:] + '/log_rocket_csv.csv'
             try:
                 with open(text, 'rb') as csvFile:
                     buf = []
@@ -52,7 +56,7 @@ try:
                     plotArray[0].append(toFloat(buf[7]))
                     plotArray[1].append(toFloat(buf[8]))
             except:
-                print('JJGG')
+                print('Error: too many cases given.')
         print(plotArray[0])
         print(plotArray[1])
         plt.plot(plotArray[0],plotArray[1],"o")
