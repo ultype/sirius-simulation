@@ -14,8 +14,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('golden', help='Input the file position of golden file.')
 parser.add_argument('target',
     help='Input the file position of target folder.\n\
-          Default: ../MONTE_RUN_monte/,
-    default='../MONTE_RUN_monte/')
+          Default: ../MONTE_RUN_monte/')
 parser.add_argument('number',
                     help='Input the number of input file.',
                     default='20',
@@ -40,10 +39,7 @@ try:
             goldenFinal.append(num)
 
         plotArray = [[goldenFinal[7]],[goldenFinal[8]]]
-        test = 0
         for i in range(0,args.number):
-            print(test)
-            test += 1
             text = args.target + 'RUN_' + ('00000' + str(i))[-5:] + '/log_rocket_csv.csv'
             try:
                 with open(text, 'rb') as csvFile:
