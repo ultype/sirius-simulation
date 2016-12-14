@@ -22,13 +22,16 @@ for i in range(0, RUNNER):
     trick_mc.mc.add_slave(slave[i])
 
 ##########################################################
-#Event0:rcs_on
-rcs_on = trick.new_event("rcs_on")
-rcs_on.set_cycle(0.001)
-rcs_on.condition(0, "trick.exec_get_sim_time() == 5.001")
-rcs_on.action(0, "rkt.rcs.mrcs_moment = 20")
-trick.add_event(rcs_on)
-rcs_on.activate()
+#Event0:control_on
+control_on = trick.new_event("control_on")
+control_on.set_cycle(0.001)
+control_on.condition(0, "trick.exec_get_sim_time() == 5.001")
+control_on.action(0, "rkt.rcs.mrcs_moment = 20")
+control_on.action(1, "rkt.control.maut = 53")
+control_on.action(2, "rkt.control.ancomx = -0.0")
+control_on.action(3, "rkt.tvc.mtvc = 2")
+trick.add_event(control_on)
+control_on.activate()
 #Event1:Stage 2 ignition
 speration_1 = trick.new_event("speration_1")
 speration_1.set_cycle(0.001)
@@ -140,7 +143,7 @@ rkt.propulsion.fuel_flow_rate = 88.89  #fuel flow rate
 rkt.propulsion.aexit = 0.258242843 #nozzle exhaust area
 rkt.propulsion.payload = 98 #payload mass
 #INS
-rkt.ins.mins   = 0
+rkt.ins.mins   = 1
 #INS Acceleration
 rkt.ins.efspb  = [0, 0, 0]
 rkt.ins.ewalka = [0, 0, 0]
@@ -323,5 +326,20 @@ rkt.rcs.rocket_r = 0.68  #rocket's radius - m  module rcs
 #Guidance
 rkt.guidance.alphacomx = 0   #Alpha command - deg  module guidance
 rkt.guidance.betacomx = 0    #Beta command - deg  module guidance
+#Control
+rkt.control.maut = 0  #turn on acceleration autopilot
+rkt.control.ancomx = 0 #acceleration command on normal direction
+rkt.control.delimx = 10 #eta rate limiter
+rkt.control.drlimx = 10 #zeta rate limiter
+rkt.control.zaclp = 0.7 #damping ratio of pitch controller
+rkt.control.zacly = 0.9 #damping ratio of
+#TVC
+rkt.tvc.mtvc = 0  #TVC mode switch
+rkt.tvc.gtvc = 1
+rkt.tvc.parm = 19.25 #TVC moment arm
+rkt.tvc.tvclimx = 10  # TVC acuator limiter
+rkt.tvc.dtvclimx = 200  #TVC acuator rate limiter
+rkt.tvc.zettvc = 0.7  #TVC acuator damping ratio
+rkt.tvc.wntvc = 100  #TVC natrual freqency
 
-trick.stop(700)
+trick.stop(120)
