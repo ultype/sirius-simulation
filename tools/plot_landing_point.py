@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('golden', help='Input the file position of golden file.')
 parser.add_argument('target',
     help='Input the file position of target folder.\n\
-          Default: ../MONTE_RUN_monte/')
+          Default: ../MONTE_RUN_monte/' )
 parser.add_argument('number',
                     help='Input the number of input file.',
                     default='20',
@@ -49,13 +49,18 @@ try:
                         buf = []
                         for num in row:
                             buf.append(num)
-                    plotArray[0].append(toFloat(buf[7]))
-                    plotArray[1].append(toFloat(buf[8]))
-            except:
-                print('Error: too many cases given.')
-        print(plotArray[0])
-        print(plotArray[1])
-        plt.plot(plotArray[0],plotArray[1],"o")
+                    x = toFloat(buf[7])
+                    y = toFloat(buf[8])
+                    if isinstance(x,float) and isinstance(y,float):
+                        plotArray[0].append(x)
+                        plotArray[1].append(y)
+            except Exception as e:
+                print (e.__doc__)
+                print (e.message)
+        #print(plotArray[0])
+        #print(plotArray[1])
+        plt.plot(plotArray[0],plotArray[1],"o", color='red');
+        plt.plot(plotArray[0][0],plotArray[1][0],"o",color = 'yellow');
         #plt.axis([plotArray[0][0]-1000000,plotArray[0][0]+1000000,plotArray[1][0]-1000000,plotArray[1][0]+1000000])
         plt.xlabel('x(m)')
         plt.ylabel('y(m)')
