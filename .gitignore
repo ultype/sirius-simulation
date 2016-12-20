@@ -31,5 +31,6 @@ MONTE_RUN_golden/monte_header
 MONTE_RUN_golden/monte_runs
 MONTE_RUN_golden/run_summary
 
+MONTE_RUN_monte
 
 !RUN_golden/golden.csv
