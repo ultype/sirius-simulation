@@ -2,6 +2,8 @@ import csv
 import argparse
 #import matplotlib.pyplot as plt
 
+eps = 1e-9
+
 def toFloat(str):
     try:
         return float(str)
@@ -47,25 +49,29 @@ try:
 
         if(args.last): #only last
             for idx, num in enumerate(goldenArray[-1]):
-                try:
-                    outputArray.append((num - targetArray[-1][idx])/num)
-                except TypeError:
-                    outputArray.append(goldenNum)
-                except ZeroDivisionError:
-                    outputArray.append('DivByZero')
+                if num < eps and num > -eps:
+                    outputArray.append((num - targetArray[-1][idx])/(num + 1))
+                else:
+                    try:
+                        outputArray.append((num - targetArray[-1][idx])/num)
+                    except TypeError:
+                        outputArray.append(goldenNum)
             writer.writerow(outputArray);
         else: #All to All
             for idxRow, goldenRow in enumerate(goldenArray):
                 outputArray.append([]);
                 for idxNum, goldenNum in enumerate(goldenRow):
-                    try:
+                    if goldenNum < eps and goldenNum > -eps:
                         outputArray[-1].append(
-                            (goldenNum - targetArray[idxRow][idxNum])/goldenNum
+                            (goldenNum - targetArray[idxRow][idxNum])/(goldenNum + 1)
                         )
-                    except TypeError:
-                        outputArray[-1].append(goldenNum)
-                    except ZeroDivisionError:
-                        outputArray[-1].append('DivByZero')
+                    else:
+                        try:
+                            outputArray[-1].append(
+                                (goldenNum - targetArray[idxRow][idxNum])/goldenNum
+                            )
+                        except TypeError:
+                            outputArray[-1].append(goldenNum)
             writer.writerows(outputArray)
 
 except IOError as e:
