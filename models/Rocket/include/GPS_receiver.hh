@@ -36,6 +36,11 @@ class GPS_Receiver {
     GPS_Satellites *gps_sats;
     INS *ins;
 
+    double position_state[3];  /* *o (m)        Position state (inertial coor) */
+    double velocity_state[3];  /* *o (m)        Velocity state (inertial coor) */
+    int gps_update;       /* *o (--)       GPS update? > 0 updated */
+  private:
+
     /* Internal variables */
     bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
     double gps_epoch;           /* ** (s)       GPS update epoch time since launch */
@@ -95,7 +100,7 @@ class GPS_Receiver {
     double factr;           /* *i (--)      Factor to modifiy the R-matrix R(1+factr) */
 
     /* GPS Outputs */
-    int gps_update;       /* *o (--)       GPS update? > 0 updated */
+
     double gdop;            /* *o (m)        Geometric dillution of precision of quadriga */
     double slot[4];         /* *o (--)       SV slot#  of quadriga */
     double ssii_quad[16];   /* *o (m)        Best quadriga inertial coordinates and their slot# */
@@ -121,8 +126,7 @@ class GPS_Receiver {
     double alt3;            /* *o (m)        Quadriga 3rd alt */
     double alt4;            /* *o (m)        quadriga 4th alt */
 
-    double position_state[3];  /* *o (m)        Position state (inertial coor) */
-    double velocity_state[3];  /* *o (m)        Velocity state (inertial coor) */
+
     double clock_state[3];     /* *o (--)       CLock state */
 
     double gps_pos_meas;    /* *o (m)        */

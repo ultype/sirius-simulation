@@ -22,18 +22,20 @@ class Propulsion{
         Environment *environment;
         /***********************************Variables describtion******************************/
         int mprop;          /* *io (--)     propulsion mode =0:none; =3 input; =4 LTG control*/
-        double acowl;       /* *io (m2)     Cowl area of engine inlet*/
         double vmass;       /* *io (kg)     Vehicle mass*/
-        double vmass0;      /* *io (kg)     Initial vehicle mass*/
         double xcg;         /* *io (m)      Center 0f Gravity location from nose cone*/
         double ibbb[3][3];  /* *io (kg*m2)  Vehicle moment of inertia*/
+        double thrust;      /* *io (N)      Thrust*/
+        double fmassr;      /* *io (kg)     Remaining fuel mass*/
+
+      private:
+        double acowl;       /* *io (m2)     Cowl area of engine inlet*/
+        double vmass0;      /* *io (kg)     Initial vehicle mass*/
         double fmass0;      /* *io (kg)     Initial fuel mass in stage*/
         double fmasse;      /* *io (kg)     Fuel mass expended (zero initialization required)*/
         double fmassd;      /* *io (kg/s)   Fuel mass expended derivative*/
         double aexit;       /* *io (m2)     Nozzle exit area*/
         double spi;         /* *io (s)      Specific impulse*/
-        double thrust;      /* *io (N)      Thrust*/
-        double fmassr;      /* *io (kg)     Remaining fuel mass*/
         double xcg_0;       /* *io (m)      Initial cg location from nose*/
         double xcg_1;       /* *io (m)      Final cg location from nose*/
         double fuel_flow_rate;/* *io (kg/s) Fuel flow rate of rocket motor*/

@@ -21,7 +21,7 @@ class Propulsion;
 class AeroDynamics;
 
 class Control {
-    public:
+  public:
     Control() {}
 
     void default_data();
@@ -54,6 +54,9 @@ class Control {
     // 030520 Created by Peter H Zipfel
     // 091214 Modified for ROCKET6, PZi
     ///////////////////////////////////////////////////////////////////////////////
+    double  delecx;         /* *io (d)      Pitch command deflection */ // n
+    double  delrcx;         /* *io (d)      Yaw command deflection */   // n
+  private:
     int     maut;           /* *io (--)     maut=|mauty|mautp| see table */
     int     mfreeze;        /* *io (--)     =0:Unfreeze; =1:Freeze; increment for more */
     double  waclp;          /* *io (r/s)    Nat freq of accel close loop complex pole */
@@ -65,8 +68,6 @@ class Control {
     double  yy;             /* *io (m/s)    Yaw feed-forward integration variable */
     double  zzd;            /* *io (m/s2)   Pitch feed-forward derivative variable */
     double  zz;             /* *io (m/s)    Pitch feed-forward integration variable */
-    double  delecx;         /* *io (d)      Pitch command deflection */
-    double  delrcx;         /* *io (d)      Yaw command deflection */
     double  alcomx_actual;  /* *io (--)     Later accel com limited by 'betalimx' */
     double  ancomx_actual;  /* *io (--)     Normal accel com limited by 'alplimx' */
     double  gainfp[3];      /* *io (--)     Feedback gains of pitch accel controller */

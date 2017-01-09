@@ -144,10 +144,14 @@ class Guidance {
     // 091214 Modified for ROCKET6, PZi
     ///////////////////////////////////////////////////////////////////////////////
 
+    double  utbc[3];        /* *io  (--)        Commanded unit thrust vector in body coor */
+    double  alphacomx;      /* *io  (d)         Alpha command */
+    double  betacomx;       /* *io  (d)         Beta command */
+  private:
+
     int     mguide;         /* *io  (--)        Guidance modes, see table */
     int     init_flag;      /* *io  (--)        Flag for initializing LTG flags */
     double  time_ltg;       /* *io  (s)         Time since initiating LTG */
-    double  utbc[3];        /* *io  (--)        Commanded unit thrust vector in body coor */
     double  rbias[3];       /* *io  (m)         Range-to-be-gained bias */
     int     beco_flag;      /* *io  (--)        Boost engine cut-off flag */
     int     inisw_flag;     /* *io  (--)        Flag to initialize '..._intl()' */
@@ -193,8 +197,7 @@ class Guidance {
     double  ddb;            /* *io  (m)         Position error at BECO */
     double  dvdb;           /* *io  (m/s)       Distance of vehicle from the desired end-point */
     double  thtvddbx;       /* *io  (d)         Angle error at BECO */
-    double  alphacomx;      /* *io  (d)         Alpha command */
-    double  betacomx;       /* *io  (d)         Beta command */
+
 
 };
 

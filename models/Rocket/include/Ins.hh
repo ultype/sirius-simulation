@@ -41,6 +41,23 @@ class INS {
     Kinematics *kinematics;
     GPS_Receiver *gpsr;
 
+    double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
+    double qqcx;        /* *io  (d/s)   INS computed pitch rate */
+    double rrcx;        /* *io  (d/s)   INS computed yaw rate */
+    double fspcb[3];    /* *io  (N/kg)  Computed specific force on body */
+    double sbiic[3];    /* *io  (m)     Computed pos of body wrt earth reference point*/
+    double vbiic[3];    /* *io  (m/s)   Computed body vel in earth coor */
+    double wbici[3];    /* *io  (r/s)   Computed inertial body rate in inert coordinate */
+    double tbic[3][3];  /* *io  (--)    Comp T.M. of body wrt earth coordinate */
+    double ppcx;        /* *io  (d/s)   INS computed roll rate */
+    double alphacx;     /* *io  (d)     INS computed angle of attack */
+    double betacx;      /* *io  (d)     INS computed sideslip angle */
+    double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
+    double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
+    double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
+    
+  private:
+
     /* Accelmeter */
     double efspb[3];    /* *i   (N/kg)  Error in specific force on body in body coordinate */
     double ewalka[3];   /* *i   (m/s2)  Acceleration random noise */
@@ -63,31 +80,15 @@ class INS {
 
     int mins;           /* *io  (--)    INS mode. =0:ideal INS; =1:with INS error */
     double frax_algnmnt;/* *io  (--)    Fractn to mod initial INS err state: XXO=XXO(1+frax) */
-    double vbiic[3];    /* *io  (m/s)   Computed body vel in earth coor */
-    double sbiic[3];    /* *io  (m)     Computed pos of body wrt earth reference point*/
-    double wbici[3];    /* *io  (r/s)   Computed inertial body rate in inert coordinate */
     double wbicb[3];    /* *io  (r/s)   Computed inertial body rate in body coordinate */
-    double tbic[3][3];  /* *io  (--)    Comp T.M. of body wrt earth coordinate */
-
-    double ppcx;        /* *io  (d/s)   INS computed roll rate */
-    double qqcx;        /* *io  (d/s)   INS computed pitch rate */
-    double rrcx;        /* *io  (d/s)   INS computed yaw rate */
-
     double loncx;       /* *io  (d)     INS derived longitude */
     double latcx;       /* *io  (d)     INS derived latitude */
     double altc;        /* *io  (m)     INS derived altitude */
     double vbecd[3];    /* *io  (m/s)   Geodetic velocity */
-    double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
     double tdci[3][3];  /* *io  (--)    Comp T.M. of geodetic wrt inertial */
     double thtvdcx;     /* *io  (d)     INS computed vertical flight path angle */
     double psivdcx;     /* *io  (d)     INS computed heading angle */
-    double fspcb[3];    /* *io  (N/kg)  Computed specific force on body */
     double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
-    double alphacx;     /* *io  (d)     INS computed angle of attack */
-    double betacx;      /* *io  (d)     INS computed sideslip angle */
-    double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
-    double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
-    double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
     double alppcx;      /* *io  (d)     INS computed total angle of attack */
     double phipcx;      /* *io  (d)     INS computed aero roll angle */
     double ricid[3];    /* *io  (r)     INS tilt error derivative */

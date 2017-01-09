@@ -38,16 +38,17 @@ class TVC {
     Control *control;
     Propulsion *propulsion;
 
-    int mtvc;            /* *io  (--)    =0:no TVC;=1:no dyn;=2:scnd order;=3:2+gain */
+    int mtvc;            /* *io  (--)    =0:no TVC;=1:no dyn;=2:scnd order;=3:2+gain n*/
+    double gtvc;        /* *io  (--)    TVC nozzle deflection gain n*/
+    double parm;        /* *io  (m)     Propulsion moment arm from vehicle nose n*/
+    double fpb[3];      /* *io  (N)     Thrust force in body axes n*/
+    double fmpb[3];     /* *io  (N*m)    Thrust moment in body axes */
+  private:
     double tvclimx;     /* *io  (d)     Nozzle deflection limiter */
     double dtvclimx;    /* *io  (d/s)   Nozzle deflection rate limiter */
     double wntvc;       /* *io  (r/s)   Natural frequency of TVC */
     double zettvc;      /* *io  (--)    Damping of TVC */
     double factgtvc;    /* *io  (--)    Factor for TVC gain */
-    double gtvc;        /* *io  (--)    TVC nozzle deflection gain */
-    double parm;        /* *io  (m)     Propulsion moment arm from vehicle nose */
-    double fpb[3];      /* *io  (N)     Thrust force in body axes */
-    double fmpb[3];     /* *io  (N*m)    Thrust moment in body axes */
     double etax;        /* *io  (d)     Nozzle pitch deflection */
     double zetx;        /* *io  (d)     Nozzle yaw deflection */
     double etacx;       /* *io  (d)     Commanded nozzle pitch deflection */

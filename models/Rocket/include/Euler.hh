@@ -33,10 +33,11 @@ class _Euler_ {
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */
         double rrx;     /* *io (d/s)        Body yaw angular velocity wrt earth in body axes */
-        double wbeb[3]; /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
-        double wbib[3]; /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
-        double wbibd[3];/* *io (r/s2)      Angular velocity of vehicle wrt inertia in body coord - derivative */
         double wbii[3]; /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
+        double wbib[3]; /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
+      private:
+        double wbeb[3]; /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
+        double wbibd[3];/* *io (r/s2)      Angular velocity of vehicle wrt inertia in body coord - derivative */
 /**************************************************************************************/
 };
 

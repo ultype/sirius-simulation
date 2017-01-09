@@ -53,16 +53,28 @@ class AeroDynamics
     ///////////////////////////////////////////////////////////////////////////////
 
     /***********************************Variables describtion******************************/
-        int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
+        double dyb;         /* *io (m/s2)   Side force derivative - m/s^2*/
+        double dma;         /* *io (1/s2)   Pitch moment derivative - 1/s^2*/
+        double dnb;         /* *io (1/s2)   Yawing moment derivative - 1/s^2*/
+        double dnd;         /* *io (m/s2)   pitch contrl force derivative -m/s^2*/
+        double dmq;         /* *io (1/s)    Pitch damping derivative - 1/s*/
+        double dnr;         /* *io (1/s)    Yaw dampnig derivative - 1/s*/
+        double dmde;        /* *io (1/s2)   Pitch control derivative - 1/s^2*/
+        double dndr;        /* *io (1/s2)   Yaw control derivative - 1/s^2*/
+        double gymax;       /* *io (--)     Max g permissable in yaw for vehicle - g's*/
+        double dla;         /* *io (m/s2)   Lift slope derivative - m/s^2*/
         double refa;        /* *io (m2)     Reference area for aero coefficients - m^2*/
         double refd;        /* *io (m)      Reference length for aero coefficients - m*/
-        double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
         double cy;          /* *io (--)     Side force coefficient - ND*/
         double cll;         /* *io (--)     Rolling moment coefficient - ND*/
         double clm;         /* *io (--)     Pitching moment coefficient - ND*/
         double cln;         /* *io (--)     Yawing moment coefficient - ND*/
         double cx;          /* *io (--)     X-force coefficient - ND*/
         double cz;          /* *io (--)     Z-force coefficient - ND*/
+
+      private:
+        int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
+        double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
         double ca0;         /* *io (--)     Axial force coeff(Mach) - ND*/
         double caa;         /* *io (--)     Delta axial force due to alpha(Mach) - ND*/
         double cn0;         /* *io (--)     Normal force coeff(Mach,alpha) - ND*/
@@ -82,19 +94,10 @@ class AeroDynamics
         double cnr;         /* *io (1/r)    Yaw damping deriv(alpha,mach) - 1/rad*/
         double stmarg_yaw;  /* *io (--)     Static margin yaw (+stable, -unstable) - caliber*/
         double stmarg_pitch;/* *io (--)     Static margin pitch (+stable, -unstable) - caliber*/
-        double dla;         /* *io (m/s2)   Lift slope derivative - m/s^2*/
         double dlde;        /* *io (m/s2)   Lift elevator control derivative - m/s^2*/
-        double dma;         /* *io (1/s2)   Pitch moment derivative - 1/s^2*/
-        double dmq;         /* *io (1/s)    Pitch damping derivative - 1/s*/
-        double dmde;        /* *io (1/s2)   Pitch control derivative - 1/s^2*/
-        double dyb;         /* *io (m/s2)   Side force derivative - m/s^2*/
         double dydr;        /* *io (m/s2)   Side force control derivative - m/s^2*/
-        double dnb;         /* *io (1/s2)   Yawing moment derivative - 1/s^2*/
-        double dnr;         /* *io (1/s)    Yaw dampnig derivative - 1/s*/
-        double dndr;        /* *io (1/s2)   Yaw control derivative - 1/s^2*/
         double dllp;        /* *io (1/s)    Roll damping derivative - 1/s*/
         double dllda;       /* *io (1/s2)   Roll control derivative - 1/s^2*/
-        double dnd;         /* *io (m/s2)   pitch contrl force derivative -m/s^2*/
         double realp1;      /* *io (r/s)    First real root of airframe pitch dyn  - rad/s*/
         double realp2;      /* *io (r/s)    Second real root of airframe pitch dyn - rad/s*/
         double wnp;         /* *io (r/s)    Natural frequency of airframe pitch dynamics - rad/s*/
@@ -110,8 +113,6 @@ class AeroDynamics
         double gnavail;     /* *io (--)     G available in pitch for vehicle - g's*/
         double gyavail;     /* *io (--)     G available in yaw for vehicle - g's*/
         double gnmax;       /* *io (--)     Max g permissable in pitch for vehicle - g's*/
-        double gymax;       /* *io (--)     Max g permissable in yaw for vehicle - g's*/
-
 };
 
 
