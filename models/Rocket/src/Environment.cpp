@@ -10,7 +10,7 @@ void Environment::initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine)
     newton=newt;
     aerodynamics=aero;
 
-    dvba=newton->dvbe;
+    dvba=newton->get_dvbe();
 
     read_tables("auxiliary/weather_table.txt",weathertable);
 }
@@ -22,10 +22,10 @@ void Environment::calculate_env(double int_step,Datadeck &weathertable)
     Matrix VAED(vaed);
     Matrix VAEDS(vaeds);
     Matrix VAEDSD(vaedsd);
-    Matrix VBED(newton->vbed);
+    Matrix VBED = newton->get_VBED();
     Matrix SBII(3,1);
-    SBII.build_vec3(newton->IPos[0],newton->IPos[1],newton->IPos[2]);
-    double alt=newton->alt;
+    SBII.build_vec3(newton->get_IPos()[0],newton->get_IPos()[1],newton->get_IPos()[2]);
+    double alt=newton->get_alt();
     //decoding the air switch
     int matmo=mair/100;
     int mturb=(mair-matmo*100)/10;

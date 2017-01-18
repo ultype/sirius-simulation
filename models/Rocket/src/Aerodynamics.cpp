@@ -27,7 +27,7 @@ void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
     double ppx=euler->ppx;
     double qqx=euler->qqx;
     double rrx=euler->rrx;
-    double alt=newton->alt;
+    double alt=newton->get_alt();
     double mprop=propulsion->mprop;
     double vmass=propulsion->vmass;
     double xcg=propulsion->xcg;

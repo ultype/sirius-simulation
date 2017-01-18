@@ -11,10 +11,10 @@ void Kinematics::initialize(Newton *newt, Environment *env, _Euler_ *eul){
     environment = env;
     euler = eul;
 
-    double lonx=newton->lonx;
-    double latx=newton->latx;
-    double alt=newton->alt;
-    double dvbe=newton->dvbe;
+    double lonx=newton->get_lonx();
+    double latx=newton->get_latx();
+    double alt=newton->get_alt();
+    double dvbe=newton->get_dvbe();
     Matrix TDI(3,3);
     Matrix TBD(3,3);
     Matrix TBI(3,3);
@@ -35,9 +35,9 @@ void Kinematics::calculate_kinematics(double int_step){
     Matrix TBD(3,3);
 
     double dvba=environment->dvba;
-    double lonx=newton->lonx;
-    double latx=newton->latx;
-    double alt=newton->alt;
+    double lonx=newton->get_lonx();
+    double latx=newton->get_latx();
+    double alt=newton->get_alt();
 
     Matrix WBIB(3,1);
     Matrix VBED(3,1);
@@ -45,9 +45,9 @@ void Kinematics::calculate_kinematics(double int_step){
     Matrix VBII(3,1);
 
     WBIB.build_vec3(euler->wbib);
-    VBED.build_vec3(newton->vbed);
+    VBED = newton->get_VBED();
     VAED.build_vec3(environment->vaed);
-    VBII.build_vec3(newton->IVel);
+    VBII = newton->get_IVel();
 
     Matrix TBI(3,3);
     Matrix TBID(3,3);

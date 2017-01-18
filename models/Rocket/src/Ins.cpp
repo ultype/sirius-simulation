@@ -18,7 +18,7 @@ void INS::default_data(){
 // 081118 Improved initialization, PZi
 ///////////////////////////////////////////////////////////////////////////////
 void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps){
-    
+
     newton = ntn;
     euler = elr;
     environment = env;
@@ -106,7 +106,7 @@ void INS::ins_accl()
     Matrix ESCALA(escala);
     Matrix EBIASA(ebiasa);
     Matrix EWALKA(ewalka);
-    Matrix FSPB(newton->fspb);
+    Matrix FSPB = newton->get_FSPB();
 
     //-------------------------------------------------------------------------
     // computing accelerometer erros without random walk (done in 'ins()')
@@ -131,7 +131,7 @@ void INS::ins_gyro(double int_step)
     Matrix EBIASG(ebiasg);
     // input from other modules
     Matrix WBIB(euler->wbib);
-    Matrix FSPB(newton->fspb);
+    Matrix FSPB = newton->get_FSPB();
     //-------------------------------------------------------------------------
     // computing cluster misalignment error
     Matrix EGB = ESCALG.diamat_vec() + EMISG.skew_sym();
@@ -166,7 +166,7 @@ void INS::ins_grav()
     Matrix ESBI(esbi);
     Matrix SBIIC(sbiic);
     //-------------------------------------------------------------------------
-    double dbi = newton->dbi;
+    double dbi = newton->get_dbi();
     double dbic = SBIIC.absolute();
     double ed = dbic - dbi;
     double dum = GM / pow(dbic, 3);
@@ -224,9 +224,9 @@ void INS::update(double int_step){
     Matrix TBI(kinematics->tbi);
     Matrix WBIB(euler->wbib);
     Matrix WBII(euler->wbii);
-    Matrix SBII(newton->IPos);
-    Matrix VBII(newton->IVel);
-    Matrix FSPB(newton->fspb);
+    Matrix SBII = newton->get_IPos();
+    Matrix VBII = newton->get_IVel();
+    Matrix FSPB = newton->get_FSPB();
 
     int mroll = 0; // Ambiguous
 

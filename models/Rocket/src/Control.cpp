@@ -188,7 +188,7 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     double dnb = aerodynamics->dnb;
     double dnr = aerodynamics->dnr;
     double dndr = aerodynamics->dndr;
-    double dvbe = newton->dvbe;
+    double dvbe = newton->get_dvbe();
     double rrcx = ins->rrcx;
     Matrix FSPCB(ins->fspcb);
 

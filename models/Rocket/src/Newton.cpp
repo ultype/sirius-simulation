@@ -7,74 +7,72 @@
 
 #include "utility_header.hh"
 
+Matrix Newton::build_WEII(){
+    Matrix WEII(3, 3);
+    WEII.assign_loc(0, 1, -WEII3);
+    WEII.assign_loc(1, 0, WEII3);
+
+    return WEII;
+}
+
+Matrix Newton::build_VBEB(double _alpha0x, double _beta0x, double _dvbe){
+    Matrix VBEB(3, 1);
+    double salp = sin(_alpha0x * RAD);
+    double calp = cos(_alpha0x * RAD);
+    double sbet = sin(_beta0x * RAD);
+    double cbet = cos(_beta0x * RAD);
+    double vbeb1 = calp * cbet * _dvbe;
+    double vbeb2 = sbet * _dvbe;
+    double vbeb3 = salp * cbet * _dvbe;
+    VBEB.build_vec3(vbeb1, vbeb2, vbeb3);
+
+    return VBEB;
+}
+
+Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
+    : kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc)
+{
+}
+
 void Newton::default_data(){
 }
 
-void Newton::initialize(Kinematics *kine, _Euler_ *elr, Environment *env, Propulsion *prop, Forces *forc){
-    kinematics = kine;
-    euler = elr;
-    environment = env;
-    propulsion = prop;
-    forces = forc;
+void Newton::initialize(){
+    double psibdx = kinematics->psibdx;
+    double thtbdx = kinematics->thtbdx;
+    double phibdx = kinematics->phibdx;
 
-    Matrix WBII(3, 3);
-    double dbi(0);
-    Matrix VBED(3, 1);
-    Matrix SBII(3, 1);
-    Matrix VBII(3, 1);
-    double dvbi(0);
-    double psivdx(0);
-    double thtvdx(0);
-
-    double psibdx=kinematics->psibdx;
-    double thtbdx=kinematics->thtbdx;
-    double phibdx=kinematics->phibdx;
-
-    Matrix VBEB(3,1);
-    Matrix POLAR(3,1);
     //Earth's angular velocity skew-symmetric matrix (3x3)
-    Matrix WEII(3,3);
-    WEII.assign_loc(0,1,-WEII3);
-    WEII.assign_loc(1,0,WEII3);
+    Matrix WEII = this->build_WEII();
+    WEII.fill(this->weii);
 
     //converting geodetic lonx, latx, alt to SBII
     // XXX: time might skew
-    SBII=cad_in_geo84(lonx*RAD,latx*RAD,alt,get_rettime());
-    dbi=SBII.absolute();
+    Matrix SBII = cad_in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
+    SBII.fill(this->IPos);
+    this->dbi = SBII.absolute();
 
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
-    double salp=sin(alpha0x*RAD);
-    double calp=cos(alpha0x*RAD);
-    double sbet=sin(beta0x*RAD);
-    double cbet=cos(beta0x*RAD);
-    double vbeb1=calp*cbet*dvbe;
-    double vbeb2=sbet*dvbe;
-    double vbeb3=salp*cbet*dvbe;
-    VBEB.build_vec3(vbeb1,vbeb2,vbeb3);
+    Matrix VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
 
     //building TBD
-    Matrix TBD=mat3tr(psibdx*RAD,thtbdx*RAD,phibdx*RAD);
+    Matrix TBD = mat3tr(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
     //Geodetic velocity
-    VBED=~TBD*VBEB;
+    Matrix VBED = ~TBD * VBEB;
+    VBED.fill(this->vbed);
+    //calculating geodetic flight path angles (plotting initialization)
+    this->psivdx = DEG * VBED.pol_from_cart().get_loc(1, 0);
+    this->thtvdx = DEG * VBED.pol_from_cart().get_loc(2, 0);
 
     //building inertial velocity
-    Matrix TDI=cad_tdi84(lonx*RAD,latx*RAD,alt,get_rettime());
-    Matrix TGI=cad_tgi84(lonx*RAD,latx*RAD,alt,get_rettime());
-    VBII=~TDI*VBED+WEII*SBII;
-    dvbi=VBII.absolute();
+    Matrix TDI = cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    Matrix TGI = cad_tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    TDI.fill(this->tdi);
+    TGI.fill(this->tgi);
 
-    //calculating geodetic flight path angles (plotting initialization)
-    POLAR=VBED.pol_from_cart();
-    psivdx=DEG*POLAR.get_loc(1,0);
-    thtvdx=DEG*POLAR.get_loc(2,0);
-
-    //Update Matrix variables
-    WEII.fill(weii);
-    SBII.fill(IPos);
-    VBII.fill(IVel);
-    VBED.fill(vbed);
-    TDI.fill(tdi);
-    TGI.fill(tgi);
+    Matrix VBII = ~TDI * VBED + WEII * SBII;
+    dvbi = VBII.absolute();
+    VBII.fill(this->IVel);
 }
 
 void Newton::calculate_newton(double int_step){
@@ -173,3 +171,5 @@ void Newton::orbital(Matrix &SBII, Matrix &VBII, double &dbi)
     ref_alt = dbi-REARTH;
 
 }
+
+

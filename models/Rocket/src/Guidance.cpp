@@ -144,9 +144,9 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
     Matrix UZ(uz);
     // input from other modules
     double time = get_rettime();
-    double dbi = newton->dbi;
-    double dvbi = newton->dvbi;
-    double thtvdx = newton->thtvdx;
+    double dbi = newton->get_dbi();
+    double dvbi = newton->get_dvbi();
+    double thtvdx = newton->get_thtvdx();
     double fmassr = propulsion->fmassr;
     Matrix VBIIC(ins->vbiic);
     Matrix SBIIC(ins->sbiic);
