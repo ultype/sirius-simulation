@@ -22,7 +22,10 @@ class Kinematics;
 
 class AeroDynamics
 {
+    TRICK_INTERFACE(AeroDynamics);
+
     public:
+
         Kinematics *kinematics;
         Environment *environment;
         Propulsion *propulsion;
@@ -71,9 +74,13 @@ class AeroDynamics
         double cx;          /* *io (--)     X-force coefficient - ND*/
         double cz;          /* *io (--)     Z-force coefficient - ND*/
 
-    private:
+        /* Input File */
         int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
         double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
+        double alplimx;     /* *io (d)      Alpha limiter for vehicle - deg*/
+        double alimitx;     /* *io (--)     Structural  limiter for vehicle*/
+
+    private:
         double ca0;         /* *io (--)     Axial force coeff(Mach) - ND*/
         double caa;         /* *io (--)     Delta axial force due to alpha(Mach) - ND*/
         double cn0;         /* *io (--)     Normal force coeff(Mach,alpha) - ND*/
@@ -107,8 +114,6 @@ class AeroDynamics
         double wny;         /* *io (r/s)    Natural frequency of airframe yaw dynamics - rad/s*/
         double zety;        /* *io (--)     Damping of airframe yaw dynamics - NA*/
         double ryreal;      /* *io (r/s)    Real part or mean value (real roots) of yaw - rad/s*/
-        double alplimx;     /* *io (d)      Alpha limiter for vehicle - deg*/
-        double alimitx;     /* *io (--)     Structural  limiter for vehicle*/
         double gnavail;     /* *io (--)     G available in pitch for vehicle - g's*/
         double gyavail;     /* *io (--)     G available in yaw for vehicle - g's*/
         double gnmax;       /* *io (--)     Max g permissable in pitch for vehicle - g's*/

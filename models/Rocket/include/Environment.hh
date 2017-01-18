@@ -15,6 +15,7 @@ PROGRAMMERS:
 #include "Aerodynamics.hh"
 
 class Environment{
+    TRICK_INTERFACE(AeroDynamics);
 
     public:
 
@@ -61,9 +62,10 @@ class Environment{
         double grav;        /* *io (m/s2)       Magnitude of gravity acceleration */
         double press;       /* *io (pa)         Atmospheric pressure */
 
-
-    private:
+        /* Input File */
         int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
+
+      private:
         double vsound;      /* *io (m/s)        Sonic speed */
         double dvae;        /* *io (m/s)        Madnitude of constant air speed */
         double turb_length; /* *io (m)          Turbulence correlation length - m*/
