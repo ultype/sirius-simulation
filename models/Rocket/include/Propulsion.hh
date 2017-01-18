@@ -47,7 +47,7 @@ class Propulsion{
         /* Input File Event */
         double fmasse;      /* *io (kg)     Fuel mass expended (zero initialization required)*/
 
-      private:
+    private:
         double acowl;       /* *io (m2)     Cowl area of engine inlet*/
         double fmassd;      /* *io (kg/s)   Fuel mass expended derivative*/
         double thrust_delta_v;/* *io (m/s)  delta v*/

@@ -65,7 +65,7 @@ class Environment{
         /* Input File */
         int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
 
-      private:
+    private:
         double vsound;      /* *io (m/s)        Sonic speed */
         double dvae;        /* *io (m/s)        Madnitude of constant air speed */
         double turb_length; /* *io (m)          Turbulence correlation length - m*/
