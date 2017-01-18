@@ -39,6 +39,7 @@ class Forces{
         double fapb[3];         /* *io (N)      Aerodynamic and propulsion forces in body axes */
         double fap[3];          /* *io (N)      Aerodynamic force in body axes */
         double fmb[3];          /* *io (N*m)    Aerodynamic and propulsion moment in body axes */
+      private:
 /**************************************************************************************/
 };
 

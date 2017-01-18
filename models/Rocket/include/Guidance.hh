@@ -17,6 +17,8 @@ class Propulsion;
 class Environment;
 
 class Guidance {
+    TRICK_INTERFACE(Guidance);
+
     public:
         Guidance() {}
 
