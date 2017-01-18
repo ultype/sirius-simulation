@@ -62,7 +62,7 @@ class Environment{
         double press;       /* *io (pa)         Atmospheric pressure */
 
 
-      private:
+    private:
         int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
         double vsound;      /* *io (m/s)        Sonic speed */
         double dvae;        /* *io (m/s)        Madnitude of constant air speed */

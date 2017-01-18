@@ -23,7 +23,6 @@ class Kinematics;
 class AeroDynamics
 {
     public:
-
         Kinematics *kinematics;
         Environment *environment;
         Propulsion *propulsion;
@@ -72,7 +71,7 @@ class AeroDynamics
         double cx;          /* *io (--)     X-force coefficient - ND*/
         double cz;          /* *io (--)     Z-force coefficient - ND*/
 
-      private:
+    private:
         int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
         double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
         double ca0;         /* *io (--)     Axial force coeff(Mach) - ND*/

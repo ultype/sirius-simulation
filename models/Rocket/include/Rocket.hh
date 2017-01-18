@@ -13,14 +13,14 @@ PROGRAMMERS:
 
 class Rocket {
     public:
-    Rocket() {}
+        Rocket() {}
 
-    void default_data();
-    void initialize();
+        void default_data();
+        void initialize();
 
-    double IPos[3];     /* *i (m)       Body in Inertial Coordinate */
-    double IVel[3];     /* *i (m)       Body in Inertial Coordinate */
-    double IW[3];       /* *i (m)       Body in Inertial Coordinate */
+        double IPos[3];     /* *i (m)       Body in Inertial Coordinate */
+        double IVel[3];     /* *i (m)       Body in Inertial Coordinate */
+        double IW[3];       /* *i (m)       Body in Inertial Coordinate */
 };
 
 #endif  // __Rocket_HH__

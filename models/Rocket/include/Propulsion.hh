@@ -28,7 +28,7 @@ class Propulsion{
         double thrust;      /* *io (N)      Thrust*/
         double fmassr;      /* *io (kg)     Remaining fuel mass*/
 
-      private:
+    private:
         double acowl;       /* *io (m2)     Cowl area of engine inlet*/
         double vmass0;      /* *io (kg)     Initial vehicle mass*/
         double fmass0;      /* *io (kg)     Initial fuel mass in stage*/

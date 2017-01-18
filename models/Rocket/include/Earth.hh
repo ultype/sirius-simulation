@@ -11,10 +11,10 @@ PROGRAMMERS:
 
 class Earth {
     public:
-    Earth() {};
+        Earth() {};
 
-    const static double radius;  /* (m)        Mean radius of Earth */
-    const static double mass;    /* (kg)       Earth Mass */
+        const static double radius;  /* (m)        Mean radius of Earth */
+        const static double mass;    /* (kg)       Earth Mass */
 };
 
 #endif

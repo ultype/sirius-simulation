@@ -40,7 +40,7 @@ class Kinematics{
         double psibdx;      /* *io (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
         double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
         double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
-      private:
+    private:
         double tbid[3][3];     /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
         double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/
         double psibd;       /* *io (r)     Yaw angle of Vehicle wrt geodetic coord */

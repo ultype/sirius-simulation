@@ -23,19 +23,19 @@ class Forces;
 class _Euler_ {
     public:
         _Euler_(){};
-         void initialization(Kinematics* kine, Propulsion* prop, Forces* forc);
-         void euler(double int_step);
+        void initialization(Kinematics* kine, Propulsion* prop, Forces* forc);
+        void euler(double int_step);
 
-         Kinematics *kinematics;
-         Propulsion *propulsion;
-         Forces *force;
+        Kinematics *kinematics;
+        Propulsion *propulsion;
+        Forces *force;
 /***********************************Variables describtion******************************/
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */
         double rrx;     /* *io (d/s)        Body yaw angular velocity wrt earth in body axes */
         double wbii[3]; /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
         double wbib[3]; /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
-      private:
+    private:
         double wbeb[3]; /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
         double wbibd[3];/* *io (r/s2)      Angular velocity of vehicle wrt inertia in body coord - derivative */
 /**************************************************************************************/
