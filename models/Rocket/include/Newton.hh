@@ -34,22 +34,25 @@ class Newton {
         void calculate_newton(double int_step);
         void orbital(Matrix &SBII, Matrix &VBII, double &dbi);
 
-        double get_alt() { return alt; };
-        double get_dvbe() { return dvbe; };
-        double get_dbi() { return dbi; };
-        double get_dvbi() { return dvbi; };
-        double get_thtvdx() { return thtvdx; };
-        double get_lonx() { return lonx; };
-        double get_latx() { return latx; };
-        Matrix get_IPos() { return Matrix(IPos); };
-        Matrix get_IVel() { return Matrix(IVel); };
-        Matrix get_FSPB() { return Matrix(fspb); };
-        Matrix get_VBED() { return Matrix(vbed); };
+        void load_location(double lonx, double latx, double alt);
+        void load_geodetic_velocity(double alpha0x, double beta0x);
+
+        double get_alt();
+        double get_lonx();
+        double get_latx();
+        double get_dvbe();
+        double get_dbi();
+        double get_dvbi();
+        double get_thtvdx();
+        Matrix get_IPos();
+        Matrix get_IVel();
+        Matrix get_FSPB();
+        Matrix get_VBED();
 
         // XXX: Use getter and setters
         /* Interfacing Variabes */
-        double alpha0x;     /* *i (d)      Initial angle-of-attack */
-        double beta0x;      /* *i (d)      Initial sideslip-angle */
+        double alpha0x;     /* *i (d)       Initial angle-of-attack */
+        double beta0x;      /* *i (d)       Initial sideslip-angle */
         double alt;         /* *io (m)      Vehicle altitude */
         double lonx;        /* *io (d)      Vehicle longitude */
         double latx;        /* *io (d)      Vehicle latitude */
@@ -63,6 +66,7 @@ class Newton {
         double IVel[3];     /* *o  (m/s)    Vehicle inertia velocity */
 
     private:
+        /* Internal Initializers */
         Matrix build_WEII();
         Matrix build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
 
@@ -73,23 +77,26 @@ class Newton {
         Propulsion  *propulsion;
         Forces      *forces;
 
-        /* Internal Variables */
-/***********************************************Variables description******************************************/
-        double psivdx;        /* *o (d)      Vehicle's heading angle */
-        double tvd[3][3];     /* ** (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
-        double tdi[3][3];     /* ** (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
+        /* Module Outputs */
+
+        /* Propagative Internal Stats */
         double weii[3][3];    /* ** (r/s)    Earth's angular velocity (skew-sym) */
+        double tdi[3][3];     /* ** (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double tgi[3][3];     /* ** (--)     Transformation Matrix geocentric wrt inertia coord */
-        double altx;          /* ** (ft)     Vehicle altitude - ft */
-        double IAccl[3];      /* ** (m/s2)   Vehicle inertia acceleration */
-        double grndtrck;      /* ** (m)      Vehicle ground track on earth */
-        double ayx;           /* ** (m/s2)   Achieved side acceleration */
-        double anx;           /* ** (m/s2)   Achieved normal acceleration */
-        double gndtrkmx;      /* ** (km)     Ground track - km */
-        double gndtrnmx;      /* ** (nm)     Ground track - nm */
+        double tvd[3][3];     /* ** (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
         double aero_loss;     /* ** (m/s)    Velocity loss caused by aerodynamic drag */
         double gravity_loss;  /* ** (m/s)    Velocity loss caused by gravity */
-        double gravity_loss2; /* ** (m/s)    Velocity loss caused by gravity */
+
+        /* Non-propagating Diagnostic Variables */
+        double IAccl[3];      /* ** (m/s2)   Vehicle inertia acceleration */
+        double psivdx;        /* *o (d)      Vehicle's heading angle */
+        double altx;          /* ** (ft)     Vehicle altitude - ft */
+        double grndtrck;      /* ** (m)      Vehicle ground track on earth */
+        double gndtrkmx;      /* ** (km)     Ground track - km */
+        double gndtrnmx;      /* ** (nm)     Ground track - nm */
+        double ayx;           /* ** (m/s2)   Achieved side acceleration */
+        double anx;           /* ** (m/s2)   Achieved normal acceleration */
+
         double inclination;   /* ** (deg)    Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object*/
         double eccentricity;  /* ** (--)     Determines the amount by which its orbit around another body deviates from a perfect circle*/
         double semi_major;    /* ** (m)      the major axis of an ellipse is its longest diameter*/
@@ -99,7 +106,6 @@ class Newton {
         double arg_perix;     /* ** (deg)    The argument of periapsis (also called argument of perifocus or argument of pericenter), symbolized as ω, is one of the orbital elements of an orbiting body. Parametrically, ω is the angle from the body's ascending node to its periapsis, measured in the direction of motion*/
         double true_anomx;    /* ** (deg)    In celestial mechanics, true anomaly is an angular parameter that defines the position of a body moving along a Keplerian orbit. It is the angle between the direction of periapsis and the current position of the body, as seen from the main focus of the ellipse (the point around which the object orbits)*/
         double ref_alt;       /* ** (m)      */
-/*************************************************************************************************************/
 };
 
 #endif  // __newton_HH__
