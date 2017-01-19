@@ -31,6 +31,19 @@ Execute in shell at repo root
 Result will be stored in RUN_test/monte Directory
 
 # Tests
+
+## Automative testing
+A auto-testing is preset and should be run every time change is applied.
+To run, issue:
+```
+    ./tools/run_test.sh
+```
+which will build, execute and compare against golden data.
+Result will be displayed on screen.
+
+The testing is based on average result relative error against golden data < 1E-6
+
+## Golden Model (Not runnable for master branch due to refactor)
 Build and Run Golden Model
 Use the comparison tool to compare the result
 ```
