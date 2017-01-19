@@ -1,6 +1,6 @@
 test:
     script:
-        - ./tool/run_test.sh
+        - ./tools/run_test.sh
         - python ./tools/ci_test.py result.csv 1e-6 > test_result
     artifacts:
         paths:
