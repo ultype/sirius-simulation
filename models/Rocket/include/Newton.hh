@@ -67,9 +67,6 @@ class Newton {
         double fspb[3];       /* *o  (m/s2)   Specific force in body coord */
 
         double vbed[3];       /* *o  (m/s)    Geographic velocity in geodetic coord */
-        double dvbe;          /* *o  (m/s)    Vehicle geographic speed */
-        double thtvdx;        /* *o  (d)      Vehicle's flight path angle */
-        double psivdx;        /* *o  (d)      Vehicle's heading angle */
 
         /* Constants */
         double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
@@ -94,8 +91,11 @@ class Newton {
         double gndtrnmx;      /* ** (nm)     Ground track - nm */
         double ayx;           /* ** (m/s2)   Achieved side acceleration */
         double anx;           /* ** (m/s2)   Achieved normal acceleration */
-        double dbi;           /* *o (m)     Vehicle distance from center of earth */
-        double dvbi;          /* *o (m/s)   Vehicle inertia speed */
+        double dbi;           /* *o (m)      Vehicle distance from center of earth */
+        double dvbi;          /* *o (m/s)    Vehicle inertia speed */
+        double dvbe;          /* *o  (m/s)   Vehicle geographic speed */
+        double thtvdx;        /* *o  (d)     Vehicle's flight path angle */
+        double psivdx;        /* *o  (d)     Vehicle's heading angle */
 
         double inclination;   /* ** (deg)    Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object*/
         double eccentricity;  /* ** (--)     Determines the amount by which its orbit around another body deviates from a perfect circle*/
