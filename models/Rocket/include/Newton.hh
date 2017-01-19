@@ -64,25 +64,23 @@ class Newton {
         Propulsion  *propulsion;
         Forces      *forces;
 
-        /* Module Outputs */
         double fspb[3];       /* *o  (m/s2)   Specific force in body coord */
-
-        double alt;           /* *o  (m)      Vehicle altitude */
-        double lonx;          /* *o  (d)      Vehicle longitude */
-        double latx;          /* *o  (d)      Vehicle latitude */
-
-        double dbi;           /* *o  (m)      Vehicle distance from center of earth */
-        double dvbi;          /* *o  (m/s)    Vehicle inertia speee */
 
         double vbed[3];       /* *o  (m/s)    Geographic velocity in geodetic coord */
         double dvbe;          /* *o  (m/s)    Vehicle geographic speed */
         double thtvdx;        /* *o  (d)      Vehicle's flight path angle */
         double psivdx;        /* *o  (d)      Vehicle's heading angle */
 
-        /* Propagative Internal Stats */
+        /* Constants */
+        double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
+
+        /* Propagative Stats */
+        double alt;           /* *o  (m)      Vehicle altitude */
+        double lonx;          /* *o  (d)      Vehicle longitude */
+        double latx;          /* *o  (d)      Vehicle latitude */
         double IPos[3];       /* *o  (m)      Vehicle position in inertia coord */
         double IVel[3];       /* *o  (m/s)    Vehicle inertia velocity */
-        double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
+
         double tdi[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double tgi[3][3];     /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
         double tvd[3][3];     /* **  (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
@@ -96,6 +94,8 @@ class Newton {
         double gndtrnmx;      /* ** (nm)     Ground track - nm */
         double ayx;           /* ** (m/s2)   Achieved side acceleration */
         double anx;           /* ** (m/s2)   Achieved normal acceleration */
+        double dbi;           /* *o (m)     Vehicle distance from center of earth */
+        double dvbi;          /* *o (m/s)   Vehicle inertia speed */
 
         double inclination;   /* ** (deg)    Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object*/
         double eccentricity;  /* ** (--)     Determines the amount by which its orbit around another body deviates from a perfect circle*/

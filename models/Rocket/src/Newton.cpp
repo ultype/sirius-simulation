@@ -17,11 +17,13 @@ double Newton::get_dvbe(){
 }
 
 double Newton::get_dbi(){
-    return dbi;
+    Matrix SBII(IPos);
+    return SBII.absolute();
 }
 
 double Newton::get_dvbi(){
-    return dvbi;
+    Matrix VBII(IVel);
+    return VBII.absolute();
 }
 
 double Newton::get_thtvdx(){
