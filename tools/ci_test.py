@@ -36,10 +36,22 @@ try:
         acc_error /= nums_of_items
 
         if acc_error <= error_threshold:
-            print("Accumaltive Error: {} <= {}, Test Passed".format(acc_error, error_threshold))
+            print("");
+            print("==============================================")
+            print("");
+            print("=  Accumaltive Error: {} <= {}, Test Passed  =".format(acc_error, error_threshold))
+            print("");
+            print("==============================================")
+            print("");
             sys.exit(0);
         else:
+            print("");
+            print("==============================================")
+            print("");
             print("Accumaltive Error: {} > {}, Test Failed".format(acc_error, error_threshold))
+            print("");
+            print("==============================================")
+            print("");
             sys.exit(255);
 
 
