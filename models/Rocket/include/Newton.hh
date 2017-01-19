@@ -35,7 +35,7 @@ class Newton {
         void orbital(Matrix &SBII, Matrix &VBII, double &dbi);
 
         void load_location(double lonx, double latx, double alt);
-        void load_geodetic_velocity(double alpha0x, double beta0x);
+        void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
 
         double get_alt();
         double get_lonx();
@@ -51,19 +51,6 @@ class Newton {
 
         // XXX: Use getter and setters
         /* Interfacing Variabes */
-        double alpha0x;     /* *i (d)       Initial angle-of-attack */
-        double beta0x;      /* *i (d)       Initial sideslip-angle */
-        double alt;         /* *io (m)      Vehicle altitude */
-        double lonx;        /* *io (d)      Vehicle longitude */
-        double latx;        /* *io (d)      Vehicle latitude */
-        double dvbe;        /* *io (m/s)    Vehicle geographic speed */
-        double dbi;         /* *o  (m)      Vehicle distance from center of earth */
-        double dvbi;        /* *o  (m/s)    Vehicle inertia speee */
-        double thtvdx;      /* *o  (d)      Vehicle's flight path angle */
-        double fspb[3];     /* *o  (m/s2)   Specific force in body coord */
-        double vbed[3];     /* *o  (m/s)    Geographic velocity in geodetic coord */
-        double IPos[3];     /* *o  (m)      Vehicle position in inertia coord */
-        double IVel[3];     /* *o  (m/s)    Vehicle inertia velocity */
 
     private:
         /* Internal Initializers */
@@ -78,19 +65,32 @@ class Newton {
         Forces      *forces;
 
         /* Module Outputs */
+        double fspb[3];       /* *o  (m/s2)   Specific force in body coord */
+
+        double alt;           /* *o  (m)      Vehicle altitude */
+        double lonx;          /* *o  (d)      Vehicle longitude */
+        double latx;          /* *o  (d)      Vehicle latitude */
+
+        double dbi;           /* *o  (m)      Vehicle distance from center of earth */
+        double dvbi;          /* *o  (m/s)    Vehicle inertia speee */
+
+        double vbed[3];       /* *o  (m/s)    Geographic velocity in geodetic coord */
+        double dvbe;          /* *o  (m/s)    Vehicle geographic speed */
+        double thtvdx;        /* *o  (d)      Vehicle's flight path angle */
+        double psivdx;        /* *o  (d)      Vehicle's heading angle */
 
         /* Propagative Internal Stats */
-        double weii[3][3];    /* ** (r/s)    Earth's angular velocity (skew-sym) */
-        double tdi[3][3];     /* ** (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
-        double tgi[3][3];     /* ** (--)     Transformation Matrix geocentric wrt inertia coord */
-        double tvd[3][3];     /* ** (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
-        double aero_loss;     /* ** (m/s)    Velocity loss caused by aerodynamic drag */
-        double gravity_loss;  /* ** (m/s)    Velocity loss caused by gravity */
+        double IPos[3];       /* *o  (m)      Vehicle position in inertia coord */
+        double IVel[3];       /* *o  (m/s)    Vehicle inertia velocity */
+        double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
+        double tdi[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
+        double tgi[3][3];     /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
+        double tvd[3][3];     /* **  (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
+        double aero_loss;     /* **  (m/s)    Velocity loss caused by aerodynamic drag */
+        double gravity_loss;  /* **  (m/s)    Velocity loss caused by gravity */
 
         /* Non-propagating Diagnostic Variables */
         double IAccl[3];      /* ** (m/s2)   Vehicle inertia acceleration */
-        double psivdx;        /* *o (d)      Vehicle's heading angle */
-        double altx;          /* ** (ft)     Vehicle altitude - ft */
         double grndtrck;      /* ** (m)      Vehicle ground track on earth */
         double gndtrkmx;      /* ** (km)     Ground track - km */
         double gndtrnmx;      /* ** (nm)     Ground track - nm */

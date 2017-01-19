@@ -96,8 +96,6 @@ void Newton::load_location(double lonx, double latx, double alt){
 }
 
 void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
-    this->alpha0x = alpha0x;
-    this->beta0x = beta0x;
     this->dvbe = dvbe;
 
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
