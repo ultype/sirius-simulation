@@ -29,7 +29,12 @@ Matrix Newton::get_IVel(){
 }
 
 Matrix Newton::get_FSPB(){
-    return Matrix(fspb);
+    Matrix FAPB(3,1);
+    FAPB.build_vec3(forces->fapb);
+
+    Matrix FSPB = FAPB * (1. / propulsion->vmass);
+
+    return FSPB;
 }
 
 Matrix Newton::get_VBED(){

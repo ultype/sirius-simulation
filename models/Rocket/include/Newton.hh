@@ -64,8 +64,6 @@ class Newton {
         Propulsion  *propulsion;
         Forces      *forces;
 
-        double fspb[3];       /* *o  (m/s2)   Specific force in body coord */
-
         double vbed[3];       /* *o  (m/s)    Geographic velocity in geodetic coord */
 
         /* Constants */
@@ -96,6 +94,7 @@ class Newton {
         double dvbe;          /* *o  (m/s)   Vehicle geographic speed */
         double thtvdx;        /* *o  (d)     Vehicle's flight path angle */
         double psivdx;        /* *o  (d)     Vehicle's heading angle */
+        double fspb[3];       /* *o  (m/s2)   Specific force in body coord */
 
         double inclination;   /* ** (deg)    Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object*/
         double eccentricity;  /* ** (--)     Determines the amount by which its orbit around another body deviates from a perfect circle*/
