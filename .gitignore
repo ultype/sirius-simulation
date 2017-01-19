@@ -20,6 +20,8 @@ build
 trick
 DP_Product/
 
+*.csv
+
 */S_job_execution
 */S_run_summary
 */*.trk
