@@ -38,7 +38,20 @@ Matrix Newton::get_FSPB(){
 }
 
 Matrix Newton::get_VBED(){
-    return Matrix(vbed);
+    Matrix TDI(3, 3);
+    TDI.build_mat33(tdi);
+
+    Matrix WEII(3, 3);
+    WEII.build_mat33(weii);
+
+    Matrix SBII(3, 1);
+    SBII.build_vec3(IPos);
+
+    Matrix VBII(3, 1);
+    VBII.build_vec3(IVel);
+
+    Matrix VBED = TDI * (VBII - WEII * SBII);
+    return VBED;
 }
 
 double Newton::get_dvbe(){
