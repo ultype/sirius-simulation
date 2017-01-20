@@ -32,7 +32,7 @@ class Newton {
         void default_data();
         void initialize();
         void calculate_newton(double int_step);
-        void orbital(Matrix &SBII, Matrix &VBII, double &dbi);
+        void orbital(Matrix &SBII, Matrix &VBII, double dbi);
 
         void load_location(double lonx, double latx, double alt);
         void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
@@ -57,6 +57,9 @@ class Newton {
         Matrix build_WEII();
         Matrix build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
 
+        /* Internal Updaters */
+        void update_diagnostic_attributes(double int_step);
+
         /* Routing references */
         Kinematics  *kinematics;
         Environment *environment;
@@ -64,7 +67,6 @@ class Newton {
         Propulsion  *propulsion;
         Forces      *forces;
 
-        double vbed[3];       /* *o  (m/s)    Geographic velocity in geodetic coord */
 
         /* Constants */
         double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
@@ -75,36 +77,41 @@ class Newton {
         double latx;          /* *o  (d)      Vehicle latitude */
         double IPos[3];       /* *o  (m)      Vehicle position in inertia coord */
         double IVel[3];       /* *o  (m/s)    Vehicle inertia velocity */
+        double IAccl[3];      /* **  (m/s2)   Vehicle inertia acceleration */
 
         double tdi[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double tgi[3][3];     /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
-        double tvd[3][3];     /* **  (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
         double aero_loss;     /* **  (m/s)    Velocity loss caused by aerodynamic drag */
         double gravity_loss;  /* **  (m/s)    Velocity loss caused by gravity */
 
-        /* Non-propagating Diagnostic Variables */
-        double IAccl[3];      /* ** (m/s2)   Vehicle inertia acceleration */
-        double grndtrck;      /* ** (m)      Vehicle ground track on earth */
-        double gndtrkmx;      /* ** (km)     Ground track - km */
-        double gndtrnmx;      /* ** (nm)     Ground track - nm */
-        double ayx;           /* ** (m/s2)   Achieved side acceleration */
-        double anx;           /* ** (m/s2)   Achieved normal acceleration */
-        double dbi;           /* *o (m)      Vehicle distance from center of earth */
-        double dvbi;          /* *o (m/s)    Vehicle inertia speed */
-        double dvbe;          /* *o  (m/s)   Vehicle geographic speed */
-        double thtvdx;        /* *o  (d)     Vehicle's flight path angle */
-        double psivdx;        /* *o  (d)     Vehicle's heading angle */
+        /* Generating Outputs */
         double fspb[3];       /* *o  (m/s2)   Specific force in body coord */
 
-        double inclination;   /* ** (deg)    Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object*/
-        double eccentricity;  /* ** (--)     Determines the amount by which its orbit around another body deviates from a perfect circle*/
-        double semi_major;    /* ** (m)      the major axis of an ellipse is its longest diameter*/
-        double ha;            /* ** (m)      Orbital Apogee*/
-        double hp;            /* ** (m)      Orbital Perigee*/
-        double lon_anodex;    /* ** (deg)    The longitude of the ascending node (☊ or Ω) is one of the orbital elements used to specify the orbit of an object in space. It is the angle from a reference direction, called the origin of longitude, to the direction of the ascending node, measured in a reference plane*/
-        double arg_perix;     /* ** (deg)    The argument of periapsis (also called argument of perifocus or argument of pericenter), symbolized as ω, is one of the orbital elements of an orbiting body. Parametrically, ω is the angle from the body's ascending node to its periapsis, measured in the direction of motion*/
-        double true_anomx;    /* ** (deg)    In celestial mechanics, true anomaly is an angular parameter that defines the position of a body moving along a Keplerian orbit. It is the angle between the direction of periapsis and the current position of the body, as seen from the main focus of the ellipse (the point around which the object orbits)*/
-        double ref_alt;       /* ** (m)      */
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
+        double _tvd[3][3];     /* **  (--)     Transformation Matrix of geographic velocity wrt geodetic coord */
+        double _vbed[3];       /* *o  (m/s)   [DIAG] Geographic velocity in geodetic coord */
+        double _grndtrck;      /* **  (m)     [DIAG] Vehicle ground track on earth */
+        double _gndtrkmx;      /* **  (km)    [DIAG] Ground track - km */
+        double _gndtrnmx;      /* **  (nm)    [DIAG] Ground track - nm */
+        double _ayx;           /* **  (m/s2)  [DIAG] Achieved side acceleration */
+        double _anx;           /* **  (m/s2)  [DIAG] Achieved normal acceleration */
+        double _dbi;           /* *o  (m)     [DIAG] Vehicle distance from center of earth */
+        double dvbi;          /* *o  (m/s)   [DIAG] Vehicle inertia speed */
+        double _dvbe;          /* *o  (m/s)   [DIAG] Vehicle geographic speed */
+        double thtvdx;        /* *o  (d)     [DIAG] Vehicle's flight path angle */
+        double psivdx;        /* *o  (d)     [DIAG] Vehicle's heading angle */
+
+        /* Orbital Logging */
+        double _inclination;   /* **  (deg)   [DIAG] Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object */
+        double _eccentricity;  /* **  (--)    [DIAG] Determines the amount by which its orbit around another body deviates from a perfect circle */
+        double _semi_major;    /* **  (m)     [DIAG] the major axis of an ellipse is its longest diameter */
+        double _ha;            /* **  (m)     [DIAG] Orbital Apogee */
+        double _hp;            /* **  (m)     [DIAG] Orbital Perigee */
+        double _lon_anodex;    /* **  (deg)   [DIAG] The longitude of the ascending node (☊ or Ω) is one of the orbital elements used to specify the orbit of an object in space. It is the angle from a reference direction, called the origin of longitude, to the direction of the ascending node, measured in a reference plane */
+        double _arg_perix;     /* **  (deg)   [DIAG] The argument of periapsis (also called argument of perifocus or argument of pericenter), symbolized as ω, is one of the orbital elements of an orbiting body. Parametrically, ω is the angle from the body's ascending node to its periapsis, measured in the direction of motion */
+        double _true_anomx;    /* **  (deg)   [DIAG] In celestial mechanics, true anomaly is an angular parameter that defines the position of a body moving along a Keplerian orbit. It is the angle between the direction of periapsis and the current position of the body, as seen from the main focus of the ellipse (the point around which the object orbits) */
+        double _ref_alt;       /* **  (m)     [DIAG] */
 };
 
 #endif  // __newton_HH__
