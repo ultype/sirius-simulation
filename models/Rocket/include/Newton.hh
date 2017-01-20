@@ -9,6 +9,9 @@ PROGRAMMERS:
       (((Lai Jun Xu) () () () ))
 *******************************************************************************/
 
+#include <armadillo>
+#include <vector>
+
 #include "global_constants.hh"
 #include "utility_header.hh"
 #include "aux.hh"
@@ -28,8 +31,10 @@ class Newton {
 
     public:
         Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc);
+        Newton(const Newton& other);
 
-        void default_data();
+        Newton& operator=(const Newton& other);
+
         void initialize();
         void propagate(double int_step);
         void update_diagnostic_attributes(double int_step);
@@ -54,6 +59,8 @@ class Newton {
         /* Interfacing Variabes */
 
     private:
+        void default_data();
+
         /* Internal Initializers */
         Matrix build_WEII();
         Matrix build_VBEB(double _alpha0x, double _beta0x, double _dvbe);

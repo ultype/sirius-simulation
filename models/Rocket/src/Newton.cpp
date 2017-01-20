@@ -78,6 +78,58 @@ double Newton::get_psivdx(){
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
     : kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc)
 {
+    this->default_data();
+}
+
+Newton::Newton(const Newton& other)
+    : kinematics(other.kinematics), euler(other.euler), environment(other.environment), propulsion(other.propulsion), forces(other.forces)
+{
+    this->default_data();
+
+    /* Propagative Stats */
+    this->alt = other.alt;
+    this->lonx = other.lonx;
+    this->latx = other.latx;
+    memcpy(this->IPos, other.IPos, sizeof(other.IPos));
+    memcpy(this->IVel, other.IVel, sizeof(other.IVel));
+    memcpy(this->IAccl, other.IAccl, sizeof(other.IAccl));
+
+    memcpy(this->tgi, other.tgi, sizeof(other.tgi));
+    memcpy(this->tdi, other.tdi, sizeof(other.tdi));
+    this->aero_loss = other.aero_loss;
+    this->gravity_loss = other.gravity_loss;
+
+    /* Generating Outputs */;
+    memcpy(this->fspb, other.fspb, sizeof(other.fspb));
+}
+
+Newton& Newton::operator=(const Newton& other){
+    if(&other == this)
+        return *this;
+
+    this->kinematics = other.kinematics;
+    this->environment = other.environment;
+    this->euler = other.euler;
+    this->propulsion = other.propulsion;
+    this->forces = other.forces;
+
+    /* Propagative Stats */
+    this->alt = other.alt;
+    this->lonx = other.lonx;
+    this->latx = other.latx;
+    memcpy(this->IPos, other.IPos, sizeof(other.IPos));
+    memcpy(this->IVel, other.IVel, sizeof(other.IVel));
+    memcpy(this->IAccl, other.IAccl, sizeof(other.IAccl));
+
+    memcpy(this->tgi, other.tgi, sizeof(other.tgi));
+    memcpy(this->tdi, other.tdi, sizeof(other.tdi));
+    this->aero_loss = other.aero_loss;
+    this->gravity_loss = other.gravity_loss;
+
+    /* Generating Outputs */;
+    memcpy(this->fspb, other.fspb, sizeof(other.fspb));
+
+    return *this;
 }
 
 Matrix Newton::build_WEII(){
