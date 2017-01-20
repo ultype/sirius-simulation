@@ -26,20 +26,20 @@ void _Euler_::initialization(Kinematics* kine, Propulsion* prop, Forces* forc)
     WBIB.fill(wbib);
 }
 
-double get_ppx() { return ppx; }
+double _Euler_::get_ppx() { return ppx; }
 
-double get_qqx() { return qqx; }
+double _Euler_::get_qqx() { return qqx; }
 
-double get_rrx() { return rrx; }
+double _Euler_::get_rrx() { return rrx; }
 
-Matrix get_WBII()
+Matrix _Euler_::get_WBII()
 {
     Matrix WBII(3, 1);
     WBII.build_vec3(wbii);
     return WBII;
 }
 
-Matrix get_WBIB()
+Matrix _Euler_::get_WBIB()
 {
     Matrix WBIB(3, 1);
     WBIB.build_vec3(wbib);
