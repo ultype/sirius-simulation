@@ -98,6 +98,9 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") newton.propagate(0.001);
             (0.001, "scheduled") euler.euler(0.001);
 
+            (0.001, "logging") newton.update_diagnostic_attributes(0.001);
+
+
         }
 };
 

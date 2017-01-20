@@ -32,7 +32,7 @@ class Newton {
         void default_data();
         void initialize();
         void propagate(double int_step);
-        void orbital(Matrix &SBII, Matrix &VBII, double dbi);
+        void update_diagnostic_attributes(double int_step);
 
         void load_location(double lonx, double latx, double alt);
         void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
@@ -66,7 +66,7 @@ class Newton {
         void propagate_gravityloss(double int_step);
 
         /* Internal Updaters */
-        void update_diagnostic_attributes(double int_step);
+        void orbital(Matrix &SBII, Matrix &VBII, double dbi);
 
         /* Routing references */
         Kinematics  *kinematics;
@@ -74,7 +74,6 @@ class Newton {
         _Euler_     *euler;
         Propulsion  *propulsion;
         Forces      *forces;
-
 
         /* Constants */
         double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */

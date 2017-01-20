@@ -150,47 +150,12 @@ void Newton::initialize(){
 }
 
 void Newton::propagate(double int_step){
-    double lon(0);
-    double lat(0);
-
-    Matrix TDI(3, 3);
-    TDI.build_mat33(tdi);
-
-    Matrix TGI(3, 3);
-    TGI.build_mat33(tgi);
-
-    Matrix WEII(3, 3);
-    WEII.build_mat33(weii);
-
-    Matrix SBII(3, 1);
-    SBII.build_vec3(IPos);
-
-    Matrix VBII(3, 1);
-    VBII.build_vec3(IVel);
-
-    Matrix ABII(3, 1);
-    ABII.build_vec3(IAccl);
-
-    Matrix GRAVG(3,1);
-    GRAVG.build_vec3(environment->gravg);
-
-    Matrix TBI(3,3);
-    TBI.build_mat33(kinematics->tbi);
-
-    Matrix FAPB(3,1);
-    FAPB.build_vec3(forces->fapb);
-
-    Matrix FAP(3,1);
-    FAP.build_vec3(forces->fap);
-
     update_fspb();
 
     propagate_position_speed_acceleration(int_step);
 
     propagate_aeroloss(int_step);
     propagate_gravityloss(int_step);
-
-    update_diagnostic_attributes(int_step);
 }
 
 void Newton::update_fspb(){
@@ -247,16 +212,6 @@ void Newton::propagate_gravityloss(double int_step){
     gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
 }
 
-void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
-{
-    //calculate orbital elements
-    int cadorbin_flag = cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
-    _ha = (1. + _eccentricity) * _semi_major - REARTH;
-    _hp = (1. - _eccentricity) * _semi_major - REARTH;
-    _ref_alt = dbi - REARTH;
-
-}
-
 void Newton::update_diagnostic_attributes(double int_step){
     _dbi = get_dbi();
     _dvbi = get_dvbi();
@@ -288,3 +243,14 @@ void Newton::update_diagnostic_attributes(double int_step){
     Matrix VBII(IVel);
     orbital(SBII,VBII,get_dbi());
 }
+
+void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
+{
+    //calculate orbital elements
+    int cadorbin_flag = cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
+    _ha = (1. + _eccentricity) * _semi_major - REARTH;
+    _hp = (1. - _eccentricity) * _semi_major - REARTH;
+    _ref_alt = dbi - REARTH;
+
+}
+
