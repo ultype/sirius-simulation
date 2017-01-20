@@ -50,11 +50,6 @@ Matrix Newton::get_VBED(){
     return VBED;
 }
 
-double Newton::get_dvbe(){
-    Matrix VBED = get_VBED();
-    return VBED.pol_from_cart().get_loc(0, 0);
-}
-
 double Newton::get_dbi(){
     Matrix SBII(IPos);
     return SBII.absolute();
@@ -63,6 +58,11 @@ double Newton::get_dbi(){
 double Newton::get_dvbi(){
     Matrix VBII(IVel);
     return VBII.absolute();
+}
+
+double Newton::get_dvbe(){
+    Matrix VBED = get_VBED();
+    return VBED.pol_from_cart().get_loc(0, 0);
 }
 
 double Newton::get_thtvdx(){
@@ -127,11 +127,6 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     Matrix TBD = mat3tr(kinematics->psibdx * RAD, kinematics->thtbdx * RAD, kinematics->phibdx * RAD);
     //Geodetic velocity
     Matrix VBED = ~TBD * VBEB;
-    //VBED.fill(this->vbed);
-
-    //calculating geodetic flight path angles (plotting initialization)
-    //this->psivdx = DEG * VBED.pol_from_cart().get_loc(1, 0);
-    //this->thtvdx = DEG * VBED.pol_from_cart().get_loc(2, 0);
 
     Matrix SBII(IPos);
     Matrix TDI(tdi);
@@ -220,6 +215,7 @@ void Newton::calculate_newton(double int_step){
 
     update_diagnostic_attributes(int_step);
 }
+
 
 
 void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
