@@ -70,6 +70,11 @@ double Newton::get_thtvdx(){
     return DEG * VBED.pol_from_cart().get_loc(2, 0);
 }
 
+double Newton::get_psivdx(){
+    Matrix VBED = get_VBED();
+    return DEG * VBED.pol_from_cart().get_loc(1, 0);
+}
+
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
     : kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc)
 {
@@ -206,35 +211,12 @@ void Newton::calculate_newton(double int_step){
     TDI.fill(tdi);
     TGI.fill(tgi);
 
-    //geographic velocity in geodetic axes VBED(3x1) and flight path angles
-    Matrix VBED = get_VBED();
-    //Matrix POLAR = VBED.pol_from_cart();
-    //dvbe = POLAR[0];
-    //psivdx = DEG * POLAR[1];
-    //thtvdx = DEG * POLAR[2];
-
     //calculate aero loss`:`
     FAP = FAP * (1. / propulsion->vmass);
     aero_loss = aero_loss + FAP.absolute() * int_step;
 
     //calculate gravity loss
     gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
-
-    //T.M. of geographic velocity wrt geodetic coordinates
-    //Matrix TVD = mat2tr(psivdx * RAD, thtvdx * RAD);
-
-    //diagnostics: acceleration achieved
-    //ayx =  FSPB[1] / AGRAV;
-    //anx = -FSPB[2] / AGRAV;
-
-    //ground track travelled (10% accuracy, usually on the high side)
-    //double vbed1 = VBED[0];
-    //double vbed2 = VBED[1];
-    //grndtrck += sqrt(vbed1 * vbed1 + vbed2 * vbed2) * int_step * REARTH / dbi;
-    //gndtrkmx = 0.001 * grndtrck;
-    //gndtrnmx = NMILES * grndtrck;
-
-
 
     update_diagnostic_attributes(int_step);
 }
@@ -252,16 +234,17 @@ void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
 
 void Newton::update_diagnostic_attributes(double int_step){
     _dbi = get_dbi();
-    dvbi = get_dvbi();
+    _dvbi = get_dvbi();
 
     Matrix VBED = get_VBED();
     VBED.fill(_vbed);
 
     Matrix POLAR = VBED.pol_from_cart();
     _dvbe = POLAR[0];
-    psivdx = DEG * POLAR[1];
-    thtvdx = DEG * POLAR[2];
+    _psivdx = DEG * POLAR[1];
+    _thtvdx = DEG * POLAR[2];
 
+    //ground track travelled (10% accuracy, usually on the high side)
     double vbed1 = VBED[0];
     double vbed2 = VBED[1];
     _grndtrck += sqrt(vbed1 * vbed1 + vbed2 * vbed2) * int_step * REARTH / get_dbi();
@@ -273,7 +256,7 @@ void Newton::update_diagnostic_attributes(double int_step){
     _anx = -FSPB[2] / AGRAV;
 
     //T.M. of geographic velocity wrt geodetic coordinates
-    Matrix TVD = mat2tr(psivdx * RAD, thtvdx * RAD);
+    Matrix TVD = mat2tr(_psivdx * RAD, _thtvdx * RAD);
     TVD.fill(_tvd);
 
     Matrix SBII(IPos);

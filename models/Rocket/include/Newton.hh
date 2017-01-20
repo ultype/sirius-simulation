@@ -44,6 +44,7 @@ class Newton {
         double get_dbi();
         double get_dvbi();
         double get_thtvdx();
+        double get_psivdx();
         Matrix get_IPos();
         Matrix get_IVel();
         Matrix get_FSPB();
@@ -97,10 +98,10 @@ class Newton {
         double _ayx;           /* **  (m/s2)  [DIAG] Achieved side acceleration */
         double _anx;           /* **  (m/s2)  [DIAG] Achieved normal acceleration */
         double _dbi;           /* *o  (m)     [DIAG] Vehicle distance from center of earth */
-        double dvbi;          /* *o  (m/s)   [DIAG] Vehicle inertia speed */
+        double _dvbi;          /* *o  (m/s)   [DIAG] Vehicle inertia speed */
         double _dvbe;          /* *o  (m/s)   [DIAG] Vehicle geographic speed */
-        double thtvdx;        /* *o  (d)     [DIAG] Vehicle's flight path angle */
-        double psivdx;        /* *o  (d)     [DIAG] Vehicle's heading angle */
+        double _thtvdx;        /* *o  (d)     [DIAG] Vehicle's flight path angle */
+        double _psivdx;        /* *o  (d)     [DIAG] Vehicle's heading angle */
 
         /* Orbital Logging */
         double _inclination;   /* **  (deg)   [DIAG] Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object */
