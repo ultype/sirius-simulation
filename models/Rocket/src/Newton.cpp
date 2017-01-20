@@ -29,12 +29,8 @@ Matrix Newton::get_IVel(){
 }
 
 Matrix Newton::get_FSPB(){
-    Matrix FAPB(3,1);
-    FAPB.build_vec3(forces->fapb);
-
-    Matrix FSPB = FAPB * (1. / propulsion->vmass);
-
-    return FSPB;
+    /* Use stored Value due to coherence with other models */
+    return Matrix(fspb);
 }
 
 Matrix Newton::get_VBED(){
@@ -187,8 +183,10 @@ void Newton::calculate_newton(double int_step){
     Matrix FAP(3,1);
     FAP.build_vec3(forces->fap);
 
-    /* Prograte S, V, A status */
+    /* Stored Value due to coherence with other models */
     Matrix FSPB = FAPB * (1. / propulsion->vmass);
+
+    /* Prograte S, V, A status */
     Matrix NEXT_ACC = ~TBI * FSPB + ~TGI * GRAVG;
     Matrix NEXT_VEL = integrate(NEXT_ACC, ABII, VBII, int_step);
     SBII = integrate(NEXT_VEL, VBII, SBII, int_step);
