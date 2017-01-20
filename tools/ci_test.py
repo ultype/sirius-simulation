@@ -30,7 +30,7 @@ try:
         nums_of_items = 0;
 
         for num in next(resultData):
-            acc_error += toFloat(num)
+            acc_error += abs(toFloat(num))
             nums_of_items += 1
 
         acc_error /= nums_of_items
