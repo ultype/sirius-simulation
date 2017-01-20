@@ -24,9 +24,9 @@ void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
     double pdynmc=environment->pdynmc;
     double tempk=environment->tempk;
     double dvba=environment->dvba;
-    double ppx=euler->ppx;
-    double qqx=euler->qqx;
-    double rrx=euler->rrx;
+    double ppx=euler->get_ppx();
+    double qqx=euler->get_qqx();
+    double rrx=euler->get_rrx();
     double alt=newton->get_alt();
     double mprop=propulsion->mprop;
     double vmass=propulsion->vmass;
@@ -299,4 +299,3 @@ void AeroDynamics::aerodynamics_der()
         ryreal=-zety*wny;
     }
 }
-

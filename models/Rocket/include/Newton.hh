@@ -67,7 +67,6 @@ class Newton {
         Propulsion  *propulsion;
         Forces      *forces;
 
-
         /* Constants */
         double weii[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
 
@@ -78,7 +77,7 @@ class Newton {
         double IPos[3];       /* *o  (m)      Vehicle position in inertia coord */
         double IVel[3];       /* *o  (m/s)    Vehicle inertia velocity */
         double IAccl[3];      /* **  (m/s2)   Vehicle inertia acceleration */
-
+        
         double tdi[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double tgi[3][3];     /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
         double aero_loss;     /* **  (m/s)    Velocity loss caused by aerodynamic drag */
@@ -97,10 +96,10 @@ class Newton {
         double _ayx;           /* **  (m/s2)  [DIAG] Achieved side acceleration */
         double _anx;           /* **  (m/s2)  [DIAG] Achieved normal acceleration */
         double _dbi;           /* *o  (m)     [DIAG] Vehicle distance from center of earth */
-        double dvbi;          /* *o  (m/s)   [DIAG] Vehicle inertia speed */
+        double dvbi;           /* *o  (m/s)   [DIAG] Vehicle inertia speed */
         double _dvbe;          /* *o  (m/s)   [DIAG] Vehicle geographic speed */
-        double thtvdx;        /* *o  (d)     [DIAG] Vehicle's flight path angle */
-        double psivdx;        /* *o  (d)     [DIAG] Vehicle's heading angle */
+        double thtvdx;         /* *o  (d)     [DIAG] Vehicle's flight path angle */
+        double psivdx;         /* *o  (d)     [DIAG] Vehicle's heading angle */
 
         /* Orbital Logging */
         double _inclination;   /* **  (deg)   [DIAG] Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object */

@@ -39,12 +39,11 @@ void Kinematics::calculate_kinematics(double int_step){
     double latx=newton->get_latx();
     double alt=newton->get_alt();
 
-    Matrix WBIB(3,1);
+    Matrix WBIB = euler->get_WBIB();
     Matrix VBED(3,1);
     Matrix VAED(3,1);
     Matrix VBII(3,1);
 
-    WBIB.build_vec3(euler->wbib);
     VBED = newton->get_VBED();
     VAED.build_vec3(environment->vaed);
     VBII = newton->get_IVel();

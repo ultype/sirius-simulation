@@ -130,7 +130,7 @@ void INS::ins_gyro(double int_step)
     Matrix ESCALG(escalg);
     Matrix EBIASG(ebiasg);
     // input from other modules
-    Matrix WBIB(euler->wbib);
+    Matrix WBIB = euler->get_WBIB();
     Matrix FSPB = newton->get_FSPB();
     //-------------------------------------------------------------------------
     // computing cluster misalignment error
@@ -222,8 +222,8 @@ void INS::update(double int_step){
     double time = get_rettime();
     Matrix GRAVG(environment->gravg);
     Matrix TBI(kinematics->tbi);
-    Matrix WBIB(euler->wbib);
-    Matrix WBII(euler->wbii);
+    Matrix WBIB = euler->get_WBIB();
+    Matrix WBII = euler->get_WBII();
     Matrix SBII = newton->get_IPos();
     Matrix VBII = newton->get_IVel();
     Matrix FSPB = newton->get_FSPB();

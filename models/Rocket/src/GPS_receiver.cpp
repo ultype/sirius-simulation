@@ -448,10 +448,10 @@ void GPS_Receiver::measure(){
 
         Matrix SBII(3, 1);
         Matrix VBII(3, 1);
-        Matrix WBII(3, 1);
+        Matrix WBII = euler->get_WBII();
         SBII.build_vec3(newton->get_IPos()[0], newton->get_IPos()[1], newton->get_IPos()[2]);
         VBII.build_vec3(newton->get_IVel()[0], newton->get_IVel()[1], newton->get_IVel()[2]);
-        WBII.build_vec3(euler->wbii[0], euler->wbii[1], euler->wbii[2]);
+
 
         Matrix SBIIC(ins->sbiic);
         Matrix VBIIC(ins->vbiic);
