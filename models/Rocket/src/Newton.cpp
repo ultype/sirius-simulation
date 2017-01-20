@@ -50,11 +50,6 @@ Matrix Newton::get_VBED(){
     return VBED;
 }
 
-double Newton::get_dvbe(){
-    Matrix VBED = get_VBED();
-    return VBED.pol_from_cart().get_loc(0, 0);
-}
-
 double Newton::get_dbi(){
     Matrix SBII(IPos);
     return SBII.absolute();
@@ -65,9 +60,19 @@ double Newton::get_dvbi(){
     return VBII.absolute();
 }
 
+double Newton::get_dvbe(){
+    Matrix VBED = get_VBED();
+    return VBED.pol_from_cart().get_loc(0, 0);
+}
+
 double Newton::get_thtvdx(){
     Matrix VBED = get_VBED();
     return DEG * VBED.pol_from_cart().get_loc(2, 0);
+}
+
+double Newton::get_psivdx(){
+    Matrix VBED = get_VBED();
+    return DEG * VBED.pol_from_cart().get_loc(1, 0);
 }
 
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
@@ -122,11 +127,6 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     Matrix TBD = mat3tr(kinematics->psibdx * RAD, kinematics->thtbdx * RAD, kinematics->phibdx * RAD);
     //Geodetic velocity
     Matrix VBED = ~TBD * VBEB;
-    //VBED.fill(this->vbed);
-
-    //calculating geodetic flight path angles (plotting initialization)
-    //this->psivdx = DEG * VBED.pol_from_cart().get_loc(1, 0);
-    //this->thtvdx = DEG * VBED.pol_from_cart().get_loc(2, 0);
 
     Matrix SBII(IPos);
     Matrix TDI(tdi);
@@ -149,43 +149,34 @@ void Newton::default_data(){
 void Newton::initialize(){
 }
 
-void Newton::calculate_newton(double int_step){
-    double lon(0);
-    double lat(0);
+void Newton::propagate(double int_step){
+    update_fspb();
 
-    Matrix TDI(3, 3);
-    TDI.build_mat33(tdi);
+    propagate_position_speed_acceleration(int_step);
 
-    Matrix TGI(3, 3);
-    TGI.build_mat33(tgi);
+    propagate_aeroloss(int_step);
+    propagate_gravityloss(int_step);
+}
 
-    Matrix WEII(3, 3);
-    WEII.build_mat33(weii);
-
-    Matrix SBII(3, 1);
-    SBII.build_vec3(IPos);
-
-    Matrix VBII(3, 1);
-    VBII.build_vec3(IVel);
-
-    Matrix ABII(3, 1);
-    ABII.build_vec3(IAccl);
-
-    Matrix GRAVG(3,1);
-    GRAVG.build_vec3(environment->gravg);
-
-    Matrix TBI(3,3);
-    TBI.build_mat33(kinematics->tbi);
-
-    Matrix FAPB(3,1);
-    FAPB.build_vec3(forces->fapb);
-
-    Matrix FAP(3,1);
-    FAP.build_vec3(forces->fap);
+void Newton::update_fspb(){
+    Matrix FAPB(forces->fapb);
 
     /* Stored Value due to coherence with other models */
     Matrix FSPB = FAPB * (1. / propulsion->vmass);
     FSPB.fill(fspb);
+}
+
+void Newton::propagate_position_speed_acceleration(double int_step){
+    double lon, lat, al;
+
+    Matrix TDI(tdi);
+    Matrix TBI(kinematics->tbi);
+    Matrix TGI(tgi);
+    Matrix SBII(IPos);
+    Matrix VBII(IVel);
+    Matrix ABII(IAccl);
+    Matrix GRAVG(environment->gravg);
+    Matrix FSPB(fspb);
 
     /* Prograte S, V, A status */
     Matrix NEXT_ACC = ~TBI * FSPB + ~TGI * GRAVG;
@@ -194,74 +185,46 @@ void Newton::calculate_newton(double int_step){
     ABII = NEXT_ACC;
     VBII = NEXT_VEL;
 
-    cad_geo84_in(lon,lat,alt,SBII,get_rettime());
-    TDI = cad_tdi84(lon,lat,alt,get_rettime());
-    TGI = cad_tgi84(lon,lat,alt,get_rettime());
-    lonx = lon * DEG;
-    latx = lat * DEG;
+    cad_geo84_in(lon, lat, al, SBII, get_rettime());
+    TDI = cad_tdi84(lon, lat, al, get_rettime());
+    TGI = cad_tgi84(lon, lat, al, get_rettime());
 
+    this->lonx = lon * DEG;
+    this->latx = lat * DEG;
+    this->alt  = al;
     SBII.fill(IPos);
     VBII.fill(IVel);
     ABII.fill(IAccl);
     TDI.fill(tdi);
     TGI.fill(tgi);
+}
 
-    //geographic velocity in geodetic axes VBED(3x1) and flight path angles
-    Matrix VBED = get_VBED();
-    //Matrix POLAR = VBED.pol_from_cart();
-    //dvbe = POLAR[0];
-    //psivdx = DEG * POLAR[1];
-    //thtvdx = DEG * POLAR[2];
+void Newton::propagate_aeroloss(double int_step){
+    Matrix FAP(forces->fap);
 
     //calculate aero loss`:`
     FAP = FAP * (1. / propulsion->vmass);
     aero_loss = aero_loss + FAP.absolute() * int_step;
-
-    //calculate gravity loss
-    gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
-
-    //T.M. of geographic velocity wrt geodetic coordinates
-    //Matrix TVD = mat2tr(psivdx * RAD, thtvdx * RAD);
-
-    //diagnostics: acceleration achieved
-    //ayx =  FSPB[1] / AGRAV;
-    //anx = -FSPB[2] / AGRAV;
-
-    //ground track travelled (10% accuracy, usually on the high side)
-    //double vbed1 = VBED[0];
-    //double vbed2 = VBED[1];
-    //grndtrck += sqrt(vbed1 * vbed1 + vbed2 * vbed2) * int_step * REARTH / dbi;
-    //gndtrkmx = 0.001 * grndtrck;
-    //gndtrnmx = NMILES * grndtrck;
-
-
-
-    update_diagnostic_attributes(int_step);
 }
 
-
-void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
-{
-    //calculate orbital elements
-    int cadorbin_flag = cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
-    _ha = (1. + _eccentricity) * _semi_major - REARTH;
-    _hp = (1. - _eccentricity) * _semi_major - REARTH;
-    _ref_alt = dbi - REARTH;
-
+void Newton::propagate_gravityloss(double int_step){
+    //calculate gravity loss
+    gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
 }
 
 void Newton::update_diagnostic_attributes(double int_step){
     _dbi = get_dbi();
-    dvbi = get_dvbi();
+    _dvbi = get_dvbi();
 
     Matrix VBED = get_VBED();
     VBED.fill(_vbed);
 
     Matrix POLAR = VBED.pol_from_cart();
     _dvbe = POLAR[0];
-    psivdx = DEG * POLAR[1];
-    thtvdx = DEG * POLAR[2];
+    _psivdx = DEG * POLAR[1];
+    _thtvdx = DEG * POLAR[2];
 
+    //ground track travelled (10% accuracy, usually on the high side)
     double vbed1 = VBED[0];
     double vbed2 = VBED[1];
     _grndtrck += sqrt(vbed1 * vbed1 + vbed2 * vbed2) * int_step * REARTH / get_dbi();
@@ -273,10 +236,21 @@ void Newton::update_diagnostic_attributes(double int_step){
     _anx = -FSPB[2] / AGRAV;
 
     //T.M. of geographic velocity wrt geodetic coordinates
-    Matrix TVD = mat2tr(psivdx * RAD, thtvdx * RAD);
+    Matrix TVD = mat2tr(_psivdx * RAD, _thtvdx * RAD);
     TVD.fill(_tvd);
 
     Matrix SBII(IPos);
     Matrix VBII(IVel);
     orbital(SBII,VBII,get_dbi());
 }
+
+void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
+{
+    //calculate orbital elements
+    int cadorbin_flag = cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
+    _ha = (1. + _eccentricity) * _semi_major - REARTH;
+    _hp = (1. - _eccentricity) * _semi_major - REARTH;
+    _ref_alt = dbi - REARTH;
+
+}
+
