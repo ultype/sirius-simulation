@@ -31,7 +31,7 @@ class Newton {
 
         void default_data();
         void initialize();
-        void calculate_newton(double int_step);
+        void propagate(double int_step);
         void orbital(Matrix &SBII, Matrix &VBII, double dbi);
 
         void load_location(double lonx, double latx, double alt);
@@ -57,6 +57,13 @@ class Newton {
         /* Internal Initializers */
         Matrix build_WEII();
         Matrix build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
+
+        /* Internal Propagator */
+        void update_fspb();
+
+        void propagate_position_speed_acceleration(double int_step);
+        void propagate_aeroloss(double int_step);
+        void propagate_gravityloss(double int_step);
 
         /* Internal Updaters */
         void update_diagnostic_attributes(double int_step);

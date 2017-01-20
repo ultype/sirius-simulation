@@ -149,7 +149,7 @@ void Newton::default_data(){
 void Newton::initialize(){
 }
 
-void Newton::calculate_newton(double int_step){
+void Newton::propagate(double int_step){
     double lon(0);
     double lat(0);
 
@@ -183,9 +183,35 @@ void Newton::calculate_newton(double int_step){
     Matrix FAP(3,1);
     FAP.build_vec3(forces->fap);
 
+    update_fspb();
+
+    propagate_position_speed_acceleration(int_step);
+
+    propagate_aeroloss(int_step);
+    propagate_gravityloss(int_step);
+
+    update_diagnostic_attributes(int_step);
+}
+
+void Newton::update_fspb(){
+    Matrix FAPB(forces->fapb);
+
     /* Stored Value due to coherence with other models */
     Matrix FSPB = FAPB * (1. / propulsion->vmass);
     FSPB.fill(fspb);
+}
+
+void Newton::propagate_position_speed_acceleration(double int_step){
+    double lon, lat, al;
+
+    Matrix TDI(tdi);
+    Matrix TBI(kinematics->tbi);
+    Matrix TGI(tgi);
+    Matrix SBII(IPos);
+    Matrix VBII(IVel);
+    Matrix ABII(IAccl);
+    Matrix GRAVG(environment->gravg);
+    Matrix FSPB(fspb);
 
     /* Prograte S, V, A status */
     Matrix NEXT_ACC = ~TBI * FSPB + ~TGI * GRAVG;
@@ -194,29 +220,32 @@ void Newton::calculate_newton(double int_step){
     ABII = NEXT_ACC;
     VBII = NEXT_VEL;
 
-    cad_geo84_in(lon,lat,alt,SBII,get_rettime());
-    TDI = cad_tdi84(lon,lat,alt,get_rettime());
-    TGI = cad_tgi84(lon,lat,alt,get_rettime());
-    lonx = lon * DEG;
-    latx = lat * DEG;
+    cad_geo84_in(lon, lat, al, SBII, get_rettime());
+    TDI = cad_tdi84(lon, lat, al, get_rettime());
+    TGI = cad_tgi84(lon, lat, al, get_rettime());
 
+    this->lonx = lon * DEG;
+    this->latx = lat * DEG;
+    this->alt  = al;
     SBII.fill(IPos);
     VBII.fill(IVel);
     ABII.fill(IAccl);
     TDI.fill(tdi);
     TGI.fill(tgi);
+}
+
+void Newton::propagate_aeroloss(double int_step){
+    Matrix FAP(forces->fap);
 
     //calculate aero loss`:`
     FAP = FAP * (1. / propulsion->vmass);
     aero_loss = aero_loss + FAP.absolute() * int_step;
-
-    //calculate gravity loss
-    gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
-
-    update_diagnostic_attributes(int_step);
 }
 
-
+void Newton::propagate_gravityloss(double int_step){
+    //calculate gravity loss
+    gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
+}
 
 void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
 {

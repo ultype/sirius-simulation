@@ -95,7 +95,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.05, "scheduled") rcs.actuate();
             (0.001, "scheduled") rcs.rcs_schmitt_thrust();
             (0.001, "scheduled") force.forces();
-            (0.001, "scheduled") newton.calculate_newton(0.001);
+            (0.001, "scheduled") newton.propagate(0.001);
             (0.001, "scheduled") euler.euler(0.001);
 
         }
