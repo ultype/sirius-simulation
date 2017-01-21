@@ -2574,6 +2574,39 @@ Matrix integrate(Matrix &DYDX_NEW,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Integration of Matrix MAT(r,c)
+//
+// 030424 Created by Peter H Zipfel
+// 170120 Modified to use armadillo library matrix type
+///////////////////////////////////////////////////////////////////////////////
+arma::mat integrate(arma::mat &DYDX_NEW,
+                 arma::mat &DYDX,
+                 arma::mat &Y,
+                 const double int_step)
+{
+    int nrow = Y.n_rows;
+    int nrow1 = DYDX_NEW.n_rows;
+    int nrow2 = DYDX.n_rows;
+    int ncol = Y.n_cols;
+    int ncol1 = DYDX_NEW.n_cols;
+    int ncol2 = DYDX.n_cols;
+
+    assert((nrow == nrow1 && nrow == nrow2) &&
+           " *** Error: incompatible row-dimensions in 'integrate()' *** ");
+    assert((ncol == ncol1 && ncol == ncol2) &&
+           " *** Error: incompatible column-dimensions in 'integrate()' *** ");
+
+    arma::mat RESULT(nrow, ncol);
+    for (int r = 0; r < nrow; r++)
+        for (int c = 0; c < ncol; c++)
+            RESULT(r, c) =
+                integrate(DYDX_NEW(r, c), DYDX(r, c),
+                                Y(r, c), int_step);
+
+    return RESULT;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // US Standard Atmosphere 1976 (Public Domain)
 // *Calculates the atmospheric properties density pressure and temperature
 //  up to 85 km.

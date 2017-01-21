@@ -53,11 +53,19 @@ ICG: (No)
 #ifndef utility_header__HPP
 #define utility_header__HPP
 
+#include <armadillo>
 #include <iostream>
 #include <cmath>
 #include "global_constants.hh"
 
 using namespace std;
+
+template<class _Matrix>
+void print_matrix(_Matrix matrix) {
+    matrix.print(std::cout);
+}
+
+template void print_matrix<arma::mat>(arma::mat matrix);
 
 /**
  * \brief One dimensional and two dimensional arrays of any size of type
@@ -596,6 +604,11 @@ double integrate(const double &dydx_new,
 Matrix integrate(Matrix &DYDX_NEW,
                  Matrix &DYDX,
                  Matrix &Y,
+                 const double int_step);
+
+arma::mat integrate(arma::mat &DYDX_NEW,
+                 arma::mat &DYDX,
+                 arma::mat &Y,
                  const double int_step);
 
 /**
