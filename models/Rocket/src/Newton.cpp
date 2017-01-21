@@ -21,43 +21,31 @@ double Newton::get_latx(){
 }
 
 Matrix Newton::get_IPos(){
-    return Matrix(IPos);
+    return Matrix(_SBII);
 }
 
 Matrix Newton::get_IVel(){
-    return Matrix(IVel);
+    return Matrix(_VBII);
 }
 
 Matrix Newton::get_FSPB(){
     /* Use stored Value due to coherence with other models */
-    return Matrix(fspb);
+    return Matrix(_FSPB);
 }
 
 Matrix Newton::get_VBED(){
-    Matrix TDI(3, 3);
-    TDI.build_mat33(tdi);
+    arma::mat VBED = TDI * (VBII - WEII * SBII);
 
-    Matrix WEII(3, 3);
-    WEII.build_mat33(weii);
-
-    Matrix SBII(3, 1);
-    SBII.build_vec3(IPos);
-
-    Matrix VBII(3, 1);
-    VBII.build_vec3(IVel);
-
-    Matrix VBED = TDI * (VBII - WEII * SBII);
-    return VBED;
+    Matrix __VBED(VBED.memptr());
+    return __VBED;
 }
 
 double Newton::get_dbi(){
-    Matrix SBII(IPos);
-    return SBII.absolute();
+    return norm(SBII);
 }
 
 double Newton::get_dvbi(){
-    Matrix VBII(IVel);
-    return VBII.absolute();
+    return norm(VBII);
 }
 
 double Newton::get_dvbe(){
@@ -76,13 +64,27 @@ double Newton::get_psivdx(){
 }
 
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
-    : kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc)
+    :   kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc),
+        WEII(&_WEII[0][0], 3, 3, false, true),
+        SBII(&_SBII[0], 3, false, true),
+        VBII(&_VBII[0], 3, false, true),
+        ABII(&_ABII[0], 3, false, true),
+        FSPB(&_FSPB[0], 3, false, true),
+        TDI(&_TDI[0][0], 3, 3, false, true),
+        TGI(&_TGI[0][0], 3, 3, false, true)
 {
     this->default_data();
 }
 
 Newton::Newton(const Newton& other)
-    : kinematics(other.kinematics), euler(other.euler), environment(other.environment), propulsion(other.propulsion), forces(other.forces)
+    :   kinematics(other.kinematics), euler(other.euler), environment(other.environment), propulsion(other.propulsion), forces(other.forces),
+        WEII(&_WEII[0][0], 3, 3, false, true),
+        SBII(&_SBII[0], 3, false, true),
+        VBII(&_VBII[0], 3, false, true),
+        ABII(&_ABII[0], 3, false, true),
+        FSPB(&_FSPB[0], 3, false, true),
+        TDI(&_TDI[0][0], 3, 3, false, true),
+        TGI(&_TGI[0][0], 3, 3, false, true)
 {
     this->default_data();
 
@@ -90,17 +92,16 @@ Newton::Newton(const Newton& other)
     this->alt = other.alt;
     this->lonx = other.lonx;
     this->latx = other.latx;
-    memcpy(this->IPos, other.IPos, sizeof(other.IPos));
-    memcpy(this->IVel, other.IVel, sizeof(other.IVel));
-    memcpy(this->IAccl, other.IAccl, sizeof(other.IAccl));
+    this->SBII = other.SBII;
+    this->VBII = other.VBII;
+    this->ABII = other.ABII;
 
-    memcpy(this->tgi, other.tgi, sizeof(other.tgi));
-    memcpy(this->tdi, other.tdi, sizeof(other.tdi));
+    this->TGI = other.TGI;
+    this->TDI = other.TDI;
     this->aero_loss = other.aero_loss;
     this->gravity_loss = other.gravity_loss;
 
-    /* Generating Outputs */;
-    memcpy(this->fspb, other.fspb, sizeof(other.fspb));
+    this->FSPB = other.FSPB;
 }
 
 Newton& Newton::operator=(const Newton& other){
@@ -117,30 +118,29 @@ Newton& Newton::operator=(const Newton& other){
     this->alt = other.alt;
     this->lonx = other.lonx;
     this->latx = other.latx;
-    memcpy(this->IPos, other.IPos, sizeof(other.IPos));
-    memcpy(this->IVel, other.IVel, sizeof(other.IVel));
-    memcpy(this->IAccl, other.IAccl, sizeof(other.IAccl));
+    this->SBII = other.SBII;
+    this->VBII = other.VBII;
+    this->ABII = other.ABII;
 
-    memcpy(this->tgi, other.tgi, sizeof(other.tgi));
-    memcpy(this->tdi, other.tdi, sizeof(other.tdi));
+    this->TGI = other.TGI;
+    this->TDI = other.TDI;
     this->aero_loss = other.aero_loss;
     this->gravity_loss = other.gravity_loss;
 
-    /* Generating Outputs */;
-    memcpy(this->fspb, other.fspb, sizeof(other.fspb));
+    this->FSPB = other.FSPB;
 
     return *this;
 }
 
-Matrix Newton::build_WEII(){
-    Matrix WEII(3, 3);
-    WEII.assign_loc(0, 1, -WEII3);
-    WEII.assign_loc(1, 0, WEII3);
+arma::mat Newton::build_WEII(){
+    arma::mat33 WEII;
+    WEII.zeros();
+    WEII(0, 1) = -WEII3;
+    WEII(1, 0) =  WEII3;
     return WEII;
 }
 
-Matrix Newton::build_VBEB(double _alpha0x, double _beta0x, double _dvbe){
-    Matrix VBEB(3, 1);
+arma::vec Newton::build_VBEB(double _alpha0x, double _beta0x, double _dvbe){
     double salp = sin(_alpha0x * RAD);
     double calp = cos(_alpha0x * RAD);
     double sbet = sin(_beta0x * RAD);
@@ -148,7 +148,7 @@ Matrix Newton::build_VBEB(double _alpha0x, double _beta0x, double _dvbe){
     double vbeb1 = calp * cbet * _dvbe;
     double vbeb2 = sbet * _dvbe;
     double vbeb3 = salp * cbet * _dvbe;
-    VBEB.build_vec3(vbeb1, vbeb2, vbeb3);
+    arma::vec3 VBEB= {vbeb1, vbeb2, vbeb3};
     return VBEB;
 }
 
@@ -158,44 +158,54 @@ void Newton::load_location(double lonx, double latx, double alt){
     this->latx = latx;
     this->alt = alt;
 
+    //XXX: Need fixing
     //converting geodetic lonx, latx, alt to SBII
     Matrix SBII = cad_in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
-    SBII.fill(this->IPos);
-    //this->dbi = SBII.absolute();
+    SBII.fill(this->_SBII);
 
     //building inertial velocity
     Matrix TDI = cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     Matrix TGI = cad_tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    TDI.fill(this->tdi);
-    TGI.fill(this->tgi);
+    TDI.trans().fill(this->_TDI);
+    TGI.trans().fill(this->_TGI);
 }
 
 void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     //this->dvbe = dvbe;
 
+    //XXX: Need fixing
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
-    Matrix VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
+    arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
     //building TBD
-    Matrix TBD = mat3tr(kinematics->psibdx * RAD, kinematics->thtbdx * RAD, kinematics->phibdx * RAD);
+    //XXX: Need Fix
+    arma::mat33 TBD(mat3tr(kinematics->psibdx * RAD, kinematics->thtbdx * RAD, kinematics->phibdx * RAD).get_pbody());
+    TBD = trans(TBD);
     //Geodetic velocity
-    Matrix VBED = ~TBD * VBEB;
+    arma::mat VBED = trans(TBD) * VBEB;
 
-    Matrix SBII(IPos);
-    Matrix TDI(tdi);
-    Matrix WEII(weii);
-    Matrix VBII = ~TDI * VBED + WEII * SBII;
-    //dvbi = VBII.absolute();
-    VBII.fill(this->IVel);
+    VBII = trans(TDI) * VBED + WEII * SBII;
 }
 
 void Newton::default_data(){
     //Earth's angular velocity skew-symmetric matrix (3x3)
-    Matrix WEII = this->build_WEII();
-    WEII.fill(this->weii);
+    this->WEII = this->build_WEII();
 
-    this->IAccl[0] = 0;
-    this->IAccl[1] = 0;
-    this->IAccl[2] = 0;
+    this->SBII.zeros();
+    this->VBII.zeros();
+    this->ABII.zeros();
+
+    this->FSPB.zeros();
+
+    this->TDI.zeros();
+    this->TGI.zeros();
+
+    alt = 0;
+    lonx = 0;
+    latx = 0;
+
+    aero_loss = 0;
+    gravity_loss = 0;
+
 }
 
 void Newton::initialize(){
@@ -211,52 +221,60 @@ void Newton::propagate(double int_step){
 }
 
 void Newton::update_fspb(){
-    Matrix FAPB(forces->fapb);
+    arma::vec3 FAPB(&forces->fapb[0]);
 
     /* Stored Value due to coherence with other models */
-    Matrix FSPB = FAPB * (1. / propulsion->vmass);
-    FSPB.fill(fspb);
+    FSPB = FAPB * (1. / propulsion->vmass);
 }
 
 void Newton::propagate_position_speed_acceleration(double int_step){
     double lon, lat, al;
 
-    Matrix TDI(tdi);
-    Matrix TBI(kinematics->tbi);
-    Matrix TGI(tgi);
-    Matrix SBII(IPos);
-    Matrix VBII(IVel);
-    Matrix ABII(IAccl);
-    Matrix GRAVG(environment->gravg);
-    Matrix FSPB(fspb);
+    //XXX: Need Fix
+    arma::mat33 TBI(&kinematics->tbi[0][0]);
+    TBI = trans(TBI);
+
+    arma::vec3 GRAVG(&environment->gravg[0]);
 
     /* Prograte S, V, A status */
-    Matrix NEXT_ACC = ~TBI * FSPB + ~TGI * GRAVG;
-    Matrix NEXT_VEL = integrate(NEXT_ACC, ABII, VBII, int_step);
+    arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
+    arma::mat NEXT_VEL = integrate(NEXT_ACC, ABII, VBII, int_step);
     SBII = integrate(NEXT_VEL, VBII, SBII, int_step);
     ABII = NEXT_ACC;
     VBII = NEXT_VEL;
 
-    cad_geo84_in(lon, lat, al, SBII, get_rettime());
-    TDI = cad_tdi84(lon, lat, al, get_rettime());
-    TGI = cad_tgi84(lon, lat, al, get_rettime());
+
+    //XXX: Temp fix
+    // Load old Matrix with aux memory
+    Matrix __SBII(_SBII);
+
+    //Calculate lon lat alt
+    cad_geo84_in(lon, lat, al, __SBII, get_rettime());
 
     this->lonx = lon * DEG;
     this->latx = lat * DEG;
     this->alt  = al;
-    SBII.fill(IPos);
-    VBII.fill(IVel);
-    ABII.fill(IAccl);
-    TDI.fill(tdi);
-    TGI.fill(tgi);
+
+    // Use old Metrix Type
+    Matrix __TDI = cad_tdi84(lon, lat, al, get_rettime());
+    Matrix __TGI = cad_tgi84(lon, lat, al, get_rettime());
+
+    //XXX: Need Fix
+    //Fill back into aux memory
+    __TDI = ~__TDI;
+    __TGI = ~__TGI;
+    __TDI.fill(_TDI);
+    __TGI.fill(_TGI);
 }
 
 void Newton::propagate_aeroloss(double int_step){
-    Matrix FAP(forces->fap);
+    //XXX: Need fixing
+
+    arma::vec3 FAP(&forces->fap[0]);
 
     //calculate aero loss`:`
     FAP = FAP * (1. / propulsion->vmass);
-    aero_loss = aero_loss + FAP.absolute() * int_step;
+    aero_loss = aero_loss + norm(FAP) * int_step;
 }
 
 void Newton::propagate_gravityloss(double int_step){
@@ -268,8 +286,9 @@ void Newton::update_diagnostic_attributes(double int_step){
     _dbi = get_dbi();
     _dvbi = get_dvbi();
 
+    //XXX: Need Fixing
+    // Load up old Old Matrix Type from aux memory
     Matrix VBED = get_VBED();
-    VBED.fill(_vbed);
 
     Matrix POLAR = VBED.pol_from_cart();
     _dvbe = POLAR[0];
@@ -283,16 +302,22 @@ void Newton::update_diagnostic_attributes(double int_step){
     _gndtrkmx = 0.001 * _grndtrck;
     _gndtrnmx = NMILES * _grndtrck;
 
-    Matrix FSPB = get_FSPB();
+    //XXX: Need Fixing
+    // Load up old Old Matrix Type from aux memory
+    Matrix FSPB(_FSPB);
     _ayx =  FSPB[1] / AGRAV;
     _anx = -FSPB[2] / AGRAV;
 
+    //XXX: Need Fixing
     //T.M. of geographic velocity wrt geodetic coordinates
     Matrix TVD = mat2tr(_psivdx * RAD, _thtvdx * RAD);
-    TVD.fill(_tvd);
+    TVD = ~TVD;
+    TVD.fill(_TVD);
 
-    Matrix SBII(IPos);
-    Matrix VBII(IVel);
+    //XXX: Need Fixing
+    Matrix SBII(_SBII);
+    Matrix VBII(_VBII);
+
     orbital(SBII,VBII,get_dbi());
 }
 
