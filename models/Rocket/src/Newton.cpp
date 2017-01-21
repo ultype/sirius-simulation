@@ -7,62 +7,6 @@
 
 #include "utility_header.hh"
 
-
-double Newton::get_alt(){
-    return alt;
-}
-
-double Newton::get_lonx(){
-    return lonx;
-}
-
-double Newton::get_latx(){
-    return latx;
-}
-
-Matrix Newton::get_IPos(){
-    return Matrix(_SBII);
-}
-
-Matrix Newton::get_IVel(){
-    return Matrix(_VBII);
-}
-
-Matrix Newton::get_FSPB(){
-    /* Use stored Value due to coherence with other models */
-    return Matrix(_FSPB);
-}
-
-Matrix Newton::get_VBED(){
-    arma::mat VBED = TDI * (VBII - WEII * SBII);
-
-    Matrix __VBED(VBED.memptr());
-    return __VBED;
-}
-
-double Newton::get_dbi(){
-    return norm(SBII);
-}
-
-double Newton::get_dvbi(){
-    return norm(VBII);
-}
-
-double Newton::get_dvbe(){
-    Matrix VBED = get_VBED();
-    return VBED.pol_from_cart().get_loc(0, 0);
-}
-
-double Newton::get_thtvdx(){
-    Matrix VBED = get_VBED();
-    return DEG * VBED.pol_from_cart().get_loc(2, 0);
-}
-
-double Newton::get_psivdx(){
-    Matrix VBED = get_VBED();
-    return DEG * VBED.pol_from_cart().get_loc(1, 0);
-}
-
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
     :   kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc),
         WEII(&_WEII[0][0], 3, 3, false, true),
@@ -132,6 +76,31 @@ Newton& Newton::operator=(const Newton& other){
     return *this;
 }
 
+void Newton::default_data(){
+    //Earth's angular velocity skew-symmetric matrix (3x3)
+    this->WEII = this->build_WEII();
+
+    this->SBII.zeros();
+    this->VBII.zeros();
+    this->ABII.zeros();
+
+    this->FSPB.zeros();
+
+    this->TDI.zeros();
+    this->TGI.zeros();
+
+    alt = 0;
+    lonx = 0;
+    latx = 0;
+
+    aero_loss = 0;
+    gravity_loss = 0;
+
+}
+
+void Newton::initialize(){
+}
+
 arma::mat Newton::build_WEII(){
     arma::mat33 WEII;
     WEII.zeros();
@@ -179,31 +148,6 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     arma::mat VBED = trans(TBD) * VBEB;
 
     VBII = trans(TDI) * VBED + WEII * SBII;
-}
-
-void Newton::default_data(){
-    //Earth's angular velocity skew-symmetric matrix (3x3)
-    this->WEII = this->build_WEII();
-
-    this->SBII.zeros();
-    this->VBII.zeros();
-    this->ABII.zeros();
-
-    this->FSPB.zeros();
-
-    this->TDI.zeros();
-    this->TGI.zeros();
-
-    alt = 0;
-    lonx = 0;
-    latx = 0;
-
-    aero_loss = 0;
-    gravity_loss = 0;
-
-}
-
-void Newton::initialize(){
 }
 
 void Newton::propagate(double int_step){
@@ -299,3 +243,41 @@ void Newton::orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi)
     _ref_alt = dbi - REARTH;
 }
 
+double Newton::get_alt() { return alt; }
+
+double Newton::get_lonx() { return lonx; }
+
+double Newton::get_latx() { return latx; }
+
+Matrix Newton::get_IPos() { return Matrix(_SBII); }
+
+Matrix Newton::get_IVel() { return Matrix(_VBII); }
+
+/* Use stored Value due to coherence with other models */
+Matrix Newton::get_FSPB() { return Matrix(_FSPB); }
+
+Matrix Newton::get_VBED() {
+    arma::mat VBED = TDI * (VBII - WEII * SBII);
+
+    Matrix __VBED(VBED.memptr());
+    return __VBED;
+}
+
+double Newton::get_dbi() { return norm(SBII); }
+
+double Newton::get_dvbi() { return norm(VBII); }
+
+double Newton::get_dvbe(){
+    Matrix VBED = get_VBED();
+    return VBED.pol_from_cart().get_loc(0, 0);
+}
+
+double Newton::get_thtvdx(){
+    Matrix VBED = get_VBED();
+    return DEG * VBED.pol_from_cart().get_loc(2, 0);
+}
+
+double Newton::get_psivdx(){
+    Matrix VBED = get_VBED();
+    return DEG * VBED.pol_from_cart().get_loc(1, 0);
+}
