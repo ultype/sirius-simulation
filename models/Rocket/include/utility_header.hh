@@ -385,11 +385,16 @@ int sign(const double &variable);
 /// @return the angle between two 3x1 vectors
 double angle(Matrix VEC1, Matrix VEC2);
 
+/// @return skew symmetric matrix of a Vector3
+arma::mat33 skew_sym(arma::vec3 vec);
+
 /// @return the T.M. of the psivg -> thtvg sequence
 Matrix mat2tr(const double &psivg, const double &thtvg);
+arma::mat33 build_transform_matrix(const double &psivg, const double &thtvg);
 
 /// @return the Euler T.M. of the psi->tht->phi sequence
 Matrix mat3tr(const double &psi, const double &tht, const double &phi);
+arma::mat33 build_euler_transform_matrix(const double &psi, const double &tht, const double &phi);
 
 /// @return great circle distance between two point on a spherical Earth
 double cad_distance(const double &lon1,
@@ -404,6 +409,12 @@ void cad_geo84_in(double &lon,
                   double &lat,
                   double &alt,
                   const Matrix SBII,
+                  const double &time);
+
+void arma_cad_geo84_in(double &lon,
+                  double &lat,
+                  double &alt,
+                  arma::vec3 SBII,
                   const double &time);
 
 /// Calculates geodetic velocity vector from inertial states
@@ -485,11 +496,25 @@ int cad_orb_in(double &semi,
                Matrix &SBII,
                Matrix &VBII);
 
+int arma_cad_orb_in(double &semi,
+                   double &ecc,
+                   double &inclx,
+                   double &lon_anodex,
+                   double &arg_perix,
+                   double &true_anomx,
+                   arma::vec3 &SBII,
+                   arma::vec3 &VBII);
+
 /// @return the T.M. of geodetic wrt inertial coordinates
 Matrix cad_tdi84(const double &lon,
                  const double &lat,
                  const double &alt,
                  const double &time);
+
+arma::mat33 arma_cad_tdi84(const double &lon,
+                           const double &lat,
+                           const double &alt,
+                           const double &time);
 
 /// @return the T.M. of earth wrt inertial coordinates
 Matrix cad_tei(const double &time);
@@ -502,6 +527,11 @@ Matrix cad_tgi84(const double &lon,
                  const double &lat,
                  const double &alt,
                  const double &time);
+
+arma::mat33 arma_cad_tgi84(const double &lon,
+                           const double &lat,
+                           const double &alt,
+                           const double &time);
 
 /// @return the transformation matrix of inertial wrt perifocal coordinates
 Matrix cad_tip(const double &incl,

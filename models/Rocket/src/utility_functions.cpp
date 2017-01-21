@@ -1338,10 +1338,40 @@ int sign(const double &variable)
 
     return sign;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Return skew symmetric matrix of a Vector3
+//            | 0 -c  b|        |a|
+//            | c  0 -a| <--    |b|
+//            |-b  a  0|        |c|
+//
+// Example: MAT = VEC.skew_sym();
+///////////////////////////////////////////////////////////////////////////////
+arma::mat33 skew_sym(arma::vec3 vec)
+{
+    arma::mat33 RESULT;
+
+    RESULT(0, 0) = 0;
+    RESULT(1, 0) = vec(2);
+    RESULT(2, 0) = -vec(1);
+    RESULT(0, 1) = -vec(2);
+    RESULT(1, 1) = 0;
+    RESULT(2, 1) = -vec(0);
+    RESULT(0, 2) = vec(1);
+    RESULT(1, 2) = -vec(0);
+    RESULT(2, 2) = 0;
+
+    return RESULT;
+}
+// 010824 Created by Peter H Zipfel
+///////////////////////////////////////////////////////////////////////////////
+arma::mat33 skew_sym(arma::vec3 vec);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the T.M. of the psivg -> thtvg sequence
 //
 // 010628 Created by Peter H Zipfel
+// 170121 Create Armadillo Version by soncyang
 ////////////////////////////////////////////////////////////////////////////////
 Matrix mat2tr(const double &psivg, const double &thtvg)
 {
@@ -1359,11 +1389,30 @@ Matrix mat2tr(const double &psivg, const double &thtvg)
 
     return AMAT;
 }
+
+arma::mat33 build_transform_matrix(const double &psivg, const double &thtvg)
+{
+    arma::mat33 AMAT;
+
+    AMAT(0, 2) = -sin(thtvg);
+    AMAT(1, 0) = -sin(psivg);
+    AMAT(1, 1) = cos(psivg);
+    AMAT(2, 2) = cos(thtvg);
+    AMAT(0, 0) = (AMAT(2, 2) * AMAT(1, 1));
+    AMAT(0, 1) = (-AMAT(2, 2) * AMAT(1, 0));
+    AMAT(2, 0) = (-AMAT(0, 2) * AMAT(1, 1));
+    AMAT(2, 1) = (AMAT(0, 2) * AMAT(1, 0));
+    AMAT(1, 2) = 0.0;
+
+    return AMAT;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the T.M. of the psi->tht->phi sequence
 // Euler angle transformation matrix of flight mechanics
 //
 // 011126 Created by Peter H Zipfel
+// 170121 Add Armadillo version
 ////////////////////////////////////////////////////////////////////////////////
 
 Matrix mat3tr(const double &psi, const double &tht, const double &phi)
@@ -1385,6 +1434,29 @@ Matrix mat3tr(const double &psi, const double &tht, const double &phi)
     AMAT.assign_loc(0, 2, -stht);
     AMAT.assign_loc(1, 2, ctht * sphi);
     AMAT.assign_loc(2, 2, ctht * cphi);
+
+    return AMAT;
+}
+
+arma::mat33 build_euler_transform_matrix(const double &psi, const double &tht, const double &phi)
+{
+    double spsi = sin(psi);
+    double cpsi = cos(psi);
+    double stht = sin(tht);
+    double ctht = cos(tht);
+    double sphi = sin(phi);
+    double cphi = cos(phi);
+
+    arma::mat33 AMAT;
+    AMAT(0, 0) = cpsi * ctht;
+    AMAT(1, 0) = cpsi * stht * sphi - spsi * cphi;
+    AMAT(2, 0) = cpsi * stht * cphi + spsi * sphi;
+    AMAT(0, 1) = spsi * ctht;
+    AMAT(1, 1) = spsi * stht * sphi + cpsi * cphi;
+    AMAT(2, 1) = spsi * stht * cphi - cpsi * sphi;
+    AMAT(0, 2) = -stht;
+    AMAT(1, 2) = ctht * sphi;
+    AMAT(2, 2) = ctht * cphi;
 
     return AMAT;
 }
@@ -1425,9 +1497,11 @@ double cad_distance(const double &lon1,
 //    lat = geodetic latitude - rad
 //    alt = altitude above ellipsoid - m
 // Parameter input
+//    lat = geodetic latitude - rad
 //    SBII(3x1) = Inertial position - m
 //
 // 030414 Created from FORTRAN by Peter H Zipfel
+// 170121 Create Armadillo Version by soncyang
 ///////////////////////////////////////////////////////////////////////////////
 void cad_geo84_in(double &lon,
                   double &lat,
@@ -1465,6 +1539,57 @@ void cad_geo84_in(double &lon,
     // longitude
     double sbii1 = SBII.get_loc(0, 0);
     double sbii2 = SBII.get_loc(1, 0);
+    double dum4 = asin(sbii2 / sqrt(sbii1 * sbii1 + sbii2 * sbii2));
+    // Resolving the multi-valued arcsin function
+    if ((sbii1 >= 0.0) && (sbii2 >= 0.0))
+        alamda = dum4;  // quadrant I
+    if ((sbii1 < 0.0) && (sbii2 >= 0.0))
+        alamda = (180. * RAD) - dum4;  // quadrant II
+    if ((sbii1 < 0.0) && (sbii2 < 0.0))
+        alamda = (180. * RAD) - dum4;  // quadrant III
+    if ((sbii1 > 0.0) && (sbii2 < 0.0))
+        alamda = (360. * RAD) + dum4;  // quadrant IV
+    lon = alamda - WEII3 * time - GW_CLONG;
+    if ((lon) > (180. * RAD))
+        lon = -((360. * RAD) - lon);  // east positive, west negative
+}
+
+void arma_cad_geo84_in(double &lon,
+                  double &lat,
+                  double &alt,
+                  arma::vec3 SBII,
+                  const double &time)
+{
+    int count(0);
+    double lat0(0);
+    double alamda(0);
+
+    // initializing geodetic latitude using geocentric latitude
+    double dbi = norm(SBII);
+    double latg = asin(SBII(2, 0) / dbi);
+    lat = latg;
+
+    // iterating to calculate geodetic latitude and altitude
+    do {
+        lat0 = lat;
+        double r0 =
+            SMAJOR_AXIS *
+            (1. - FLATTENING * (1. - cos(2. * lat0)) / 2. +
+             5. * pow(FLATTENING, 2) * (1. - cos(4. * lat0)) / 16.);  // eq 4-21
+        alt = dbi - r0;
+        double dd = FLATTENING * sin(2. * lat0) *
+                    (1. - FLATTENING / 2. - alt / r0);  // eq 4-15
+        lat = latg + dd;
+        count++;
+        assert(count <= 100 &&
+               " *** Stop: Geodetic latitude does not "
+               "converge,'cad_geo84_in()' *** ");
+
+    } while (fabs(lat - lat0) > SMALL);
+
+    // longitude
+    double sbii1 = SBII(0, 0);
+    double sbii2 = SBII(1, 0);
     double dum4 = asin(sbii2 / sqrt(sbii1 * sbii1 + sbii2 * sbii2));
     // Resolving the multi-valued arcsin function
     if ((sbii1 >= 0.0) && (sbii2 >= 0.0))
@@ -2064,6 +2189,7 @@ void cadkepler1_ucs(double &c, double &s, const double &z)
 //    VBII = Inertial velocity - m/s
 //
 // 040510 Created by Peter H Zipfel
+// 170121 Create Armadillo Version by soncyang
 ///////////////////////////////////////////////////////////////////////////////
 int cad_orb_in(double &semi,
                double &ecc,
@@ -2164,6 +2290,107 @@ int cad_orb_in(double &semi,
 
     return cadorbin_flag;
 }
+
+int arma_cad_orb_in(double &semi,
+                   double &ecc,
+                   double &inclx,
+                   double &lon_anodex,
+                   double &arg_perix,
+                   double &true_anomx,
+                   arma::vec3 &SBII,
+                   arma::vec3 &VBII)
+{
+    // local variable
+    int cadorbin_flag(0);
+    arma::vec3 NODE_I;
+    double lon_anode(0);
+    double arg_peri(0);
+    double true_anom(0);
+
+    // angular momentum vector of orbit
+    arma::mat ANGL_MOM_I = skew_sym(SBII) * VBII;
+    double angl_mom = norm(ANGL_MOM_I);
+
+    // vector of the ascending node (undefined if inclx=0)
+    NODE_I(0) = -ANGL_MOM_I(1);
+    NODE_I(1) = ANGL_MOM_I(0);
+    double node = norm(NODE_I);
+
+    // orbit eccentricity vector and magnitude
+    double dbi = norm(SBII);
+    double dvbi = norm(VBII);
+    arma::vec3 EI;
+    EI = (SBII * (dvbi * dvbi - GM / dbi) - VBII * dot(SBII, VBII)) * (1 / GM);
+    ecc = norm(EI);
+
+    // semi latus rectum
+    double pp = angl_mom * angl_mom / GM;
+
+    // semi-major axis of orbit
+    if (pp == 1)
+        cadorbin_flag = 2;
+    else
+        semi = pp / (1 - ecc * ecc);
+
+    // orbit inclination
+    double arg = ANGL_MOM_I(2) * (1 / angl_mom);
+    if (fabs(arg) > 1)
+        arg = 1;
+    inclx = acos(arg) * DEG;
+
+    // bypass calculations if equatorial orbit
+    if (node < SMALL) {
+        cadorbin_flag = 3;
+    } else {
+        // longitude of the ascending node
+        arg = NODE_I(0) / node;
+        if (fabs(arg) > 1)
+            arg = 1;
+        lon_anode = acos(arg);
+    }
+
+    // bypass calculations if circular and/or equatorial orbit
+    if (ecc < SMALL || node < SMALL)
+        cadorbin_flag = 13;
+    else {
+        // argument of periapsis
+        arg = dot(NODE_I, EI) * (1 / (node * ecc));
+        if (fabs(arg) > 1)
+            arg = 1;
+        arg_peri = acos(arg);
+    }
+
+    // bypass calculations if circular orbit
+    if (ecc < SMALL)
+        cadorbin_flag = 1;
+    else {
+        // true anomaly
+        arg = dot(SBII, EI) * (1 / (dbi * ecc));
+        if (fabs(arg) > 1)
+            arg = 1;
+        true_anom = acos(arg);
+    }
+
+    // quadrant resolution
+    double quadrant = dot(SBII, VBII);
+    if (quadrant >= 0)
+        true_anomx = true_anom * DEG;
+    else
+        true_anomx = (2 * PI - true_anom) * DEG;
+
+    if (EI(2) >= 0)
+        arg_perix = arg_peri * DEG;
+    else
+        arg_perix = (2 * PI - arg_peri) * DEG;
+
+    if (NODE_I(1) > 0)
+        lon_anodex = lon_anode * DEG;
+    else
+        lon_anodex = (2 * PI - lon_anode) * DEG;
+
+    return cadorbin_flag;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Returns the T.M. of geodetic wrt inertial coordinates
 // using the WGS 84 reference ellipsoid
@@ -2176,6 +2403,7 @@ int cad_orb_in(double &semi,
 //    alt = altitude above ellipsoid - m
 //
 // 030424 Created by Peter H Zipfel
+// 170121 Create Armadillo Version by soncyang
 ///////////////////////////////////////////////////////////////////////////////
 Matrix cad_tdi84(const double &lon,
                  const double &lat,
@@ -2203,6 +2431,35 @@ Matrix cad_tdi84(const double &lon,
 
     return TDI;
 }
+
+arma::mat33 arma_cad_tdi84(const double &lon,
+                           const double &lat,
+                           const double &alt,
+                           const double &time)
+{
+    arma::mat33 TDI;
+
+    // celestial longitude of vehicle at simulation 'time'
+    double lon_cel = GW_CLONG + WEII3 * time + lon;
+
+    // T.M. of geodetic coord wrt inertial coord., TDI(3x3)
+    double tdi13 = cos(lat);
+    double tdi33 = -sin(lat);
+    double tdi22 = cos(lon_cel);
+    double tdi21 = -sin(lon_cel);
+    TDI(0, 0) = tdi33 * tdi22;
+    TDI(0, 1) = -tdi33 * tdi21;
+    TDI(0, 2) = tdi13;
+    TDI(1, 0) = tdi21;
+    TDI(1, 1) = tdi22;
+    TDI(1, 2) = 0;
+    TDI(2, 0) = -tdi13 * tdi22;
+    TDI(2, 1) = tdi13 * tdi21;
+    TDI(2, 2) = tdi33;
+
+    return TDI;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the T.M. of earth wrt inertial coordinates
 //
@@ -2277,6 +2534,7 @@ Matrix cad_tge(const double &lon, const double &lat)
 //    alt = altitude above ellipsoid - m
 //
 // 030414 Created from FORTRAN by Peter H Zipfel
+// 170121 Create Armadillo Version by soncyang
 ///////////////////////////////////////////////////////////////////////////////
 Matrix cad_tgi84(const double &lon,
                  const double &lat,
@@ -2323,6 +2581,36 @@ Matrix cad_tgi84(const double &lon,
 
     return TGI;
 }
+
+arma::mat33 arma_cad_tgi84(const double &lon,
+                           const double &lat,
+                           const double &alt,
+                           const double &time)
+{
+    arma::mat33 TDI = arma_cad_tdi84(lon, lat, alt, time);
+    arma::mat33 TGD;
+
+    // deflection of the normal, dd, and length of earth's radius to ellipse
+    // surface, R0
+    double r0 = SMAJOR_AXIS * (1. - FLATTENING * (1. - cos(2. * lat)) / 2. +
+                               5. * pow(FLATTENING, 2) * (1. - cos(4. * lat)) /
+                                   16.);  // eq 4-21
+    double dd = FLATTENING * sin(2. * lat) *
+                (1. - FLATTENING / 2. - alt / r0);  // eq 4-15
+
+    // T.M. of geographic (geocentric) wrt geodetic coord., TGD(3x3)
+    TGD(0, 0) = cos(dd);
+    TGD(2, 2) = cos(dd);
+    TGD(1, 1) = 1;
+    TGD(2, 0) = sin(dd);
+    TGD(0, 2) = -sin(dd);
+
+    // T.M. of geographic (geocentric) wrt inertial coord., TGI(3x3)
+    arma::mat33 TGI = TGD * TDI;
+
+    return TGI;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Returns the transformation matrix of inertial wrt perifocal coordinates
 //
