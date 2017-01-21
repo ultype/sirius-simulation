@@ -1809,6 +1809,7 @@ Matrix cad_grav84(Matrix SBII, const double &time)
 //     time = simulation time - sec
 //
 // 030411 Created from FORTRAN by Peter H Zipfel
+// 170121 Create Armadillo Version by soncyang
 ///////////////////////////////////////////////////////////////////////////////
 Matrix cad_in_geo84(const double lon,
                     const double lat,
@@ -1848,6 +1849,48 @@ Matrix cad_in_geo84(const double lon,
     double sbii2 = -slat * slon * sbid1 - clat * slon * sbid3;
     double sbii3 = clat * sbid1 - slat * sbid3;
     SBII.build_vec3(sbii1, sbii2, sbii3);
+
+    return SBII;
+}
+
+arma::vec3 arma_cad_in_geo84(const double lon,
+                             const double lat,
+                             const double alt,
+                             const double &time)
+{
+    arma::vec3 SBID;
+
+    // deflection of the normal, dd, and length of earth's radius to ellipse
+    // surface, R0
+    double r0 = SMAJOR_AXIS * (1. - FLATTENING * (1. - cos(2. * lat)) / 2. +
+                               5. * pow(FLATTENING, 2) * (1. - cos(4. * lat)) /
+                                   16.);  // eq 4-21
+    double dd = FLATTENING * sin(2. * lat) *
+                (1. - FLATTENING / 2. - alt / r0);  // eq 4-15
+
+    // vehicle's displacement vector from earth's center SBID(3x1) in geodetic
+    // coord.
+    double dbi = r0 + alt;
+    SBID(0, 0) = -dbi * sin(dd);
+    SBID(1, 0) = 0.;
+    SBID(2, 0) = -dbi * cos(dd);
+
+    // celestial longitude of vehicle at simulation 'time'
+    double lon_cel = GW_CLONG + WEII3 * time + lon;
+
+    // vehicle's displacement vector in inertial coord.
+    // SBII(3x1)=TID(3x3)xSBID(3x3)
+    double slat = sin(lat);
+    double clat = cos(lat);
+    double slon = sin(lon_cel);
+    double clon = cos(lon_cel);
+    double sbid1 = SBID(0, 0);
+    double sbid3 = SBID(2, 0);
+    double sbii1 = -slat * clon * sbid1 - clat * clon * sbid3;
+    double sbii2 = -slat * slon * sbid1 - clat * slon * sbid3;
+    double sbii3 = clat * sbid1 - slat * sbid3;
+
+    arma::vec3 SBII = {sbii1, sbii2, sbii3};
 
     return SBII;
 }

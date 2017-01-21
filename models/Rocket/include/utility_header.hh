@@ -448,6 +448,11 @@ Matrix cad_in_geo84(const double lon,
                     const double alt,
                     const double &time);
 
+arma::vec3 arma_cad_in_geo84(const double lon,
+                             const double lat,
+                             const double alt,
+                             const double &time);
+
 /// @return the inertial displacement vector from geocentric longitude,
 ///         latitude and altitude
 Matrix cad_in_geoc(const double &lon,
