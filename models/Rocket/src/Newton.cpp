@@ -158,28 +158,23 @@ void Newton::load_location(double lonx, double latx, double alt){
     this->latx = latx;
     this->alt = alt;
 
-    //XXX: Need fixing
     //converting geodetic lonx, latx, alt to SBII
-    Matrix SBII = cad_in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
-    SBII.fill(this->_SBII);
+    SBII = arma_cad_in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
 
     //building inertial velocity
-    Matrix TDI = cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    Matrix TGI = cad_tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    TDI.trans().fill(this->_TDI);
-    TGI.trans().fill(this->_TGI);
+    TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    TGI = arma_cad_tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
 }
 
 void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     //this->dvbe = dvbe;
 
-    //XXX: Need fixing
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
     arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
     //building TBD
-    //XXX: Need Fix
-    arma::mat33 TBD(mat3tr(kinematics->psibdx * RAD, kinematics->thtbdx * RAD, kinematics->phibdx * RAD).get_pbody());
-    TBD = trans(TBD);
+    arma::mat33 TBD = build_euler_transform_matrix( kinematics->psibdx * RAD,
+                                                    kinematics->thtbdx * RAD,
+                                                    kinematics->phibdx * RAD);
     //Geodetic velocity
     arma::mat VBED = trans(TBD) * VBEB;
 
@@ -243,28 +238,15 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     ABII = NEXT_ACC;
     VBII = NEXT_VEL;
 
-
-    //XXX: Temp fix
-    // Load old Matrix with aux memory
-    Matrix __SBII(_SBII);
-
     //Calculate lon lat alt
-    cad_geo84_in(lon, lat, al, __SBII, get_rettime());
-
+    arma_cad_geo84_in(lon, lat, al, SBII, get_rettime());
     this->lonx = lon * DEG;
     this->latx = lat * DEG;
     this->alt  = al;
 
     // Use old Metrix Type
-    Matrix __TDI = cad_tdi84(lon, lat, al, get_rettime());
-    Matrix __TGI = cad_tgi84(lon, lat, al, get_rettime());
-
-    //XXX: Need Fix
-    //Fill back into aux memory
-    __TDI = ~__TDI;
-    __TGI = ~__TGI;
-    __TDI.fill(_TDI);
-    __TGI.fill(_TGI);
+    TDI = arma_cad_tdi84(lon, lat, al, get_rettime());
+    TGI = arma_cad_tgi84(lon, lat, al, get_rettime());
 }
 
 void Newton::propagate_aeroloss(double int_step){
@@ -286,48 +268,34 @@ void Newton::update_diagnostic_attributes(double int_step){
     _dbi = get_dbi();
     _dvbi = get_dvbi();
 
-    //XXX: Need Fixing
-    // Load up old Old Matrix Type from aux memory
-    Matrix VBED = get_VBED();
+    _dvbe = get_dvbe();
+    _psivdx = get_psivdx();
+    _thtvdx = get_thtvdx();
 
-    Matrix POLAR = VBED.pol_from_cart();
-    _dvbe = POLAR[0];
-    _psivdx = DEG * POLAR[1];
-    _thtvdx = DEG * POLAR[2];
-
+    //XXX: Need Fixing, if interface return type change
     //ground track travelled (10% accuracy, usually on the high side)
-    double vbed1 = VBED[0];
-    double vbed2 = VBED[1];
+    double vbed1 = get_VBED()[0];
+    double vbed2 = get_VBED()[1];
     _grndtrck += sqrt(vbed1 * vbed1 + vbed2 * vbed2) * int_step * REARTH / get_dbi();
     _gndtrkmx = 0.001 * _grndtrck;
     _gndtrnmx = NMILES * _grndtrck;
 
-    //XXX: Need Fixing
-    // Load up old Old Matrix Type from aux memory
-    Matrix FSPB(_FSPB);
-    _ayx =  FSPB[1] / AGRAV;
-    _anx = -FSPB[2] / AGRAV;
+    _ayx =  FSPB(1) / AGRAV;
+    _anx = -FSPB(2) / AGRAV;
 
-    //XXX: Need Fixing
     //T.M. of geographic velocity wrt geodetic coordinates
-    Matrix TVD = mat2tr(_psivdx * RAD, _thtvdx * RAD);
-    TVD = ~TVD;
-    TVD.fill(_TVD);
+    arma::mat TVD(&_TVD[0][0], 3, 3, false, true);
+    TVD = build_transform_matrix(_psivdx * RAD, _thtvdx * RAD);
 
-    //XXX: Need Fixing
-    Matrix SBII(_SBII);
-    Matrix VBII(_VBII);
-
-    orbital(SBII,VBII,get_dbi());
+    orbital(SBII, VBII, get_dbi());
 }
 
-void Newton::orbital(Matrix &SBII, Matrix &VBII, double dbi)
+void Newton::orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi)
 {
     //calculate orbital elements
-    int cadorbin_flag = cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
+    int cadorbin_flag = arma_cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
     _ha = (1. + _eccentricity) * _semi_major - REARTH;
     _hp = (1. - _eccentricity) * _semi_major - REARTH;
     _ref_alt = dbi - REARTH;
-
 }
 

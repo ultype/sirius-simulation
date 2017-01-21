@@ -72,7 +72,7 @@ class Newton {
         void propagate_gravityloss(double int_step);
 
         /* Internal Updaters */
-        void orbital(Matrix &SBII, Matrix &VBII, double dbi);
+        void orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi);
 
         /* Routing references */
         Kinematics  *kinematics;
