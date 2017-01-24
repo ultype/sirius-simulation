@@ -11,12 +11,11 @@ void _Euler_::initialization(Kinematics* kine, Propulsion* prop, Forces* forc)
     propulsion=prop;
     force=forc;
 
-    Matrix TBI(3,3);
+    Matrix TBI = kinematics->get_TBI();
     Matrix WBEB(3,1);
     Matrix WBIB(3,1);
     Matrix WEII(3,1);
 
-    TBI.build_mat33(kinematics->tbi);
     //body rate wrt Earth frame in body coordinates
     WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
     //body rate wrt ineritial frame in body coordinates
@@ -54,11 +53,9 @@ void _Euler_::euler(double int_step)
     Matrix FMB = force->get_FMB();
     Matrix IBBB(3,3);
     Matrix WBIBD(3,1);
-    Matrix TBI(3,3);
+    Matrix TBI = kinematics->get_TBI();
     Matrix WBIB(3,1);
 
-    //input data from other module
-    TBI.build_mat33(kinematics->tbi);
     //body rate wrt Earth frame in body coordinates
     WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
     //body rate wrt ineritial frame in body coordinates

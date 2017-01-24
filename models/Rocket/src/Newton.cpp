@@ -141,9 +141,9 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
     arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
     //building TBD
-    arma::mat33 TBD = build_euler_transform_matrix( kinematics->psibdx * RAD,
-                                                    kinematics->thtbdx * RAD,
-                                                    kinematics->phibdx * RAD);
+    arma::mat33 TBD = build_euler_transform_matrix( kinematics->get_psibdx() * RAD,
+                                                    kinematics->get_thtbdx() * RAD,
+                                                    kinematics->get_phibdx() * RAD);
     //Geodetic velocity
     arma::mat VBED = trans(TBD) * VBEB;
 
@@ -170,7 +170,7 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     double lon, lat, al;
 
     //XXX: Need Fix
-    arma::mat33 TBI(&kinematics->tbi[0][0]);
+    arma::mat33 TBI(kinematics->get_tbi_ptr());
     TBI = trans(TBI);
 
     arma::vec3 GRAVG(environment->get_gravg_ptr()); // BUG: Matrix to Arma?

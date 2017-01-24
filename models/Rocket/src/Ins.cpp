@@ -221,7 +221,7 @@ void INS::update(double int_step){
     // input from other modules
     double time = get_rettime();
     Matrix GRAVG = environment->get_GRAVG();
-    Matrix TBI(kinematics->tbi);
+    Matrix TBI = kinematics->get_TBI();
     Matrix WBIB = euler->get_WBIB();
     Matrix WBII = euler->get_WBII();
     Matrix SBII = newton->get_IPos();
@@ -461,4 +461,202 @@ void INS::update(double int_step){
     EWBIB.fill(ewbib);
     EFSPB.fill(efspb);
     EGRAVI.fill(egravi);
+}
+
+double INS::get_dvbec() { return dvbec; }
+double INS::get_qqcx() { return qqcx; }
+double INS::get_rrcx() { return rrcx; }
+double INS::get_ppcx() { return ppcx; }
+double INS::get_alphacx() { return alphacx; }
+double INS::get_betacx() { return betacx; }
+double INS::get_phibdcx() { return phibdcx; }
+double INS::get_thtbdcx() { return thtbdcx; }
+double INS::get_psibdcx() { return psibdcx; }
+
+Matrix INS::get_FSPCB() {
+    Matrix FSPCB(3, 1);
+    FSPCB.build_vec3(fspcb);
+    return FSPCB;
+}
+Matrix INS::get_SBIIC() {
+    Matrix SBIIC(3, 1);
+    SBIIC.build_vec3(sbiic);
+    return SBIIC;
+}
+Matrix INS::get_VBIIC() {
+    Matrix VBIIC(3, 1);
+    VBIIC.build_vec3(vbiic);
+    return VBIIC;
+}
+Matrix INS::get_WBICI() {
+    Matrix WBICI(3, 1);
+    WBICI.build_vec3(wbici);
+    return WBICI;
+}
+Matrix INS::get_EFSPB() {
+    Matrix EFSPB(3, 1);
+    EFSPB.build_vec3(efspb);
+    return EFSPB;
+}
+Matrix INS::get_EWALKA() {
+    Matrix EWALKA(3, 1);
+    EWALKA.build_vec3(ewalka);
+    return EWALKA;
+}
+Matrix INS::get_EMISA() {
+    Matrix EMISA(3, 1);
+    EMISA.build_vec3(emisa);
+    return EMISA;
+}
+Matrix INS::get_ESCALA() {
+    Matrix ESCALA(3, 1);
+    ESCALA.build_vec3(escala);
+    return ESCALA;
+}
+Matrix INS::get_EBIASA() {
+    Matrix EBIASA(3, 1);
+    EBIASA.build_vec3(ebiasa);
+    return EBIASA;
+}
+Matrix INS::get_EUG() {
+    Matrix EUG(3, 1);
+    EUG.build_vec3(eug);
+    return EUG;
+}
+Matrix INS::get_EWG() {
+    Matrix EWG(3, 1);
+    EWG.build_vec3(ewg);
+    return EWG;
+}
+Matrix INS::get_EWBIB() {
+    Matrix EWBIB(3, 1);
+    EWBIB.build_vec3(ewbib);
+    return EWBIB;
+}
+Matrix INS::get_EWALKG() {
+    Matrix EWALKG(3, 1);
+    EWALKG.build_vec3(ewalkg);
+    return EWALKG;
+}
+Matrix INS::get_EUNBG() {
+    Matrix EUNBG(3, 1);
+    EUNBG.build_vec3(eunbg);
+    return EUNBG;
+}
+Matrix INS::get_EMISG() {
+    Matrix EMISG(3, 1);
+    EMISG.build_vec3(emisg);
+    return EMISG;
+}
+Matrix INS::get_ESCALG() {
+    Matrix ESCALG(3, 1);
+    ESCALG.build_vec3(escalg);
+    return ESCALG;
+}
+Matrix INS::get_EBIASG() {
+    Matrix EBIASG(3, 1);
+    EBIASG.build_vec3(ebiasg);
+    return EBIASG;
+}
+Matrix INS::get_EGRAVI() {
+    Matrix EGRAVI(3, 1);
+    EGRAVI.build_vec3(egravi);
+    return EGRAVI;
+}
+
+Matrix INS::get_TBIC() {
+    Matrix TBIC(3, 3);
+    TBIC.build_mat33(tbic);
+    return TBIC;
+}
+
+void INS::set_FSPCB(double n0, double n1, double n2) {
+    fspcb[0] = n0;
+    fspcb[1] = n1;
+    fspcb[2] = n2;
+}
+void INS::set_SBIIC(double n0, double n1, double n2) {
+    sbiic[0] = n0;
+    sbiic[1] = n1;
+    sbiic[2] = n2;
+}
+void INS::set_VBIIC(double n0, double n1, double n2) {
+    vbiic[0] = n0;
+    vbiic[1] = n1;
+    vbiic[2] = n2;
+}
+void INS::set_WBICI(double n0, double n1, double n2) {
+    wbici[0] = n0;
+    wbici[1] = n1;
+    wbici[2] = n2;
+}
+void INS::set_EFSPB(double n0, double n1, double n2) {
+    efspb[0] = n0;
+    efspb[1] = n1;
+    efspb[2] = n2;
+}
+void INS::set_EWALKA(double n0, double n1, double n2) {
+    ewalka[0] = n0;
+    ewalka[1] = n1;
+    ewalka[2] = n2;
+}
+void INS::set_EMISA(double n0, double n1, double n2) {
+    emisa[0] = n0;
+    emisa[1] = n1;
+    emisa[2] = n2;
+}
+void INS::set_ESCALA(double n0, double n1, double n2) {
+    escala[0] = n0;
+    escala[1] = n1;
+    escala[2] = n2;
+}
+void INS::set_EBIASA(double n0, double n1, double n2) {
+    ebiasa[0] = n0;
+    ebiasa[1] = n1;
+    ebiasa[2] = n2;
+}
+void INS::set_EUG(double n0, double n1, double n2) {
+    eug[0] = n0;
+    eug[1] = n1;
+    eug[2] = n2;
+}
+void INS::set_EWG(double n0, double n1, double n2) {
+    ewg[0] = n0;
+    ewg[1] = n1;
+    ewg[2] = n2;
+}
+void INS::set_EWBIB(double n0, double n1, double n2) {
+    ewbib[0] = n0;
+    ewbib[1] = n1;
+    ewbib[2] = n2;
+}
+void INS::set_EWALKG(double n0, double n1, double n2) {
+    ewalkg[0] = n0;
+    ewalkg[1] = n1;
+    ewalkg[2] = n2;
+}
+void INS::set_EUNBG(double n0, double n1, double n2) {
+    eunbg[0] = n0;
+    eunbg[1] = n1;
+    eunbg[2] = n2;
+}
+void INS::set_EMISG(double n0, double n1, double n2) {
+    emisg[0] = n0;
+    emisg[1] = n1;
+    emisg[2] = n2;
+}
+void INS::set_ESCALG(double n0, double n1, double n2) {
+    escalg[0] = n0;
+    escalg[1] = n1;
+    escalg[2] = n2;
+}
+void INS::set_EBIASG(double n0, double n1, double n2) {
+    ebiasg[0] = n0;
+    ebiasg[1] = n1;
+    ebiasg[2] = n2;
+}
+void INS::set_EGRAVI(double n0, double n1, double n2) {
+    egravi[0] = n0;
+    egravi[1] = n1;
+    egravi[2] = n2;
 }

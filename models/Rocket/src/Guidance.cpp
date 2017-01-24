@@ -36,7 +36,7 @@ void Guidance::guidance(double int_step)
 
     int mprop = propulsion->mprop;
     Matrix UTBC(utbc);
-    Matrix TBIC(ins->tbic);
+    Matrix TBIC = ins->get_TBIC();
     //-------------------------------------------------------------------------
     // zeroing UTBC,if no guidance
     if (mguide == 0)
@@ -148,10 +148,10 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
     double dvbi = newton->get_dvbi();
     double thtvdx = newton->get_thtvdx();
     double fmassr = propulsion->fmassr;
-    Matrix VBIIC(ins->vbiic);
-    Matrix SBIIC(ins->sbiic);
-    Matrix TBIC(ins->tbic);
-    Matrix FSPCB(ins->fspcb);
+    Matrix VBIIC = ins->get_VBIIC();
+    Matrix SBIIC = ins->get_SBIIC();
+    Matrix TBIC = ins->get_TBIC();
+    Matrix FSPCB = ins->get_FSPCB();
     //-------------------------------------------------------------------------
     // preparing necessary variables
     Matrix ABII = ~TBIC * FSPCB;
@@ -854,4 +854,17 @@ void Guidance::guidance_ltg_crct(Matrix &SDII,
     dbd = dbi - ddi;
 
     //-------------------------------------------------------------------------
+}
+
+Matrix  Guidance::get_UTBC() {
+    Matrix UTBC(3, 1);
+    UTBC.build_vec3(utbc);
+    return UTBC;
+}
+double  Guidance::get_alphacomx() { return alphacomx; }
+double  Guidance::get_betacomx() { return betacomx; }
+
+void Guidance::set_degree(double a, double b) {
+    alphacomx = a;
+    betacomx = b;
 }

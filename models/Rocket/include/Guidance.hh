@@ -145,11 +145,16 @@ class Guidance {
         // 030616 Created by Peter H Zipfel
         // 091214 Modified for ROCKET6, PZi
         ///////////////////////////////////////////////////////////////////////////////
+        Matrix get_UTBC();
+        double  get_alphacomx();
+        double  get_betacomx();
 
+        void set_degree(double, double);
+    private:
         double  utbc[3];        /* *io  (--)        Commanded unit thrust vector in body coor */
         double  alphacomx;      /* *io  (d)         Alpha command */
         double  betacomx;       /* *io  (d)         Beta command */
-    private:
+
         int     mguide;         /* *io  (--)        Guidance modes, see table */
         int     init_flag;      /* *io  (--)        Flag for initializing LTG flags */
         double  time_ltg;       /* *io  (s)         Time since initiating LTG */

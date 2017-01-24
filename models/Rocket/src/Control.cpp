@@ -119,9 +119,9 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double dma = aerodynamics->get_dma();
     double dmq = aerodynamics->get_dmq();
     double dmde = aerodynamics->get_dmde();
-    double dvbec = ins->dvbec;
-    double qqcx = ins->qqcx;
-    Matrix FSPCB(ins->fspcb);
+    double dvbec = ins->get_dvbec();
+    double qqcx = ins->get_qqcx();
+    Matrix FSPCB = ins->get_FSPCB();
     //-------------------------------------------------------------------------
     // calculating online close loop poles
     waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
@@ -192,8 +192,8 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     double dnr = aerodynamics->get_dnr();
     double dndr = aerodynamics->get_dndr();
     double dvbe = newton->get_dvbe();
-    double rrcx = ins->rrcx;
-    Matrix FSPCB(ins->fspcb);
+    double rrcx = ins->get_rrcx();
+    Matrix FSPCB = ins->get_FSPCB();
 
     //-------------------------------------------------------------------------
     // calculating close loop poles
@@ -246,9 +246,9 @@ double Control::control_pitch_rate(double qqdx){
     double dma = aerodynamics->get_dma();
     double dmq = aerodynamics->get_dmq();
     double dmde = aerodynamics->get_dmde();
-    double dvbec = ins->dvbec;
+    double dvbec = ins->get_dvbec();
     double dnd = aerodynamics->get_dnd();
-    double qqcx = ins->qqcx;
+    double qqcx = ins->get_qqcx();
 
     //-------------------------------------------------------------------------
     // parameters of open loop angular rate transfer function

@@ -42,7 +42,7 @@ void TVC::actuate(double int_step){
     double thrust = propulsion->thrust;
     double delecx = control->get_delecx();
     double delrcx = control->get_delrcx();
-    double alphax = kinematics->alphax;
+    double alphax = kinematics->get_alphax();
     /*********************************
     Matrix UTBC=hyper[430].vec();
     double thtbdcx=hyper[339].real();

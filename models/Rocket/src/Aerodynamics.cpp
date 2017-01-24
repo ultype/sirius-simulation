@@ -41,10 +41,10 @@ void AeroDynamics::initialize(Kinematics *kine, Environment *env, Propulsion *pr
 void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
 {
     //Input data from other module//////////////////
-    double alppx=kinematics->alppx;
-    double phipx=kinematics->phipx;
-    double alphax=kinematics->alphax;
-    double betax=kinematics->betax;
+    double alppx=kinematics->get_alppx();
+    double phipx=kinematics->get_phipx();
+    double alphax=kinematics->get_alphax();
+    double betax=kinematics->get_betax();
     double rho=environment->get_rho();
     double vmach=environment->get_vmach();
     double pdynmc=environment->get_pdynmc();

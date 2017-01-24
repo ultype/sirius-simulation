@@ -150,3 +150,29 @@ void Kinematics::calculate_kinematics(double int_step){
     TBID.fill(tbid);
     TBD.fill(tbd);
 }
+
+double Kinematics::get_alppx() { return alppx; }
+double Kinematics::get_phipx() { return phipx; }
+double Kinematics::get_alphax() { return alphax; }
+double Kinematics::get_betax() { return betax; }
+double Kinematics::get_psibdx() { return psibdx; }
+double Kinematics::get_thtbdx() { return thtbdx; }
+double Kinematics::get_phibdx() { return phibdx; }
+double* Kinematics::get_tbi_ptr() { return &tbi[0][0]; }
+
+Matrix Kinematics::get_TBD() {
+    Matrix TBD(3, 3);
+    TBD.build_mat33(tbd);
+    return TBD;
+}
+Matrix Kinematics::get_TBI() {
+    Matrix TBI(3, 3);
+    TBI.build_mat33(tbi);
+    return TBI;
+}
+
+void Kinematics::load_angle(double roll, double pitch, double yaw) {
+    phibdx = roll;
+    thtbdx = pitch;
+    psibdx = yaw;
+}

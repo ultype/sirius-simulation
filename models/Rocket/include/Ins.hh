@@ -42,6 +42,60 @@ class INS {
         Kinematics *kinematics;
         GPS_Receiver *gpsr;
 
+        /* Input File */
+        int mins;           /* *io  (--)    INS mode. =0:ideal INS; =1:with INS error */
+
+        double get_dvbec();
+        double get_qqcx();
+        double get_rrcx();
+        double get_ppcx();
+        double get_alphacx();
+        double get_betacx();
+        double get_phibdcx();
+        double get_thtbdcx();
+        double get_psibdcx();
+
+        Matrix get_FSPCB();
+        Matrix get_SBIIC();
+        Matrix get_VBIIC();
+        Matrix get_WBICI();
+        Matrix get_EFSPB();
+        Matrix get_EWALKA();
+        Matrix get_EMISA();
+        Matrix get_ESCALA();
+        Matrix get_EBIASA();
+        Matrix get_EUG();
+        Matrix get_EWG();
+        Matrix get_EWBIB();
+        Matrix get_EWALKG();
+        Matrix get_EUNBG();
+        Matrix get_EMISG();
+        Matrix get_ESCALG();
+        Matrix get_EBIASG();
+        Matrix get_EGRAVI();
+
+        void set_FSPCB(double, double, double);
+        void set_SBIIC(double, double, double);
+        void set_VBIIC(double, double, double);
+        void set_WBICI(double, double, double);
+        void set_EFSPB(double, double, double);
+        void set_EWALKA(double, double, double);
+        void set_EMISA(double, double, double);
+        void set_ESCALA(double, double, double);
+        void set_EBIASA(double, double, double);
+        void set_EUG(double, double, double);
+        void set_EWG(double, double, double);
+        void set_EWBIB(double, double, double);
+        void set_EWALKG(double, double, double);
+        void set_EUNBG(double, double, double);
+        void set_EMISG(double, double, double);
+        void set_ESCALG(double, double, double);
+        void set_EBIASG(double, double, double);
+        void set_EGRAVI(double, double, double);
+
+        Matrix get_TBIC();
+
+    private:
         double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
         double qqcx;        /* *io  (d/s)   INS computed pitch rate */
         double rrcx;        /* *io  (d/s)   INS computed yaw rate */
@@ -57,8 +111,6 @@ class INS {
         double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
         double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
 
-        /* Input File */
-        int mins;           /* *io  (--)    INS mode. =0:ideal INS; =1:with INS error */
         /* Accelmeter */
         double efspb[3];    /* *i   (N/kg)  Error in specific force on body in body coordinate */
         double ewalka[3];   /* *i   (m/s2)  Acceleration random noise */
@@ -78,7 +130,7 @@ class INS {
 
         /* grav */
         double egravi[3];   /* *i   (--)    error by gravity */
-    private:
+
         double frax_algnmnt;/* *io  (--)    Fractn to mod initial INS err state: XXO=XXO(1+frax) */
         double wbicb[3];    /* *io  (r/s)   Computed inertial body rate in body coordinate */
         double loncx;       /* *io  (d)     INS derived longitude */

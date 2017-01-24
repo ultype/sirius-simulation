@@ -134,12 +134,9 @@ void Environment::calculate_env(double int_step,Datadeck &weathertable)
 Matrix Environment::environment_dryden(double dvba,double int_step)
 {
     Matrix VTAD(3,1);
-    Matrix TBD(3,3);
-    TBD.build_mat33(kinematics->tbd[0][0],kinematics->tbd[0][1],kinematics->tbd[0][2],
-                    kinematics->tbd[1][0],kinematics->tbd[1][1],kinematics->tbd[1][2],
-                    kinematics->tbd[2][0],kinematics->tbd[2][1],kinematics->tbd[2][2]);
-    double alppx=kinematics->alppx;
-    double phipx=kinematics->phipx;
+    Matrix TBD = kinematics->get_TBD();
+    double alppx=kinematics->get_alppx();
+    double phipx=kinematics->get_phipx();
     double value1;
     do
         value1=(double)rand()/RAND_MAX;

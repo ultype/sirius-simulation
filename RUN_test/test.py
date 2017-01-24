@@ -94,9 +94,10 @@ latx       = 22.138917  # Vehicle latitude  - deg  module newton
 alt        = 100        # Vehicle altitude  - m  module newton
 rkt.newton.load_location(lonx, latx, alt)
 
-rkt.kinematics.phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
-rkt.kinematics.thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
-rkt.kinematics.psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
+phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
+psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
+rkt.kinematics.load_angle(phibdx, thtbdx, psibdx)
 
 alpha0x    = 0    #Initial angle-of-attack   - deg  module newton
 beta0x     = 0    #Initial sideslip angle    - deg  module newton
@@ -129,24 +130,24 @@ rkt.propulsion.payload = 98 #payload mass
 #INS
 rkt.ins.mins   = 0
 #INS Acceleration
-rkt.ins.efspb  = [0, 0, 0]
-rkt.ins.ewalka = [0, 0, 0]
-rkt.ins.emisa  = [0 ,0 ,0]  #gauss(0, 1.1e-4)
-rkt.ins.escala = [0, 0, 0]  #gauss(0, 5e-4)
-rkt.ins.ebiasa = [0, 0, 0]  #gauss(0, 3.56e-3)
+rkt.ins.set_EFSPB(0, 0, 0)
+rkt.ins.set_EWALKA(0, 0, 0)
+rkt.ins.set_EMISA(0, 0, 0)      #gauss(0, 1.1e-4)
+rkt.ins.set_ESCALA(0, 0, 0)     #gauss(0, 5e-4)
+rkt.ins.set_EBIASA(0, 0, 0)     #gauss(0, 3.56e-3)
 
 #ins gyrp
-rkt.ins.eug    = [0, 0, 0]
-rkt.ins.ewg    = [0, 0, 0]
-rkt.ins.ewbib  = [0, 0, 0]
-rkt.ins.ewalkg = [0, 0, 0]
-rkt.ins.eunbg  = [0, 0, 0]
-rkt.ins.emisg  = [0, 0, 0]  #gauss(0, 1.1e-4)
-rkt.ins.escalg = [0, 0, 0]  #gauss(0, 2.e-5)
-rkt.ins.ebiasg = [0, 0, 0]  #gauss(0, 1.e-6)
+rkt.ins.set_EUG(0, 0, 0)
+rkt.ins.set_EWG(0, 0, 0)
+rkt.ins.set_EWBIB(0, 0, 0)
+rkt.ins.set_EWALKG(0, 0, 0)
+rkt.ins.set_EUNBG(0, 0, 0)
+rkt.ins.set_EMISG(0, 0, 0)       #gauss(0, 1.1e-4)
+rkt.ins.set_ESCALG(0, 0, 0)      #gauss(0, 2.e-5)
+rkt.ins.set_EBIASG(0, 0, 0)      #gauss(0, 1.e-6)
 
 #ins grav
-rkt.ins.egravi = [0, 0, 0]
+rkt.ins.set_EGRAVI(0, 0, 0)
 
 #GPS
 gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps
@@ -222,7 +223,8 @@ rkt.rcs.rcs_thrust = 100   #rcs thrust - N  module rcs
 rkt.rcs.rcs_pos = 1.66507   #rcs thruster's postion from nose - m  module rcs
 rkt.rcs.rocket_r = 0.68  #rocket's radius - m  module rcs
 #Guidance
-rkt.guidance.alphacomx = 0   #Alpha command - deg  module guidance
-rkt.guidance.betacomx = 0    #Beta command - deg  module guidance
+alphacomx = 0   #Alpha command - deg  module guidance
+betacomx = 0    #Beta command - deg  module guidance
+rkt.guidance.set_degree(alphacomx, betacomx)
 
 trick.stop(700)
