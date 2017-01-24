@@ -19,6 +19,8 @@ class Environment;
 class _Euler_;
 
 class Kinematics{
+    TRICK_INTERFACE(Kinematics);
+
     public:
         Newton *newton;
         Environment *environment;
@@ -45,9 +47,9 @@ class Kinematics{
         void load_angle(double, double, double);
 
         // XXX: can't get from private....
+    private:
         double alphax;      /* *io (d)     Angle of attack */
         double betax;       /* *io (d)     Sideslip angle */
-    private:
         double tbd[3][3];      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
         double tbi[3][3];      /* *io (--)    Transformation Matrix of body coord wrt inertia coord */
         double alppx;       /* *io (d)     Total angle of attack */

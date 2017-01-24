@@ -1,3 +1,4 @@
+#include "utility_header.hh"
 #include "Rcs.hh"
 
 void RCS::default_data(){
@@ -182,8 +183,8 @@ void RCS::rcs_schmitt_thrust() {
         yaw_count++;
 
     FMRCS[0] = o_roll * rcs_thrust * rocket_r;
-    FMRCS[1] = o_pitch * rcs_thrust * (propulsion->xcg - 1);
-    FMRCS[2] = o_yaw * rcs_thrust * (propulsion->xcg - 1);
+    FMRCS[1] = o_pitch * rcs_thrust * (propulsion->get_xcg() - 1);
+    FMRCS[2] = o_yaw * rcs_thrust * (propulsion->get_xcg() - 1);
 
     FMRCS.fill(fmrcs);
 }
@@ -199,11 +200,38 @@ int RCS::rcs_schmitt(double input_new, double input, double dead_zone, double hy
     double trigger = (dead_zone * side + hysteresis * trend) / 2;
 
     if (input >= trigger && side == 1) {
-        output = 1;
+        output =  1;
     } else if (input <= trigger && side == -1) {
         output = -1;
     } else
         output = 0;
 
     return output;
+}
+
+void RCS::set_rcs_tau(double in) { rcs_tau = in; }
+void RCS::set_roll_mom_max(double in) { roll_mom_max = in; }
+void RCS::set_pitch_mom_max(double in) { pitch_mom_max = in; }
+void RCS::set_yaw_mom_max(double in) { yaw_mom_max = in; }
+void RCS::set_thtbdcomx(double in) { thtbdcomx = in; }
+void RCS::set_psibdcomx(double in) { psibdcomx = in; }
+void RCS::set_dead_zone(double in) { dead_zone = in; }
+void RCS::set_hysteresis(double in) { hysteresis = in; }
+void RCS::set_rcs_thrust(double in) { rcs_thrust = in; }
+void RCS::set_rocket_r(double in) { rocket_r = in; }
+void RCS::set_rcs_pos(double in) { rcs_pos = in; }
+void RCS::set_mrcs_moment(int in) { mrcs_moment = in; }
+
+int RCS::get_mrcs_moment() { return mrcs_moment; }
+int RCS::get_mrcs_force() { return mrcs_force; }
+
+Matrix RCS::get_FMRCS() {
+    Matrix FMRCS(3, 1);
+    FMRCS.build_vec3(fmrcs);
+    return FMRCS;
+}
+Matrix RCS::get_FARCS() {
+    Matrix FARCS(3, 1);
+    FARCS.build_vec3(farcs);
+    return FARCS;
 }

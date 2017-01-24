@@ -34,7 +34,7 @@ void Guidance::guidance(double int_step)
     // local module variable
     Matrix UTIC(3, 1);
 
-    int mprop = propulsion->mprop;
+    int mprop = propulsion->get_mprop();
     Matrix UTBC(utbc);
     Matrix TBIC = ins->get_TBIC();
     //-------------------------------------------------------------------------
@@ -60,7 +60,7 @@ void Guidance::guidance(double int_step)
         }
     }
     //-------------------------------------------------------------------------
-    propulsion->mprop = mprop;
+    propulsion->set_mprop(mprop);
     UTBC.fill(utbc);
     // diagnostics
     UTIC.fill(utic);
@@ -147,7 +147,7 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
     double dbi = newton->get_dbi();
     double dvbi = newton->get_dvbi();
     double thtvdx = newton->get_thtvdx();
-    double fmassr = propulsion->fmassr;
+    double fmassr = propulsion->get_fmassr();
     Matrix VBIIC = ins->get_VBIIC();
     Matrix SBIIC = ins->get_SBIIC();
     Matrix TBIC = ins->get_TBIC();

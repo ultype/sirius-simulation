@@ -54,9 +54,9 @@ void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
     double qqx=euler->get_qqx();
     double rrx=euler->get_rrx();
     double alt=newton->get_alt();
-    double mprop=propulsion->mprop;
-    double vmass=propulsion->vmass;
-    double xcg=propulsion->xcg;
+    double mprop=propulsion->get_mprop();
+    double vmass=propulsion->get_vmass();
+    double xcg=propulsion->get_xcg();
     ////////////////////////////////////////////////////
     int thrust_on=false;
     double ca0b(0);
@@ -218,15 +218,14 @@ void AeroDynamics::aerodynamics_der()
     double vmach=environment->get_vmach();
     double pdynmc=environment->get_pdynmc();
     double dvba=environment->get_dvba();
-    double vmass=propulsion->vmass;
-    double xcg=propulsion->xcg;
-    double thrust=propulsion->thrust;
-    int mtvc=tvc->mtvc;
-    double gtvc=tvc->gtvc;
-    double parm=tvc->parm;
+    double vmass=propulsion->get_vmass();
+    double xcg=propulsion->get_xcg();
+    double thrust=propulsion->get_thrust();
+    int mtvc=tvc->get_mtvc();
+    double gtvc=tvc->get_gtvc();
+    double parm=tvc->get_parm();
 
-    Matrix IBBB(3,3);
-    IBBB.build_mat33(propulsion->ibbb);
+    Matrix IBBB = propulsion->get_IBBB();
 
     //MOI components
     double ibbb11=IBBB.get_loc(0,0);

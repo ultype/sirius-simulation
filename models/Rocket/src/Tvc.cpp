@@ -38,8 +38,8 @@ void TVC::actuate(double int_step){
 
     // input from other modules
     double pdynmc = environment->get_pdynmc();
-    double xcg = propulsion->xcg;
-    double thrust = propulsion->thrust;
+    double xcg = propulsion->get_xcg();
+    double thrust = propulsion->get_thrust();
     double delecx = control->get_delecx();
     double delrcx = control->get_delrcx();
     double alphax = kinematics->get_alphax();
@@ -182,4 +182,18 @@ void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double in
     if (iflag && dzeta * dzetad > 0.)
         dzetad = 0.;
     zet = zeta;
+}
+
+int TVC::get_mtvc() { return mtvc; }
+double TVC::get_gtvc() { return gtvc; }
+double TVC::get_parm() { return parm; }
+Matrix TVC::get_FPB() {
+    Matrix FPB(3, 1);
+    FPB.build_vec3(fpb);
+    return FPB;
+}
+Matrix TVC::get_FMPB() {
+    Matrix FMPB(3, 1);
+    FMPB.build_vec3(fmpb);
+    return FMPB;
 }

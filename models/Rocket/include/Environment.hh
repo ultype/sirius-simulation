@@ -15,7 +15,7 @@ PROGRAMMERS:
 #include "Aerodynamics.hh"
 
 class Environment{
-    TRICK_INTERFACE(AeroDynamics);
+    TRICK_INTERFACE(Environment);
 
     public:
 

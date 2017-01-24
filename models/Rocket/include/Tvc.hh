@@ -38,12 +38,19 @@ class TVC {
         Control *control;
         Propulsion *propulsion;
 
+        int get_mtvc();
+        double get_gtvc();
+        double get_parm();
+        Matrix get_FPB();
+        Matrix get_FMPB();
+
+    private:
         int mtvc;            /* *io  (--)    =0:no TVC;=1:no dyn;=2:scnd order;=3:2+gain n*/
         double gtvc;        /* *io  (--)    TVC nozzle deflection gain n*/
         double parm;        /* *io  (m)     Propulsion moment arm from vehicle nose n*/
         double fpb[3];      /* *io  (N)     Thrust force in body axes n*/
         double fmpb[3];     /* *io  (N*m)    Thrust moment in body axes */
-    private:
+
         double tvclimx;     /* *io  (d)     Nozzle deflection limiter */
         double dtvclimx;    /* *io  (d/s)   Nozzle deflection rate limiter */
         double wntvc;       /* *io  (r/s)   Natural frequency of TVC */

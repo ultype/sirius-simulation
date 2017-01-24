@@ -163,7 +163,7 @@ void Newton::update_fspb(){
     arma::vec3 FAPB(forces->get_fapb_ptr());
 
     /* Stored Value due to coherence with other models */
-    FSPB = FAPB * (1. / propulsion->vmass);
+    FSPB = FAPB * (1. / propulsion->get_vmass());
 }
 
 void Newton::propagate_position_speed_acceleration(double int_step){
@@ -199,7 +199,7 @@ void Newton::propagate_aeroloss(double int_step){
     arma::vec3 FAP(forces->get_fap_ptr());
 
     //calculate aero loss`:`
-    FAP = FAP * (1. / propulsion->vmass);
+    FAP = FAP * (1. / propulsion->get_vmass());
     aero_loss = aero_loss + norm(FAP) * int_step;
 }
 

@@ -51,7 +51,7 @@ void _Euler_::euler(double int_step)
     Matrix WBEB(3,1);
     Matrix WBII(3,1);
     Matrix FMB = force->get_FMB();
-    Matrix IBBB(3,3);
+    Matrix IBBB = propulsion->get_IBBB();
     Matrix WBIBD(3,1);
     Matrix TBI = kinematics->get_TBI();
     Matrix WBIB(3,1);
@@ -60,7 +60,6 @@ void _Euler_::euler(double int_step)
     WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
     //body rate wrt ineritial frame in body coordinates
     WEII.build_vec3(0,0,WEII3);
-    IBBB.build_mat33(propulsion->ibbb);
     WBIB.build_vec3(wbib);
     WBIBD.build_vec3(wbibd);
     /***********************************************************************************************/

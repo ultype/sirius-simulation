@@ -73,6 +73,30 @@ void Propulsion::calculate_propulsion(double int_step)
         }
         IBBB.fill(ibbb);
     }
+}
 
+void Propulsion::set_vmass0(double in) { vmass0 = in; }
+void Propulsion::set_fmass0(double in) { fmass0 = in; }
+void Propulsion::set_xcg_0(double in) { xcg_0 = in; }
+void Propulsion::set_xcg_1(double in) { xcg_1 = in; }
+void Propulsion::set_fuel_flow_rate(double in) { fuel_flow_rate = in; }
+void Propulsion::set_moi_roll_0(double in) { moi_roll_0 = in; }
+void Propulsion::set_moi_roll_1(double in) { moi_roll_1 = in; }
+void Propulsion::set_moi_trans_0(double in) { moi_trans_0 = in; }
+void Propulsion::set_moi_trans_1(double in) { moi_trans_1 = in; }
+void Propulsion::set_aexit(double in) { aexit = in; }
+void Propulsion::set_spi(double in) { spi = in; }
+void Propulsion::set_payload(double in) { payload = in; }
+void Propulsion::set_fmasse(double in) { fmasse = in; }
 
+int Propulsion::get_mprop() { return mprop; }
+void Propulsion::set_mprop(int in) { mprop = in; }
+double Propulsion::get_vmass() { return vmass; }
+double Propulsion::get_xcg() { return xcg; }
+double Propulsion::get_thrust() { return thrust; }
+double Propulsion::get_fmassr() { return fmassr; }
+Matrix Propulsion::get_IBBB() {
+    Matrix IBBB(3, 3);
+    IBBB.build_mat33(ibbb);
+    return IBBB;
 }

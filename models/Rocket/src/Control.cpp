@@ -33,7 +33,7 @@ void Control::initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp,
 void Control::control(double int_step){
     // localizing module-variables
     // input from other modules
-    int mprop = propulsion->mprop;
+    int mprop = propulsion->get_mprop();
     double gymax = aerodynamics->get_gymax();
     //-------------------------------------------------------------------------
     // decoding control flag

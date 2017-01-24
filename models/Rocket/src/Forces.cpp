@@ -20,10 +20,10 @@ void Forces::forces()
 
     /*****************input from another module*******************/
     double pdynmc=environment->get_pdynmc();
-    double mprop=propulsion->mprop;
-    double thrust=propulsion->thrust;
-    double mrcs_moment=rcs->mrcs_moment;
-    double mrcs_force=rcs->mrcs_force;
+    double mprop=propulsion->get_mprop();
+    double thrust=propulsion->get_thrust();
+    double mrcs_moment=rcs->get_mrcs_moment();
+    double mrcs_force=rcs->get_mrcs_force();
     double refa=Aerodynamics->get_refa();
     double refd=Aerodynamics->get_refd();
     double cy=Aerodynamics->get_cy();
@@ -32,20 +32,16 @@ void Forces::forces()
     double cln=Aerodynamics->get_cln();
     double cx=Aerodynamics->get_cx();
     double cz=Aerodynamics->get_cz();
-    int mtvc=tvc->mtvc;
+    int mtvc=tvc->get_mtvc();
 
-    Matrix FMRCS(3,1);
-    Matrix FARCS(3,1);
-    Matrix FPB(3,1);
-    Matrix FMPB(3,1);
+    Matrix FMRCS = rcs->get_FMRCS();
+    Matrix FARCS = rcs->get_FARCS();
+    Matrix FPB = tvc->get_FPB();
+    Matrix FMPB = tvc->get_FMPB();
     Matrix FAPB(3,1);
     Matrix FAP(3,1);
     Matrix FMB(3,1);
 
-    FMRCS.build_vec3(rcs->fmrcs[0],rcs->fmrcs[1],rcs->fmrcs[2]);
-    FARCS.build_vec3(rcs->farcs[0],rcs->farcs[1],rcs->farcs[2]);
-    FPB.build_vec3(tvc->fpb[0],tvc->fpb[1],tvc->fpb[2]);
-    FMPB.build_vec3(tvc->fmpb[0],tvc->fmpb[1],tvc->fmpb[2]);
     /*************************************************************/
 
     //total non-gravitational forces
