@@ -160,7 +160,7 @@ void Newton::propagate(double int_step){
 }
 
 void Newton::update_fspb(){
-    arma::vec3 FAPB(&forces->fapb[0]);
+    arma::vec3 FAPB(forces->get_fapb_ptr());
 
     /* Stored Value due to coherence with other models */
     FSPB = FAPB * (1. / propulsion->vmass);
@@ -173,7 +173,7 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     arma::mat33 TBI(&kinematics->tbi[0][0]);
     TBI = trans(TBI);
 
-    arma::vec3 GRAVG(&environment->gravg[0]);
+    arma::vec3 GRAVG(environment->get_gravg_ptr()); // BUG: Matrix to Arma?
 
     /* Prograte S, V, A status */
     arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
@@ -196,7 +196,7 @@ void Newton::propagate_position_speed_acceleration(double int_step){
 void Newton::propagate_aeroloss(double int_step){
     //XXX: Need fixing
 
-    arma::vec3 FAP(&forces->fap[0]);
+    arma::vec3 FAP(forces->get_fap_ptr());
 
     //calculate aero loss`:`
     FAP = FAP * (1. / propulsion->vmass);
@@ -205,7 +205,7 @@ void Newton::propagate_aeroloss(double int_step){
 
 void Newton::propagate_gravityloss(double int_step){
     //calculate gravity loss
-    gravity_loss = gravity_loss + environment->grav * sin(get_thtvdx() * RAD) * int_step;
+    gravity_loss = gravity_loss + environment->get_grav() * sin(get_thtvdx() * RAD) * int_step;
 }
 
 void Newton::update_diagnostic_attributes(double int_step){

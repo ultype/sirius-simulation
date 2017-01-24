@@ -16,7 +16,7 @@ void Propulsion::calculate_propulsion(double int_step)
     Matrix IBBB1(3,3);
     Matrix IBBB(3,3);
 
-    double press=environment->press;
+    double press=environment->get_press();
 
     //no thrusting
     if(mprop==0){

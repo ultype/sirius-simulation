@@ -220,7 +220,7 @@ void INS::update(double int_step){
     Matrix SBIIC(sbiic);
     // input from other modules
     double time = get_rettime();
-    Matrix GRAVG(environment->gravg);
+    Matrix GRAVG = environment->get_GRAVG();
     Matrix TBI(kinematics->tbi);
     Matrix WBIB = euler->get_WBIB();
     Matrix WBII = euler->get_WBII();

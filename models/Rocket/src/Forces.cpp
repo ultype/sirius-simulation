@@ -13,12 +13,13 @@ void Forces::init_force(Environment* env, Propulsion* prop, RCS* rc
     Aerodynamics=aero;
     tvc=tv;
 }
+
 void Forces::forces()
 {
 
 
     /*****************input from another module*******************/
-    double pdynmc=environment->pdynmc;
+    double pdynmc=environment->get_pdynmc();
     double mprop=propulsion->mprop;
     double thrust=propulsion->thrust;
     double mrcs_moment=rcs->mrcs_moment;
@@ -83,4 +84,25 @@ void Forces::forces()
     FMB.fill(fmb);
     FAP.fill(fap);
     /*******************************************/
+}
+
+double* Forces::get_fapb_ptr() { return fapb; }
+double* Forces::get_fap_ptr() { return fap; }
+
+Matrix Forces::get_FAPB() {
+    Matrix FAPB(3,1);
+    FAPB.build_vec3(fapb);
+    return FAPB;
+}
+
+Matrix Forces::get_FAP() {
+    Matrix FAP(3,1);
+    FAP.build_vec3(fap);
+    return FAP;
+}
+
+Matrix Forces::get_FMB() {
+    Matrix FMB(3,1);
+    FMB.build_vec3(fmb);
+    return FMB;
 }

@@ -45,11 +45,11 @@ void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
     double phipx=kinematics->phipx;
     double alphax=kinematics->alphax;
     double betax=kinematics->betax;
-    double rho=environment->rho;
-    double vmach=environment->vmach;
-    double pdynmc=environment->pdynmc;
-    double tempk=environment->tempk;
-    double dvba=environment->dvba;
+    double rho=environment->get_rho();
+    double vmach=environment->get_vmach();
+    double pdynmc=environment->get_pdynmc();
+    double tempk=environment->get_tempk();
+    double dvba=environment->get_dvba();
     double ppx=euler->get_ppx();
     double qqx=euler->get_qqx();
     double rrx=euler->get_rrx();
@@ -215,9 +215,9 @@ void AeroDynamics::calculate_aero(double int_step, Datadeck &aerotable)
 
 void AeroDynamics::aerodynamics_der()
 {
-    double vmach=environment->vmach;
-    double pdynmc=environment->pdynmc;
-    double dvba=environment->dvba;
+    double vmach=environment->get_vmach();
+    double pdynmc=environment->get_pdynmc();
+    double dvba=environment->get_dvba();
     double vmass=propulsion->vmass;
     double xcg=propulsion->xcg;
     double thrust=propulsion->thrust;

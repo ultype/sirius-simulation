@@ -35,11 +35,20 @@ class Forces{
          RCS *rcs;
          AeroDynamics *Aerodynamics;
          TVC *tvc;
-/***********************************Variables describtion******************************/
+
+         Matrix get_FAPB();
+         double* get_fapb_ptr();
+
+         Matrix get_FAP();
+         double* get_fap_ptr();
+
+         Matrix get_FMB();
+
+    private:
         double fapb[3];         /* *io (N)      Aerodynamic and propulsion forces in body axes */
         double fap[3];          /* *io (N)      Aerodynamic force in body axes */
         double fmb[3];          /* *io (N*m)    Aerodynamic and propulsion moment in body axes */
-/**************************************************************************************/
+
 };
 
 

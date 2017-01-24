@@ -38,8 +38,8 @@ void Actuator::actuate(double int_step){
 
     // input from other modules
     double delacx = 0; //XXX: Ambiguous;
-    double delecx = control->delecx;
-    double delrcx = control->delrcx;
+    double delecx = control->get_delecx();
+    double delrcx = control->get_delrcx();
     //-------------------------------------------------------------------------
     // decoding actuator flag
     int morder = mact / 10;
@@ -228,4 +228,3 @@ Matrix Actuator::actuator_scnd(Matrix ACTCZ, double dlimx, double dlimx_min, int
 
     return ACTZ = DZ;
 }
-

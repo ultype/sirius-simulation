@@ -37,11 +37,11 @@ void TVC::actuate(double int_step){
     Matrix FMPB(3, 1);
 
     // input from other modules
-    double pdynmc = environment->pdynmc;
+    double pdynmc = environment->get_pdynmc();
     double xcg = propulsion->xcg;
     double thrust = propulsion->thrust;
-    double delecx = control->delecx;
-    double delrcx = control->delrcx;
+    double delecx = control->get_delecx();
+    double delrcx = control->get_delrcx();
     double alphax = kinematics->alphax;
     /*********************************
     Matrix UTBC=hyper[430].vec();
@@ -183,4 +183,3 @@ void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double in
         dzetad = 0.;
     zet = zeta;
 }
-

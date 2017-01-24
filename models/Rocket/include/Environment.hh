@@ -52,9 +52,28 @@ class Environment{
 //030507 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 /***********************************Variables describtion******************************/
+
+        /* Input File */
+        int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
+
+        double get_rho();
+        double get_vmach();
+        double get_pdynmc();
+        double get_tempk();
+        double get_dvba();
+        double get_grav();
+        double get_press();
+
+        double* get_gravg_ptr();
+        Matrix get_GRAVG();
+        Matrix get_VAED();
+
+        // XXX: Why trick can't see these in private?
         double rho;         /* *io (kg/m3)      Atmospheric Density */
         double vmach;       /* *io (--)         Mach number */
         double pdynmc;      /* *io (pa)         Dynamic pressure */
+    private:
+
         double tempk;       /* *io (K)          Atmospheric temperature */
         double dvba;        /* *io (m/s)        Vehicle speed wrt air */
         double gravg[3];    /* *io (m/s2)       Gravity acceleration in geocentric coord */
@@ -62,10 +81,7 @@ class Environment{
         double grav;        /* *io (m/s2)       Magnitude of gravity acceleration */
         double press;       /* *io (pa)         Atmospheric pressure */
 
-        /* Input File */
-        int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
 
-    private:
         double vsound;      /* *io (m/s)        Sonic speed */
         double dvae;        /* *io (m/s)        Madnitude of constant air speed */
         double turb_length; /* *io (m)          Turbulence correlation length - m*/

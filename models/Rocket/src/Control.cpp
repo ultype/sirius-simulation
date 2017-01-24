@@ -3,6 +3,9 @@
 void Control::default_data(){
 }
 
+double  Control::get_delecx() { return delecx; }
+double  Control::get_delrcx() { return delrcx; }
+
 void Control::initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero){
     ins = i;
     environment = env;
@@ -111,7 +114,7 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double dndr = aerodynamics->get_dndr();
 
     // input from other modules
-    double pdynmc = environment->pdynmc;
+    double pdynmc = environment->get_pdynmc();
     double dla = aerodynamics->get_dla();
     double dma = aerodynamics->get_dma();
     double dmq = aerodynamics->get_dmq();
@@ -183,7 +186,7 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     Matrix GAINFY(3, 1);
 
     // input from other modules
-    double pdynmc = environment->pdynmc;
+    double pdynmc = environment->get_pdynmc();
     double dyb = aerodynamics->get_dyb();
     double dnb = aerodynamics->get_dnb();
     double dnr = aerodynamics->get_dnr();
@@ -238,7 +241,7 @@ double Control::control_pitch_rate(double qqdx){
     double dqcx(0);
 
     // input from aerodynamic
-    double pdynmc = environment->pdynmc;
+    double pdynmc = environment->get_pdynmc();
     double dla = aerodynamics->get_dla();
     double dma = aerodynamics->get_dma();
     double dmq = aerodynamics->get_dmq();

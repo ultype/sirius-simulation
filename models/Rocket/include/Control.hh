@@ -56,9 +56,13 @@ class Control {
         // 030520 Created by Peter H Zipfel
         // 091214 Modified for ROCKET6, PZi
         ///////////////////////////////////////////////////////////////////////////////
+        double  get_delecx();
+        double  get_delrcx();
+
+    private:
         double  delecx;         /* *io (d)      Pitch command deflection */ // n
         double  delrcx;         /* *io (d)      Yaw command deflection */   // n
-    private:
+
         int     maut;           /* *io (--)     maut=|mauty|mautp| see table */
         int     mfreeze;        /* *io (--)     =0:Unfreeze; =1:Freeze; increment for more */
         double  waclp;          /* *io (r/s)    Nat freq of accel close loop complex pole */

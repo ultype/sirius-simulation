@@ -34,18 +34,17 @@ void Kinematics::calculate_kinematics(double int_step){
     double phip(0);
     Matrix TBD(3,3);
 
-    double dvba=environment->dvba;
+    double dvba=environment->get_dvba();
     double lonx=newton->get_lonx();
     double latx=newton->get_latx();
     double alt=newton->get_alt();
 
     Matrix WBIB = euler->get_WBIB();
     Matrix VBED(3,1);
-    Matrix VAED(3,1);
+    Matrix VAED = environment->get_VAED();
     Matrix VBII(3,1);
 
     VBED = newton->get_VBED();
-    VAED.build_vec3(environment->vaed);
     VBII = newton->get_IVel();
 
     Matrix TBI(3,3);
