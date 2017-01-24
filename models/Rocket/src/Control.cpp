@@ -31,7 +31,7 @@ void Control::control(double int_step){
     // localizing module-variables
     // input from other modules
     int mprop = propulsion->mprop;
-    double gymax = aerodynamics->gymax;
+    double gymax = aerodynamics->get_gymax();
     //-------------------------------------------------------------------------
     // decoding control flag
     // std::cout<<"Called : Control"<<'\n';
@@ -105,17 +105,17 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double gainfb2(0);
     double gainfb3(0);
 
-    double dyb = aerodynamics->dyb;
-    double dnb = aerodynamics->dnb;
-    double dnr = aerodynamics->dnr;
-    double dndr = aerodynamics->dndr;
+    double dyb = aerodynamics->get_dyb();
+    double dnb = aerodynamics->get_dnb();
+    double dnr = aerodynamics->get_dnr();
+    double dndr = aerodynamics->get_dndr();
 
     // input from other modules
     double pdynmc = environment->pdynmc;
-    double dla = aerodynamics->dla;
-    double dma = aerodynamics->dma;
-    double dmq = aerodynamics->dmq;
-    double dmde = aerodynamics->dmde;
+    double dla = aerodynamics->get_dla();
+    double dma = aerodynamics->get_dma();
+    double dmq = aerodynamics->get_dmq();
+    double dmde = aerodynamics->get_dmde();
     double dvbec = ins->dvbec;
     double qqcx = ins->qqcx;
     Matrix FSPCB(ins->fspcb);
@@ -184,10 +184,10 @@ double Control::control_yaw_accel(double alcomx, double int_step){
 
     // input from other modules
     double pdynmc = environment->pdynmc;
-    double dyb = aerodynamics->dyb;
-    double dnb = aerodynamics->dnb;
-    double dnr = aerodynamics->dnr;
-    double dndr = aerodynamics->dndr;
+    double dyb = aerodynamics->get_dyb();
+    double dnb = aerodynamics->get_dnb();
+    double dnr = aerodynamics->get_dnr();
+    double dndr = aerodynamics->get_dndr();
     double dvbe = newton->get_dvbe();
     double rrcx = ins->rrcx;
     Matrix FSPCB(ins->fspcb);
@@ -239,12 +239,12 @@ double Control::control_pitch_rate(double qqdx){
 
     // input from aerodynamic
     double pdynmc = environment->pdynmc;
-    double dla = aerodynamics->dla;
-    double dma = aerodynamics->dma;
-    double dmq = aerodynamics->dmq;
-    double dmde = aerodynamics->dmde;
+    double dla = aerodynamics->get_dla();
+    double dma = aerodynamics->get_dma();
+    double dmq = aerodynamics->get_dmq();
+    double dmde = aerodynamics->get_dmde();
     double dvbec = ins->dvbec;
-    double dnd = aerodynamics->dnd;
+    double dnd = aerodynamics->get_dnd();
     double qqcx = ins->qqcx;
 
     //-------------------------------------------------------------------------
@@ -275,4 +275,3 @@ double Control::control_pitch_rate(double qqdx){
 
     return delecx;
 }
-

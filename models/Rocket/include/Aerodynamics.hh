@@ -55,6 +55,41 @@ class AeroDynamics
     ///////////////////////////////////////////////////////////////////////////////
 
     /***********************************Variables describtion******************************/
+        double get_dyb();
+        double get_dma();
+        double get_dnb();
+        double get_dnd();
+        double get_dmq();
+        double get_dnr();
+        double get_dmde();
+        double get_dndr();
+        double get_gymax();
+        double get_dla();
+        double get_refa();
+        double get_refd();
+        double get_cy();
+        double get_cll();
+        double get_clm();
+        double get_cln();
+        double get_cx();
+        double get_cz();
+
+
+        /* Input File */
+        int set_maero(int);          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
+        double set_xcg_ref(double);     /* *io (m)      Reference cg location from nose - m*/
+        double set_alplimx(double);     /* *io (d)      Alpha limiter for vehicle - deg*/
+        double set_alimitx(double);     /* *io (--)     Structural  limiter for vehicle*/
+        double set_refa(double);        /* *io (m2)     Reference area for aero coefficients - m^2*/
+        double set_refd(double);        /* *io (m)      Reference length for aero coefficients - m*/
+
+    private:
+        int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
+        double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
+        double alplimx;     /* *io (d)      Alpha limiter for vehicle - deg*/
+        double alimitx;     /* *io (--)     Structural  limiter for vehicle*/
+        double refa;        /* *io (m2)     Reference area for aero coefficients - m^2*/
+        double refd;        /* *io (m)      Reference length for aero coefficients - m*/
         double dyb;         /* *io (m/s2)   Side force derivative - m/s^2*/
         double dma;         /* *io (1/s2)   Pitch moment derivative - 1/s^2*/
         double dnb;         /* *io (1/s2)   Yawing moment derivative - 1/s^2*/
@@ -65,8 +100,6 @@ class AeroDynamics
         double dndr;        /* *io (1/s2)   Yaw control derivative - 1/s^2*/
         double gymax;       /* *io (--)     Max g permissable in yaw for vehicle - g's*/
         double dla;         /* *io (m/s2)   Lift slope derivative - m/s^2*/
-        double refa;        /* *io (m2)     Reference area for aero coefficients - m^2*/
-        double refd;        /* *io (m)      Reference length for aero coefficients - m*/
         double cy;          /* *io (--)     Side force coefficient - ND*/
         double cll;         /* *io (--)     Rolling moment coefficient - ND*/
         double clm;         /* *io (--)     Pitching moment coefficient - ND*/
@@ -74,13 +107,6 @@ class AeroDynamics
         double cx;          /* *io (--)     X-force coefficient - ND*/
         double cz;          /* *io (--)     Z-force coefficient - ND*/
 
-        /* Input File */
-        int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
-        double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
-        double alplimx;     /* *io (d)      Alpha limiter for vehicle - deg*/
-        double alimitx;     /* *io (--)     Structural  limiter for vehicle*/
-
-    private:
         double ca0;         /* *io (--)     Axial force coeff(Mach) - ND*/
         double caa;         /* *io (--)     Delta axial force due to alpha(Mach) - ND*/
         double cn0;         /* *io (--)     Normal force coeff(Mach,alpha) - ND*/

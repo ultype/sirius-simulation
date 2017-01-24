@@ -16,9 +16,9 @@ rcs_on.activate()
 speration_1 = trick.new_event("speration_1")
 speration_1.set_cycle(0.001)
 speration_1.condition(0, "trick.exec_get_sim_time() == 101.001")
-speration_1.action(0, "rkt.aerodynamics.refa = 1.13")
+speration_1.action(0, "rkt.aerodynamics.set_refa(1.13)")
 speration_1.action(1, "rkt.propulsion.aexit = 0")
-speration_1.action(2, "rkt.aerodynamics.xcg_ref = 3.429")
+speration_1.action(2, "rkt.aerodynamics.set_xcg_ref(3.429)")
 speration_1.action(3, "rkt.propulsion.vmass0 = 3893")
 speration_1.action(4, "rkt.propulsion.fmass0 = 2963")
 speration_1.action(5, "rkt.propulsion.fmasse = 0")
@@ -34,7 +34,7 @@ speration_1.action(14, "rkt.propulsion.mprop = 3")
 speration_1.action(15, "rkt.rcs.mrcs_moment = 23")
 speration_1.action(16, "trick.add_event(speration_2)")
 speration_1.action(17, "speration_2.activate()")
-speration_1.action(18, "rkt.aerodynamics.maero = 12")
+speration_1.action(18, "rkt.aerodynamics.set_maero(12)")
 trick.add_event(speration_1)
 speration_1.activate()
 ###############################################################
@@ -51,7 +51,7 @@ speration_3=trick.new_event("speration_3")
 speration_3.set_cycle(0.001)
 speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
 speration_3.action(0, "rkt.rcs.rcs_thrust = 10")
-speration_3.action(1, "rkt.aerodynamics.xcg_ref = 3.2489")
+speration_3.action(1, "rkt.aerodynamics.set_xcg_ref(3.2489)")
 speration_3.action(2, "rkt.rcs.roll_mom_max = 10")
 speration_3.action(3, "rkt.rcs.pitch_mom_max = 100")
 speration_3.action(4, "rkt.rcs.yaw_mom_max = 20")
@@ -69,7 +69,7 @@ speration_3.action(15, "rkt.propulsion.fuel_flow_rate = 3.33")
 speration_3.action(16, "rkt.propulsion.mprop = 3")
 speration_3.action(17, "trick.add_event(speration_4)")
 speration_3.action(18, "speration_4.activate()")
-speration_3.action(19, "rkt.aerodynamics.maero = 11")
+speration_3.action(19, "rkt.aerodynamics.set_maero(11)")
 speration_3.action(20, "rkt.rcs.mrcs_moment = 23")
 #############################################################
 #Event4:MECO
@@ -106,12 +106,12 @@ rkt.newton.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 #environment
 rkt.env.mair = 0              #mair =|matmo|mturb|mwind|
 #aerodynamics
-rkt.aerodynamics.maero = 13      #=11: last stage; =12: 2 stages; =13: 3 stages
-rkt.aerodynamics.xcg_ref = 9.632   #Reference cg location from nose - m
-rkt.aerodynamics.refa = 2.36       #Reference area for aero coefficients - m^2
-rkt.aerodynamics.refd = 1.7334     #Reference length for aero coefficients - m
-rkt.aerodynamics.alplimx = 20      #Alpha limiter for vehicle - deg
-rkt.aerodynamics.alimitx = 5       #Structural  limiter for vehicle
+rkt.aerodynamics.set_maero(13)      #=11: last stage; =12: 2 stages; =13: 3 stages
+rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m
+rkt.aerodynamics.set_refa(2.36)       #Reference area for aero coefficients - m^2
+rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - m
+rkt.aerodynamics.set_alplimx(20)      #Alpha limiter for vehicle - deg
+rkt.aerodynamics.set_alimitx(5)       #Structural  limiter for vehicle
 #propulsion
 rkt.propulsion.mprop  = 3   #'int' =0:none; =3 input; =4 LTG control  module propulsion
 rkt.propulsion.vmass0 = 13970       #vehicle initial mass

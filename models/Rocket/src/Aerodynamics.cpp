@@ -1,5 +1,31 @@
 #include "Aerodynamics.hh"
 
+double AeroDynamics::get_dyb() { return dyb; }
+double AeroDynamics::get_dma() { return dma; }
+double AeroDynamics::get_dnb() { return dnb; }
+double AeroDynamics::get_dnd() { return dnd; }
+double AeroDynamics::get_dmq() { return dmq; }
+double AeroDynamics::get_dnr() { return dnr; }
+double AeroDynamics::get_dmde() { return dmde; }
+double AeroDynamics::get_dndr() { return dndr; }
+double AeroDynamics::get_gymax() { return gymax; }
+double AeroDynamics::get_dla() { return dla; }
+double AeroDynamics::get_refa() { return refa; }
+double AeroDynamics::get_refd() { return refd; }
+double AeroDynamics::get_cy() { return cy; }
+double AeroDynamics::get_cll() { return cll; }
+double AeroDynamics::get_clm() { return clm; }
+double AeroDynamics::get_cln() { return cln; }
+double AeroDynamics::get_cx() { return cx; }
+double AeroDynamics::get_cz() { return cz; }
+
+int AeroDynamics::set_maero(int in) { maero = in; }
+double AeroDynamics::set_xcg_ref(double in) { xcg_ref = in; }
+double AeroDynamics::set_alplimx(double in) { alplimx = in; }
+double AeroDynamics::set_alimitx(double in) { alimitx = in; }
+double AeroDynamics::set_refa(double in) { refa = in; }
+double AeroDynamics::set_refd(double in) { refd = in; }
+
 void AeroDynamics::initialize(Kinematics *kine, Environment *env, Propulsion *prop, _Euler_ *eul, Newton *newt, TVC *t)
 {
     kinematics = kine;

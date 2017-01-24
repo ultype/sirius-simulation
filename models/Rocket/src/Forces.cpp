@@ -23,14 +23,14 @@ void Forces::forces()
     double thrust=propulsion->thrust;
     double mrcs_moment=rcs->mrcs_moment;
     double mrcs_force=rcs->mrcs_force;
-    double refa=Aerodynamics->refa;
-    double refd=Aerodynamics->refd;
-    double cy=Aerodynamics->cy;
-    double cll=Aerodynamics->cll;
-    double clm=Aerodynamics->clm;
-    double cln=Aerodynamics->cln;
-    double cx=Aerodynamics->cx;
-    double cz=Aerodynamics->cz;
+    double refa=Aerodynamics->get_refa();
+    double refd=Aerodynamics->get_refd();
+    double cy=Aerodynamics->get_cy();
+    double cll=Aerodynamics->get_cll();
+    double clm=Aerodynamics->get_clm();
+    double cln=Aerodynamics->get_cln();
+    double cx=Aerodynamics->get_cx();
+    double cz=Aerodynamics->get_cz();
     int mtvc=tvc->mtvc;
 
     Matrix FMRCS(3,1);
