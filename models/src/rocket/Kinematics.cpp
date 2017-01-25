@@ -133,15 +133,8 @@ void Kinematics::calculate_kinematics(double int_step){
     psibdx = get_psibdx();
     phibdx = get_phibdx();
 
-    //*incidence angles using wind vector VAED in geodetic coord
-    arma::vec3 VBAB = TBD * (VBED - VAED);
-    double vbab1 = VBAB(0);
-    double vbab2 = VBAB(1);
-    double vbab3 = VBAB(2);
-    double alpha = atan2(vbab3, vbab1);
-    double beta = asin(vbab2 / dvba);
-    alphax = alpha * DEG;
-    betax = beta * DEG;
+    alphax = get_alphax();
+    betax = get_betax();
 
     //incidence angles in load factor plane (aeroballistic)
     double dum = vbab1 / dvba;
@@ -181,8 +174,24 @@ void Kinematics::calculate_kinematics(double int_step){
 double Kinematics::get_alppx() { return alppx; }
 double Kinematics::get_phipx() { return phipx; }
 
-double Kinematics::get_alphax() { return alphax; }
-double Kinematics::get_betax() { return betax; }
+double Kinematics::get_alphax() {
+    arma::vec VBED = newton->get_VBED_();
+    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
+
+    //*incidence angles using wind vector VAED in geodetic coord
+    arma::vec3 VBAB = TBD * (VBED - VAED);
+    double alpha = atan2(VBAB(2), VBAB(0));
+    return alpha * DEG;
+}
+double Kinematics::get_betax() {
+    arma::vec VBED = newton->get_VBED_();
+    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
+    double dvba = environment->get_dvba();
+    //*incidence angles using wind vector VAED in geodetic coord
+    arma::vec3 VBAB = TBD * (VBED - VAED);
+    double beta = asin(VBAB(1) / dvba);
+    return beta * DEG;
+}
 
 double Kinematics::get_psibdx() {
     double psibd = 0;
