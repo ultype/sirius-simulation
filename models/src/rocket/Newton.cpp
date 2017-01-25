@@ -137,10 +137,7 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
 
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
     arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
-    //building TBD
-    arma::mat33 TBD = build_euler_transform_matrix( kinematics->get_psibdx() * RAD,
-                                                    kinematics->get_thtbdx() * RAD,
-                                                    kinematics->get_phibdx() * RAD);
+    arma::mat33 TBD = kinematics->get_TBD_();
     //Geodetic velocity
     arma::mat VBED = trans(TBD) * VBEB;
 
