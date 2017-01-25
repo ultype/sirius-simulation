@@ -80,14 +80,18 @@ Kinematics& Kinematics::operator=(const Kinematics& other){
 }
 
 void Kinematics::load_angle(double yaw, double roll, double pitch) {
-    psibdx = yaw;
-    phibdx = roll;
-    thtbdx = pitch;
+    this->psibdx = yaw;
+    this->phibdx = roll;
+    this->thtbdx = pitch;
+
+    double lonx = newton->get_lonx();
+    double latx = newton->get_latx();
+    double alt  = newton->get_alt();
 
     TBD = build_euler_transform_matrix(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
-    //XXX
-    arma::mat TDI = newton->get_TDI();
-    TBI = TBD * TDI;
+
+    arma::mat current_TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    TBI = TBD * current_TDI;
 
 }
 
@@ -112,12 +116,7 @@ void Kinematics::calculate_kinematics(double int_step){
     arma::vec VBED = newton->get_VBED_();
     arma::vec VBII = newton->get_VBII();
 
-
-    std::cout << std::scientific <<  std::setprecision(12);
-
     //*integrating direction cosine matrix
-    //XXX: Matrix TBID_NEW = *TBI;
-    //
     arma::mat TBID_NEW = trans(skew_sym(WBIB)) * TBI;
     TBI = integrate(TBID_NEW, TBID, TBI, int_step);
     TBID = TBID_NEW;
@@ -126,47 +125,46 @@ void Kinematics::calculate_kinematics(double int_step){
     arma::mat EE = arma::eye(3, 3) - TBI * trans(TBI);
     TBI = TBI + EE * TBI * 0.5;
 
-
-
     //TBI orthogonality check
-    double e1=EE(0,0);
-    double e2=EE(1,1);
-    double e3=EE(2,2);
+    double e1 = EE(0,0);
+    double e2 = EE(1,1);
+    double e3 = EE(2,2);
     ortho_error=sqrt(e1*e1+e2*e2+e3*e3);
 
     //_Euler_ angles
-    // XXX: Timing might make the position skew
     arma::mat TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     TBD = TBI * trans(TDI);
-    double tbd13=TBD(0,2);
-    double tbd11=TBD(0,0);
-    double tbd33=TBD(2,2);
-    double tbd12=TBD(0,1);
-    double tbd23=TBD(1,2);
+    double tbd13 = TBD(0,2);
+    double tbd11 = TBD(0,0);
+    double tbd33 = TBD(2,2);
+    double tbd12 = TBD(0,1);
+    double tbd23 = TBD(1,2);
 
     //*geodetic _Euler_ angles
     //pitch angle: 'thtbd'
     //note: when |tbd13| >= 1, thtbd = +- pi/2, but cos(thtbd) is
     //      forced to be a small positive number to prevent division by zero
-    if(fabs(tbd13)<1){
-        thtbd=asin(-tbd13);
-        cthtbd=cos(thtbd);
+    if(fabs(tbd13) < 1){
+        thtbd = asin(-tbd13);
+        cthtbd = cos(thtbd);
+    }else{
+        thtbd = PI / 2 * sign(-tbd13);
+        cthtbd = arma::datum::eps;
     }
-    else{
-        thtbd=PI/2*sign(-tbd13);
-        cthtbd=EPS;
-    }
+
     //yaw angle: 'psibd'
-    double cpsi=tbd11/cthtbd;
-    if(fabs(cpsi)>1)
-        cpsi=1*sign(cpsi);
-    psibd=acos(cpsi)*sign(tbd12);
+    double cpsi = tbd11 / cthtbd;
+    if(fabs(cpsi) > 1){
+        cpsi = 1 * sign(cpsi);
+    }
+    psibd = acos(cpsi) * sign(tbd12);
 
     //roll angle: 'phibdc'
-    double cphi=tbd33/cthtbd;
-    if(fabs(cphi)>1)
-        cphi=1*sign(cphi);
-    phibd=acos(cphi)*sign(tbd23);
+    double cphi = tbd33 / cthtbd;
+    if(fabs(cphi) > 1){
+        cphi = 1 * sign(cphi);
+    }
+    phibd = acos(cphi) * sign(tbd23);
 
     psibdx = DEG * psibd;
     thtbdx = DEG * thtbd;
@@ -174,42 +172,45 @@ void Kinematics::calculate_kinematics(double int_step){
 
     //*incidence angles using wind vector VAED in geodetic coord
     arma::vec3 VBAB = TBD * (VBED - VAED);
-    double vbab1=VBAB(0);
-    double vbab2=VBAB(1);
-    double vbab3=VBAB(2);
-    double alpha=atan2(vbab3,vbab1);
-    double beta=asin(vbab2/dvba);
-    alphax=alpha*DEG;
-    betax=beta*DEG;
+    double vbab1 = VBAB(0);
+    double vbab2 = VBAB(1);
+    double vbab3 = VBAB(2);
+    double alpha = atan2(vbab3, vbab1);
+    double beta = asin(vbab2 / dvba);
+    alphax = alpha * DEG;
+    betax = beta * DEG;
 
     //incidence angles in load factor plane (aeroballistic)
-    double dum=vbab1/dvba;
+    double dum = vbab1 / dvba;
 
-    if(fabs(dum)>1)
-        dum=1*sign(dum);
-    double alpp=acos(dum);
-    if(vbab2==0&&vbab3==0)
-        phip=0.;
-    //note: if vbeb2 is <EPS the value phip is forced to be 0 or PI
-    //      to prevent oscillations
-    else if(fabs(vbab2)<EPS)
-        if(vbab3>0) phip=0;
-        if(vbab3<0) phip=PI;
+    if(fabs(dum) > 1)
+        dum = 1 * sign(dum);
+    double alpp = acos(dum);
+
+    //XXX: WTF over this place? Is this correct? Code differ from comments
+    if(vbab2 == 0 && vbab3 == 0)
+        phip = 0.;
+    else if(fabs(vbab2) < arma::datum::eps)
+        //note: if vbeb2 is <EPS the value phip is forced to be 0 or PI
+        //      to prevent oscillations
+        // XXX: Missing Braces?
+        if(vbab3 > 0) phip = 0;
+    if(vbab3 < 0) phip = PI;
     else
         phip=atan2(vbab2,vbab3);
-    alppx=alpp*DEG;
-    phipx=phip*DEG;
+    alppx = alpp * DEG;
+    phipx = phip * DEG;
 
     //*diagnostic: calculating the inertial incidence angles
     arma::vec3 VBIB = TBI * VBII;
-    double vbib1=VBIB(0);
-    double vbib2=VBIB(1);
-    double vbib3=VBIB(2);
-    double alphai=atan2(vbib3,vbib1);
-    double dvbi=norm(VBIB);
-    double betai=asin(vbib2/dvbi);
-    alphaix=alphai*DEG;
-    betaix=betai*DEG;
+    double vbib1 = VBIB(0);
+    double vbib2 = VBIB(1);
+    double vbib3 = VBIB(2);
+    double alphai = atan2(vbib3, vbib1);
+    double dvbi = norm(VBIB);
+    double betai = asin(vbib2 / dvbi);
+    alphaix = alphai * DEG;
+    betaix = betai*DEG;
 
 }
 
