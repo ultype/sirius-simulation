@@ -171,8 +171,8 @@ Matrix Kinematics::get_TBI() {
     return TBI;
 }
 
-void Kinematics::load_angle(double roll, double pitch, double yaw) {
+void Kinematics::load_angle(double yaw, double roll, double pitch) {
+    psibdx = yaw;
     phibdx = roll;
     thtbdx = pitch;
-    psibdx = yaw;
 }

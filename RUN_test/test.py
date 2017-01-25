@@ -97,7 +97,7 @@ rkt.newton.load_location(lonx, latx, alt)
 phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
 thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
 psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
-rkt.kinematics.load_angle(phibdx, thtbdx, psibdx)
+rkt.kinematics.load_angle(psibdx, phibdx, thtbdx)
 
 alpha0x    = 0    #Initial angle-of-attack   - deg  module newton
 beta0x     = 0    #Initial sideslip angle    - deg  module newton

@@ -44,7 +44,7 @@ class Kinematics{
         double get_thtbdx();
         double get_phibdx();
 
-        void load_angle(double, double, double);
+        void load_angle(double yaw, double roll, double pitch);
 
         // XXX: can't get from private....
     private:
