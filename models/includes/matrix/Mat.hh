@@ -8,16 +8,30 @@ LIBRARY DEPENDENCY:
 #include <armadillo>
 
 template<unsigned int n, unsigned int m>
-class Mat : public arma::mat {
+class TrickMatrix : public arma::Mat<double> {
     public:
 
-        Mat() : arma::mat(&this->memory[0][0], n, m, false, true){
+        TrickMatrix() : arma::Mat<double>(&this->memory[0][0], n, m, false, true){
             this->zeros();
         }
 
         using arma::mat::operator=;
 
         double memory[m][n];
+
+
 };
 
-typedef Mat<3, 3> Mat33;
+typedef TrickMatrix<3, 3> TrickMatrix33;
+
+namespace arma{
+    template<unsigned int n, unsigned int m>
+    struct is_Mat< TrickMatrix<n, m> >
+      { static const bool value = true; };
+
+
+    template<unsigned int n, unsigned int m>
+        class Proxy< TrickMatrix<n, m> > : public Proxy< Mat<double> >{
+            using Proxy< Mat<double> >::Proxy;
+        };
+}

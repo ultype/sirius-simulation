@@ -11,13 +11,13 @@ template<unsigned int n>
 class Vec : public arma::vec {
     public:
 
-        Vec() : arma::vec(&this->memory[0][0], n, m, false, true){
+        Vec() : arma::vec(&this->memory[0], n, false, true){
             this->zeros();
         }
 
         using arma::vec::operator=;
 
-        double memory[m][n];
+        double memory[n];
 };
 
-typedef Vec<3> vec3;
+typedef Vec<3> Vec3;
