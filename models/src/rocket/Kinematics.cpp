@@ -187,17 +187,18 @@ void Kinematics::calculate_kinematics(double int_step){
         dum = 1 * sign(dum);
     double alpp = acos(dum);
 
-    //XXX: WTF over this place? Is this correct? Code differ from comments
-    if(vbab2 == 0 && vbab3 == 0)
+    // Changed according to comments, not original code, refer commit:b613a992
+    if(vbab2 == 0 && vbab3 == 0){
         phip = 0.;
-    else if(fabs(vbab2) < arma::datum::eps)
+    }else if(fabs(vbab2) < arma::datum::eps){
         //note: if vbeb2 is <EPS the value phip is forced to be 0 or PI
         //      to prevent oscillations
-        // XXX: Missing Braces?
         if(vbab3 > 0) phip = 0;
-    if(vbab3 < 0) phip = PI;
-    else
+        if(vbab3 < 0) phip = PI;
+    }
+    else{
         phip=atan2(vbab2,vbab3);
+    }
     alppx = alpp * DEG;
     phipx = phip * DEG;
 
