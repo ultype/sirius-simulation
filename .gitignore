@@ -2,6 +2,8 @@
 *.DS_Store
 *.sublime-project
 *.sublime-workspace
+cscope.*
+tags
 
 *.o
 *.pyc
