@@ -166,9 +166,7 @@ void Newton::update_fspb(){
 void Newton::propagate_position_speed_acceleration(double int_step){
     double lon, lat, al;
 
-    //XXX: Need Fix
-    arma::mat33 TBI(kinematics->get_tbi_ptr());
-    TBI = trans(TBI);
+    arma::mat33 TBI(kinematics->get_TBI_());
 
     arma::vec3 GRAVG(environment->get_gravg_ptr()); // BUG: Matrix to Arma?
 
