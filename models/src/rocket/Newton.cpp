@@ -260,6 +260,12 @@ Matrix Newton::get_VBED() {
     return __VBED;
 }
 
+arma::vec Newton::get_VBED_() {
+    arma::mat VBED = TDI * (VBII - WEII * SBII);
+
+    return VBED;
+}
+
 double Newton::get_dbi() { return norm(SBII); }
 
 double Newton::get_dvbi() { return norm(VBII); }
@@ -278,3 +284,6 @@ double Newton::get_psivdx(){
     Matrix VBED = get_VBED();
     return DEG * VBED.pol_from_cart().get_loc(1, 0);
 }
+
+arma::mat Newton::get_TDI() { return TDI; }
+arma::vec Newton::get_VBII() { return VBII; }

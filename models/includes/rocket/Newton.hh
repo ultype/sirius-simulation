@@ -54,6 +54,10 @@ class Newton {
         Matrix get_FSPB();
         Matrix get_VBED();
 
+        arma::mat get_TDI();
+        arma::vec get_VBII();
+        arma::vec get_VBED_();
+
         // XXX: Use getter and setters
         /* Interfacing Variabes */
 

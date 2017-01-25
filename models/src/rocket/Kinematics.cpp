@@ -5,11 +5,76 @@
 #include "trick_utils/math/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
 
+Kinematics::Kinematics(Newton &newt, Environment &env, _Euler_ &eul)
+    :   newton(&newt), euler(&eul), environment(&env)
+{
+    this->default_data();
+}
 
-void Kinematics::initialize(Newton *newt, Environment *env, _Euler_ *eul){
-    newton = newt;
-    environment = env;
-    euler = eul;
+Kinematics::Kinematics(const Kinematics& other)
+    :   newton(other.newton), euler(other.euler), environment(other.environment)
+{
+    this->default_data();
+
+    /* Propagative Stats */
+    memcpy(this->tbd, other.tbd, sizeof(tbd));
+    memcpy(this->tbi, other.tbi, sizeof(tbd));
+    memcpy(this->tbid, other.tbid, sizeof(tbd));
+    //this->TBD = other.TBD;
+    //this->TBI = other.TBI;
+    //this->TBID = other.TBID;
+
+    this->alphax = other.alphax;
+    this->betax = other.betax;
+    this->alppx = other.alppx;
+    this->phipx = other.phipx;
+    this->psibdx = other.psibdx;
+    this->thtbdx = other.thtbdx;
+    this->phibdx = other.phibdx;
+    this->ortho_error = other.ortho_error;
+    this->psibd = other.psibd;
+    this->thtbd = other.thtbd;
+    this->phibd = other.phibd;
+    this->alphaix = other.alphaix;
+    this->betaix = other.betaix;
+}
+
+Kinematics& Kinematics::operator=(const Kinematics& other){
+    if(&other == this)
+        return *this;
+
+    this->newton = other.newton;
+    this->environment = other.environment;
+    this->euler = other.euler;
+
+    /* Propagative Stats */
+    memcpy(this->tbd, other.tbd, sizeof(tbd));
+    memcpy(this->tbi, other.tbi, sizeof(tbd));
+    memcpy(this->tbid, other.tbid, sizeof(tbd));
+    //this->TBD = other.TBD;
+    //this->TBI = other.TBI;
+    //this->TBID = other.TBID;
+    this->alphax = other.alphax;
+    this->betax = other.betax;
+    this->alppx = other.alppx;
+    this->phipx = other.phipx;
+    this->psibdx = other.psibdx;
+    this->thtbdx = other.thtbdx;
+    this->phibdx = other.phibdx;
+    this->ortho_error = other.ortho_error;
+    this->psibd = other.psibd;
+    this->thtbd = other.thtbd;
+    this->phibd = other.phibd;
+    this->alphaix = other.alphaix;
+    this->betaix = other.betaix;
+
+    return *this;
+}
+
+void Kinematics::load_angle(double yaw, double roll, double pitch) {
+    psibdx = yaw;
+    phibdx = roll;
+    thtbdx = pitch;
 
     double lonx=newton->get_lonx();
     double latx=newton->get_latx();
@@ -25,6 +90,12 @@ void Kinematics::initialize(Newton *newt, Environment *env, _Euler_ *eul){
 
     TBD.fill(tbd);
     TBI.fill(tbi);
+}
+
+void Kinematics::initialize(){
+}
+
+void Kinematics::default_data(){
 }
 
 void Kinematics::calculate_kinematics(double int_step){
@@ -169,10 +240,4 @@ Matrix Kinematics::get_TBI() {
     Matrix TBI(3, 3);
     TBI.build_mat33(tbi);
     return TBI;
-}
-
-void Kinematics::load_angle(double yaw, double roll, double pitch) {
-    psibdx = yaw;
-    phibdx = roll;
-    thtbdx = pitch;
 }

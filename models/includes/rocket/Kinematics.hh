@@ -22,13 +22,13 @@ class Kinematics{
     TRICK_INTERFACE(Kinematics);
 
     public:
-        Newton *newton;
-        Environment *environment;
-        _Euler_* euler;
+        Kinematics(Newton &newt, Environment &env, _Euler_ &eul);
+        Kinematics(const Kinematics& other);
 
-        Kinematics(){};
+        Kinematics& operator=(const Kinematics& other);
 
-        void initialize(Newton* newt, Environment* env, _Euler_* eul);
+        void initialize();
+
         void calculate_kinematics(double int_step);
 
 /***********************************Variables describtion******************************/
@@ -48,6 +48,27 @@ class Kinematics{
 
         // XXX: can't get from private....
     private:
+        void default_data();
+
+        /* Internal Initializers */
+
+        /* Internal Propagator */
+
+        /* Internal Updaters */
+
+        /* Routing references */
+        Newton      * newton;
+        Environment * environment;
+        _Euler_     * euler;
+
+        /* Constants */
+
+        /* Propagative Stats */
+
+        /* Generating Outputs */
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
         double alphax;      /* *io (d)     Angle of attack */
         double betax;       /* *io (d)     Sideslip angle */
         double tbd[3][3];      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
