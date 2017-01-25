@@ -1356,7 +1356,7 @@ arma::mat33 skew_sym(arma::vec3 vec)
     RESULT(2, 0) = -vec(1);
     RESULT(0, 1) = -vec(2);
     RESULT(1, 1) = 0;
-    RESULT(2, 1) = -vec(0);
+    RESULT(2, 1) = vec(0);
     RESULT(0, 2) = vec(1);
     RESULT(1, 2) = -vec(0);
     RESULT(2, 2) = 0;
