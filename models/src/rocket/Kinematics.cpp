@@ -134,41 +134,10 @@ void Kinematics::calculate_kinematics(double int_step){
     //_Euler_ angles
     arma::mat TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     TBD = TBI * trans(TDI);
-    double tbd13 = TBD(0,2);
-    double tbd11 = TBD(0,0);
-    double tbd33 = TBD(2,2);
-    double tbd12 = TBD(0,1);
-    double tbd23 = TBD(1,2);
 
-    //*geodetic _Euler_ angles
-    //pitch angle: 'thtbd'
-    //note: when |tbd13| >= 1, thtbd = +- pi/2, but cos(thtbd) is
-    //      forced to be a small positive number to prevent division by zero
-    if(fabs(tbd13) < 1){
-        thtbd = asin(-tbd13);
-        cthtbd = cos(thtbd);
-    }else{
-        thtbd = PI / 2 * sign(-tbd13);
-        cthtbd = arma::datum::eps;
-    }
-
-    //yaw angle: 'psibd'
-    double cpsi = tbd11 / cthtbd;
-    if(fabs(cpsi) > 1){
-        cpsi = 1 * sign(cpsi);
-    }
-    psibd = acos(cpsi) * sign(tbd12);
-
-    //roll angle: 'phibdc'
-    double cphi = tbd33 / cthtbd;
-    if(fabs(cphi) > 1){
-        cphi = 1 * sign(cphi);
-    }
-    phibd = acos(cphi) * sign(tbd23);
-
-    psibdx = DEG * psibd;
-    thtbdx = DEG * thtbd;
-    phibdx = DEG * phibd;
+    thtbdx = get_thtbdx();
+    psibdx = get_psibdx();
+    phibdx = get_phibdx();
 
     //*incidence angles using wind vector VAED in geodetic coord
     arma::vec3 VBAB = TBD * (VBED - VAED);
@@ -217,11 +186,63 @@ void Kinematics::calculate_kinematics(double int_step){
 
 double Kinematics::get_alppx() { return alppx; }
 double Kinematics::get_phipx() { return phipx; }
+
 double Kinematics::get_alphax() { return alphax; }
 double Kinematics::get_betax() { return betax; }
-double Kinematics::get_psibdx() { return psibdx; }
-double Kinematics::get_thtbdx() { return thtbdx; }
-double Kinematics::get_phibdx() { return phibdx; }
+
+double Kinematics::get_psibdx() {
+    double psibd = 0;
+    double cthtbd = 0;
+
+    get_thtbdx(cthtbd);
+
+    //yaw angle: 'psibd'
+    double cpsi = TBD(0, 0) / cthtbd;
+    if(fabs(cpsi) > 1){
+        cpsi = 1 * sign(cpsi);
+    }
+    psibd = acos(cpsi) * sign(TBD(0, 1));
+
+    return DEG * psibd;
+}
+
+double Kinematics::get_thtbdx() {
+    double cthtbd = 0;
+    return get_thtbdx(cthtbd);
+}
+
+double Kinematics::get_thtbdx(double &cthtbd) {
+    double thtbd = 0;
+
+    //*geodetic _Euler_ angles
+    //pitch angle: 'thtbd'
+    //note: when |tbd13| >= 1, thtbd = +- pi/2, but cos(thtbd) is
+    //      forced to be a small positive number to prevent division by zero
+    if(fabs(TBD(0, 2)) < 1){
+        thtbd = asin(-TBD(0, 2));
+        cthtbd = cos(thtbd);
+    }else{
+        thtbd = PI / 2 * sign(-TBD(0, 2));
+        cthtbd = arma::datum::eps;
+    }
+
+    return DEG * thtbd;
+}
+double Kinematics::get_phibdx() {
+    double phibd = 0;
+    double cthtbd = 0;
+
+    get_thtbdx(cthtbd);
+
+    //roll angle: 'phibdc'
+    double cphi = TBD(2, 2) / cthtbd;
+    if(fabs(cphi) > 1){
+        cphi = 1 * sign(cphi);
+    }
+    phibd = acos(cphi) * sign(TBD(1, 2));
+
+    return DEG * phibd;
+}
 
 Matrix Kinematics::get_TBD() {
     Matrix TBD(3, 3);

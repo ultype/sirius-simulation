@@ -51,6 +51,9 @@ class Kinematics{
     private:
         void default_data();
 
+        /* Internal Getter */
+        double get_thtbdx(double &cthtbd);
+
         /* Internal Initializers */
 
         /* Internal Propagator */
