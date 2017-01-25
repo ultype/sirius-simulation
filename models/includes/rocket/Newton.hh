@@ -82,38 +82,38 @@ class Newton {
         Forces      *forces;
 
         /* Constants */
-        arma::mat WEII;     /* **  (r/s)    Earth's angular velocity (skew-sym) */
+        arma::mat WEII;     /* *o  (r/s)    Earth's angular velocity (skew-sym) */
+        double _WEII[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
 
         /* Propagative Stats */
         double alt;           /* *o  (m)      Vehicle altitude */
         double lonx;          /* *o  (d)      Vehicle longitude */
         double latx;          /* *o  (d)      Vehicle latitude */
+
         arma::vec SBII;      /* *o  (m)      Vehicle position in inertia coord */
+        double _SBII[3];       /* *o  (m)      Vehicle position in inertia coord */
+
         arma::vec VBII;      /* *o  (m/s)    Vehicle inertia velocity */
+        double _VBII[3];       /* *o  (m/s)    Vehicle inertia velocity */
+
         arma::vec ABII;      /* **  (m/s2)   Vehicle inertia acceleration */
+        double _ABII[3];      /* **  (m/s2)   Vehicle inertia acceleration */
 
         arma::mat TDI;      /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
+        double _TDI[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
+
         arma::mat TGI;      /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
+        double _TGI[3][3];     /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
 
         double aero_loss;     /* **  (m/s)    Velocity loss caused by aerodynamic drag */
         double gravity_loss;  /* **  (m/s)    Velocity loss caused by gravity */
 
         /* Generating Outputs */
         arma::vec FSPB;       /* *o  (m/s2)   Specific force in body coord */
+        double _FSPB[3];       /* *o  (m/s2)   Specific force in body coord */
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */
-        double _WEII[3][3];    /* **  (r/s)    Earth's angular velocity (skew-sym) */
-
-        double _SBII[3];       /* *o  (m)      Vehicle position in inertia coord */
-        double _VBII[3];       /* *o  (m/s)    Vehicle inertia velocity */
-        double _ABII[3];      /* **  (m/s2)   Vehicle inertia acceleration */
-
-        double _TDI[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
-        double _TGI[3][3];     /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
-
-        double _FSPB[3];       /* *o  (m/s2)   Specific force in body coord */
-
         double _TVD[3][3];     /* **  (--)    Transformation Matrix of geographic velocity wrt geodetic coord */
         double _VBED[3];       /* *o  (m/s)   [DIAG] Geographic velocity in geodetic coord */
         double _grndtrck;      /* **  (m)     [DIAG] Vehicle ground track on earth */
