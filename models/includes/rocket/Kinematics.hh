@@ -88,9 +88,6 @@ class Kinematics{
         double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
         double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
         double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/
-        double psibd;       /* *io (r)     Yaw angle of Vehicle wrt geodetic coord */
-        double thtbd;       /* *io (r)     Pitch angle of Vehicle wrt geodetic coord */
-        double phibd;       /* *io (r)     Roll angle of Vehicle wrt geodetic coord */
         double alphaix;     /* *io (d)     Angle of attack, inertia velocity*/
         double betaix;      /* *io (d)     Sideslip angle, inertia velocity*/
 /**************************************************************************************/

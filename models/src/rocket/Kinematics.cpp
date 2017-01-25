@@ -40,9 +40,6 @@ Kinematics::Kinematics(const Kinematics& other)
     this->thtbdx = other.thtbdx;
     this->phibdx = other.phibdx;
     this->ortho_error = other.ortho_error;
-    this->psibd = other.psibd;
-    this->thtbd = other.thtbd;
-    this->phibd = other.phibd;
     this->alphaix = other.alphaix;
     this->betaix = other.betaix;
 }
@@ -70,9 +67,6 @@ Kinematics& Kinematics::operator=(const Kinematics& other){
     this->thtbdx = other.thtbdx;
     this->phibdx = other.phibdx;
     this->ortho_error = other.ortho_error;
-    this->psibd = other.psibd;
-    this->thtbd = other.thtbd;
-    this->phibd = other.phibd;
     this->alphaix = other.alphaix;
     this->betaix = other.betaix;
 
