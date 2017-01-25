@@ -59,6 +59,10 @@ class Kinematics{
         /* Internal Propagator */
 
         /* Internal Updaters */
+        void update_alppx();
+        void update_phipx();
+        void update_alphax();
+        void update_betax();
 
         /* Routing references */
         Newton      * newton;
@@ -78,12 +82,13 @@ class Kinematics{
         arma::mat TBD;      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
         double _TBD[3][3];  /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
 
-        /* Non-propagating Diagnostic Variables */
-        /* These can be deleted, but keep to remain trackable in trick simulator */
         double alphax;      /* *io (d)     Angle of attack */
         double betax;       /* *io (d)     Sideslip angle */
         double alppx;       /* *io (d)     Total angle of attack */
         double phipx;       /* *io (d)     Aerodynamic roll angle*/
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
         double psibdx;      /* *io (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
         double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
         double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */

@@ -133,30 +133,11 @@ void Kinematics::calculate_kinematics(double int_step){
     psibdx = get_psibdx();
     phibdx = get_phibdx();
 
-    alphax = get_alphax();
-    betax = get_betax();
+    update_alphax();
+    update_betax();
 
-    //incidence angles in load factor plane (aeroballistic)
-    double dum = vbab1 / dvba;
-
-    if(fabs(dum) > 1)
-        dum = 1 * sign(dum);
-    double alpp = acos(dum);
-
-    // Changed according to comments, not original code, refer commit:b613a992
-    if(vbab2 == 0 && vbab3 == 0){
-        phip = 0.;
-    }else if(fabs(vbab2) < arma::datum::eps){
-        //note: if vbeb2 is <EPS the value phip is forced to be 0 or PI
-        //      to prevent oscillations
-        if(vbab3 > 0) phip = 0;
-        if(vbab3 < 0) phip = PI;
-    }
-    else{
-        phip=atan2(vbab2,vbab3);
-    }
-    alppx = alpp * DEG;
-    phipx = phip * DEG;
+    update_alppx();
+    update_phipx();
 
     //*diagnostic: calculating the inertial incidence angles
     arma::vec3 VBIB = TBI * VBII;
@@ -171,27 +152,73 @@ void Kinematics::calculate_kinematics(double int_step){
 
 }
 
-double Kinematics::get_alppx() { return alppx; }
-double Kinematics::get_phipx() { return phipx; }
+void Kinematics::update_alppx() {
+    arma::vec VBED = newton->get_VBED_();
+    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
+    double dvba = environment->get_dvba();
 
-double Kinematics::get_alphax() {
+    arma::vec3 VBAB = TBD * (VBED - VAED);
+
+    //incidence angles in load factor plane (aeroballistic)
+    double dum = VBAB(0) / dvba;
+
+    if(fabs(dum) > 1)
+        dum = 1 * sign(dum);
+    double alpp = acos(dum);
+
+    this->alppx = alpp * DEG;
+}
+
+void Kinematics::update_phipx() {
+    arma::vec VBED = newton->get_VBED_();
+    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
+    double dvba = environment->get_dvba();
+
+    arma::vec3 VBAB = TBD * (VBED - VAED);
+
+    double phip = 0;
+    // Changed according to comments, not original code, refer commit:b613a992
+    if(VBAB(1) == 0 && VBAB(2) == 0){
+        phip = 0.;
+    }else if(fabs(VBAB(1)) < arma::datum::eps){
+        //note: if vbeb2 is <EPS the value phip is forced to be 0 or PI
+        //      to prevent oscillations
+        if(VBAB(3) > 0) phip = 0;
+        if(VBAB(3) < 0) phip = PI;
+    }
+    else{
+        phip = atan2(VBAB(1), VBAB(2));
+    }
+
+    this->phipx = phip * DEG;
+}
+
+void Kinematics::update_alphax() {
     arma::vec VBED = newton->get_VBED_();
     arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
 
     //*incidence angles using wind vector VAED in geodetic coord
     arma::vec3 VBAB = TBD * (VBED - VAED);
     double alpha = atan2(VBAB(2), VBAB(0));
-    return alpha * DEG;
+    this->alphax = alpha * DEG;
 }
-double Kinematics::get_betax() {
+
+void Kinematics::update_betax() {
     arma::vec VBED = newton->get_VBED_();
     arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
     double dvba = environment->get_dvba();
+
     //*incidence angles using wind vector VAED in geodetic coord
     arma::vec3 VBAB = TBD * (VBED - VAED);
     double beta = asin(VBAB(1) / dvba);
-    return beta * DEG;
+    this->betax = beta * DEG;
 }
+
+double Kinematics::get_alppx() { return alppx; }
+double Kinematics::get_phipx() { return phipx; }
+
+double Kinematics::get_alphax() { return alphax; }
+double Kinematics::get_betax() { return betax; }
 
 double Kinematics::get_psibdx() {
     double psibd = 0;
