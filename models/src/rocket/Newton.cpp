@@ -2,29 +2,30 @@
 #include "sim_services/include/simtime.h"
 
 #include "aux/utility_header.hh"
+#include "aux/aux.hh"
 
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)
     :   kinematics(&kine), euler(&elr), environment(&env), propulsion(&prop), forces(&forc),
-        WEII(&_WEII[0][0], 3, 3, false, true),
-        SBII(&_SBII[0], 3, false, true),
-        VBII(&_VBII[0], 3, false, true),
-        ABII(&_ABII[0], 3, false, true),
-        FSPB(&_FSPB[0], 3, false, true),
-        TDI(&_TDI[0][0], 3, 3, false, true),
-        TGI(&_TGI[0][0], 3, 3, false, true)
+        MATRIX_INIT(WEII, 3, 3),
+        MATRIX_INIT(TDI, 3, 3),
+        MATRIX_INIT(TGI, 3, 3),
+        VECTOR_INIT(SBII, 3),
+        VECTOR_INIT(VBII, 3),
+        VECTOR_INIT(ABII, 3),
+        VECTOR_INIT(FSPB, 3)
 {
     this->default_data();
 }
 
 Newton::Newton(const Newton& other)
     :   kinematics(other.kinematics), euler(other.euler), environment(other.environment), propulsion(other.propulsion), forces(other.forces),
-        WEII(&_WEII[0][0], 3, 3, false, true),
-        SBII(&_SBII[0], 3, false, true),
-        VBII(&_VBII[0], 3, false, true),
-        ABII(&_ABII[0], 3, false, true),
-        FSPB(&_FSPB[0], 3, false, true),
-        TDI(&_TDI[0][0], 3, 3, false, true),
-        TGI(&_TGI[0][0], 3, 3, false, true)
+        MATRIX_INIT(WEII, 3, 3),
+        MATRIX_INIT(TDI, 3, 3),
+        MATRIX_INIT(TGI, 3, 3),
+        VECTOR_INIT(SBII, 3),
+        VECTOR_INIT(VBII, 3),
+        VECTOR_INIT(ABII, 3),
+        VECTOR_INIT(FSPB, 3)
 {
     this->default_data();
 
