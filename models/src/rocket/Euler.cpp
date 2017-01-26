@@ -46,8 +46,8 @@ void _Euler_::load_angular_velocity(double ppx, double qqx, double rrx){
     arma::mat33 TBI = kinematics->get_TBI_();
 
     //body rate wrt Earth frame in body coordinates
-    WBEB = {ppx * RAD, qqx * RAD, rrx * RAD};
-    WBIB = WBEB + TBI * WEII;
+    this->WBEB = {ppx * RAD, qqx * RAD, rrx * RAD};
+    this->WBIB = this->WBEB + TBI * this->WEII;
 }
 
 void _Euler_::initialize()
@@ -55,8 +55,8 @@ void _Euler_::initialize()
 }
 
 void _Euler_::default_data(){
-    WEII.zeros();
-    WEII(2) = WEII3;
+    this->WEII.zeros();
+    this->WEII(2) = WEII3;
 }
 
 void _Euler_::euler(double int_step)
@@ -70,37 +70,37 @@ void _Euler_::euler(double int_step)
     arma::mat33 TBI = kinematics->get_TBI_();
 
     //body rate wrt Earth frame in body coordinates
-    WBEB = {ppx * RAD, qqx * RAD,rrx * RAD};
+    this->WBEB = {ppx * RAD, qqx * RAD,rrx * RAD};
     //body rate wrt ineritial frame in body coordinates
 
     //integrating the angular velocity acc wrt the inertial frame in body coord
     // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm test
     arma::vec3 WACC_NEXT = arma::solve(IBBB, (FMB - skew_sym(WBIB) * IBBB * WBIB));
-    WBIB = integrate(WACC_NEXT, WBIBD, WBIB, int_step);
-    WBIBD = WACC_NEXT;
+    this->WBIB = integrate(WACC_NEXT, WBIBD, WBIB, int_step);
+    this->WBIBD = WACC_NEXT;
 
     //angular velocity wrt inertial frame in inertial coordinates
-    WBII = trans(TBI) * WBIB;
+    this->WBII = trans(TBI) * this->WBIB;
 
     //angular velocity wrt Earth in body coordinates
-    WBEB = WBIB - TBI * WEII;
+    this->WBEB = this->WBIB - TBI * this->WEII;
 
     //body rates in deg/s
-    ppx = WBEB(0) * DEG;
-    qqx = WBEB(1) * DEG;
-    rrx = WBEB(2) * DEG;
+    this->ppx = this->WBEB(0) * DEG;
+    this->qqx = this->WBEB(1) * DEG;
+    this->rrx = this->WBEB(2) * DEG;
 
 }
 
-double _Euler_::get_ppx() { return ppx; }
+double _Euler_::get_ppx() { return this->ppx; }
 
-double _Euler_::get_qqx() { return qqx; }
+double _Euler_::get_qqx() { return this->qqx; }
 
-double _Euler_::get_rrx() { return rrx; }
+double _Euler_::get_rrx() { return this->rrx; }
 
-arma::vec3 _Euler_::get_WBII_() { return WBII; }
+arma::vec3 _Euler_::get_WBII_() { return this->WBII; }
 
-arma::vec3 _Euler_::get_WBIB_() { return WBIB; }
+arma::vec3 _Euler_::get_WBIB_() { return this->WBIB; }
 
 Matrix _Euler_::get_WBII()
 {
