@@ -111,54 +111,52 @@ void Kinematics::calculate_kinematics(double int_step){
     arma::vec VBII = newton->get_VBII();
 
     //*integrating direction cosine matrix
-    arma::mat TBID_NEW = trans(skew_sym(WBIB)) * TBI;
-    TBI = integrate(TBID_NEW, TBID, TBI, int_step);
-    TBID = TBID_NEW;
+    arma::mat TBID_NEW = trans(skew_sym(WBIB)) * this->TBI;
+    this->TBI = integrate(TBID_NEW, TBID, TBI, int_step);
+    this->TBID = TBID_NEW;
 
     //orthonormalizing TBI
     arma::mat EE = arma::eye(3, 3) - TBI * trans(TBI);
-    TBI = TBI + EE * TBI * 0.5;
+    this->TBI = TBI + EE * TBI * 0.5;
 
     //TBI orthogonality check
     double e1 = EE(0,0);
     double e2 = EE(1,1);
     double e3 = EE(2,2);
-    ortho_error=sqrt(e1*e1+e2*e2+e3*e3);
+    this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
 
     //_Euler_ angles
     arma::mat TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    TBD = TBI * trans(TDI);
+    this->TBD = TBI * trans(TDI);
 
-    thtbdx = get_thtbdx();
-    psibdx = get_psibdx();
-    phibdx = get_phibdx();
+    //*incidence angles using wind vector VAED in geodetic coord
+    arma::vec3 VBAB = TBD * (VBED - VAED);
+    this->alphax = calculate_alphax(VBAB);
+    this->betax  = calculate_betax(VBAB, dvba);
 
-    update_alphax();
-    update_betax();
-
-    update_alppx();
-    update_phipx();
+    this->alppx = calculate_alppx(VBAB, dvba);
+    this->phipx = calculate_phipx(VBAB);
 
     //*diagnostic: calculating the inertial incidence angles
     arma::vec3 VBIB = TBI * VBII;
-    double vbib1 = VBIB(0);
-    double vbib2 = VBIB(1);
-    double vbib3 = VBIB(2);
-    double alphai = atan2(vbib3, vbib1);
-    double dvbi = norm(VBIB);
-    double betai = asin(vbib2 / dvbi);
-    alphaix = alphai * DEG;
-    betaix = betai*DEG;
+    this->alphaix = calculate_alphaix(VBIB);
+    this->betaix  = calculate_betaix(VBIB);
 
+    this->thtbdx = get_thtbdx();
+    this->psibdx = get_psibdx();
+    this->phibdx = get_phibdx();
 }
 
-void Kinematics::update_alppx() {
-    arma::vec VBED = newton->get_VBED_();
-    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
-    double dvba = environment->get_dvba();
+double Kinematics::calculate_alphaix(arma::vec3 VBIB) {
+    return atan2(VBIB(2), VBIB(0)) * DEG;
+}
 
-    arma::vec3 VBAB = TBD * (VBED - VAED);
+double Kinematics::calculate_betaix(arma::vec3 VBIB) {
+    double dvbi = norm(VBIB);
+    return asin(VBIB(1) / dvbi) * DEG;
+}
 
+double Kinematics::calculate_alppx(arma::vec3 VBAB, double dvba) {
     //incidence angles in load factor plane (aeroballistic)
     double dum = VBAB(0) / dvba;
 
@@ -166,16 +164,10 @@ void Kinematics::update_alppx() {
         dum = 1 * sign(dum);
     double alpp = acos(dum);
 
-    this->alppx = alpp * DEG;
+    return alpp * DEG;
 }
 
-void Kinematics::update_phipx() {
-    arma::vec VBED = newton->get_VBED_();
-    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
-    double dvba = environment->get_dvba();
-
-    arma::vec3 VBAB = TBD * (VBED - VAED);
-
+double Kinematics::calculate_phipx(arma::vec3 VBAB) {
     double phip = 0;
     // Changed according to comments, not original code, refer commit:b613a992
     if(VBAB(1) == 0 && VBAB(2) == 0){
@@ -190,28 +182,17 @@ void Kinematics::update_phipx() {
         phip = atan2(VBAB(1), VBAB(2));
     }
 
-    this->phipx = phip * DEG;
+    return phip * DEG;
 }
 
-void Kinematics::update_alphax() {
-    arma::vec VBED = newton->get_VBED_();
-    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
-
-    //*incidence angles using wind vector VAED in geodetic coord
-    arma::vec3 VBAB = TBD * (VBED - VAED);
+double Kinematics::calculate_alphax(arma::vec3 VBAB) {
     double alpha = atan2(VBAB(2), VBAB(0));
-    this->alphax = alpha * DEG;
+    return alpha * DEG;
 }
 
-void Kinematics::update_betax() {
-    arma::vec VBED = newton->get_VBED_();
-    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
-    double dvba = environment->get_dvba();
-
-    //*incidence angles using wind vector VAED in geodetic coord
-    arma::vec3 VBAB = TBD * (VBED - VAED);
+double Kinematics::calculate_betax(arma::vec3 VBAB, double dvba) {
     double beta = asin(VBAB(1) / dvba);
-    this->betax = beta * DEG;
+    return beta * DEG;
 }
 
 double Kinematics::get_alppx() { return alppx; }

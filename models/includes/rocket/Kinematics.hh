@@ -58,11 +58,13 @@ class Kinematics{
 
         /* Internal Propagator */
 
-        /* Internal Updaters */
-        void update_alppx();
-        void update_phipx();
-        void update_alphax();
-        void update_betax();
+        /* Internal Calculators */
+        double calculate_alphaix(arma::vec3 VBIB);
+        double calculate_betaix(arma::vec3 VBIB);
+        double calculate_alppx(arma::vec3 VBAB, double dvba);
+        double calculate_phipx(arma::vec3 VBAB);
+        double calculate_alphax(arma::vec3 VBAB);
+        double calculate_betax(arma::vec3 VBAB, double dvba);
 
         /* Routing references */
         Newton      * newton;
@@ -79,6 +81,8 @@ class Kinematics{
         double _TBID[3][3]; /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
 
         /* Generating Outputs */
+        double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/
+
         arma::mat TBD;      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
         double _TBD[3][3];  /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
 
@@ -87,14 +91,14 @@ class Kinematics{
         double alppx;       /* *io (d)     Total angle of attack */
         double phipx;       /* *io (d)     Aerodynamic roll angle*/
 
+        double alphaix;     /* *io (d)     Angle of attack, inertia velocity*/
+        double betaix;      /* *io (d)     Sideslip angle, inertia velocity*/
+
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */
         double psibdx;      /* *io (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
         double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
         double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
-        double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/
-        double alphaix;     /* *io (d)     Angle of attack, inertia velocity*/
-        double betaix;      /* *io (d)     Sideslip angle, inertia velocity*/
 /**************************************************************************************/
 };
 
