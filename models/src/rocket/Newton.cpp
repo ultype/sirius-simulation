@@ -145,7 +145,10 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
 }
 
 void Newton::propagate(double int_step){
-    update_fspb();
+    double vmass = propulsion->get_vmass();
+    arma::vec3 FAPB(forces->get_fapb_ptr());
+
+    this->FSPB = calculate_fspb(FAPB, vmass);
 
     propagate_position_speed_acceleration(int_step);
 
@@ -153,11 +156,9 @@ void Newton::propagate(double int_step){
     propagate_gravityloss(int_step);
 }
 
-void Newton::update_fspb(){
-    arma::vec3 FAPB(forces->get_fapb_ptr());
-
+void Newton::calculate_fspb(arma::vec3 FAPB, double vmass){
     /* Stored Value due to coherence with other models */
-    FSPB = FAPB * (1. / propulsion->get_vmass());
+    return FAPB * (1. / vmass);
 }
 
 void Newton::propagate_position_speed_acceleration(double int_step){

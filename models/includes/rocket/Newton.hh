@@ -68,8 +68,8 @@ class Newton {
         arma::mat build_WEII();
         arma::vec build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
 
-        /* Internal Propagator */
-        void update_fspb();
+        /* Internal Propagator / Calculators */
+        arma::vec3 calculate_fspb(arma::vec3 FAPB, double vmass)
 
         void propagate_position_speed_acceleration(double int_step);
         void propagate_aeroloss(double int_step);
