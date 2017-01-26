@@ -156,7 +156,7 @@ void Newton::propagate(double int_step){
     propagate_gravityloss(int_step);
 }
 
-void Newton::calculate_fspb(arma::vec3 FAPB, double vmass){
+arma::vec3 Newton::calculate_fspb(arma::vec3 FAPB, double vmass){
     /* Stored Value due to coherence with other models */
     return FAPB * (1. / vmass);
 }
