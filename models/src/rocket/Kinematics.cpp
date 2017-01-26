@@ -21,9 +21,6 @@ Kinematics::Kinematics(const Kinematics& other)
     this->default_data();
 
     /* Propagative Stats */
-    //memcpy(this->tbd, other.tbd, sizeof(tbd));
-    //memcpy(this->tbi, other.tbi, sizeof(tbd));
-    //memcpy(this->tbid, other.tbid, sizeof(tbd));
     this->TBD = other.TBD;
     this->TBI = other.TBI;
     this->TBID = other.TBID;
@@ -49,9 +46,6 @@ Kinematics& Kinematics::operator=(const Kinematics& other){
     this->euler = other.euler;
 
     /* Propagative Stats */
-    //memcpy(this->tbd, other.tbd, sizeof(tbd));
-    //memcpy(this->tbi, other.tbi, sizeof(tbd));
-    //memcpy(this->tbid, other.tbid, sizeof(tbd));
     this->TBD = other.TBD;
     this->TBI = other.TBI;
     this->TBID = other.TBID;
