@@ -63,12 +63,6 @@ void _Euler_::default_data(){
     WEII.fill(weii);
 }
 
-double _Euler_::get_ppx() { return ppx; }
-
-double _Euler_::get_qqx() { return qqx; }
-
-double _Euler_::get_rrx() { return rrx; }
-
 Matrix _Euler_::get_WBII()
 {
     Matrix WBII(3, 1);
@@ -124,3 +118,10 @@ void _Euler_::euler(double int_step)
     WBEB.fill(wbeb);
     WBII.fill(wbii);
 }
+
+double _Euler_::get_ppx() { return ppx; }
+
+double _Euler_::get_qqx() { return qqx; }
+
+double _Euler_::get_rrx() { return rrx; }
+
