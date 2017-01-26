@@ -30,7 +30,9 @@ class _Euler_ {
         _Euler_& operator=(const _Euler_& other);
 
         void initialize();
-        void euler(double int_step);
+
+        void propagate(double int_step);
+        void update_diagnostic_attributes(double int_step);
 
         double get_ppx();
         double get_qqx();

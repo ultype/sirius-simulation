@@ -59,7 +59,7 @@ void _Euler_::default_data(){
     this->WEII(2) = WEII3;
 }
 
-void _Euler_::euler(double int_step)
+void _Euler_::propagate(double int_step)
 {
     arma::vec3 FMB(forces->get_FMB().get_pbody());
 
@@ -80,6 +80,12 @@ void _Euler_::euler(double int_step)
 
     //angular velocity wrt Earth in body coordinates
     this->WBEB = this->WBIB - TBI * this->WEII;
+}
+
+void _Euler_::update_diagnostic_attributes(double int_step){
+    this->ppx = get_ppx();
+    this->qqx = get_qqx();
+    this->rrx = get_rrx();
 }
 
 double _Euler_::get_ppx() { return this->WBEB(0) * DEG; }
