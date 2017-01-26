@@ -94,7 +94,7 @@ void Kinematics::propagate(double int_step){
     double latx = newton->get_latx();
     double alt  = newton->get_alt();
 
-    arma::vec WBIB = arma::vec3(euler->get_WBIB().get_pbody());
+    arma::vec WBIB = euler->get_WBIB_();
     arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
 
     arma::vec VBED = newton->get_VBED_();

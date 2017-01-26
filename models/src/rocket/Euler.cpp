@@ -98,6 +98,10 @@ double _Euler_::get_qqx() { return qqx; }
 
 double _Euler_::get_rrx() { return rrx; }
 
+arma::vec3 _Euler_::get_WBII_() { return WBII; }
+
+arma::vec3 _Euler_::get_WBIB_() { return WBIB; }
+
 Matrix _Euler_::get_WBII()
 {
     Matrix WBII(_WBII);
