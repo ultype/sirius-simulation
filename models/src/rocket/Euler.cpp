@@ -69,10 +69,6 @@ void _Euler_::euler(double int_step)
 
     arma::mat33 TBI = kinematics->get_TBI_();
 
-    //body rate wrt Earth frame in body coordinates
-    this->WBEB = {ppx * RAD, qqx * RAD,rrx * RAD};
-    //body rate wrt ineritial frame in body coordinates
-
     //integrating the angular velocity acc wrt the inertial frame in body coord
     // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm test
     arma::vec3 WACC_NEXT = arma::solve(IBBB, (FMB - skew_sym(WBIB) * IBBB * WBIB));
@@ -84,19 +80,13 @@ void _Euler_::euler(double int_step)
 
     //angular velocity wrt Earth in body coordinates
     this->WBEB = this->WBIB - TBI * this->WEII;
-
-    //body rates in deg/s
-    this->ppx = this->WBEB(0) * DEG;
-    this->qqx = this->WBEB(1) * DEG;
-    this->rrx = this->WBEB(2) * DEG;
-
 }
 
-double _Euler_::get_ppx() { return this->ppx; }
+double _Euler_::get_ppx() { return this->WBEB(0) * DEG; }
 
-double _Euler_::get_qqx() { return this->qqx; }
+double _Euler_::get_qqx() { return this->WBEB(1) * DEG; }
 
-double _Euler_::get_rrx() { return this->rrx; }
+double _Euler_::get_rrx() { return this->WBEB(2) * DEG; }
 
 arma::vec3 _Euler_::get_WBII_() { return this->WBII; }
 
