@@ -79,7 +79,7 @@ Matrix _Euler_::get_WBIB()
 
 void _Euler_::euler(double int_step)
 {
-    Matrix WEII(3,1);
+    Matrix WEII(weii);
     Matrix WBEB(3,1);
     Matrix WBII(3,1);
     Matrix FMB = forces->get_FMB();
@@ -91,7 +91,6 @@ void _Euler_::euler(double int_step)
     //body rate wrt Earth frame in body coordinates
     WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
     //body rate wrt ineritial frame in body coordinates
-    WEII.build_vec3(0,0,WEII3);
     WBIB.build_vec3(wbib);
     WBIBD.build_vec3(wbibd);
     /***********************************************************************************************/
