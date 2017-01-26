@@ -30,6 +30,7 @@ class Kinematics{
         void initialize();
 
         void propagate(double int_step);
+        void update_diagnostic_attributes(double int_step);
 
         Matrix get_TBD();
         Matrix get_TBI();
@@ -53,10 +54,9 @@ class Kinematics{
 
         /* Internal Initializers */
 
-        /* Internal Propagator */
+        /* Internal Propagator / Calculators */
         void propagate_TBI(double int_step, arma::vec3 WBIB);
 
-        /* Internal Calculators */
         arma::mat calculate_TBD(double lonx, double latx, double alt);
 
         double calculate_alphaix(arma::vec3 VBIB);
@@ -65,6 +65,8 @@ class Kinematics{
         double calculate_phipx(arma::vec3 VBAB);
         double calculate_alphax(arma::vec3 VBAB);
         double calculate_betax(arma::vec3 VBAB, double dvba);
+
+        /* Internal Calculators */
 
         /* Routing references */
         Newton      * newton;

@@ -116,7 +116,10 @@ void Kinematics::propagate(double int_step){
     arma::vec3 VBIB = TBI * VBII;
     this->alphaix = calculate_alphaix(VBIB);
     this->betaix  = calculate_betaix(VBIB);
+}
 
+
+void Kinematics::update_diagnostic_attributes(double int_step) {
     this->thtbdx = get_thtbdx();
     this->psibdx = get_psibdx();
     this->phibdx = get_phibdx();
