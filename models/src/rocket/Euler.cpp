@@ -69,17 +69,29 @@ void _Euler_::propagate(double int_step)
 
     arma::mat33 TBI = kinematics->get_TBI_();
 
-    //integrating the angular velocity acc wrt the inertial frame in body coord
-    // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm test
-    arma::vec3 WACC_NEXT = arma::solve(IBBB, (FMB - skew_sym(WBIB) * IBBB * WBIB));
-    this->WBIB = integrate(WACC_NEXT, WBIBD, WBIB, int_step);
-    this->WBIBD = WACC_NEXT;
+    propagate_WBIB(int_step, FMB, IBBB);
 
     //angular velocity wrt inertial frame in inertial coordinates
-    this->WBII = trans(TBI) * this->WBIB;
+    this->WBII = calculate_WBII(TBI);
 
     //angular velocity wrt Earth in body coordinates
-    this->WBEB = this->WBIB - TBI * this->WEII;
+    this->WBEB = calculate_WBEB(TBI);
+}
+
+void _Euler_::propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB){
+    //integrating the angular velocity acc wrt the inertial frame in body coord
+    // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm test
+    arma::vec3 WACC_NEXT = arma::solve(IBBB, (FMB - skew_sym(this->WBIB) * IBBB * this->WBIB));
+    this->WBIB = integrate(WACC_NEXT, WBIBD, WBIB, int_step);
+    this->WBIBD = WACC_NEXT;
+}
+
+arma::vec3 _Euler_::calculate_WBII(arma::mat33 TBI){
+    return trans(TBI) * this->WBIB;
+}
+
+arma::vec3 _Euler_::calculate_WBEB(arma::mat33 TBI){
+    return this->WBIB - TBI * this->WEII;
 }
 
 void _Euler_::update_diagnostic_attributes(double int_step){

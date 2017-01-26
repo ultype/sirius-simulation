@@ -51,8 +51,12 @@ class _Euler_ {
         void default_data();
 
         /* Internal Propagator / Calculators */
+        void propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB);
 
         /* Internal Calculators */
+        arma::vec3 calculate_WBII(arma::mat33 TBI);
+
+        arma::vec3 calculate_WBEB(arma::mat33 TBI);
 
         /* Routing references */
         Kinematics * kinematics;
@@ -65,20 +69,20 @@ class _Euler_ {
 
         /* Propagative Stats */
 
-        /* Generating Outputs */
-
-        /* Non-propagating Diagnostic Variables */
-        /* These can be deleted, but keep to remain trackable in trick simulator */
-        arma::vec WBII;   /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
-        double _WBII[3];  /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
-
         arma::vec WBIB;   /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
         double _WBIB[3];  /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
         arma::vec WBIBD;  /* *io (r/s2)       Angular velocity of vehicle wrt inertia in body coord - derivative */
         double _WBIBD[3]; /* *io (r/s2)       Angular velocity of vehicle wrt inertia in body coord - derivative */
 
+        /* Generating Outputs */
+        arma::vec WBII;   /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
+        double _WBII[3];  /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
+
         arma::vec WBEB;   /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
         double _WBEB[3];  /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
 
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */
