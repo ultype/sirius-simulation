@@ -31,8 +31,6 @@ class Kinematics{
 
         void propagate(double int_step);
 
-/***********************************Variables describtion******************************/
-        //double time;        /* *io (s)     simulation time */
         Matrix get_TBD();
         Matrix get_TBI();
         arma::mat get_TBD_();
@@ -47,7 +45,6 @@ class Kinematics{
 
         void load_angle(double yaw, double roll, double pitch);
 
-        // XXX: can't get from private....
     private:
         void default_data();
 
@@ -102,7 +99,6 @@ class Kinematics{
         double psibdx;      /* *io (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
         double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
         double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
-/**************************************************************************************/
 };
 
 

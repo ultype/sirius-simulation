@@ -1,10 +1,6 @@
 #include <iomanip>
 
 #include "rocket/Kinematics.hh"
-#include "trick_utils/math/include/quat_macros.h"
-#include "trick_utils/math/include/matrix_macros.h"
-#include "trick_utils/math/include/vector_macros.h"
-#include "trick_utils/math/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
 
 Kinematics::Kinematics(Newton &newt, Environment &env, _Euler_ &eul)
