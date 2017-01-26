@@ -6,19 +6,23 @@
 #include "sim_services/include/simtime.h"
 
 _Euler_::_Euler_(Kinematics& kine, Propulsion& prop, Forces& forc)
-    :   kinematics(&kine), propulsion(&prop), forces(&forc)
-        //MATRIX_INIT(TBD, 3, 3),
-        //MATRIX_INIT(TBI, 3, 3),
-        //MATRIX_INIT(TBID, 3, 3)
+    :   kinematics(&kine), propulsion(&prop), forces(&forc),
+        VECTOR_INIT(WEII, 3),
+        VECTOR_INIT(WBII, 3),
+        VECTOR_INIT(WBIB, 3),
+        VECTOR_INIT(WBIBD, 3),
+        VECTOR_INIT(WBEB, 3)
 {
     this->default_data();
 }
 
 _Euler_::_Euler_(const _Euler_& other)
-    :   kinematics(other.kinematics), propulsion(other.propulsion), forces(other.forces)
-        //MATRIX_INIT(TBD, 3, 3)
-        //MATRIX_INIT(TBI, 3, 3),
-        //MATRIX_INIT(TBID, 3, 3)
+    :   kinematics(other.kinematics), propulsion(other.propulsion), forces(other.forces),
+        VECTOR_INIT(WEII, 3),
+        VECTOR_INIT(WBII, 3),
+        VECTOR_INIT(WBIB, 3),
+        VECTOR_INIT(WBIBD, 3),
+        VECTOR_INIT(WBEB, 3)
 {
     this->default_data();
 
@@ -39,15 +43,11 @@ _Euler_& _Euler_::operator=(const _Euler_& other){
 }
 
 void _Euler_::load_angular_velocity(double ppx, double qqx, double rrx){
-    Matrix TBI = kinematics->get_TBI();
-    Matrix WBEB(3,1);
-    Matrix WBIB(3,1);
-    Matrix WEII(weii);
+    arma::mat33 TBI = kinematics->get_TBI_();
 
     //body rate wrt Earth frame in body coordinates
-    WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
-    WBIB=WBEB+TBI*WEII;
-    WBIB.fill(wbib);
+    WBEB = {ppx * RAD, qqx * RAD, rrx * RAD};
+    WBIB = WBEB + TBI * WEII;
 }
 
 void _Euler_::initialize()
@@ -55,67 +55,41 @@ void _Euler_::initialize()
 }
 
 void _Euler_::default_data(){
-    Matrix WEII(3,1);
-
-    //body rate wrt ineritial frame in body coordinates
-    WEII.build_vec3(0,0,WEII3);
-
-    WEII.fill(weii);
-}
-
-Matrix _Euler_::get_WBII()
-{
-    Matrix WBII(3, 1);
-    WBII.build_vec3(wbii);
-    return WBII;
-}
-
-Matrix _Euler_::get_WBIB()
-{
-    Matrix WBIB(3, 1);
-    WBIB.build_vec3(wbib);
-    return WBIB;
+    WEII.zeros();
+    WEII(2) = WEII3;
 }
 
 void _Euler_::euler(double int_step)
 {
-    Matrix WEII(weii);
-    Matrix WBEB(3,1);
-    Matrix WBII(3,1);
-    Matrix FMB = forces->get_FMB();
-    Matrix IBBB = propulsion->get_IBBB();
-    Matrix WBIBD(3,1);
-    Matrix TBI = kinematics->get_TBI();
-    Matrix WBIB(3,1);
+    arma::vec3 FMB(forces->get_FMB().get_pbody());
+
+    // XXX: Trans
+    arma::mat33 IBBB = (propulsion->get_IBBB().get_pbody());
+    IBBB = trans(IBBB);
+
+    arma::mat33 TBI = kinematics->get_TBI_();
 
     //body rate wrt Earth frame in body coordinates
-    WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
+    WBEB = {ppx * RAD, qqx * RAD,rrx * RAD};
     //body rate wrt ineritial frame in body coordinates
-    WBIB.build_vec3(wbib);
-    WBIBD.build_vec3(wbibd);
-    /***********************************************************************************************/
-    //integrating the angular velocity acc wrt the inertial frame in body coord
 
-    Matrix WACC_NEXT=IBBB.inverse()*(FMB-WBIB.skew_sym()*IBBB*WBIB);
-    WBIB=integrate(WACC_NEXT,WBIBD,WBIB,int_step);
-    WBIBD=WACC_NEXT;
+    //integrating the angular velocity acc wrt the inertial frame in body coord
+    // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm test
+    arma::vec3 WACC_NEXT = arma::solve(IBBB, (FMB - skew_sym(WBIB) * IBBB * WBIB));
+    WBIB = integrate(WACC_NEXT, WBIBD, WBIB, int_step);
+    WBIBD = WACC_NEXT;
 
     //angular velocity wrt inertial frame in inertial coordinates
-    WBII=~TBI*WBIB;
+    WBII = trans(TBI) * WBIB;
 
     //angular velocity wrt Earth in body coordinates
-    WBEB=WBIB-TBI*WEII;
+    WBEB = WBIB - TBI * WEII;
 
     //body rates in deg/s
-    ppx=WBEB.get_loc(0,0)*DEG;
-    qqx=WBEB.get_loc(1,0)*DEG;
-    rrx=WBEB.get_loc(2,0)*DEG;
+    ppx = WBEB(0) * DEG;
+    qqx = WBEB(1) * DEG;
+    rrx = WBEB(2) * DEG;
 
-    //update matrix elements to module variables
-    WBIB.fill(wbib);
-    WBIBD.fill(wbibd);
-    WBEB.fill(wbeb);
-    WBII.fill(wbii);
 }
 
 double _Euler_::get_ppx() { return ppx; }
@@ -123,4 +97,16 @@ double _Euler_::get_ppx() { return ppx; }
 double _Euler_::get_qqx() { return qqx; }
 
 double _Euler_::get_rrx() { return rrx; }
+
+Matrix _Euler_::get_WBII()
+{
+    Matrix WBII(_WBII);
+    return WBII;
+}
+
+Matrix _Euler_::get_WBIB()
+{
+    Matrix WBIB(_WBIB);
+    return WBIB;
+}
 

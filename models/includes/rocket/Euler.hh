@@ -8,6 +8,8 @@ LIBRARY DEPENDENCY:
 PROGRAMMERS:
       ((Lai Jun Xu))
 *******************************************************************************/
+#include <armadillo>
+
 #include "aux/global_constants.hh"
 #include "aux/utility_header.hh"
 #include "Environment.hh"
@@ -54,7 +56,8 @@ class _Euler_ {
         Forces     * forces;
 
         /* Constants */
-        double weii[3]; /* ** */
+        arma::vec WEII; /* ** */
+        double _WEII[3]; /* ** */
 
         /* Propagative Stats */
 
@@ -62,14 +65,20 @@ class _Euler_ {
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */
+        arma::vec WBII;   /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
+        double _WBII[3];  /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
+
+        arma::vec WBIB;   /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
+        double _WBIB[3];  /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
+        arma::vec WBIBD;  /* *io (r/s2)       Angular velocity of vehicle wrt inertia in body coord - derivative */
+        double _WBIBD[3]; /* *io (r/s2)       Angular velocity of vehicle wrt inertia in body coord - derivative */
+
+        arma::vec WBEB;   /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
+        double _WBEB[3];  /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
+
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */
         double rrx;     /* *io (d/s)        Body yaw angular velocity wrt earth in body axes */
-        double wbii[3]; /* *io (r/s)        Vehicle's inertia angular velocity in inertia coord */
-        double wbib[3]; /* *io (r/s)        Augular velocity of vehicle wrt inertia in body coord */
-
-        double wbeb[3]; /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
-        double wbibd[3];/* *io (r/s2)      Angular velocity of vehicle wrt inertia in body coord - derivative */
 };
 
 
