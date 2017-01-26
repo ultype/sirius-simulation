@@ -30,11 +30,6 @@ class _Euler_ {
         void initialize();
         void euler(double int_step);
 
-        Kinematics *kinematics;
-        Propulsion *propulsion;
-        Forces *forces;
-/***********************************Variables describtion******************************/
-
         double get_ppx();
         double get_qqx();
         double get_rrx();
@@ -44,10 +39,29 @@ class _Euler_ {
         void load_angular_velocity(double ppx, double qqx, double rrx);
 
     private:
+        /* Internal Getter */
+
+        /* Internal Initializers */
         void default_data();
 
-        double weii[3]; /* *io (r/s)         */
+        /* Internal Propagator / Calculators */
 
+        /* Internal Calculators */
+
+        /* Routing references */
+        Kinematics * kinematics;
+        Propulsion * propulsion;
+        Forces     * forces;
+
+        /* Constants */
+        double weii[3]; /* ** */
+
+        /* Propagative Stats */
+
+        /* Generating Outputs */
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
         double ppx;     /* *io (d/s)        Body roll angular velocity wrt earth in body axes */
         double qqx;     /* *io (d/s)        Body pitch angular velocity wrt earth in body axes */
         double rrx;     /* *io (d/s)        Body yaw angular velocity wrt earth in body axes */
@@ -56,7 +70,6 @@ class _Euler_ {
 
         double wbeb[3]; /* *io (r/s)        Angular velocity of vehicle wrt earth in body coord */
         double wbibd[3];/* *io (r/s2)      Angular velocity of vehicle wrt inertia in body coord - derivative */
-/**************************************************************************************/
 };
 
 
