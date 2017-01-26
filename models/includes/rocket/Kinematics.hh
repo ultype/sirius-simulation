@@ -29,7 +29,7 @@ class Kinematics{
 
         void initialize();
 
-        void calculate_kinematics(double int_step);
+        void propagate(double int_step);
 
 /***********************************Variables describtion******************************/
         //double time;        /* *io (s)     simulation time */
@@ -57,8 +57,11 @@ class Kinematics{
         /* Internal Initializers */
 
         /* Internal Propagator */
+        void propagate_TBI(double int_step, arma::vec3 WBIB);
 
         /* Internal Calculators */
+        arma::mat calculate_TBD(double lonx, double latx, double alt);
+
         double calculate_alphaix(arma::vec3 VBIB);
         double calculate_betaix(arma::vec3 VBIB);
         double calculate_alppx(arma::vec3 VBAB, double dvba);

@@ -95,7 +95,7 @@ void Kinematics::initialize(){
 void Kinematics::default_data(){
 }
 
-void Kinematics::calculate_kinematics(double int_step){
+void Kinematics::propagate(double int_step){
     double cthtbd = 0;
     double phip = 0;
 
@@ -110,24 +110,9 @@ void Kinematics::calculate_kinematics(double int_step){
     arma::vec VBED = newton->get_VBED_();
     arma::vec VBII = newton->get_VBII();
 
-    //*integrating direction cosine matrix
-    arma::mat TBID_NEW = trans(skew_sym(WBIB)) * this->TBI;
-    this->TBI = integrate(TBID_NEW, TBID, TBI, int_step);
-    this->TBID = TBID_NEW;
+    propagate_TBI(int_step, WBIB);
 
-    //orthonormalizing TBI
-    arma::mat EE = arma::eye(3, 3) - TBI * trans(TBI);
-    this->TBI = TBI + EE * TBI * 0.5;
-
-    //TBI orthogonality check
-    double e1 = EE(0,0);
-    double e2 = EE(1,1);
-    double e3 = EE(2,2);
-    this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
-
-    //_Euler_ angles
-    arma::mat TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    this->TBD = TBI * trans(TDI);
+    this->TBD = calculate_TBD(lonx, latx, alt);
 
     //*incidence angles using wind vector VAED in geodetic coord
     arma::vec3 VBAB = TBD * (VBED - VAED);
@@ -145,6 +130,30 @@ void Kinematics::calculate_kinematics(double int_step){
     this->thtbdx = get_thtbdx();
     this->psibdx = get_psibdx();
     this->phibdx = get_phibdx();
+}
+
+void Kinematics::propagate_TBI(double int_step, arma::vec3 WBIB) {
+    //*integrating direction cosine matrix
+    arma::mat TBID_NEW = trans(skew_sym(WBIB)) * this->TBI;
+    this->TBI = integrate(TBID_NEW, TBID, TBI, int_step);
+    this->TBID = TBID_NEW;
+
+    //orthonormalizing TBI
+    arma::mat EE = arma::eye(3, 3) - TBI * trans(TBI);
+    this->TBI = TBI + EE * TBI * 0.5;
+
+    //TBI orthogonality check
+    double e1 = EE(0,0);
+    double e2 = EE(1,1);
+    double e3 = EE(2,2);
+    this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
+
+}
+
+arma::mat Kinematics::calculate_TBD(double lonx, double latx, double alt) {
+    //_Euler_ angles
+    arma::mat TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    return this->TBI * trans(TDI);
 }
 
 double Kinematics::calculate_alphaix(arma::vec3 VBIB) {
