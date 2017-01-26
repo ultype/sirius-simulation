@@ -5,24 +5,62 @@
 #include "trick_utils/math/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
 
-void _Euler_::initialization(Kinematics* kine, Propulsion* prop, Forces* forc)
+_Euler_::_Euler_(Kinematics& kine, Propulsion& prop, Forces& forc)
+    :   kinematics(&kine), propulsion(&prop), forces(&forc)
+        //MATRIX_INIT(TBD, 3, 3),
+        //MATRIX_INIT(TBI, 3, 3),
+        //MATRIX_INIT(TBID, 3, 3)
 {
-    kinematics=kine;
-    propulsion=prop;
-    force=forc;
+    this->default_data();
+}
 
+_Euler_::_Euler_(const _Euler_& other)
+    :   kinematics(other.kinematics), propulsion(other.propulsion), forces(other.forces)
+        //MATRIX_INIT(TBD, 3, 3)
+        //MATRIX_INIT(TBI, 3, 3),
+        //MATRIX_INIT(TBID, 3, 3)
+{
+    this->default_data();
+
+    /* Propagative Stats */
+}
+
+_Euler_& _Euler_::operator=(const _Euler_& other){
+    if(&other == this)
+        return *this;
+
+    this->kinematics = other.kinematics;
+    this->propulsion = other.propulsion;
+    this->forces = other.forces;
+
+    /* Propagative Stats */
+
+    return *this;
+}
+
+void _Euler_::load_angular_velocity(double ppx, double qqx, double rrx){
     Matrix TBI = kinematics->get_TBI();
     Matrix WBEB(3,1);
     Matrix WBIB(3,1);
-    Matrix WEII(3,1);
+    Matrix WEII(weii);
 
     //body rate wrt Earth frame in body coordinates
     WBEB.build_vec3(ppx*RAD,qqx*RAD,rrx*RAD);
+    WBIB=WBEB+TBI*WEII;
+    WBIB.fill(wbib);
+}
+
+void _Euler_::initialize()
+{
+}
+
+void _Euler_::default_data(){
+    Matrix WEII(3,1);
+
     //body rate wrt ineritial frame in body coordinates
     WEII.build_vec3(0,0,WEII3);
-    WBIB=WBEB+TBI*WEII;
-    //update martrix
-    WBIB.fill(wbib);
+
+    WEII.fill(weii);
 }
 
 double _Euler_::get_ppx() { return ppx; }
@@ -50,7 +88,7 @@ void _Euler_::euler(double int_step)
     Matrix WEII(3,1);
     Matrix WBEB(3,1);
     Matrix WBII(3,1);
-    Matrix FMB = force->get_FMB();
+    Matrix FMB = forces->get_FMB();
     Matrix IBBB = propulsion->get_IBBB();
     Matrix WBIBD(3,1);
     Matrix TBI = kinematics->get_TBI();
