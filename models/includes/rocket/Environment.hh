@@ -19,12 +19,6 @@ class Environment{
 
     public:
 
-        Newton *newton;
-        Kinematics *kinematics;
-        AeroDynamics *aerodynamics;
-        Datadeck weathertable; /* ** (--) Weather Deck */
-
-
         void initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine);
         void calculate_env(double int_step,Datadeck &weathertable);
         Matrix environment_dryden(double dvba,double int_step);
@@ -69,6 +63,29 @@ class Environment{
         Matrix get_VAED();
 
     private:
+        /* Internal Getter */
+
+        /* Internal Initializers */
+        void default_data() {};
+
+        /* Internal Propagator / Calculators */
+
+        /* Internal Calculators */
+
+        /* Routing references */
+        Newton       * newton;
+        Kinematics   * kinematics;
+        AeroDynamics * aerodynamics;
+
+        /* Constants */
+        Datadeck weathertable; /* ** (--) Weather Deck */
+
+        /* Propagative Stats */
+
+        /* Generating Outputs */
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
         double rho;         /* *io (kg/m3)      Atmospheric Density */
         double vmach;       /* *io (--)         Mach number */
         double pdynmc;      /* *io (pa)         Dynamic pressure */
