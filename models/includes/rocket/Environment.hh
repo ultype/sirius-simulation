@@ -54,7 +54,7 @@ class Environment{
 /***********************************Variables describtion******************************/
 
         /* Input File */
-        int mair;           /* *io (--)         mair =|matmo|mturb|mwind|*/
+        int mair;           /* *io (--)         mair =|matmo|mturb|mwind| Trick cannot see this XXX*/
 
         double get_rho();
         double get_vmach();
@@ -68,11 +68,10 @@ class Environment{
         Matrix get_GRAVG();
         Matrix get_VAED();
 
-        // XXX: Why trick can't see these in private?
+    private:
         double rho;         /* *io (kg/m3)      Atmospheric Density */
         double vmach;       /* *io (--)         Mach number */
         double pdynmc;      /* *io (pa)         Dynamic pressure */
-    private:
 
         double tempk;       /* *io (K)          Atmospheric temperature */
         double dvba;        /* *io (m/s)        Vehicle speed wrt air */
