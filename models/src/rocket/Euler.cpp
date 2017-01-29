@@ -27,6 +27,12 @@ _Euler_::_Euler_(const _Euler_& other)
     this->default_data();
 
     /* Propagative Stats */
+    this->WBIB = other.WBIB;
+    this->WBIBD = other.WBIBD;
+
+    /* Generating Outputs */
+    this->WBII = other.WBII;
+    this->WBEB = other.WBEB;
 }
 
 _Euler_& _Euler_::operator=(const _Euler_& other){
@@ -38,6 +44,12 @@ _Euler_& _Euler_::operator=(const _Euler_& other){
     this->forces = other.forces;
 
     /* Propagative Stats */
+    this->WBIB = other.WBIB;
+    this->WBIBD = other.WBIBD;
+
+    /* Generating Outputs */
+    this->WBII = other.WBII;
+    this->WBEB = other.WBEB;
 
     return *this;
 }
