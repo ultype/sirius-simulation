@@ -23,6 +23,8 @@ class Kinematics;
 class Forces;
 
 class _Euler_ {
+    TRICK_INTERFACE(_Euler_);
+
     public:
         _Euler_(Kinematics& kine, Propulsion& prop, Forces& forc);
         _Euler_(const _Euler_& other);
