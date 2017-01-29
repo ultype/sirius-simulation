@@ -18,9 +18,15 @@ class Environment{
     TRICK_INTERFACE(Environment);
 
     public:
+        Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine);
+        Environment(const Environment& other);
 
-        void initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine);
-        void calculate_env(double int_step,Datadeck &weathertable);
+        Environment& operator=(const Environment& other);
+
+        void load_weather_deck(char* filename);
+
+        void initialize();
+        void calculate_env(double int_step);
         Matrix environment_dryden(double dvba,double int_step);
 ///////////////////////////////////////////////////////////////////////////////
 //Definition of environment module-variables
@@ -48,6 +54,8 @@ class Environment{
 /***********************************Variables describtion******************************/
 
         /* Input File */
+        Datadeck weathertable; /* ** (--) Weather Deck */
+
         int mair;           /* *io (--)         mair =|matmo|mturb|mwind| Trick cannot see this XXX*/
 
         double get_rho();
@@ -66,7 +74,7 @@ class Environment{
         /* Internal Getter */
 
         /* Internal Initializers */
-        void default_data() {};
+        void default_data();
 
         /* Internal Propagator / Calculators */
 
@@ -78,7 +86,6 @@ class Environment{
         AeroDynamics * aerodynamics;
 
         /* Constants */
-        Datadeck weathertable; /* ** (--) Weather Deck */
 
         /* Propagative Stats */
 

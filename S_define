@@ -58,14 +58,15 @@ class Rocket_SimObject : public Trick::SimObject {
         Actuator actuator;
 
         Rocket_SimObject() 
-            :   newton     ( kinematics , euler      , env     , propulsion , force ) ,
-                kinematics ( newton     , env        , euler ) ,
-                euler      ( kinematics , propulsion , force)
+            :   newton     ( kinematics , euler        , env         , propulsion , force ),
+                kinematics ( newton     , env          , euler ),
+                euler      ( kinematics , propulsion   , force),
+                env        ( newton     , aerodynamics , kinematics)
             {
             ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();
-            ("initialization") env.initialize(&newton, &aerodynamics, &kinematics);
+            ("initialization") env.initialize();
             ("initialization") aerodynamics.initialize(&kinematics, &env, &propulsion, &euler, &newton, &tvc);
             ("initialization") newton.initialize();
             ("initialization") euler.initialize();
@@ -81,7 +82,7 @@ class Rocket_SimObject : public Trick::SimObject {
 
             (0.001, "scheduled") gpsr.update_markov(0.001);
             (0.001, "scheduled") kinematics.propagate(0.001);
-	        (0.001, "scheduled") env.calculate_env(0.001,env.weathertable);
+	        (0.001, "scheduled") env.calculate_env(0.001);
             (0.001, "scheduled") propulsion.calculate_propulsion(0.001);
             (0.001, "scheduled") aerodynamics.calculate_aero(0.001,aerodynamics.aerotable);
             // (0.1, "scheduled") gpsr.get_quadriga();

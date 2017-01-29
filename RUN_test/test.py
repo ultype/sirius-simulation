@@ -108,6 +108,7 @@ rkt.euler.load_angular_velocity(0, 0, 0)
 
 #environment
 rkt.env.mair = 0              #mair =|matmo|mturb|mwind|
+rkt.env.load_weather_deck("auxiliary/weather_table.txt")
 #aerodynamics
 rkt.aerodynamics.set_maero(13)      #=11: last stage; =12: 2 stages; =13: 3 stages
 rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m

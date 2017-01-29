@@ -3,18 +3,42 @@
 #include "rocket/Environment.hh"
 #include "sim_services/include/simtime.h"
 
-void Environment::initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine)
+
+Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine)
+    :   newton(&newt), aerodynamics(&aero), kinematics(&kine)
 {
-    kinematics=kine;
-    newton=newt;
-    aerodynamics=aero;
-
-    dvba=newton->get_dvbe();
-
-    read_tables("auxiliary/weather_table.txt",weathertable);
+    this->default_data();
 }
 
-void Environment::calculate_env(double int_step,Datadeck &weathertable)
+Environment::Environment(const Environment& other)
+    :   newton(other.newton), aerodynamics(other.aerodynamics), kinematics(other.kinematics)
+{
+    this->default_data();
+}
+
+Environment& Environment::operator=(const Environment& other) {
+    if(&other == this)
+        return *this;
+
+    this->kinematics   = other.kinematics;
+    this->newton       = other.newton;
+    this->aerodynamics = other.aerodynamics;
+
+    return *this;
+}
+
+void Environment::initialize() {
+    dvba = newton->get_dvbe();
+}
+
+void Environment::default_data() {
+}
+
+void Environment::load_weather_deck(char* filename) {
+    read_tables(filename, weathertable);
+}
+
+void Environment::calculate_env(double int_step)
 {
     double dvw(0);
     Matrix GRAVG(3,1);
