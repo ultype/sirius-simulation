@@ -3,26 +3,6 @@
 #include "rocket/Environment.hh"
 #include "sim_services/include/simtime.h"
 
-double Environment::get_rho() { return rho; }
-double Environment::get_vmach() { return vmach; }
-double Environment::get_pdynmc() { return pdynmc; }
-double Environment::get_tempk() { return tempk; }
-double Environment::get_dvba() { return dvba; }
-double Environment::get_grav() { return grav; }
-double Environment::get_press() { return press; }
-
-double* Environment::get_gravg_ptr() { return gravg; }
-Matrix Environment::get_GRAVG() {
-    Matrix GRAVG(3, 1);
-    GRAVG.build_vec3(gravg);
-    return GRAVG;
-}
-Matrix Environment::get_VAED() {
-    Matrix VAED(3, 1);
-    VAED.build_vec3(vaed);
-    return VAED;
-}
-
 void Environment::initialize(Newton *newt, AeroDynamics *aero, Kinematics *kine)
 {
     kinematics=kine;
@@ -170,3 +150,24 @@ Matrix Environment::environment_dryden(double dvba,double int_step)
 
     return VTAD;
 }
+
+double Environment::get_rho() { return rho; }
+double Environment::get_vmach() { return vmach; }
+double Environment::get_pdynmc() { return pdynmc; }
+double Environment::get_tempk() { return tempk; }
+double Environment::get_dvba() { return dvba; }
+double Environment::get_grav() { return grav; }
+double Environment::get_press() { return press; }
+
+double* Environment::get_gravg_ptr() { return gravg; }
+Matrix Environment::get_GRAVG() {
+    Matrix GRAVG(3, 1);
+    GRAVG.build_vec3(gravg);
+    return GRAVG;
+}
+Matrix Environment::get_VAED() {
+    Matrix VAED(3, 1);
+    VAED.build_vec3(vaed);
+    return VAED;
+}
+
