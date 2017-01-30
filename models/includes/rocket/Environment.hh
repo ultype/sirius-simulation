@@ -14,16 +14,21 @@ PROGRAMMERS:
 #include "Kinematics.hh"
 #include "Aerodynamics.hh"
 
+#include "cad/env/atmosphere.hh"
+
 class Environment{
     TRICK_INTERFACE(Environment);
 
     public:
         Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine);
         Environment(const Environment& other);
+        ~Environment();
 
         Environment& operator=(const Environment& other);
 
-        void load_weather_deck(char* filename);
+        void atmosphere_use_public();
+        void atmosphere_use_nasa();
+        void atmosphere_use_weather_deck(char* filename);
 
         void initialize();
         void calculate_env(double int_step);
@@ -54,7 +59,6 @@ class Environment{
 /***********************************Variables describtion******************************/
 
         /* Input File */
-        Datadeck weathertable; /* ** (--) Weather Deck */
 
         int mair;           /* *io (--)         mair =|matmo|mturb|mwind| Trick cannot see this XXX*/
 
@@ -87,6 +91,9 @@ class Environment{
         AeroDynamics * aerodynamics;
 
         /* Constants */
+        int matmo;          /* *o (--)          Atmosphere model selection */
+
+        cad::Atmosphere* atmosphere;
 
         /* Propagative Stats */
 

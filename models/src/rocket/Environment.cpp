@@ -3,6 +3,10 @@
 #include "rocket/Environment.hh"
 #include "sim_services/include/simtime.h"
 
+#include "cad/env/atmosphere.hh"
+#include "cad/env/atmosphere76.hh"
+#include "cad/env/atmosphere_nasa2002.hh"
+#include "cad/env/atmosphere_weatherdeck.hh"
 
 Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine)
     :   newton(&newt), aerodynamics(&aero), kinematics(&kine),
@@ -12,6 +16,8 @@ Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine)
         VECTOR_INIT(VAEDSD, 3)
 {
     this->default_data();
+
+    atmosphere = NULL;
 }
 
 Environment::Environment(const Environment& other)
@@ -35,6 +41,10 @@ Environment& Environment::operator=(const Environment& other) {
     return *this;
 }
 
+Environment::~Environment() {
+    if(atmosphere) delete atmosphere;
+}
+
 void Environment::initialize() {
     dvba = newton->get_dvbe();
 }
@@ -42,8 +52,16 @@ void Environment::initialize() {
 void Environment::default_data() {
 }
 
-void Environment::load_weather_deck(char* filename) {
-    read_tables(filename, weathertable);
+void Environment::atmosphere_use_public() {
+    atmosphere = new cad::Atmosphere76();
+}
+
+void Environment::atmosphere_use_nasa() {
+    atmosphere = new cad::Atmosphere_nasa2002();
+}
+
+void Environment::atmosphere_use_weather_deck(char* filename) {
+    atmosphere = new cad::Atmosphere_weatherdeck(filename);
 }
 
 void Environment::calculate_env(double int_step) {
@@ -62,30 +80,15 @@ void Environment::calculate_env(double int_step) {
     this->GRAVG = arma::vec3(cad_grav84(SBII, get_rettime()).get_pbody());
     this->grav = norm(GRAVG);
 
-    //US 1976 Standard Atmosphere (public domain)
-    if(matmo == 0){
-        atmosphere76(rho, press, tempk, alt);
-        tempc = tempk - 273.16;
-        //speed of sound
-        vsound = sqrt(1.4 * RGAS * tempk);
-    }
+    atmosphere->set_altitude(alt);
 
-    //US 1976 Standard Atmosphere (NASA Marshall)
-    if(matmo == 1){
-        double alt_km = alt / 1000;
-        int check = us76_nasa2002(alt_km, &rho, &press, &tempk, &vsound);
-        tempc = tempk - 273.16;
-    }
+    rho    = atmosphere->get_density();
+    press  = atmosphere->get_pressure();
+    tempk  = atmosphere->get_temperature_in_kelvin();
+    vsound = atmosphere->get_speed_of_sound();
 
-    //tabular atmosphere from WEATHER_DECK
-    if(matmo == 2){
-        rho = weathertable.look_up("density", alt);
-        press = weathertable.look_up("pressure", alt);
-        tempc = weathertable.look_up("temperature", alt);
-        //speed of sound
-        tempk = tempc+273.16;
-        vsound = sqrt(1.4 * RGAS * tempk);
-    }
+    tempc = tempk - 273.16;
+
     //mach number
     vmach = fabs(dvba / vsound);
 
@@ -100,8 +103,8 @@ void Environment::calculate_env(double int_step) {
 
         if(mwind == 2){
             //tabular wind from WEATHER_DECK
-            dvw = weathertable.look_up("speed",alt);
-            psiwdx = weathertable.look_up("direction",alt);
+            //dvw = weathertable.look_up("speed",alt);
+            //psiwdx = weathertable.look_up("direction",alt);
         }
         //wind components in geodetic coordinates
         arma::vec3 VAED_RAW;

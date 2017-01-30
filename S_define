@@ -22,6 +22,11 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Propulsion.hh"
 ##include "rocket/Aerodynamics.hh"
 
+##include "cad/env/atmosphere.hh"
+##include "cad/env/atmosphere_nasa2002.hh"
+##include "cad/env/atmosphere76.hh"
+##include "cad/env/atmosphere_weatherdeck.hh"
+
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites sats;
