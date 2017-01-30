@@ -30,6 +30,13 @@ class Environment{
         void atmosphere_use_nasa();
         void atmosphere_use_weather_deck(char* filename);
 
+        void set_no_wind();
+        void set_constant_wind(double dvae);
+        void set_tabular_wind();
+
+        void set_no_wind_turbulunce();
+        void set_wind_turbulunce();
+
         void initialize();
         void calculate_env(double int_step);
         arma::vec3 environment_dryden(double dvba,double int_step);
@@ -50,17 +57,13 @@ class Environment{
 //                 mturb = 0 no turbulence
 //                       = 1 dryden turbulence model
 //
-//                       mwind = 0 no wind
+//                       mwind =
 //                             = 1 constant wind, input: dvaeg,psiwdx
-//                             = 2 tabular wind from WEATHER_DECK
+//                             = 2
 //
 //030507 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 /***********************************Variables describtion******************************/
-
-        /* Input File */
-
-        int mair;           /* *io (--)         mair =|matmo|mturb|mwind| Trick cannot see this XXX*/
 
         double get_rho();
         double get_vmach();
@@ -91,7 +94,20 @@ class Environment{
         AeroDynamics * aerodynamics;
 
         /* Constants */
-        int matmo;          /* *o (--)          Atmosphere model selection */
+        enum {
+            NO_WIND = 0,
+            CONSTANT_WIND, //constant wind. load dvae
+            TABULAR_WIND //tabular wind from atmosphere deck
+        } ENV_WIND_TYPE;
+
+        int mwind;          /* *o  (--)         see ENV WIND TYPE */
+
+        enum {
+            NO_TURBULENCE = 0,
+            DRYDEN_TURBULENCE
+        } ENV_WIND_TURB_TYPE;
+
+        int mturb;          /* *o  (--)         see ENV WIND TURB TYPE */
 
         cad::Atmosphere* atmosphere;
 

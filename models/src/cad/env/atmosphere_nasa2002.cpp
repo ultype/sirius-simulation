@@ -9,6 +9,9 @@ cad::Atmosphere_nasa2002::Atmosphere_nasa2002() {
     altitude = 0;
 
     assert(update_values() != 1);
+
+    vwind = 0;
+    dwind = 0;
 }
 
 cad::Atmosphere_nasa2002::~Atmosphere_nasa2002() {
@@ -18,6 +21,9 @@ void cad::Atmosphere_nasa2002::set_altitude(double altitude_in_meter) {
     altitude = altitude_in_meter;
 
     assert(update_values() != 1);
+
+    vwind = 0;
+    dwind = 0;
 }
 
 int cad::Atmosphere_nasa2002::update_values() {
@@ -192,9 +198,4 @@ int cad::Atmosphere_nasa2002::update_values() {
 
     return 0; /* normal return, altitude in range */
 }
-
-double cad::Atmosphere_nasa2002::get_temperature_in_kelvin() { return tempk; }
-double cad::Atmosphere_nasa2002::get_density() { return density; }
-double cad::Atmosphere_nasa2002::get_pressure() { return pressure; }
-double cad::Atmosphere_nasa2002::get_speed_of_sound() { return vsound; }
 

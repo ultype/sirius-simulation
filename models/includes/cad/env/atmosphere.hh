@@ -22,6 +22,9 @@ namespace cad {
             virtual double get_pressure() { return pressure; };
             virtual double get_speed_of_sound() { return vsound; };
 
+            virtual double get_speed_of_wind() { return vwind; };
+            virtual double get_direction_of_wind() { return dwind; };
+
         protected:
             double altitude;
 
@@ -29,6 +32,9 @@ namespace cad {
             double density;
             double pressure;
             double vsound;
+
+            double vwind;
+            double dwind;
     };
 }
 

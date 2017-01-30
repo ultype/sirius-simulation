@@ -107,9 +107,10 @@ rkt.newton.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 rkt.euler.load_angular_velocity(0, 0, 0)
 
 #environment
-rkt.env.mair = 0              #mair =|matmo|mturb|mwind|
 #rkt.env.atmosphere_use_weather_deck("auxiliary/weather_table.txt")
 rkt.env.atmosphere_use_public()
+rkt.env.set_no_wind()
+rkt.env.set_no_wind_turbulunce()
 #aerodynamics
 rkt.aerodynamics.set_maero(13)      #=11: last stage; =12: 2 stages; =13: 3 stages
 rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m

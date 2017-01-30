@@ -24,12 +24,9 @@ int cad::Atmosphere_weatherdeck::update_values() {
     density  = weathertable.look_up("density", altitude);
     pressure = weathertable.look_up("pressure", altitude);
     tempk    = weathertable.look_up("temperature", altitude) + 273.16;
+    vwind = weathertable.look_up("speed", altitude);
+    dwind = weathertable.look_up("direction", altitude);
 
     vsound = sqrt(1.4 * RGAS * tempk);
 }
-
-double cad::Atmosphere_weatherdeck::get_temperature_in_kelvin() { return tempk; }
-double cad::Atmosphere_weatherdeck::get_density() { return density; }
-double cad::Atmosphere_weatherdeck::get_pressure() { return pressure; }
-double cad::Atmosphere_weatherdeck::get_speed_of_sound() { return vsound; }
 

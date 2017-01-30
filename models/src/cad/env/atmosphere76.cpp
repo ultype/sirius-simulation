@@ -11,6 +11,9 @@ cad::Atmosphere76::Atmosphere76() {
 
     update_values();
     vsound = sqrt(1.4 * RGAS * tempk);
+
+    vwind = 0;
+    dwind = 0;
 }
 
 cad::Atmosphere76::~Atmosphere76() {
@@ -21,6 +24,9 @@ void cad::Atmosphere76::set_altitude(double altitude_in_meter) {
 
     update_values();
     vsound = sqrt(1.4 * RGAS * tempk);
+
+    vwind = 0;
+    dwind = 0;
 }
 
 int cad::Atmosphere76::update_values() {
@@ -88,8 +94,3 @@ int cad::Atmosphere76::update_values() {
         tempk = 186.946;
     }
 }
-
-double cad::Atmosphere76::get_temperature_in_kelvin() { return tempk; }
-double cad::Atmosphere76::get_density() { return density; }
-double cad::Atmosphere76::get_pressure() { return pressure; }
-double cad::Atmosphere76::get_speed_of_sound() { return vsound; }

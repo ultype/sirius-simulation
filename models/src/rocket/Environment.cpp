@@ -64,6 +64,28 @@ void Environment::atmosphere_use_weather_deck(char* filename) {
     atmosphere = new cad::Atmosphere_weatherdeck(filename);
 }
 
+void Environment::set_no_wind(){
+    mwind = NO_WIND;
+}
+
+void Environment::set_constant_wind(double dvae){
+    mwind = CONSTANT_WIND;
+
+    this->dvae = dvae;
+}
+
+void Environment::set_tabular_wind(){
+    mwind = TABULAR_WIND;
+}
+
+void Environment::set_no_wind_turbulunce(){
+    mturb = NO_TURBULENCE;
+}
+
+void Environment::set_wind_turbulunce(){
+    mturb = DRYDEN_TURBULENCE;
+}
+
 void Environment::calculate_env(double int_step) {
     double dvw(0);
 
@@ -71,11 +93,6 @@ void Environment::calculate_env(double int_step) {
     // XXX: arma matrix subsitute
     Matrix SBII = newton->get_IPos();
     double alt = newton->get_alt();
-
-    //decoding the air switch
-    int matmo = mair / 100;
-    int mturb = (mair - matmo * 100) / 10;
-    int mwind = (mair - matmo * 100) % 10;
 
     this->GRAVG = arma::vec3(cad_grav84(SBII, get_rettime()).get_pbody());
     this->grav = norm(GRAVG);
@@ -95,17 +112,18 @@ void Environment::calculate_env(double int_step) {
     //dynamic pressure
     pdynmc = 0.5 * rho * dvba * dvba;
 
-    //wind options
-    if(mwind > 0){
-        if(mwind == 1)
-            //constant wind
-            dvw = dvae;
+    if(mwind == CONSTANT_WIND){
 
-        if(mwind == 2){
-            //tabular wind from WEATHER_DECK
-            //dvw = weathertable.look_up("speed",alt);
-            //psiwdx = weathertable.look_up("direction",alt);
-        }
+        dvw = dvae;
+
+    }else if(mwind == TABULAR_WIND){
+
+        dvw = atmosphere->get_speed_of_wind();
+        psiwdx = atmosphere->get_direction_of_wind();
+
+    }
+
+    if(mwind != NO_WIND){
         //wind components in geodetic coordinates
         arma::vec3 VAED_RAW;
         VAED_RAW(0) = -dvw * cos(psiwdx * RAD);
@@ -118,6 +136,7 @@ void Environment::calculate_env(double int_step) {
         VAEDSD = VAEDSD_NEW;
         VAED = VAEDS;
     }
+
     //wind turbulence in normal - load plane
     if(mturb == 1){
         arma::vec3 VTAD = environment_dryden(dvba,int_step);

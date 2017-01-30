@@ -19,11 +19,6 @@ namespace cad {
 
             virtual void set_altitude(double altitude_in_meter);
 
-            virtual double get_temperature_in_kelvin();
-            virtual double get_density();
-            virtual double get_pressure();
-            virtual double get_speed_of_sound();
-
         private:
             int update_values();
     };
