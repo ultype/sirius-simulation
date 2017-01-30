@@ -78,11 +78,14 @@ void Environment::set_tabular_wind(char* filename, double twind, double vertical
 }
 
 void Environment::set_no_wind_turbulunce(){
-    mturb = NO_TURBULENCE;
+    if(wind) wind->disable_turbulance();
 }
 
-void Environment::set_wind_turbulunce(){
-    mturb = DRYDEN_TURBULENCE;
+void Environment::set_wind_turbulunce(double turb_length, double turb_sigma,
+                                        double taux1, double taux1d,
+                                        double taux2, double taux2d,
+                                        double tau,   double gauss_value){
+    if(wind) wind->enable_turbulance(turb_length, turb_sigma, taux1, taux1d, taux2, taux2d, tau, gauss_value);
 }
 
 void Environment::calculate_env(double int_step) {
@@ -90,6 +93,10 @@ void Environment::calculate_env(double int_step) {
     // XXX: arma matrix subsitute
     Matrix SBII = newton->get_IPos();
     double alt = newton->get_alt();
+
+    arma::mat TBD = kinematics->get_TBD_();
+    double alppx = kinematics->get_alppx();
+    double phipx = kinematics->get_phipx();
 
     this->GRAVG = arma::vec3(cad_grav84(SBII, get_rettime()).get_pbody());
     this->grav = norm(GRAVG);
@@ -103,75 +110,20 @@ void Environment::calculate_env(double int_step) {
 
     tempc = tempk - 273.16;
 
-    //mach number
-    vmach = fabs(dvba / vsound);
-
-    //dynamic pressure
-    pdynmc = 0.5 * rho * dvba * dvba;
-
     wind->set_altitude(alt);
     psiwdx = wind->get_direction_of_wind();
-
     wind->propagate_VAED(int_step);
-
-    //wind turbulence in normal - load plane
-    if(mturb == 1){
-        arma::vec3 VTAD = environment_dryden(dvba,int_step);
-        //VAED = VTAD+VAEDS;
-    }
+    wind->apply_turbulance_if_have(int_step, dvba, TBD, alppx, phipx);
 
     //flight conditions
     arma::vec3 VBAD = VBED - wind->get_VAED();
     dvba = norm(VBAD);
 
     //mach number
-    vmach = fabs(dvba/vsound);
+    vmach = fabs(dvba / vsound);
+
     //dynamic pressure
     pdynmc = 0.5 * rho * dvba * dvba;
-}
-
-arma::vec3 Environment::environment_dryden(double dvba,double int_step) {
-    arma::vec3 VTAD;
-
-    arma::mat TBD = kinematics->get_TBD_();
-    double alppx = kinematics->get_alppx();
-    double phipx = kinematics->get_phipx();
-
-    double value1;
-    do
-        value1 = (double)rand() / RAND_MAX;
-    while(value1 == 0);
-
-    double value2 = (double)rand() / RAND_MAX;
-    gauss_value = (1/sqrt(int_step)) * sqrt(2 * log(1/value1)) * cos(2 * PI * value2);
-
-    //filter, converting white gaussian noise into a time sequence of Dryden
-    // turbulence velocity variable 'tau'  (One - dimensional cross - velocity Dryden spectrum)
-    //integrating first state variable
-    double taux1d_new = taux2;
-    taux1 = integrate(taux1d_new,taux1d,taux1,int_step);
-    taux1d = taux1d_new;
-
-    //integrating second state variable
-    double vl = dvba/turb_length;
-    double taux2d_new =  - vl * vl * taux1 - 2 * vl * taux2+vl * vl * gauss_value;
-    taux2 = integrate(taux2d_new,taux2d,taux2,int_step);
-    taux2d = taux2d_new;
-
-    //computing Dryden 'tau' from the two filter states ('2 * PI' changed to 'PI' according to Pritchard)
-    tau = turb_sigma * sqrt(1/(vl * PI)) * (taux1+sqrt(3.) * taux2/vl);
-
-    //inserting the turbulence into the load factor plane (aeroballistic 1A - 3A plane)
-    // and transforming into body coordinates VTAB = TBA * VTAA; VTAA = [0 0 tau]
-    arma::vec3 VTAB;
-    VTAB(0) = -tau * sin(alppx * RAD);
-    VTAB(1) = tau * sin(phipx * RAD) * cos(alppx * RAD);
-    VTAB(2) = tau * cos(phipx * RAD) * cos(alppx * RAD);
-
-    //turbulence in geodetic coordinates
-    VTAD = trans(TBD) * VTAB;
-
-    return VTAD;
 }
 
 double Environment::get_rho() { return rho; }
