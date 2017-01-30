@@ -5,9 +5,13 @@ PURPOSE:
       (Atmosphere model interface definition)
 *******************************************************************************/
 
+#include "aux/aux.hh"
+
 namespace cad {
     class Atmosphere
     {
+        TRICK_INTERFACE(cad__Atmosphere);
+
         public:
             char name[256];
 
