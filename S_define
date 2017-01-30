@@ -27,6 +27,11 @@ LIBRARY DEPENDENCIES:
 ##include "cad/env/atmosphere76.hh"
 ##include "cad/env/atmosphere_weatherdeck.hh"
 
+##include "cad/env/wind.hh"
+##include "cad/env/wind_no.hh"
+##include "cad/env/wind_tabular.hh"
+##include "cad/env/wind_constant.hh"
+
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites sats;

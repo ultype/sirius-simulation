@@ -15,6 +15,7 @@ PROGRAMMERS:
 #include "Aerodynamics.hh"
 
 #include "cad/env/atmosphere.hh"
+#include "cad/env/wind.hh"
 
 class Environment{
     TRICK_INTERFACE(Environment);
@@ -31,8 +32,8 @@ class Environment{
         void atmosphere_use_weather_deck(char* filename);
 
         void set_no_wind();
-        void set_constant_wind(double dvae);
-        void set_tabular_wind();
+        void set_constant_wind(double dvae, double dir, double twind, double vertical_wind);
+        void set_tabular_wind(char* filename, double twind, double vertical_wind);
 
         void set_no_wind_turbulunce();
         void set_wind_turbulunce();
@@ -95,21 +96,14 @@ class Environment{
 
         /* Constants */
         enum {
-            NO_WIND = 0,
-            CONSTANT_WIND, //constant wind. load dvae
-            TABULAR_WIND //tabular wind from atmosphere deck
-        } ENV_WIND_TYPE;
-
-        int mwind;          /* *o  (--)         see ENV WIND TYPE */
-
-        enum {
             NO_TURBULENCE = 0,
             DRYDEN_TURBULENCE
         } ENV_WIND_TURB_TYPE;
 
         int mturb;          /* *o  (--)         see ENV WIND TURB TYPE */
 
-        cad::Atmosphere* atmosphere;
+        cad::Atmosphere * atmosphere;
+        cad::Wind       * wind;
 
         /* Propagative Stats */
 
@@ -120,15 +114,6 @@ class Environment{
 
         arma::vec GRAVG;    /* *io (m/s2)       Gravity acceleration in geocentric coord */
         double _GRAVG[3];   /* *io (m/s2)       Gravity acceleration in geocentric coord */
-
-        arma::vec VAED;     /* *io (m/s)        Smoothed wind velocity in geodetic coord */
-        double _VAED[3];    /* *io (m/s)        Smoothed wind velocity in geodetic coord */
-
-        arma::vec VAEDS;    /* *io (m/s)        Smoothed wind velocity in geodetic coord - m/s */
-        double _VAEDS[3];   /* *io (m/s)        Smoothed wind velocity in geodetic coord - m/s */
-
-        arma::vec VAEDSD;   /* *io (m/s)        Smoothed wind velocity derivative - m/s */
-        double _VAEDSD[3];  /* *io (m/s)        Smoothed wind velocity derivative - m/s */
 
         double rho;         /* *io (kg/m3)      Atmospheric Density */
         double vmach;       /* *io (--)         Mach number */

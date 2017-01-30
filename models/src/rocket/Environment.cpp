@@ -8,24 +8,24 @@
 #include "cad/env/atmosphere_nasa2002.hh"
 #include "cad/env/atmosphere_weatherdeck.hh"
 
+#include "cad/env/wind.hh"
+#include "cad/env/wind_no.hh"
+#include "cad/env/wind_tabular.hh"
+#include "cad/env/wind_constant.hh"
+
 Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine)
     :   newton(&newt), aerodynamics(&aero), kinematics(&kine),
-        VECTOR_INIT(GRAVG, 3),
-        VECTOR_INIT(VAED, 3),
-        VECTOR_INIT(VAEDS, 3),
-        VECTOR_INIT(VAEDSD, 3)
+        VECTOR_INIT(GRAVG, 3)
 {
     this->default_data();
 
     atmosphere = NULL;
+    wind       = NULL;
 }
 
 Environment::Environment(const Environment& other)
     :   newton(other.newton), aerodynamics(other.aerodynamics), kinematics(other.kinematics),
-        VECTOR_INIT(GRAVG, 3),
-        VECTOR_INIT(VAED, 3),
-        VECTOR_INIT(VAEDS, 3),
-        VECTOR_INIT(VAEDSD, 3)
+        VECTOR_INIT(GRAVG, 3)
 {
     this->default_data();
 }
@@ -43,6 +43,7 @@ Environment& Environment::operator=(const Environment& other) {
 
 Environment::~Environment() {
     if(atmosphere) delete atmosphere;
+    if(wind) delete wind;
 }
 
 void Environment::initialize() {
@@ -65,17 +66,15 @@ void Environment::atmosphere_use_weather_deck(char* filename) {
 }
 
 void Environment::set_no_wind(){
-    mwind = NO_WIND;
+    wind = new cad::Wind_No();
 }
 
-void Environment::set_constant_wind(double dvae){
-    mwind = CONSTANT_WIND;
-
-    this->dvae = dvae;
+void Environment::set_constant_wind(double dvae, double dir, double twind, double vertical_wind){
+    wind = new cad::Wind_Constant(dvae, dir, twind, vertical_wind);
 }
 
-void Environment::set_tabular_wind(){
-    mwind = TABULAR_WIND;
+void Environment::set_tabular_wind(char* filename, double twind, double vertical_wind){
+    wind = new cad::Wind_Tabular(filename, twind, vertical_wind);
 }
 
 void Environment::set_no_wind_turbulunce(){
@@ -87,8 +86,6 @@ void Environment::set_wind_turbulunce(){
 }
 
 void Environment::calculate_env(double int_step) {
-    double dvw(0);
-
     arma::vec3 VBED = newton->get_VBED_();
     // XXX: arma matrix subsitute
     Matrix SBII = newton->get_IPos();
@@ -112,39 +109,19 @@ void Environment::calculate_env(double int_step) {
     //dynamic pressure
     pdynmc = 0.5 * rho * dvba * dvba;
 
-    if(mwind == CONSTANT_WIND){
+    wind->set_altitude(alt);
+    psiwdx = wind->get_direction_of_wind();
 
-        dvw = dvae;
-
-    }else if(mwind == TABULAR_WIND){
-
-        dvw = atmosphere->get_speed_of_wind();
-        psiwdx = atmosphere->get_direction_of_wind();
-
-    }
-
-    if(mwind != NO_WIND){
-        //wind components in geodetic coordinates
-        arma::vec3 VAED_RAW;
-        VAED_RAW(0) = -dvw * cos(psiwdx * RAD);
-        VAED_RAW(1) = -dvw * sin(psiwdx * RAD);
-        VAED_RAW(2) = vaed3;
-
-        //smoothing wind by filtering with time constant 'twind' sec
-        arma::vec3 VAEDSD_NEW = (VAED_RAW - VAEDS) * (1 / twind);
-        VAEDS = integrate(VAEDSD_NEW, VAEDSD, VAEDS, int_step);
-        VAEDSD = VAEDSD_NEW;
-        VAED = VAEDS;
-    }
+    wind->propagate_VAED(int_step);
 
     //wind turbulence in normal - load plane
     if(mturb == 1){
         arma::vec3 VTAD = environment_dryden(dvba,int_step);
-        VAED = VTAD+VAEDS;
+        //VAED = VTAD+VAEDS;
     }
 
     //flight conditions
-    arma::vec3 VBAD = VBED - VAED;
+    arma::vec3 VBAD = VBED - wind->get_VAED();
     dvba = norm(VBAD);
 
     //mach number
@@ -205,14 +182,14 @@ double Environment::get_dvba() { return dvba; }
 double Environment::get_grav() { return grav; }
 double Environment::get_press() { return press; }
 arma::vec3 Environment::get_GRAVG_() { return GRAVG; }
-arma::vec3 Environment::get_VAED_() { return VAED; }
+arma::vec3 Environment::get_VAED_() { return wind->get_VAED(); }
 
 Matrix Environment::get_GRAVG() {
     Matrix GRAVG(_GRAVG);
     return GRAVG;
 }
 Matrix Environment::get_VAED() {
-    Matrix VAED(_VAED);
+    Matrix VAED(wind->get_VAED().memptr());
     return VAED;
 }
 
