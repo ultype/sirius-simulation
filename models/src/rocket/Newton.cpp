@@ -166,7 +166,7 @@ void Newton::propagate_position_speed_acceleration(double int_step){
 
     arma::mat33 TBI(kinematics->get_TBI_());
 
-    arma::vec3 GRAVG(environment->get_gravg_ptr()); // BUG: Matrix to Arma?
+    arma::vec3 GRAVG = environment->get_GRAVG_();
 
     /* Prograte S, V, A status */
     arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
@@ -181,14 +181,12 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     this->latx = lat * DEG;
     this->alt  = al;
 
-    // Use old Metrix Type
     TDI = arma_cad_tdi84(lon, lat, al, get_rettime());
     TGI = arma_cad_tgi84(lon, lat, al, get_rettime());
 }
 
 void Newton::propagate_aeroloss(double int_step){
     //XXX: Need fixing
-
     arma::vec3 FAP(forces->get_fap_ptr());
 
     //calculate aero loss`:`
@@ -281,5 +279,6 @@ double Newton::get_psivdx(){
     return DEG * VBED.pol_from_cart().get_loc(1, 0);
 }
 
-arma::mat Newton::get_TDI() { return TDI; }
 arma::vec Newton::get_VBII() { return VBII; }
+
+arma::vec Newton::get_SBII() { return SBII; }

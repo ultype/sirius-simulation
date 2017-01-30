@@ -27,7 +27,7 @@ class Environment{
 
         void initialize();
         void calculate_env(double int_step);
-        Matrix environment_dryden(double dvba,double int_step);
+        arma::vec3 environment_dryden(double dvba,double int_step);
 ///////////////////////////////////////////////////////////////////////////////
 //Definition of environment module-variables
 //Member function of class 'DM'
@@ -66,9 +66,10 @@ class Environment{
         double get_grav();
         double get_press();
 
-        double* get_gravg_ptr();
         Matrix get_GRAVG();
         Matrix get_VAED();
+        arma::vec3 get_GRAVG_();
+        arma::vec3 get_VAED_();
 
     private:
         /* Internal Getter */
@@ -93,14 +94,27 @@ class Environment{
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */
+
+        arma::vec GRAVG;    /* *io (m/s2)       Gravity acceleration in geocentric coord */
+        double _GRAVG[3];   /* *io (m/s2)       Gravity acceleration in geocentric coord */
+
+        arma::vec VAED;     /* *io (m/s)        Smoothed wind velocity in geodetic coord */
+        double _VAED[3];    /* *io (m/s)        Smoothed wind velocity in geodetic coord */
+
+        arma::vec VAEDS;    /* *io (m/s)        Smoothed wind velocity in geodetic coord - m/s */
+        double _VAEDS[3];   /* *io (m/s)        Smoothed wind velocity in geodetic coord - m/s */
+
+        arma::vec VAEDSD;   /* *io (m/s)        Smoothed wind velocity derivative - m/s */
+        double _VAEDSD[3];  /* *io (m/s)        Smoothed wind velocity derivative - m/s */
+
         double rho;         /* *io (kg/m3)      Atmospheric Density */
         double vmach;       /* *io (--)         Mach number */
         double pdynmc;      /* *io (pa)         Dynamic pressure */
 
         double tempk;       /* *io (K)          Atmospheric temperature */
         double dvba;        /* *io (m/s)        Vehicle speed wrt air */
-        double gravg[3];    /* *io (m/s2)       Gravity acceleration in geocentric coord */
-        double vaed[3];     /* *io (m/s)        Smoothed wind velocity in geodetic coord */
+        //double gravg[3];    [> *io (m/s2)       Gravity acceleration in geocentric coord <]
+        //double vaed[3];     [> *io (m/s)        Smoothed wind velocity in geodetic coord <]
         double grav;        /* *io (m/s2)       Magnitude of gravity acceleration */
         double press;       /* *io (pa)         Atmospheric pressure */
 
@@ -116,8 +130,8 @@ class Environment{
         double tau;         /* *io (m/s)        Turblence velocity component in load factor plane - m/s*/
         double gauss_value; /* *io (--)         White Gaussian noise - ND*/
         double tempc;       /* *io (c)          Atmospheric temperature - Centigrade*/
-        double vaeds[3];    /* *io (m/s)        Smoothed wind velocity in geodetic coord - m/s*/
-        double vaedsd[3];   /* *io (m/s)        Smoothed wind velocity derivative - m/s*/
+        //double vaeds[3];    [> *io (m/s)        Smoothed wind velocity in geodetic coord - m/s<]
+        //double vaedsd[3];   [> *io (m/s)        Smoothed wind velocity derivative - m/s<]
         double markov_value;/* *io (m/s)        Markov variable - m/s*/
         double vaed3;       /* *io (m/s)        Vertical air speed (pos.down) - m/s*/
         double psiwdx;      /* *io (m/s)        Wind direction from north - m/s*/
