@@ -55,12 +55,14 @@ class Propulsion{
         void default_data();
 
         /* Internal Propagator / Calculators */
-        void propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB);
+        void propagate_thrust_delta_v(double int_step);
+        void propagate_fmasse(double int_step, double press, double psl);
 
         /* Internal Calculators */
-        arma::vec3 calculate_WBII(arma::mat33 TBI);
+        double calculate_thrust(double press, double psl);
+        double calculate_fmassr();
 
-        arma::vec3 calculate_WBEB(arma::mat33 TBI);
+        double calculate_xcg();
 
         /* Routing references */
         Environment * environment;

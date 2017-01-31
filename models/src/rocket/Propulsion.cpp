@@ -71,7 +71,7 @@ void Propulsion::calculate_propulsion(double int_step)
     Matrix IBBB1(3,3);
     Matrix IBBB(3,3);
 
-    double press=environment->get_press();
+    double press = environment->get_press();
 
     //no thrusting
     switch(this->thrust_state){
@@ -85,25 +85,26 @@ void Propulsion::calculate_propulsion(double int_step)
         case INPUT_THRUST:
         case LTG_THRUST:
 
-            this->thrust = this->spi * this->fuel_flow_rate * AGRAV + (psl - press) * this->aexit;
+            this->thrust = calculate_thrust(press, psl);
 
             //calculating delta-v
-            this->thrust_delta_v += this->spi * AGRAV * (this->fuel_flow_rate / this->vmass) * int_step;
+            propagate_thrust_delta_v(int_step);
 
             //calculating fuel consumption
             if (spi != 0){
-                double fmassd_next = (this->thrust - (psl - press) * this->aexit) / (this->spi * AGRAV); //thrust/(spi*AGRAV)
-                this->fmasse = integrate(fmassd_next, this->fmassd, this->fmasse, int_step);
-                this->fmassd = fmassd_next;
+                propagate_fmasse(int_step, press, psl);
             }
 
-            this->fmassr = this->fmass0 - this->fmasse;
+            this->fmassr = calculate_fmassr();
 
             //shutting down engine when all fuel is expended
             if(fmassr <= 0){
                 this->thrust_state = NO_THRUST;
                 this->thrust = 0;
             }
+
+            //interpolating cg as a function of fuel expended
+            this->xcg = calculate_xcg();
 
             //load MOI of booster
             IBBB0.zero();
@@ -118,8 +119,6 @@ void Propulsion::calculate_propulsion(double int_step)
             double mass_ratio = fmasse / fmass0;
             IBBB = IBBB0 + (IBBB1 - IBBB0) * mass_ratio;
 
-            //interpolating cg as a function of fuel expended
-            this->xcg = xcg_0 + (xcg_1 - xcg_0) * mass_ratio;
             IBBB.fill(ibbb);
 
             break;
@@ -127,6 +126,28 @@ void Propulsion::calculate_propulsion(double int_step)
 
     //calculating vehicle mass, mass flow, and fuel mass remaining
     vmass = payload + vmass0 - fmasse;
+}
+
+void Propulsion::propagate_thrust_delta_v(double int_step){
+    this->thrust_delta_v += this->spi * AGRAV * (this->fuel_flow_rate / this->vmass) * int_step;
+}
+
+void Propulsion::propagate_fmasse(double int_step, double press, double psl){
+    double fmassd_next = (this->thrust - (psl - press) * this->aexit) / (this->spi * AGRAV); //thrust/(spi*AGRAV)
+    this->fmasse = integrate(fmassd_next, this->fmassd, this->fmasse, int_step);
+    this->fmassd = fmassd_next;
+}
+double Propulsion::calculate_thrust(double press, double psl){
+    return this->spi * this->fuel_flow_rate * AGRAV + (psl - press) * this->aexit;
+}
+
+double Propulsion::calculate_fmassr(){
+    return this->fmass0 - this->fmasse;
+}
+
+double Propulsion::calculate_xcg(){
+    double mass_ratio = fmasse / fmass0;
+    return xcg_0 + (xcg_1 - xcg_0) * mass_ratio;
 }
 
 void Propulsion::set_vmass0(double in) { vmass0 = in; }
