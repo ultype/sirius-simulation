@@ -53,13 +53,13 @@ namespace cad {
         protected:
             bool   has_turbulance;
 
-            double twind;
-            double altitude;
+            double twind;       /* *o (s)          Wind smoothing time constant - sec */
+            double altitude;    /* *o (m)          Current Altitude */
 
-            double vertical_wind_speed;
+            double vertical_wind_speed; /* *o (m/s)        Vertical air speed (pos.down) - m/s */
 
-            double vwind;
-            double psiwdx;      /* *io (m/s)        Wind direction from north - m/s*/
+            double vwind;       /* *o (m/s)        Wind Speed */
+            double psiwdx;      /* *o (d)          Wind direction from north */
 
         private:
             arma::vec VAED;     /* *o (m/s)        Smoothed wind velocity in geodetic coord */

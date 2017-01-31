@@ -1696,6 +1696,41 @@ void cad_geoc_in(double &lonc,
     if ((lonc) > (180. * RAD))
         lonc = -((360. * RAD) - lonc);  // east positive, west negative
 }
+
+void arma_cad_geoc_in(double &lonc,
+                 double &latc,
+                 double &altc,
+                 arma::vec3 SBII,
+                 const double &time)
+{
+    double lon_cel(0);
+    double sbii1 = SBII(0);
+    double sbii2 = SBII(1);
+    double sbii3 = SBII(2);
+    arma::vec3 RESULT;
+
+    // latitude
+    double dbi = sqrt(sbii1 * sbii1 + sbii2 * sbii2 + sbii3 * sbii3);
+    latc = asin((sbii3) / dbi);
+
+    // altitude
+    altc = dbi - REARTH;
+
+    // longitude
+    double dum4 = asin(sbii2 / sqrt(sbii1 * sbii1 + sbii2 * sbii2));
+    // Resolving the multi-valued arcsin function
+    if ((sbii1 >= 0.0) && (sbii2 >= 0.0))
+        lon_cel = dum4;  // quadrant I
+    if ((sbii1 < 0.0) && (sbii2 >= 0.0))
+        lon_cel = (180. * RAD) - dum4;  // quadrant II
+    if ((sbii1 < 0.0) && (sbii2 < 0.0))
+        lon_cel = (180. * RAD) - dum4;  // quadrant III
+    if ((sbii1 > 0.0) && (sbii2 < 0.0))
+        lon_cel = (360. * RAD) + dum4;  // quadrant IV
+    lonc = lon_cel - WEII3 * time - GW_CLONG;
+    if ((lonc) > (180. * RAD))
+        lonc = -((360. * RAD) - lonc);  // east positive, west negative
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Returns lon, lat, alt from displacement vector in Earth coord for spherical
 // earth
@@ -1790,6 +1825,25 @@ Matrix cad_grav84(Matrix SBII, const double &time)
     GRAVG.assign_loc(0, 0, gravg1);
     GRAVG.assign_loc(1, 0, gravg2);
     GRAVG.assign_loc(2, 0, gravg3);
+
+    return GRAVG;
+}
+
+
+arma::vec3 arma_cad_grav84(arma::vec3 SBII, const double &time)
+{
+    double lonc(0), latc(0), altc(0);
+    arma::vec3 GRAVG;
+
+    arma_cad_geoc_in(lonc, latc, altc, SBII, time);
+    double dbi = norm(SBII);
+    double dum1 = GM / (dbi * dbi);
+    double dum2 = 3 * sqrt(5.);
+    double dum3 = pow((SMAJOR_AXIS / dbi), 2);
+
+    GRAVG(0) = -dum1 * dum2 * C20 * dum3 * sin(latc) * cos(latc);;
+    GRAVG(1) = 0;
+    GRAVG(2) = dum1 * (1. + dum2 / 2. * C20 * dum3 * (3. * pow(sin(latc), 2) - 1.));;
 
     return GRAVG;
 }

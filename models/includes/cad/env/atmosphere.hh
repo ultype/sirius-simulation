@@ -32,9 +32,9 @@ namespace cad {
         protected:
             double altitude;
 
-            double tempk;
-            double density;
-            double pressure;
+            double tempk;       /* *o (K)          Atmospheric temperature */
+            double density;     /* *o (kg/m3)      Atmospheric Density */
+            double pressure;    /* *o (pa)         Atmospheric pressure */
             double vsound;
 
             double vwind;

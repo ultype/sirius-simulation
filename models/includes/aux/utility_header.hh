@@ -434,12 +434,20 @@ void cad_geoc_in(double &lonc,
                  Matrix SBII,
                  const double &time);
 
+void arma_cad_geoc_in(double &lonc,
+                 double &latc,
+                 double &altc,
+                 arma::vec3 SBII,
+                 const double &time);
+
 /// @return geocentric lon, lat, alt from displacement vector in Earth coord
 Matrix cad_geoc_ine(Matrix SBIE);
 
 /// @return Earth gravitational acceleration in geocentric coord, using the
 ///         WGS 84 ellipsoid
 Matrix cad_grav84(Matrix SBII, const double &time);
+
+arma::vec3 arma_cad_grav84(arma::vec3 SBII, const double &time);
 
 /// @return the inertial diplacement vector from longitude, latitude and
 ///         altitude (WGS84)
