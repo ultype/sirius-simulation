@@ -60,7 +60,14 @@ void Guidance::guidance(double int_step)
         }
     }
     //-------------------------------------------------------------------------
-    propulsion->set_thrust((Propulsion::THRUST_TYPE)mprop);
+    switch(mprop){
+        case 0:
+            propulsion->set_no_thrust();
+            break;
+        case 4:
+            propulsion->set_ltg_thrust();
+            break;
+    }
     UTBC.fill(utbc);
     // diagnostics
     UTIC.fill(utic);

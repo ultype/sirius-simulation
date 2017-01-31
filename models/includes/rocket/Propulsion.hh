@@ -26,14 +26,14 @@ class Propulsion{
         void initialize();
         void calculate_propulsion(double int_step);
 
-        typedef enum {
-            NO_THRUST = 0,
-            INPUT_THRUST = 3,
-            LTG_THRUST = 4
-        } THRUST_TYPE;
+        void set_no_thrust();
+        void set_input_thrust(double xcg0, double xcg1,
+                                double moi_roll0, double moi_roll1,
+                                double moi_trans0, double moi_tran1,
+                                double spi, double fuel_flow_rate);
+        void set_ltg_thrust();
 
-        void set_thrust(THRUST_TYPE in);
-
+        //XXX: get_thrust_state
         int get_mprop();
         double get_vmass();
         double get_xcg();
@@ -44,48 +44,66 @@ class Propulsion{
         /* Input File */
         void set_vmass0(double);
         void set_fmass0(double);
-        void set_xcg_0(double);
-        void set_xcg_1(double);
-        void set_fuel_flow_rate(double);
-        void set_moi_roll_0(double);
-        void set_moi_roll_1(double);
-        void set_moi_trans_0(double);
-        void set_moi_trans_1(double);
+
         void set_aexit(double);
-        void set_spi(double);
         void set_payload(double);
-        /* Input File Event */
-        void set_fmasse(double);
 
     private:
+        /* Internal Getter */
+
+        /* Internal Initializers */
         void default_data();
 
-        Environment *environment;
+        /* Internal Propagator / Calculators */
+        void propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB);
 
-        THRUST_TYPE thrust_state;   /* *o (--)      propulsion mode, See THRUST TYPE*/
-        double vmass;       /* *io (kg)     Vehicle mass*/
-        double xcg;         /* *io (m)      Center 0f Gravity location from nose cone*/
-        double ibbb[3][3];  /* *io (kg*m2)  Vehicle moment of inertia*/
-        double thrust;      /* *io (N)      Thrust*/
-        double fmassr;      /* *io (kg)     Remaining fuel mass*/
+        /* Internal Calculators */
+        arma::vec3 calculate_WBII(arma::mat33 TBI);
 
-        double fmasse;      /* *io (kg)     Fuel mass expended (zero initialization required)*/
-        double vmass0;      /* *io (kg)     Initial vehicle mass*/
-        double fmass0;      /* *io (kg)     Initial fuel mass in stage*/
-        double xcg_0;       /* *io (m)      Initial cg location from nose*/
-        double xcg_1;       /* *io (m)      Final cg location from nose*/
-        double fuel_flow_rate;/* *io (kg/s) Fuel flow rate of rocket motor*/
-        double moi_roll_0;  /* *io (kg*m2)  Roll MOI of vehicle, initial*/
-        double moi_roll_1;  /* *io (kg*m2)  Roll MOI of vehicle, burn-out*/
-        double moi_trans_0; /* *io (kg*m2)  Transverse MOI of vehicle, initial*/
-        double moi_trans_1; /* *io (kg*m2)  Transverse MOI of vehicle, burn-out*/
-        double aexit;       /* *io (m2)     Nozzle exit area*/
-        double spi;         /* *io (s)      Specific impulse*/
-        double payload;     /* *io (kg)     payload mass*/
+        arma::vec3 calculate_WBEB(arma::mat33 TBI);
 
-        double acowl;       /* *io (m2)     Cowl area of engine inlet*/
-        double fmassd;      /* *io (kg/s)   Fuel mass expended derivative*/
-        double thrust_delta_v;/* *io (m/s)  delta v*/
-        /**************************************************************************************/
+        /* Routing references */
+        Environment * environment;
+
+        /* Constants */
+        typedef enum {
+            NO_THRUST = 0,
+            INPUT_THRUST = 3,
+            LTG_THRUST = 4
+        } THRUST_TYPE;
+
+        double xcg_0;           /* *o (m)      Initial cg location from nose*/
+        double xcg_1;           /* *o (m)      Final cg location from nose*/
+        double moi_roll_0;      /* *o (kg*m2)  Roll MOI of vehicle, initial*/
+        double moi_roll_1;      /* *o (kg*m2)  Roll MOI of vehicle, burn-out*/
+        double moi_trans_0;     /* *o (kg*m2)  Transverse MOI of vehicle, initial*/
+        double moi_trans_1;     /* *o (kg*m2)  Transverse MOI of vehicle, burn-out*/
+        double fuel_flow_rate;  /* *o (kg/s)   Fuel flow rate of rocket motor*/
+        double spi;             /* *o (s)      Specific impulse*/
+
+        double aexit;           /* *o (m2)     Nozzle exit area*/
+        double payload;         /* *o (kg)     payload mass*/
+
+        double vmass0;          /* *o (kg)     Initial vehicle mass*/
+        double fmass0;          /* *o (kg)     Initial fuel mass in stage*/
+
+        /* State */
+        THRUST_TYPE thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
+
+        /* Propagative Stats */
+        double fmasse;              /* *o (kg)     Fuel mass expended (zero initialization required)*/
+        double fmassd;              /* *o (kg/s)   Fuel mass expended derivative*/
+        double thrust_delta_v;      /* *o (m/s)    delta v*/
+
+        /* Generating Outputs */
+        double fmassr;              /* *o (kg)     Remaining fuel mass*/
+        double thrust;              /* *o (N)      Thrust*/
+        double vmass;               /* *o (kg)     Vehicle mass*/
+
+        double xcg;                 /* *o (m)      Center 0f Gravity location from nose cone*/
+        double ibbb[3][3];          /* *o (kg*m2)  Vehicle moment of inertia*/
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
 };
 #endif  // __propulsion_HH__

@@ -19,22 +19,24 @@ speration_1.condition(0, "trick.exec_get_sim_time() == 101.001")
 speration_1.action(0, "rkt.aerodynamics.set_refa(1.13)")
 speration_1.action(1, "rkt.propulsion.set_aexit(0)")
 speration_1.action(2, "rkt.aerodynamics.set_xcg_ref(3.429)")
+
 speration_1.action(3, "rkt.propulsion.set_vmass0(3893)")
 speration_1.action(4, "rkt.propulsion.set_fmass0(2963)")
-speration_1.action(5, "rkt.propulsion.set_fmasse(0)")
-speration_1.action(6, "rkt.propulsion.set_xcg_0(5.829)")
-speration_1.action(7, "rkt.propulsion.set_xcg_1(4.683)")
-speration_1.action(8, "rkt.propulsion.set_moi_roll_0(615.2)")
-speration_1.action(9, "rkt.propulsion.set_moi_roll_1(151.0)")
-speration_1.action(10, "rkt.propulsion.set_moi_trans_0(7407.4)")
-speration_1.action(11, "rkt.propulsion.set_moi_trans_1(3752.1)")
-speration_1.action(12, "rkt.propulsion.set_spi(290)")
-speration_1.action(13, "rkt.propulsion.set_fuel_flow_rate(29.63)")
-speration_1.action(14, "rkt.propulsion.set_thrust(rkt.propulsion.INPUT_THRUST)")
-speration_1.action(15, "rkt.rcs.set_mrcs_moment(23)")
-speration_1.action(16, "trick.add_event(speration_2)")
-speration_1.action(17, "speration_2.activate()")
-speration_1.action(18, "rkt.aerodynamics.set_maero(12)")
+
+speration_1.action(5,  "xcg_0          = 5.829 " )
+speration_1.action(6,  "xcg_1          = 4.683 " )
+speration_1.action(7,  "moi_roll_0     = 615.2 " )
+speration_1.action(8,  "moi_roll_1     = 151.0 " )
+speration_1.action(9,  "moi_trans_0    = 7407.4" )
+speration_1.action(10, "moi_trans_1    = 3752.1" )
+speration_1.action(11, "spi            = 290   " )
+speration_1.action(12, "fuel_flow_rate = 29.63 " )
+speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
+
+speration_1.action(14, "rkt.rcs.set_mrcs_moment(23)")
+speration_1.action(15, "trick.add_event(speration_2)")
+speration_1.action(16, "speration_2.activate()")
+speration_1.action(17, "rkt.aerodynamics.set_maero(12)")
 trick.add_event(speration_1)
 speration_1.activate()
 ###############################################################
@@ -55,28 +57,30 @@ speration_3.action(1, "rkt.aerodynamics.set_xcg_ref(3.2489)")
 speration_3.action(2, "rkt.rcs.set_roll_mom_max(10)")
 speration_3.action(3, "rkt.rcs.set_pitch_mom_max(100)")
 speration_3.action(4, "rkt.rcs.set_yaw_mom_max(20)")
+
 speration_3.action(5, "rkt.propulsion.set_vmass0(490)")
 speration_3.action(6, "rkt.propulsion.set_fmass0(360)")
-speration_3.action(7, "rkt.propulsion.set_fmasse(0)")
-speration_3.action(8, "rkt.propulsion.set_xcg_0(1.942)")
-speration_3.action(9, "rkt.propulsion.set_xcg_1(2.02)")
-speration_3.action(10, "rkt.propulsion.set_moi_roll_0(72.7)")
-speration_3.action(11, "rkt.propulsion.set_moi_roll_1(61.9)")
-speration_3.action(12, "rkt.propulsion.set_moi_trans_0(140.7)")
-speration_3.action(13, "rkt.propulsion.set_moi_trans_1(88.8)")
-speration_3.action(14, "rkt.propulsion.set_spi(300)")
-speration_3.action(15, "rkt.propulsion.set_fuel_flow_rate(3.33)")
-speration_3.action(16, "rkt.propulsion.set_thrust(rkt.propulsion.INPUT_THRUST)")
-speration_3.action(17, "trick.add_event(speration_4)")
-speration_3.action(18, "speration_4.activate()")
-speration_3.action(19, "rkt.aerodynamics.set_maero(11)")
-speration_3.action(20, "rkt.rcs.set_mrcs_moment(23)")
+
+speration_3.action(7,  "xcg_0          = 1.942" )
+speration_3.action(8,  "xcg_1          = 2.02 " )
+speration_3.action(9, "moi_roll_0     = 72.7 " )
+speration_3.action(10, "moi_roll_1     = 61.9 " )
+speration_3.action(11, "moi_trans_0    = 140.7" )
+speration_3.action(12, "moi_trans_1    = 88.8 " )
+speration_3.action(13, "spi            = 300  " )
+speration_3.action(14, "fuel_flow_rate = 3.33 " )
+speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
+
+speration_3.action(16, "trick.add_event(speration_4)")
+speration_3.action(17, "speration_4.activate()")
+speration_3.action(18, "rkt.aerodynamics.set_maero(11)")
+speration_3.action(19, "rkt.rcs.set_mrcs_moment(23)")
 #############################################################
 #Event4:MECO
 speration_4=trick.new_event("speration_4")
 speration_4.set_cycle(0.05)
 speration_4.condition(0, "rkt.newton.get_dvbi() > 7613.5")
-speration_4.action(0, "rkt.propulsion.set_thrust(rkt.propulsion.NO_THRUST)")
+speration_4.action(0, "rkt.propulsion.set_no_thrust()")
 speration_4.action(1, "rkt.propulsion.set_vmass0(0)")
 #############################################################
 #Realtime setting
@@ -119,17 +123,19 @@ rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - 
 rkt.aerodynamics.set_alplimx(20)      #Alpha limiter for vehicle - deg
 rkt.aerodynamics.set_alimitx(5)       #Structural  limiter for vehicle
 #propulsion
-rkt.propulsion.set_thrust(rkt.propulsion.INPUT_THRUST)
 rkt.propulsion.set_vmass0(13970)       #vehicle initial mass
 rkt.propulsion.set_fmass0(8888.9)      #vehicle initail fuel mass
-rkt.propulsion.set_xcg_0(12.032)      #vehicle initial xcg
-rkt.propulsion.set_xcg_1(7.965)       #vehicle final xcg
-rkt.propulsion.set_moi_roll_0(2426.8)  #vehicle initial moi in roll direction
-rkt.propulsion.set_moi_roll_1(914.5)   #vehicle final moi in roll direction
-rkt.propulsion.set_moi_trans_0(244537.9)   #vehicle initial transverse moi
-rkt.propulsion.set_moi_trans_1(87392.2)    #vehicle final transverse moi
-rkt.propulsion.set_spi(255.0)          #Specific impusle
-rkt.propulsion.set_fuel_flow_rate(88.89)  #fuel flow rate
+
+xcg_0          = 12.032   # vehicle initial xcg
+xcg_1          = 7.965    # vehicle final xcg
+moi_roll_0     = 2426.8   # vehicle initial moi in roll direction
+moi_roll_1     = 914.5    # vehicle final moi in roll direction
+moi_trans_0    = 244537.9 # vehicle initial transverse moi
+moi_trans_1    = 87392.2  # vehicle final transverse moi
+spi            = 255.0    # Specific impusle
+fuel_flow_rate = 88.89    # fuel flow rate
+rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)
+
 rkt.propulsion.set_aexit(0.258242843) #nozzle exhaust area
 rkt.propulsion.set_payload(98) #payload mass
 #INS
