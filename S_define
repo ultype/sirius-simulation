@@ -94,7 +94,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") gpsr.update_markov(0.001);
             (0.001, "scheduled") kinematics.propagate(0.001);
 	        (0.001, "scheduled") env.propagate(0.001);
-            (0.001, "scheduled") propulsion.calculate_propulsion(0.001);
+            (0.001, "scheduled") propulsion.propagate(0.001);
             (0.001, "scheduled") aerodynamics.calculate_aero(0.001,aerodynamics.aerotable);
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);

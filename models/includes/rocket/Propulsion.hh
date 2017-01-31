@@ -24,7 +24,7 @@ class Propulsion{
         Propulsion& operator=(const Propulsion& other);
 
         void initialize();
-        void calculate_propulsion(double int_step);
+        void propagate(double int_step);
 
         void set_no_thrust();
         void set_input_thrust(double xcg0, double xcg1,
@@ -40,6 +40,7 @@ class Propulsion{
         double get_thrust();
         double get_fmassr();
         Matrix get_IBBB();
+        arma::mat33 get_IBBB_();
 
         /* Input File */
         void set_vmass0(double);
@@ -50,6 +51,8 @@ class Propulsion{
 
     private:
         /* Internal Getter */
+        arma::mat33 get_IBBB0();
+        arma::mat33 get_IBBB1();
 
         /* Internal Initializers */
         void default_data();
@@ -63,16 +66,17 @@ class Propulsion{
         double calculate_fmassr();
 
         double calculate_xcg();
+        arma::mat33 calculate_IBBB();
 
         /* Routing references */
         Environment * environment;
 
         /* Constants */
-        typedef enum {
+        enum THRUST_TYPE {
             NO_THRUST = 0,
             INPUT_THRUST = 3,
             LTG_THRUST = 4
-        } THRUST_TYPE;
+        };
 
         double xcg_0;           /* *o (m)      Initial cg location from nose*/
         double xcg_1;           /* *o (m)      Final cg location from nose*/
@@ -90,7 +94,7 @@ class Propulsion{
         double fmass0;          /* *o (kg)     Initial fuel mass in stage*/
 
         /* State */
-        THRUST_TYPE thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
+        enum THRUST_TYPE thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
 
         /* Propagative Stats */
         double fmasse;              /* *o (kg)     Fuel mass expended (zero initialization required)*/
@@ -103,7 +107,8 @@ class Propulsion{
         double vmass;               /* *o (kg)     Vehicle mass*/
 
         double xcg;                 /* *o (m)      Center 0f Gravity location from nose cone*/
-        double ibbb[3][3];          /* *o (kg*m2)  Vehicle moment of inertia*/
+        arma::mat IBBB;             /* *o (kg*m2)  Vehicle moment of inertia*/
+        double _IBBB[3][3];         /* *o (kg*m2)  Vehicle moment of inertia*/
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */

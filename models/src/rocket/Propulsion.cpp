@@ -4,13 +4,15 @@
 #include "sim_services/include/simtime.h"
 
 Propulsion::Propulsion(Environment& env)
-    :   environment(&env)
+    :   environment(&env),
+        MATRIX_INIT(IBBB, 3, 3)
 {
     this->default_data();
 }
 
 Propulsion::Propulsion(const Propulsion& other)
-    :   environment(other.environment)
+    :   environment(other.environment),
+        MATRIX_INIT(IBBB, 3, 3)
 {
     this->default_data();
 
@@ -64,12 +66,11 @@ void Propulsion::set_ltg_thrust(){
     this->thrust_state = LTG_THRUST;
 }
 
-void Propulsion::calculate_propulsion(double int_step)
+void Propulsion::propagate(double int_step)
 {
     double psl(101300); //chamber pressure - Pa
-    Matrix IBBB0(3,3);
-    Matrix IBBB1(3,3);
-    Matrix IBBB(3,3);
+    arma::mat33 IBBB0;
+    arma::mat33 IBBB1;
 
     double press = environment->get_press();
 
@@ -106,20 +107,8 @@ void Propulsion::calculate_propulsion(double int_step)
             //interpolating cg as a function of fuel expended
             this->xcg = calculate_xcg();
 
-            //load MOI of booster
-            IBBB0.zero();
-            IBBB0.assign_loc(0,0,moi_roll_0);
-            IBBB0.assign_loc(1,1,moi_trans_0);
-            IBBB0.assign_loc(2,2,moi_trans_0);
-            IBBB1.zero();
-            IBBB1.assign_loc(0,0,moi_roll_1);
-            IBBB1.assign_loc(1,1,moi_trans_1);
-            IBBB1.assign_loc(2,2,moi_trans_1);
             //interpolating moment of inertia tensor as a function of fuel expended
-            double mass_ratio = fmasse / fmass0;
-            IBBB = IBBB0 + (IBBB1 - IBBB0) * mass_ratio;
-
-            IBBB.fill(ibbb);
+            this->IBBB = calculate_IBBB();
 
             break;
     }
@@ -150,6 +139,29 @@ double Propulsion::calculate_xcg(){
     return xcg_0 + (xcg_1 - xcg_0) * mass_ratio;
 }
 
+arma::mat33 Propulsion::calculate_IBBB(){
+    double mass_ratio = fmasse / fmass0;
+    return get_IBBB0() + (get_IBBB1() - get_IBBB0()) * mass_ratio;
+}
+
+arma::mat33 Propulsion::get_IBBB0(){
+    arma::mat33 IBBB0(arma::fill::zeros);
+    IBBB0(0,0) = moi_roll_0;
+    IBBB0(1,1) = moi_trans_0;
+    IBBB0(2,2) = moi_trans_0;
+
+    return IBBB0;
+}
+
+arma::mat33 Propulsion::get_IBBB1(){
+    arma::mat33 IBBB1(arma::fill::zeros);
+    IBBB1(0,0) = moi_roll_1;
+    IBBB1(1,1) = moi_trans_1;
+    IBBB1(2,2) = moi_trans_1;
+
+    return IBBB1;
+}
+
 void Propulsion::set_vmass0(double in) { vmass0 = in; }
 void Propulsion::set_fmass0(double in) { fmass0 = in; }
 void Propulsion::set_aexit(double in) { aexit = in; }
@@ -160,8 +172,12 @@ double Propulsion::get_vmass() { return vmass; }
 double Propulsion::get_xcg() { return xcg; }
 double Propulsion::get_thrust() { return thrust; }
 double Propulsion::get_fmassr() { return fmassr; }
+
 Matrix Propulsion::get_IBBB() {
-    Matrix IBBB(3, 3);
-    IBBB.build_mat33(ibbb);
+    Matrix IBBB(_IBBB);
+    return ~IBBB;
+}
+
+arma::mat33 Propulsion::get_IBBB_() {
     return IBBB;
 }
