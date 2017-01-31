@@ -25,11 +25,17 @@ Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine)
 
 Environment::Environment(const Environment& other)
     :   newton(other.newton), aerodynamics(other.aerodynamics), kinematics(other.kinematics),
-        VECTOR_INIT(GRAVG, 3),
-        atmosphere(new cad::Atmosphere(*other.atmosphere)),
-        wind(new cad::Wind(*other.wind))
+        VECTOR_INIT(GRAVG, 3)
 {
     this->default_data();
+
+    atmosphere = NULL;
+    wind       = NULL;
+
+    if(other.atmosphere)
+        this->atmosphere = new cad::Atmosphere(*other.atmosphere);
+    if(other.wind)
+        this->wind = new cad::Wind(*other.wind);
 
     this->GRAVG = other.GRAVG;
     this->vmach = other.vmach;
@@ -46,8 +52,10 @@ Environment& Environment::operator=(const Environment& other) {
     this->newton       = other.newton;
     this->aerodynamics = other.aerodynamics;
 
-    this->atmosphere = new cad::Atmosphere(*other.atmosphere);
-    this->wind = new cad::Wind(*other.wind);
+    if(other.atmosphere)
+        this->atmosphere = new cad::Atmosphere(*other.atmosphere);
+    if(other.wind)
+        this->wind = new cad::Wind(*other.wind);
 
     this->GRAVG = other.GRAVG;
     this->vmach = other.vmach;
