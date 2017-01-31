@@ -26,7 +26,14 @@ class Propulsion{
         void initialize();
         void calculate_propulsion(double int_step);
 
-        void set_mprop(int);
+        typedef enum {
+            NO_THRUST = 0,
+            INPUT_THRUST = 3,
+            LTG_THRUST = 4
+        } THRUST_TYPE;
+
+        void set_thrust(THRUST_TYPE in);
+
         int get_mprop();
         double get_vmass();
         double get_xcg();
@@ -51,11 +58,11 @@ class Propulsion{
         void set_fmasse(double);
 
     private:
-        void default_data() {};
+        void default_data();
 
         Environment *environment;
 
-        int mprop;          /* *io (--)     propulsion mode =0:none; =3 input; =4 LTG control*/
+        THRUST_TYPE thrust_state;   /* *o (--)      propulsion mode, See THRUST TYPE*/
         double vmass;       /* *io (kg)     Vehicle mass*/
         double xcg;         /* *io (m)      Center 0f Gravity location from nose cone*/
         double ibbb[3][3];  /* *io (kg*m2)  Vehicle moment of inertia*/

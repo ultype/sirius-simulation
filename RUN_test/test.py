@@ -30,7 +30,7 @@ speration_1.action(10, "rkt.propulsion.set_moi_trans_0(7407.4)")
 speration_1.action(11, "rkt.propulsion.set_moi_trans_1(3752.1)")
 speration_1.action(12, "rkt.propulsion.set_spi(290)")
 speration_1.action(13, "rkt.propulsion.set_fuel_flow_rate(29.63)")
-speration_1.action(14, "rkt.propulsion.set_mprop(3)")
+speration_1.action(14, "rkt.propulsion.set_thrust(rkt.propulsion.INPUT_THRUST)")
 speration_1.action(15, "rkt.rcs.set_mrcs_moment(23)")
 speration_1.action(16, "trick.add_event(speration_2)")
 speration_1.action(17, "speration_2.activate()")
@@ -66,7 +66,7 @@ speration_3.action(12, "rkt.propulsion.set_moi_trans_0(140.7)")
 speration_3.action(13, "rkt.propulsion.set_moi_trans_1(88.8)")
 speration_3.action(14, "rkt.propulsion.set_spi(300)")
 speration_3.action(15, "rkt.propulsion.set_fuel_flow_rate(3.33)")
-speration_3.action(16, "rkt.propulsion.set_mprop(3)")
+speration_3.action(16, "rkt.propulsion.set_thrust(rkt.propulsion.INPUT_THRUST)")
 speration_3.action(17, "trick.add_event(speration_4)")
 speration_3.action(18, "speration_4.activate()")
 speration_3.action(19, "rkt.aerodynamics.set_maero(11)")
@@ -76,7 +76,7 @@ speration_3.action(20, "rkt.rcs.set_mrcs_moment(23)")
 speration_4=trick.new_event("speration_4")
 speration_4.set_cycle(0.05)
 speration_4.condition(0, "rkt.newton.get_dvbi() > 7613.5")
-speration_4.action(0, "rkt.propulsion.set_mprop(0)")
+speration_4.action(0, "rkt.propulsion.set_thrust(rkt.propulsion.NO_THRUST)")
 speration_4.action(1, "rkt.propulsion.set_vmass0(0)")
 #############################################################
 #Realtime setting
@@ -119,7 +119,7 @@ rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - 
 rkt.aerodynamics.set_alplimx(20)      #Alpha limiter for vehicle - deg
 rkt.aerodynamics.set_alimitx(5)       #Structural  limiter for vehicle
 #propulsion
-rkt.propulsion.set_mprop(3)   #'int' =0:none; =3 input; =4 LTG control  module propulsion
+rkt.propulsion.set_thrust(rkt.propulsion.INPUT_THRUST)
 rkt.propulsion.set_vmass0(13970)       #vehicle initial mass
 rkt.propulsion.set_fmass0(8888.9)      #vehicle initail fuel mass
 rkt.propulsion.set_xcg_0(12.032)      #vehicle initial xcg

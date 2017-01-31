@@ -60,7 +60,7 @@ void Guidance::guidance(double int_step)
         }
     }
     //-------------------------------------------------------------------------
-    propulsion->set_mprop(mprop);
+    propulsion->set_thrust((Propulsion::THRUST_TYPE)mprop);
     UTBC.fill(utbc);
     // diagnostics
     UTIC.fill(utic);
