@@ -18,11 +18,13 @@ class Propulsion{
     TRICK_INTERFACE(Propulsion);
 
     public:
-        Propulsion(){};
-        void initialize(Environment *env);
+        Propulsion(Environment& env);
+        Propulsion(const Propulsion& other);
+
+        Propulsion& operator=(const Propulsion& other);
+
+        void initialize();
         void calculate_propulsion(double int_step);
-        Environment *environment;
-        /***********************************Variables describtion******************************/
 
         void set_mprop(int);
         int get_mprop();
@@ -49,6 +51,10 @@ class Propulsion{
         void set_fmasse(double);
 
     private:
+        void default_data() {};
+
+        Environment *environment;
+
         int mprop;          /* *io (--)     propulsion mode =0:none; =3 input; =4 LTG control*/
         double vmass;       /* *io (kg)     Vehicle mass*/
         double xcg;         /* *io (m)      Center 0f Gravity location from nose cone*/

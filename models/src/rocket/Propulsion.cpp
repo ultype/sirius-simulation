@@ -3,10 +3,31 @@
 #include "rocket/Propulsion.hh"
 #include "sim_services/include/simtime.h"
 
-
-void Propulsion::initialize(Environment *env)
+Propulsion::Propulsion(Environment& env)
+    :   environment(&env)
 {
-    environment=env;
+    this->default_data();
+}
+
+Propulsion::Propulsion(const Propulsion& other)
+    :   environment(other.environment)
+{
+    this->default_data();
+
+    /* Propagative Stats */
+}
+
+Propulsion& Propulsion::operator=(const Propulsion& other){
+    if(&other == this)
+        return *this;
+
+    this->environment = other.environment;
+
+    return *this;
+}
+
+void Propulsion::initialize()
+{
 }
 
 void Propulsion::calculate_propulsion(double int_step)
