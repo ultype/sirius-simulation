@@ -31,7 +31,6 @@ void AeroDynamics::load_aerotable(char* filename){
     read_tables(filename, aerotable);
 }
 
-int AeroDynamics::set_maero(int in) { maero = in; }
 double AeroDynamics::set_xcg_ref(double in) { xcg_ref = in; }
 double AeroDynamics::set_alplimx(double in) { alplimx = in; }
 double AeroDynamics::set_alimitx(double in) { alimitx = in; }
@@ -57,18 +56,12 @@ void AeroDynamics::calculate_aero(double int_step){
 
     double alt    = newton->get_alt();
 
-    double mprop  = propulsion->get_mprop();
+    enum Propulsion::THRUST_TYPE thrust_state
+                = propulsion->get_thrust_state();
     double vmass  = propulsion->get_vmass();
     double xcg    = propulsion->get_xcg();
     ////////////////////////////////////////////////////
-
-    int thrust_on=false;
-    double ca0b(0);
-    double cna(0);
-    double clma(0);
-    double ca(0);
-    double cn0mx(0);
-    double cn(0);
+    double cn = 0;
 
     //transforming body rates from body -> aeroballistic coord.
     double phip  = phipx * RAD;
@@ -77,19 +70,16 @@ void AeroDynamics::calculate_aero(double int_step){
     double qqax  = qqx * cphip - rrx * sphip;
     double rrax  = qqx * sphip + rrx * cphip;
 
-
     //looking up axial force coefficients
     ca0  = aerotable.look_up("ca0_vs_mach",  vmach);
     caa  = aerotable.look_up("caa_vs_mach",  vmach);
-    ca0b = aerotable.look_up("ca0b_vs_mach", vmach);
+    double ca0b = aerotable.look_up("ca0b_vs_mach", vmach);
     //axial force coefficient
-    if(mprop) thrust_on = true;
-    ca = ca0 + caa * alppx + thrust_on * ca0b;
+    double ca = ca0 + caa * alppx + (thrust_state != Propulsion::NO_THRUST) * ca0b;
 
     //looking up normal force coefficients in aeroballistic coord
-    cn0  = aerotable.look_up("cn0_vs_mach_alpha", vmach, alppx);
     //normal force coefficient
-    cna  = cn0;
+    double cna = cn0 = aerotable.look_up("cn0_vs_mach_alpha", vmach, alppx);
 
     //looking up pitching moment coefficients in aeroballistic coord
     clm0 = aerotable.look_up("clm0_vs_mach_alpha", vmach, alppx);
@@ -97,29 +87,25 @@ void AeroDynamics::calculate_aero(double int_step){
 
     //pitching moment coefficient
     double clmaref = clm0 + clmq * qqax * refd / (2. * dvba);
-    clma = clmaref - cna * (xcg_ref - xcg) / refd;
-
-    double alplx(0), alpmx(0);
-    double cn0p(0),  cn0m(0);
-    double clm0p(0), clm0m(0);
+    double clma = clmaref - cna * (xcg_ref - xcg) / refd;
 
     //Non-dimensional derivatives
     //look up coeff at +- 3 deg, but not beyond tables
-    alplx += 3.0;
-    alpmx -= 3.0;
+    double alplx = 3.0;
+    double alpmx = -3.0;
     if(alpmx < 0.) alpmx = 0.0;
 
     //calculating normal force dim derivative wrt alpha 'cla'
-    cn0p  = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx);
-    cn0m  = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx);
+    double cn0p = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx);
+    double cn0m = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx);
     //cout<<cn0p<<'\t'<<vmach<<'\t'<<alplx<<endl;
     //
     //replacing value from previous cycle, only if within max alpha limit
     if(alplx < alplimx)
         cla = (cn0p - cn0m) / (alplx - alpmx);
     //calculating pitch moment dim derivative wrt alpha 'cma'
-    clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx);
-    clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx);
+    double clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx);
+    double clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx);
     //replacing value from previous cycle, only if within max alpha limit
     if(alppx < alplimx)
         cma = (clm0p - clm0m) / (alplx - alpmx) - cla * (xcg_ref - xcg) / refd;
@@ -136,7 +122,7 @@ void AeroDynamics::calculate_aero(double int_step){
 
     //calculate load factor available for max alpha
     //looking up normal force coefficients in aeroballistic coord
-    cn0mx = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplimx);
+    double cn0mx = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplimx);
 
     double anlmx  = cn0mx * pdynmc * refa;
     double weight = vmass * AGRAV;

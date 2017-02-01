@@ -36,25 +36,7 @@ class AeroDynamics{
         void initialize();
         void calculate_aero(double int_step);
         void aerodynamics_der();
-    ///////////////////////////////////////////////////////////////////////////////
-    //Definition of aerodynamic module-variables
-    //Member function of class 'FSW'
-    //Module-variable locations are assigned to FSW[100-199]
-    //
-    // This module performs the following functions:
-    // (1) Calculates the aerodynamic force and moment coefficients from the aero_deck
-    // (2) Derives the dimensional derivatives for the flight controllers
-    //
-    // maero = 0 no aerodynamic forces
-    //         11 Booster - 1 stage (last stage)
-    //         12 Booster - 2 stages
-    //         13 Booster - 3 stages (launch)
-    //
-    //050103 Created by Peter H Zipfel
-    //091214 Modified for ROCKET6, PZi
-    ///////////////////////////////////////////////////////////////////////////////
 
-    /***********************************Variables describtion******************************/
         double get_dyb();
         double get_dma();
         double get_dnb();
@@ -76,7 +58,6 @@ class AeroDynamics{
 
 
         /* Input File */
-        int set_maero(int);          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
         double set_xcg_ref(double);     /* *io (m)      Reference cg location from nose - m*/
         double set_alplimx(double);     /* *io (d)      Alpha limiter for vehicle - deg*/
         double set_alimitx(double);     /* *io (--)     Structural  limiter for vehicle*/
@@ -92,7 +73,6 @@ class AeroDynamics{
         TVC *tvc;
         Datadeck aerotable; /* ** (--) Aero Deck */
 
-        int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
         double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
         double alplimx;     /* *io (d)      Alpha limiter for vehicle - deg*/
         double alimitx;     /* *io (--)     Structural  limiter for vehicle*/
