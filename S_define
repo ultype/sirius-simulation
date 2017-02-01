@@ -68,17 +68,18 @@ class Rocket_SimObject : public Trick::SimObject {
         Actuator actuator;
 
         Rocket_SimObject() 
-            :   newton     ( kinematics , euler        , env         , propulsion , force ),
-                kinematics ( newton     , env          , euler ),
-                euler      ( kinematics , propulsion   , force ),
-                env        ( newton     , aerodynamics , kinematics ),
-                propulsion ( env )
+            :   newton      ( kinematics , euler        , env         , propulsion , force ),
+                kinematics  ( newton     , env          , euler ),
+                euler       ( kinematics , propulsion   , force ),
+                env         ( newton     , aerodynamics , kinematics ),
+                propulsion  ( env ),
+                aerodynamics( kinematics , env          , propulsion , euler , newton , tvc )
             {
             ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();
             ("initialization") env.initialize();
-            ("initialization") aerodynamics.initialize(&kinematics, &env, &propulsion, &euler, &newton, &tvc);
+            ("initialization") aerodynamics.initialize();
             ("initialization") newton.initialize();
             ("initialization") euler.initialize();
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
@@ -95,7 +96,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") kinematics.propagate(0.001);
 	        (0.001, "scheduled") env.propagate(0.001);
             (0.001, "scheduled") propulsion.propagate(0.001);
-            (0.001, "scheduled") aerodynamics.calculate_aero(0.001,aerodynamics.aerotable);
+            (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();

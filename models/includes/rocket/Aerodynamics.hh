@@ -20,21 +20,21 @@ class _Euler_;
 class Propulsion;
 class Kinematics;
 
-class AeroDynamics
-{
+class AeroDynamics{
     TRICK_INTERFACE(AeroDynamics);
 
     public:
+        AeroDynamics(Kinematics &kine,  Environment &env,
+                     Propulsion &prop,  _Euler_     &eul,
+                     Newton     &newt,  TVC         &t);
+        AeroDynamics(const AeroDynamics& other);
 
-        Kinematics *kinematics;
-        Environment *environment;
-        Propulsion *propulsion;
-        _Euler_ *euler;
-        Newton *newton;
-        TVC *tvc;
-        Datadeck aerotable; /* ** (--) Aero Deck */
-        void initialize(Kinematics *kine, Environment *env, Propulsion *prop, _Euler_ *eul, Newton *newt,TVC *t);
-        void calculate_aero(double int_step, Datadeck &aerotable);
+        AeroDynamics& operator=(const AeroDynamics& other);
+
+        void load_aerotable(char* filename);
+
+        void initialize();
+        void calculate_aero(double int_step);
         void aerodynamics_der();
     ///////////////////////////////////////////////////////////////////////////////
     //Definition of aerodynamic module-variables
@@ -84,6 +84,14 @@ class AeroDynamics
         double set_refd(double);        /* *io (m)      Reference length for aero coefficients - m*/
 
     private:
+        Kinematics *kinematics;
+        Environment *environment;
+        Propulsion *propulsion;
+        _Euler_ *euler;
+        Newton *newton;
+        TVC *tvc;
+        Datadeck aerotable; /* ** (--) Aero Deck */
+
         int maero;          /* *io (--)     =11: last stage; =12: 2 stages; =13: 3 stages*/
         double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
         double alplimx;     /* *io (d)      Alpha limiter for vehicle - deg*/
