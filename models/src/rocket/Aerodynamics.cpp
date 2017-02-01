@@ -38,26 +38,30 @@ double AeroDynamics::set_alimitx(double in) { alimitx = in; }
 double AeroDynamics::set_refa(double in) { refa = in; }
 double AeroDynamics::set_refd(double in) { refd = in; }
 
-void AeroDynamics::calculate_aero(double int_step)
-{
+void AeroDynamics::calculate_aero(double int_step){
     //Input data from other module//////////////////
-    double alppx=kinematics->get_alppx();
-    double phipx=kinematics->get_phipx();
-    double alphax=kinematics->get_alphax();
-    double betax=kinematics->get_betax();
-    double rho=environment->get_rho();
-    double vmach=environment->get_vmach();
-    double pdynmc=environment->get_pdynmc();
-    double tempk=environment->get_tempk();
-    double dvba=environment->get_dvba();
-    double ppx=euler->get_ppx();
-    double qqx=euler->get_qqx();
-    double rrx=euler->get_rrx();
-    double alt=newton->get_alt();
-    double mprop=propulsion->get_mprop();
-    double vmass=propulsion->get_vmass();
-    double xcg=propulsion->get_xcg();
+    double alppx  = kinematics->get_alppx();
+    double phipx  = kinematics->get_phipx();
+    double alphax = kinematics->get_alphax();
+    double betax  = kinematics->get_betax();
+
+    double rho    = environment->get_rho();
+    double vmach  = environment->get_vmach();
+    double pdynmc = environment->get_pdynmc();
+    double tempk  = environment->get_tempk();
+    double dvba   = environment->get_dvba();
+
+    double ppx    = euler->get_ppx();
+    double qqx    = euler->get_qqx();
+    double rrx    = euler->get_rrx();
+
+    double alt    = newton->get_alt();
+
+    double mprop  = propulsion->get_mprop();
+    double vmass  = propulsion->get_vmass();
+    double xcg    = propulsion->get_xcg();
     ////////////////////////////////////////////////////
+
     int thrust_on=false;
     double ca0b(0);
     double cna(0);
@@ -67,163 +71,116 @@ void AeroDynamics::calculate_aero(double int_step)
     double cn(0);
 
     //transforming body rates from body -> aeroballistic coord.
-    double phip=phipx*RAD;
-    double cphip=cos(phip);
-    double sphip=sin(phip);
-    double qqax=qqx*cphip-rrx*sphip;
-    double rrax=qqx*sphip+rrx*cphip;
+    double phip  = phipx * RAD;
+    double cphip = cos(phip);
+    double sphip = sin(phip);
+    double qqax  = qqx * cphip - rrx * sphip;
+    double rrax  = qqx * sphip + rrx * cphip;
 
 
     //looking up axial force coefficients
-    if(maero==13){
-
-        ca0=aerotable.look_up("ca0slv3_vs_mach",vmach);
-        caa=aerotable.look_up("caaslv3_vs_mach",vmach);
-        ca0b=aerotable.look_up("ca0bslv3_vs_mach",vmach);
-    }else if(maero== 12){
-        ca0=aerotable.look_up("ca0slv2_vs_mach",vmach);
-        caa=aerotable.look_up("caaslv2_vs_mach",vmach);
-        ca0b=aerotable.look_up("ca0bslv2_vs_mach",vmach);
-    }else if(maero==11){
-       ca0=aerotable.look_up("ca0slv2_vs_mach",vmach);
-       caa=aerotable.look_up("caaslv2_vs_mach",vmach);
-       ca0b=aerotable.look_up("ca0bslv2_vs_mach",vmach);
-    }
+    ca0  = aerotable.look_up("ca0_vs_mach",  vmach);
+    caa  = aerotable.look_up("caa_vs_mach",  vmach);
+    ca0b = aerotable.look_up("ca0b_vs_mach", vmach);
     //axial force coefficient
-    if(mprop) thrust_on=true;
-    ca=ca0+caa*alppx+thrust_on*ca0b;
+    if(mprop) thrust_on = true;
+    ca = ca0 + caa * alppx + thrust_on * ca0b;
 
     //looking up normal force coefficients in aeroballistic coord
-    if(maero==13){
-       cn0=aerotable.look_up("cn0slv3_vs_mach_alpha",vmach,alppx);
-    }else if (maero==12){
-       cn0=aerotable.look_up("cn0slv2_vs_mach_alpha",vmach,alppx);
-    }else if (maero==11){
-       cn0=aerotable.look_up("cn0slv1_vs_mach_alpha",vmach,alppx);
-    }
+    cn0  = aerotable.look_up("cn0_vs_mach_alpha", vmach, alppx);
     //normal force coefficient
-    cna=cn0;
+    cna  = cn0;
 
     //looking up pitching moment coefficients in aeroballistic coord
-    if (maero==13){
-       clm0=aerotable.look_up("clm0slv3_vs_mach_alpha",vmach,alppx);
-       clmq=aerotable.look_up("clmqslv3_vs_mach",vmach);
-    }else if(maero==12){
-       clm0=aerotable.look_up("clm0slv2_vs_mach_alpha",vmach,alppx);
-       clmq=aerotable.look_up("clmqslv2_vs_mach",vmach);
-    }else if(maero==11){
-       clm0=aerotable.look_up("clm0slv1_vs_mach_alpha",vmach,alppx);
-       clmq=aerotable.look_up("clmqslv1_vs_mach",vmach);
-    }
-    //pitching moment coefficient
-    double clmaref=clm0+clmq*qqax*refd/(2.*dvba);
-    clma=clmaref-cna*(xcg_ref-xcg)/refd;
+    clm0 = aerotable.look_up("clm0_vs_mach_alpha", vmach, alppx);
+    clmq = aerotable.look_up("clmq_vs_mach", vmach);
 
-    double alplx(0),alpmx(0);
-    double cn0p(0),cn0m(0);
-    double clm0p(0),clm0m(0);
+    //pitching moment coefficient
+    double clmaref = clm0 + clmq * qqax * refd / (2. * dvba);
+    clma = clmaref - cna * (xcg_ref - xcg) / refd;
+
+    double alplx(0), alpmx(0);
+    double cn0p(0),  cn0m(0);
+    double clm0p(0), clm0m(0);
 
     //Non-dimensional derivatives
     //look up coeff at +- 3 deg, but not beyond tables
-    alplx=alppx+3.0;
-    alpmx=alppx-3.0;
-    if(alpmx<0.)alpmx=0.0;
+    alplx += 3.0;
+    alpmx -= 3.0;
+    if(alpmx < 0.) alpmx = 0.0;
 
     //calculating normal force dim derivative wrt alpha 'cla'
-    if(maero==13){
-       cn0p=aerotable.look_up("cn0slv3_vs_mach_alpha",vmach,alplx);
-       cn0m=aerotable.look_up("cn0slv3_vs_mach_alpha",vmach,alpmx);
-    }else if(maero==12){
-       cn0p=aerotable.look_up("cn0slv2_vs_mach_alpha",vmach,alplx);
-       cn0m=aerotable.look_up("cn0slv2_vs_mach_alpha",vmach,alpmx);
-    }else if(maero==11){
-       cn0p=aerotable.look_up("cn0slv1_vs_mach_alpha",vmach,alplx);
-       cn0m=aerotable.look_up("cn0slv1_vs_mach_alpha",vmach,alpmx);
-    }
+    cn0p  = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx);
+    cn0m  = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx);
     //cout<<cn0p<<'\t'<<vmach<<'\t'<<alplx<<endl;
+    //
     //replacing value from previous cycle, only if within max alpha limit
-    if(alplx<alplimx)
-        cla=(cn0p-cn0m)/(alplx-alpmx);
+    if(alplx < alplimx)
+        cla = (cn0p - cn0m) / (alplx - alpmx);
     //calculating pitch moment dim derivative wrt alpha 'cma'
-    if(maero== 13){
-       clm0p=aerotable.look_up("clm0slv3_vs_mach_alpha",vmach,alplx);
-       clm0m=aerotable.look_up("clm0slv3_vs_mach_alpha",vmach,alpmx);
-    }else if(maero==12){
-       clm0p=aerotable.look_up("clm0slv2_vs_mach_alpha",vmach,alplx);
-       clm0m=aerotable.look_up("clm0slv2_vs_mach_alpha",vmach,alpmx);
-    }else if(maero==11){
-       clm0p=aerotable.look_up("clm0slv1_vs_mach_alpha",vmach,alplx);
-       clm0m=aerotable.look_up("clm0slv1_vs_mach_alpha",vmach,alpmx);
-    }
+    clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx);
+    clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx);
     //replacing value from previous cycle, only if within max alpha limit
-    if(alppx<alplimx)
-        cma=(clm0p-clm0m)/(alplx-alpmx)-cla*(xcg_ref-xcg)/refd;
+    if(alppx < alplimx)
+        cma = (clm0p - clm0m) / (alplx - alpmx) - cla * (xcg_ref - xcg) / refd;
 
     //converting force and moment coeff to body axes
     //force coefficients in body axes
-    cx=-ca;
-    cy=-cna*sphip;
-    cz=-cna*cphip;
+    cx = -ca;
+    cy = -cna * sphip;
+    cz = -cna * cphip;
     //moment coefficient in body axes
-    cll=0;
-    clm=clma*cphip;
-    cln=-clma*sphip;
+    cll = 0;
+    clm = clma * cphip;
+    cln = -clma * sphip;
 
     //calculate load factor available for max alpha
     //looking up normal force coefficients in aeroballistic coord
-    if(maero==13){
+    cn0mx = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplimx);
 
-        cn0mx=aerotable.look_up("cn0slv3_vs_mach_alpha",vmach,alplimx);
-    }else if(maero==12){
-        cn0mx=aerotable.look_up("cn0slv2_vs_mach_alpha",vmach,alplimx);
-    }else if(maero==11){
-        cn0mx=aerotable.look_up("cn0slv1_vs_mach_alpha",vmach,alplimx);
-    }
-    double anlmx=cn0mx*pdynmc*refa;
-    double weight=vmass*AGRAV;
-    gnmax=anlmx/weight;
-    if(gnmax>=alimitx)gnmax=alimitx;
-    double aloadn=cn*pdynmc*refa;
-    double gng=aloadn/weight;
-    gnavail=gnmax-gng;
+    double anlmx  = cn0mx * pdynmc * refa;
+    double weight = vmass * AGRAV;
+    gnmax = anlmx / weight;
+    if(gnmax >= alimitx) gnmax = alimitx;
+
+    double aloadn = cn * pdynmc * refa;
+    double gng    = aloadn / weight;
+    gnavail = gnmax-gng;
     //same load factor in yaw plane
-    gymax=gnmax;
-    gyavail=gnavail;
+    gymax   = gnmax;
+    gyavail = gnavail;
 
     //converting output to be compatible with 'aerodynamics_der()'
     //force
-    clde=0.0;
-    cyb=-cla;
-    cydr=0.0;
+    clde = 0.0;
+    cyb  = -cla;
+    cydr = 0.0;
     //roll
-    cllda=0.0;
-    cllp=0.0;
+    cllda = 0.0;
+    cllp  = 0.0;
     //pitch
-    cmde=0.0;
-    cmq=clmq;
+    cmde = 0.0;
+    cmq  = clmq;
     //yaw
-    cnb=-cma;
-    cndr=0.0;
-    cnr=clmq;
-
+    cnb  = -cma;
+    cndr = 0.0;
+    cnr  = clmq;
 
     aerodynamics_der();
-
 }
 
 
 
-void AeroDynamics::aerodynamics_der()
-{
-    double vmach=environment->get_vmach();
-    double pdynmc=environment->get_pdynmc();
-    double dvba=environment->get_dvba();
-    double vmass=propulsion->get_vmass();
-    double xcg=propulsion->get_xcg();
-    double thrust=propulsion->get_thrust();
-    int mtvc=tvc->get_mtvc();
-    double gtvc=tvc->get_gtvc();
-    double parm=tvc->get_parm();
+void AeroDynamics::aerodynamics_der(){
+    double vmach  = environment->get_vmach();
+    double pdynmc = environment->get_pdynmc();
+    double dvba   = environment->get_dvba();
+    double vmass  = propulsion->get_vmass();
+    double xcg    = propulsion->get_xcg();
+    double thrust = propulsion->get_thrust();
+    int    mtvc   = tvc->get_mtvc();
+    double gtvc   = tvc->get_gtvc();
+    double parm   = tvc->get_parm();
 
     Matrix IBBB = propulsion->get_IBBB();
 

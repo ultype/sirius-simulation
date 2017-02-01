@@ -36,7 +36,7 @@ speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0
 speration_1.action(14, "rkt.rcs.set_mrcs_moment(23)")
 speration_1.action(15, "trick.add_event(speration_2)")
 speration_1.action(16, "speration_2.activate()")
-speration_1.action(17, "rkt.aerodynamics.set_maero(12)")
+speration_1.action(17, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv2.txt')")
 trick.add_event(speration_1)
 speration_1.activate()
 ###############################################################
@@ -73,7 +73,7 @@ speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0
 
 speration_3.action(16, "trick.add_event(speration_4)")
 speration_3.action(17, "speration_4.activate()")
-speration_3.action(18, "rkt.aerodynamics.set_maero(11)")
+speration_3.action(18, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv1.txt')")
 speration_3.action(19, "rkt.rcs.set_mrcs_moment(23)")
 #############################################################
 #Event4:MECO
@@ -116,8 +116,7 @@ rkt.env.atmosphere_use_public()
 rkt.env.set_no_wind()
 rkt.env.set_no_wind_turbulunce()
 #aerodynamics
-rkt.aerodynamics.load_aerotable("auxiliary/aero_table.txt")
-rkt.aerodynamics.set_maero(13)      #=11: last stage; =12: 2 stages; =13: 3 stages
+rkt.aerodynamics.load_aerotable("auxiliary/aero_table_slv3.txt")
 rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m
 rkt.aerodynamics.set_refa(2.36)       #Reference area for aero coefficients - m^2
 rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - m

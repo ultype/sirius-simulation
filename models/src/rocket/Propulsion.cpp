@@ -168,6 +168,7 @@ void Propulsion::set_aexit(double in) { aexit = in; }
 void Propulsion::set_payload(double in) { payload = in; }
 
 int Propulsion::get_mprop() { return (int)this->thrust_state; /*XXX work around*/ }
+enum Propulsion::THRUST_TYPE Propulsion::get_thrust_state() { return this->thrust_state; }
 double Propulsion::get_vmass() { return vmass; }
 double Propulsion::get_xcg() { return xcg; }
 double Propulsion::get_thrust() { return thrust; }

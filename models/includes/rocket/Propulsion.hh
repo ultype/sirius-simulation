@@ -26,6 +26,12 @@ class Propulsion{
         void initialize();
         void propagate(double int_step);
 
+        enum THRUST_TYPE {
+            NO_THRUST = 0,
+            INPUT_THRUST = 3,
+            LTG_THRUST = 4
+        };
+
         void set_no_thrust();
         void set_input_thrust(double xcg0, double xcg1,
                                 double moi_roll0, double moi_roll1,
@@ -34,6 +40,7 @@ class Propulsion{
         void set_ltg_thrust();
 
         //XXX: get_thrust_state
+        enum THRUST_TYPE get_thrust_state();
         int get_mprop();
         double get_vmass();
         double get_xcg();
@@ -72,12 +79,6 @@ class Propulsion{
         Environment * environment;
 
         /* Constants */
-        enum THRUST_TYPE {
-            NO_THRUST = 0,
-            INPUT_THRUST = 3,
-            LTG_THRUST = 4
-        };
-
         double xcg_0;           /* *o (m)      Initial cg location from nose*/
         double xcg_1;           /* *o (m)      Final cg location from nose*/
         double moi_roll_0;      /* *o (kg*m2)  Roll MOI of vehicle, initial*/
