@@ -294,12 +294,6 @@ void INS::update(double int_step){
         RICI = integrate(RICID_NEW, RICID, RICI, int_step);
         RICID = RICID_NEW;
 
-        // updating tilt with star tracker
-        //if (mstar == 3) {
-            //RICI = RICI - URIC;
-            //// returning flag to star tracker that update was completed
-            //mstar = 2;
-        //}
         // computed transformation matrix
         Matrix UNI(3, 3);
         UNI.identity();
