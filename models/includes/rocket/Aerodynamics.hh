@@ -35,7 +35,6 @@ class AeroDynamics{
 
         void initialize();
         void calculate_aero(double int_step);
-        void aerodynamics_der();
 
         double get_dyb();
         double get_dma();
@@ -56,7 +55,6 @@ class AeroDynamics{
         double get_cx();
         double get_cz();
 
-
         /* Input File */
         double set_xcg_ref(double);     /* *io (m)      Reference cg location from nose - m*/
         double set_alplimx(double);     /* *io (d)      Alpha limiter for vehicle - deg*/
@@ -65,12 +63,15 @@ class AeroDynamics{
         double set_refd(double);        /* *io (m)      Reference length for aero coefficients - m*/
 
     private:
-        Kinematics *kinematics;
-        Environment *environment;
-        Propulsion *propulsion;
-        _Euler_ *euler;
-        Newton *newton;
-        TVC *tvc;
+        void aerodynamics_der();
+
+        Kinematics  * kinematics;
+        Environment * environment;
+        Propulsion  * propulsion;
+        _Euler_     * euler;
+        Newton      * newton;
+        TVC         * tvc;
+
         Datadeck aerotable; /* ** (--) Aero Deck */
 
         double xcg_ref;     /* *io (m)      Reference cg location from nose - m*/
