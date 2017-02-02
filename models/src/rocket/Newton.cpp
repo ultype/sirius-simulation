@@ -247,6 +247,8 @@ Matrix Newton::get_IVel() { return Matrix(_VBII); }
 /* Use stored Value due to coherence with other models */
 Matrix Newton::get_FSPB() { return Matrix(_FSPB); }
 
+arma::vec3 Newton::get_FSPB_() { return FSPB; }
+
 Matrix Newton::get_VBED() {
     arma::mat VBED = TDI * (VBII - WEII * SBII);
 

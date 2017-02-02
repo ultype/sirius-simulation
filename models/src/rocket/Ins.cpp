@@ -3,6 +3,10 @@
 #include "rocket/Ins.hh"
 #include "sim_services/include/simtime.h"
 
+#include "sensor/gyro/gyro.hh"
+#include "sensor/gyro/gyro_ideal.hh"
+#include "sensor/gyro/gyro_rocket6g.hh"
+
 void INS::default_data(){
 }
 
@@ -223,10 +227,12 @@ void INS::update(double int_step){
     Matrix GRAVG = environment->get_GRAVG();
     Matrix TBI = kinematics->get_TBI();
     Matrix WBIB = euler->get_WBIB();
+    arma::vec3 WBIB_ = euler->get_WBIB_();
     Matrix WBII = euler->get_WBII();
     Matrix SBII = newton->get_IPos();
     Matrix VBII = newton->get_IVel();
     Matrix FSPB = newton->get_FSPB();
+    arma::vec3 FSPB_ = newton->get_FSPB_();
 
     int mroll = 0; // Ambiguous
 
@@ -257,13 +263,24 @@ void INS::update(double int_step){
     //-------------------------------------------------------------------------
     // ideal INS output
     if (mins == 0) {
-        TBIC = TBI;
-        FSPCB = FSPB;
         WBICI = WBII;
-        WBICB = WBIB;
+
         SBIIC = SBII;
         dbic = SBIIC.absolute();
+
+        //gyro
+        sensor::Gyro* gyro = new sensor::GyroIdeal();
+        gyro->propagate_error(int_step, WBIB_, FSPB_);
+        WBICB = Matrix(gyro->get_computed_WBIB().memptr());
+        delete gyro;
+
+        TBIC = TBI;
+
+        //accl
+        FSPCB = FSPB;
+
         VBIIC = VBII;
+
     } else {
         // computing INS derived postion of hyper B wrt center of Earth I
         SBIIC = ESBI + SBII;
@@ -271,6 +288,7 @@ void INS::update(double int_step){
 
         // calculating attitude errors
         // EWBIB=ins_gyro(WBICB, int_step);
+
         WBICB = WBIB + EWBIB;
         Matrix RICID_NEW = ~TBI * EWBIB;
         RICI = integrate(RICID_NEW, RICID, RICI, int_step);

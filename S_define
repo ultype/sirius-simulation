@@ -32,6 +32,10 @@ LIBRARY DEPENDENCIES:
 ##include "cad/env/wind_tabular.hh"
 ##include "cad/env/wind_constant.hh"
 
+##include "sensor/gyro/gyro.hh"
+##include "sensor/gyro/gyro_ideal.hh"
+##include "sensor/gyro/gyro_rocket6g.hh"
+
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites sats;

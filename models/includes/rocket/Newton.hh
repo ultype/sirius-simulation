@@ -52,6 +52,7 @@ class Newton {
         Matrix get_IPos();
         Matrix get_IVel();
         Matrix get_FSPB();
+        arma::vec3 get_FSPB_();
         Matrix get_VBED();
 
         arma::vec get_SBII();
