@@ -2,6 +2,27 @@
 
 #include "sim_services/include/simtime.h"
 
+Guidance::Guidance(const Guidance& other)
+    : ins(other.ins),
+      newton(other.newton),
+      propulsion(other.propulsion)
+{
+    this->default_data();
+
+    this->mguide = other.mguide;
+}
+
+Guidance& Guidance::operator= (const Guidance& other) {
+    if (&other == this)
+        return *this;
+
+    this->ins = other.ins;
+    this->newton = other.newton;
+    this->propulsion = other.propulsion;
+
+    this->mguide = other.mguide;
+}
+
 void Guidance::default_data(){
     init_flag = 1;
     inisw_flag = 1;
@@ -9,6 +30,9 @@ void Guidance::default_data(){
     ipas_flag = 1;
     ipas2_flag = 1;
     print_flag = 1;
+
+    /* This should be zero? */
+    ltg_count = 0;
 }
 
 void Guidance::initialize(INS *i, Newton *ntn, Propulsion *plp){

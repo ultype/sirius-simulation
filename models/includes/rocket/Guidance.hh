@@ -10,17 +10,18 @@ PROGRAMMERS:
 *******************************************************************************/
 
 #include "Newton.hh"
-#include "Environment.hh"
 #include "Ins.hh"
 #include "Propulsion.hh"
 class Propulsion;
-class Environment;
 
 class Guidance {
     TRICK_INTERFACE(Guidance);
 
     public:
         Guidance() {}
+        Guidance(const Guidance& other);
+
+        Guidance& operator= (const Guidance& other);
 
         void default_data();
         void initialize(INS *i, Newton *ntn, Propulsion *plp);
@@ -128,7 +129,6 @@ class Guidance {
                                       Matrix SBIIC,
                                       Matrix VBIIC);
 
-        Environment *environment;
         INS* ins;
         Newton *newton;
         Propulsion *propulsion;
@@ -145,28 +145,40 @@ class Guidance {
         // 030616 Created by Peter H Zipfel
         // 091214 Modified for ROCKET6, PZi
         ///////////////////////////////////////////////////////////////////////////////
-        Matrix get_UTBC();
+        Matrix  get_UTBC();
+
         double  get_alphacomx();
         double  get_betacomx();
 
-        void set_degree(double, double);
+        void    set_degree(double, double);
     private:
+        /* Propagative Stats */
         double  utbc[3];        /* *io  (--)        Commanded unit thrust vector in body coor */
+
+        /* Diagnostic */
+        double  utic[3];        /* *io  (--)        Commanded unit thrust vector in inertial coor */
+
+        /* Set by input.py */
         double  alphacomx;      /* *io  (d)         Alpha command */
         double  betacomx;       /* *io  (d)         Beta command */
 
-        int     mguide;         /* *io  (--)        Guidance modes, see table */
+        /* Internally set parameter */
         int     init_flag;      /* *io  (--)        Flag for initializing LTG flags */
-        double  time_ltg;       /* *io  (s)         Time since initiating LTG */
-        double  rbias[3];       /* *io  (m)         Range-to-be-gained bias */
-        int     beco_flag;      /* *io  (--)        Boost engine cut-off flag */
         int     inisw_flag;     /* *io  (--)        Flag to initialize '..._intl()' */
         int     skip_flag;      /* *io  (--)        Flag to delay output */
         int     ipas_flag;      /* *io  (--)        Flag to initialize in '..._tgo()'  */
         int     ipas2_flag;     /* *io  (--)        Flag to initialize in '..._trat()'  */
         int     print_flag;     /* *io  (--)        Flag to cause print-out  */
+        double  time_ltg;       /* *io  (s)         Time since initiating LTG */
+
         int     ltg_count;      /* *io  (--)        Counter of LTG guidance cycles  */
+
+        /* Externally set parameter */
+        int     mguide;         /* *io  (--)        Guidance modes, see table */
         double  ltg_step;       /* *io  (s)         LTG guidance time step */
+
+        double  rbias[3];       /* *io  (m)         Range-to-be-gained bias */
+        int     beco_flag;      /* *io  (--)        Boost engine cut-off flag */
         double  dbi_desired;    /* *io  (m)         Desired orbital end position */
         double  dvbi_desired;   /* *io  (m/s)       Desired orbital end velocity */
         double  thtvdx_desired; /* *io  (d)         Desired orbital flight path angle */
@@ -195,7 +207,6 @@ class Guidance {
         int     nst;            /* *io  (--)        N-th stage number */
         double  ulam[3];        /* *io  (--)        Unit thrust vector in VGO direction */
         double  _lamd[3];       /* *io  (1/s)       Thrust vector turning rate */
-        double  utic[3];        /* *io  (--)        Commanded unit thrust vector in inertial coor */
         int     nstmax;         /* *io  (--)        //# of stages needed to meet end state */
         double  lamd;           /* *io  (1/s)       Magnitude of LAMD */
         double  dpd;            /* *io  (m)         Distance of the predicted from the desired end-point */

@@ -32,7 +32,7 @@ class Newton {
         Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc);
         Newton(const Newton& other);
 
-        Newton& operator=(const Newton& other);
+        Newton& operator= (const Newton& other);
 
         void initialize();
         void propagate(double int_step);
