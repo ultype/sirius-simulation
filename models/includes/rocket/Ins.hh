@@ -27,10 +27,13 @@ class Environment;
 class INS {
     TRICK_INTERFACE(INS);
     public:
-        INS() {}
+        INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps);
+        INS(const INS& other);
+
+        INS& operator=(const INS& other);
 
         void default_data();
-        void initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps);
+        void initialize();
 
         void ins_grav();
         void update(double int_step);

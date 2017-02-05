@@ -9,28 +9,35 @@
 #include "sensor/gyro/gyro_ideal.hh"
 #include "sensor/gyro/gyro_rocket6g.hh"
 
+INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps)
+    :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps)
+{
+    this->default_data();
+}
+
+INS::INS(const INS& other)
+    :   newton(other.newton), euler(other.euler), environment(other.environment), kinematics(other.kinematics), gpsr(other.gpsr)
+{
+    this->default_data();
+}
+
+INS& INS::operator=(const INS& other){
+    if(&other == this)
+        return *this;
+
+    this->newton      = other.newton;
+    this->euler       = other.euler;
+    this->environment = other.environment;
+    this->kinematics  = other.kinematics;
+    this->gpsr        = other.gpsr;
+
+    return *this;
+}
+
 void INS::default_data(){
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// INS initialization module
-// Member function of class 'Hyper'
-// Initializes INS error states using the Cholesky method
-//
-// mins  = 0 ideal INS (no errors)
-//    = 1 space stabilized INS
-//
-// 030604 Created by Peter H Zipfel
-// 081118 Improved initialization, PZi
-///////////////////////////////////////////////////////////////////////////////
-void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps){
-
-    newton = ntn;
-    euler = elr;
-    environment = env;
-    kinematics = kins;
-    gpsr = gps;
-
+void INS::initialize(){
     // local module-variables
     Matrix ESBI(3, 1);
     Matrix EVBI(3, 1);
