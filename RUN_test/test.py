@@ -138,30 +138,27 @@ rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_
 
 rkt.propulsion.set_aexit(0.258242843) #nozzle exhaust area
 rkt.propulsion.set_payload(98) #payload mass
+
 #INS
-rkt.ins.mins   = 0
+rkt.ins.set_non_ideal()
 #INS Accel
 # Create a Errorous Accelerometer
-"""
 EMISA  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALA = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASA = [0, 0, 0]      #gauss(0, 1.e-6)
 accel = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
-"""
 # Create a Ideal Accelerometer
-accel = trick.AccelerometerIdeal(rkt.newton);
+# accel = trick.AccelerometerIdeal(rkt.newton);
 rkt.ins.set_accelerometer(accel);
 
 #ins gyro
 # Create a Errorous Gyro
-"""
 EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
 gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
-"""
 # Create a Ideal Gyro
-gyro = trick.GyroIdeal(rkt.euler);
+# gyro = trick.GyroIdeal(rkt.euler);
 rkt.ins.set_gyro(gyro);
 
 #ins grav

@@ -38,7 +38,7 @@ void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *ki
 
     //-------------------------------------------------------------------------
     // initialization without INS errors (perfect transfer alignment)
-    if (mins == 0) {
+    if (ins_mode = IDEAL_INS) {
         // do nothing
     } else {
         // Initial covariance matrix  (GPS quality)
@@ -105,11 +105,13 @@ void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *ki
 }
 
 void INS::set_gyro(sensor::Gyro &gyro) { this->gyro = &gyro; }
-
 void INS::set_accelerometer(sensor::Accelerometer &accel) { this->accel = &accel; }
 
 sensor::Gyro& INS::get_gyro() { return *gyro; }
 sensor::Accelerometer& INS::get_accelerometer() { return *accel; }
+
+void INS::set_ideal(){ ins_mode = IDEAL_INS; }
+void INS::set_non_ideal(){ ins_mode = NON_IDEAL_INS; }
 
 void INS::ins_grav()
 {
@@ -209,7 +211,7 @@ void INS::update(double int_step){
     // int fsw_time_flag=hyper[578].integer();
     //-------------------------------------------------------------------------
     // ideal INS output
-    if (mins == 0) {
+    if (ins_mode == IDEAL_INS) {
         WBICI = WBII;
 
         SBIIC = SBII;

@@ -47,8 +47,14 @@ class INS {
         sensor::Gyro& get_gyro();
         sensor::Accelerometer& get_accelerometer();
 
+        void set_ideal();
+        void set_non_ideal();
+
         /* Input File */
-        int mins;           /* *io  (--)    INS mode. =0:ideal INS; =1:with INS error */
+        enum INS_TYPE {
+            IDEAL_INS = 0,
+            NON_IDEAL_INS = 1
+        };
 
         double get_dvbec();
         double get_qqcx();
@@ -73,6 +79,8 @@ class INS {
         Matrix get_TBIC();
 
     private:
+        enum INS_TYPE ins_mode;  /* *o  (--)    INS mode. see INS_TYPE */
+
         double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
         double qqcx;        /* *io  (d/s)   INS computed pitch rate */
         double rrcx;        /* *io  (d/s)   INS computed yaw rate */
