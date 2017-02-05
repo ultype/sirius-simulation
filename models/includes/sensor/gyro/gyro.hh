@@ -21,7 +21,7 @@ namespace sensor {
             virtual ~Gyro(){};
 
             virtual void propagate_error(double int_step) {};
-            void update_diagnostic_attributes(double int_step) { ins_tilt_err = norm(RICI); };
+            virtual void update_diagnostic_attributes(double int_step) { ins_tilt_err = norm(RICI); };
 
             virtual arma::vec3 get_computed_WBIB() { return WBICB; };
             virtual arma::vec3 get_RICI() { return RICI; };

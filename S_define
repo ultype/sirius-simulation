@@ -36,6 +36,10 @@ LIBRARY DEPENDENCIES:
 ##include "sensor/gyro/gyro_ideal.hh"
 ##include "sensor/gyro/gyro_rocket6g.hh"
 
+##include "sensor/accel/accelerometer.hh"
+##include "sensor/accel/accelerometer_ideal.hh"
+##include "sensor/accel/accelerometer_rocket6g.hh"
+
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites sats;
@@ -104,7 +108,6 @@ class Rocket_SimObject : public Trick::SimObject {
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();
-            (0.001, "scheduled") ins.ins_accl();
             (0.001, "scheduled") ins.ins_grav();
             (0.05, "scheduled") ins.update(0.05);
             // (0.001, "scheduled") guidance.guidance(0.001);

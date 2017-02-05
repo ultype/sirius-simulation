@@ -140,12 +140,17 @@ rkt.propulsion.set_aexit(0.258242843) #nozzle exhaust area
 rkt.propulsion.set_payload(98) #payload mass
 #INS
 rkt.ins.mins   = 0
-#INS Acceleration
-rkt.ins.set_EFSPB(0, 0, 0)
-rkt.ins.set_EWALKA(0, 0, 0)
-rkt.ins.set_EMISA(0, 0, 0)      #gauss(0, 1.1e-4)
-rkt.ins.set_ESCALA(0, 0, 0)     #gauss(0, 5e-4)
-rkt.ins.set_EBIASA(0, 0, 0)     #gauss(0, 3.56e-3)
+#INS Accel
+# Create a Errorous Accelerometer
+"""
+EMISA  = [0, 0, 0]      #gauss(0, 1.1e-4)
+ESCALA = [0, 0, 0]      #gauss(0, 2.e-5)
+EBIASA = [0, 0, 0]      #gauss(0, 1.e-6)
+accel = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
+"""
+# Create a Ideal Accelerometer
+accel = trick.AccelerometerIdeal(rkt.newton);
+rkt.ins.set_accelerometer(accel);
 
 #ins gyro
 # Create a Errorous Gyro
@@ -157,9 +162,10 @@ gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kine
 """
 # Create a Ideal Gyro
 gyro = trick.GyroIdeal(rkt.euler);
+rkt.ins.set_gyro(gyro);
 
 #ins grav
-rkt.ins.set_gyro(gyro);
+rkt.ins.set_EGRAVI(0, 0, 0);
 
 #GPS
 gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps

@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "aux/utility_header.hh"
 
 #include "rocket/Ins.hh"
@@ -102,26 +104,12 @@ void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *ki
     ESBI.fill(esbi);
 }
 
-void INS::set_gyro(sensor::Gyro &gyro){
-    this->gyro = &gyro;
-}
+void INS::set_gyro(sensor::Gyro &gyro) { this->gyro = &gyro; }
 
-void INS::ins_accl()
-{
-    Matrix EFSPB(efspb);
-    Matrix EMISA(emisa);
-    Matrix ESCALA(escala);
-    Matrix EBIASA(ebiasa);
-    Matrix EWALKA(ewalka);
-    Matrix FSPB = newton->get_FSPB();
+void INS::set_accelerometer(sensor::Accelerometer &accel) { this->accel = &accel; }
 
-    //-------------------------------------------------------------------------
-    // computing accelerometer erros without random walk (done in 'ins()')
-    Matrix EAB = ESCALA.diamat_vec() + EMISA.skew_sym();
-    EFSPB = EWALKA + EBIASA + EAB * FSPB;
-    //-------------------------------------------------------------------------
-    EFSPB.fill(efspb);
-}
+sensor::Gyro& INS::get_gyro() { return *gyro; }
+sensor::Accelerometer& INS::get_accelerometer() { return *accel; }
 
 void INS::ins_grav()
 {
@@ -160,7 +148,8 @@ void INS::ins_grav()
 // 091130 Euler angle clean-up, PZi
 ///////////////////////////////////////////////////////////////////////////////
 void INS::update(double int_step){
-    assert(gyro && "INS module moust be given a gyro model")
+    assert(gyro && "INS module must be given a gyro model");
+    assert(accel && "INS module must be given a accelerometer model");
 
     gyro->propagate_error(int_step);
 
@@ -210,7 +199,6 @@ void INS::update(double int_step){
 
     Matrix FSPCB(fspcb);
     Matrix EGRAVI(egravi);
-    Matrix EFSPB(efspb);
     Matrix WBICB(wbicb);
     // state variables
     Matrix EVBID(evbid);
@@ -233,7 +221,7 @@ void INS::update(double int_step){
         TBIC = TBI;
 
         //accl
-        FSPCB = FSPB;
+        FSPCB = Matrix(accel->get_computed_FSPB().memptr());
 
         VBIIC = VBII;
 
@@ -256,16 +244,17 @@ void INS::update(double int_step){
         // accelerometer error (bias,scale factor,misalignment)
         // EFSPB=ins_accl();
         // acceleration measurement with random walk effect
-        FSPCB = EFSPB + FSPB;
+        FSPCB = Matrix(accel->get_computed_FSPB().memptr());
+        Matrix EFSPB = Matrix(accel->get_error_of_computed_FSPB().memptr());
         // gravitational error
         // Matrix EGRAVI=ins_grav(ESBI,SBIIC);
         // integrating velocity error equation
+        // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
         Matrix TICB = ~TBIC;
         Matrix EVBID_NEW =
             TICB * EFSPB - Matrix(skew_sym(gyro->get_RICI()).memptr()) * TICB * FSPCB + EGRAVI;
         EVBI = integrate(EVBID_NEW, EVBID, EVBI, int_step);
         EVBID = EVBID_NEW;
-
 
         // calculating position error
         Matrix ESBID_NEW = EVBI;
@@ -420,7 +409,6 @@ void INS::update(double int_step){
 
     //hyper[800].gets(mstar);
     // diagnostics
-    EFSPB.fill(efspb);
     EGRAVI.fill(egravi);
 }
 
@@ -434,11 +422,6 @@ double INS::get_phibdcx() { return phibdcx; }
 double INS::get_thtbdcx() { return thtbdcx; }
 double INS::get_psibdcx() { return psibdcx; }
 
-Matrix INS::get_FSPCB() {
-    Matrix FSPCB(3, 1);
-    FSPCB.build_vec3(fspcb);
-    return FSPCB;
-}
 Matrix INS::get_SBIIC() {
     Matrix SBIIC(3, 1);
     SBIIC.build_vec3(sbiic);
@@ -454,31 +437,6 @@ Matrix INS::get_WBICI() {
     WBICI.build_vec3(wbici);
     return WBICI;
 }
-Matrix INS::get_EFSPB() {
-    Matrix EFSPB(3, 1);
-    EFSPB.build_vec3(efspb);
-    return EFSPB;
-}
-Matrix INS::get_EWALKA() {
-    Matrix EWALKA(3, 1);
-    EWALKA.build_vec3(ewalka);
-    return EWALKA;
-}
-Matrix INS::get_EMISA() {
-    Matrix EMISA(3, 1);
-    EMISA.build_vec3(emisa);
-    return EMISA;
-}
-Matrix INS::get_ESCALA() {
-    Matrix ESCALA(3, 1);
-    ESCALA.build_vec3(escala);
-    return ESCALA;
-}
-Matrix INS::get_EBIASA() {
-    Matrix EBIASA(3, 1);
-    EBIASA.build_vec3(ebiasa);
-    return EBIASA;
-}
 Matrix INS::get_EGRAVI() {
     Matrix EGRAVI(3, 1);
     EGRAVI.build_vec3(egravi);
@@ -491,11 +449,6 @@ Matrix INS::get_TBIC() {
     return TBIC;
 }
 
-void INS::set_FSPCB(double n0, double n1, double n2) {
-    fspcb[0] = n0;
-    fspcb[1] = n1;
-    fspcb[2] = n2;
-}
 void INS::set_SBIIC(double n0, double n1, double n2) {
     sbiic[0] = n0;
     sbiic[1] = n1;
@@ -510,31 +463,6 @@ void INS::set_WBICI(double n0, double n1, double n2) {
     wbici[0] = n0;
     wbici[1] = n1;
     wbici[2] = n2;
-}
-void INS::set_EFSPB(double n0, double n1, double n2) {
-    efspb[0] = n0;
-    efspb[1] = n1;
-    efspb[2] = n2;
-}
-void INS::set_EWALKA(double n0, double n1, double n2) {
-    ewalka[0] = n0;
-    ewalka[1] = n1;
-    ewalka[2] = n2;
-}
-void INS::set_EMISA(double n0, double n1, double n2) {
-    emisa[0] = n0;
-    emisa[1] = n1;
-    emisa[2] = n2;
-}
-void INS::set_ESCALA(double n0, double n1, double n2) {
-    escala[0] = n0;
-    escala[1] = n1;
-    escala[2] = n2;
-}
-void INS::set_EBIASA(double n0, double n1, double n2) {
-    ebiasa[0] = n0;
-    ebiasa[1] = n1;
-    ebiasa[2] = n2;
 }
 void INS::set_EGRAVI(double n0, double n1, double n2) {
     egravi[0] = n0;

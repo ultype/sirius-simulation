@@ -158,7 +158,7 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
     Matrix VBIIC = ins->get_VBIIC();
     Matrix SBIIC = ins->get_SBIIC();
     Matrix TBIC = ins->get_TBIC();
-    Matrix FSPCB = ins->get_FSPCB();
+    Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
     //-------------------------------------------------------------------------
     // preparing necessary variables
     Matrix ABII = ~TBIC * FSPCB;
