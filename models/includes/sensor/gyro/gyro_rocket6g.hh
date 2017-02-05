@@ -2,7 +2,7 @@
 #define __GYRO_ROCKET6G_HH__
 /********************************* TRICK HEADER *******************************
 PURPOSE:
-      (wind model interface definition)
+      (Non-Ideal Gyro Implementation from Rocket6G)
 LIBRARY DEPENDENCY:
       ((../../../src/sensor/gyro/gyro_rocket6g.cpp))
 *******************************************************************************/

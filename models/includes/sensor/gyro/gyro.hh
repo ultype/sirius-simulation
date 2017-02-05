@@ -2,7 +2,7 @@
 #define __GYRO_HH__
 /********************************* TRICK HEADER *******************************
 PURPOSE:
-      (wind model interface definition)
+      (Gyro model interface definition)
 *******************************************************************************/
 
 #include <armadillo>
@@ -16,7 +16,7 @@ namespace sensor {
         public:
             char name[256];
 
-            Gyro() : VECTOR_INIT(RICI, 3), VECTOR_INIT(RICID, 3) {};
+            Gyro() : VECTOR_INIT(RICI, 3), VECTOR_INIT(RICID, 3), VECTOR_INIT(WBICB, 3) {};
 
             virtual ~Gyro(){};
 
@@ -27,7 +27,8 @@ namespace sensor {
             virtual arma::vec3 get_RICI() { return RICI; };
 
         protected:
-            arma::vec3 WBICB;    /* *o  (r/s)   Computed inertial body rate in body coordinate */
+            arma::vec WBICB;     /* *o  (r/s)   Computed inertial body rate in body coordinate */
+            double _WBICB[3];    /* *o  (r/s)   Computed inertial body rate in body coordinate */
 
             arma::vec RICI;      /* *o  (r)     INS tilt error derivative */
             double _RICI[3];     /* *o  (r)     INS tilt error */

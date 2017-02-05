@@ -2,7 +2,7 @@
 #define __GYRO_IDEAL_HH__
 /********************************* TRICK HEADER *******************************
 PURPOSE:
-      (wind model interface definition)
+      (Ideal Gyro Implementation)
 LIBRARY DEPENDENCY:
       ((../../../src/sensor/gyro/gyro_ideal.cpp))
 *******************************************************************************/
