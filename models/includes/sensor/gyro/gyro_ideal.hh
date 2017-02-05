@@ -12,6 +12,8 @@ LIBRARY DEPENDENCY:
 
 #include "sensor/gyro/gyro.hh"
 
+#include "rocket/Euler.hh"
+
 namespace sensor {
     class GyroIdeal : public Gyro
     {
@@ -20,15 +22,19 @@ namespace sensor {
         public:
             char name[256];
 
-            GyroIdeal();
+            GyroIdeal(_Euler_ &eul);
 
             virtual ~GyroIdeal() {};
 
-            virtual void propagate_error(double int_step, arma::vec3 WBIB, arma::vec3 FSPB);
+            virtual void propagate_error(double int_step);
 
             virtual arma::vec3 get_computed_WBIB();
+            virtual arma::vec3 get_error_of_WBIB();
 
         private:
+            /* Routing components */
+            _Euler_ * euler;
+
             arma::vec3 WBICB; /* ** (--) */
     };
 }

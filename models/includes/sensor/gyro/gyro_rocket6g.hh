@@ -12,6 +12,10 @@ LIBRARY DEPENDENCY:
 
 #include "sensor/gyro/gyro.hh"
 
+#include "rocket/Newton.hh"
+#include "rocket/Euler.hh"
+#include "rocket/Kinematics.hh"
+
 namespace sensor {
     class GyroRocket6G : public Gyro
     {
@@ -20,15 +24,20 @@ namespace sensor {
         public:
             char name[256];
 
-            GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3]);
+            GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine);
 
             virtual ~GyroRocket6G() {};
 
-            virtual void propagate_error(double int_step, arma::vec3 WBIB, arma::vec3 FSPB);
+            virtual void propagate_error(double int_step);
 
             virtual arma::vec3 get_computed_WBIB();
+            virtual arma::vec3 get_error_of_WBIB();
 
         private:
+            Newton     * newton;
+            _Euler_    * euler;
+            Kinematics * kinematics;
+
             arma::vec3 WBICB;    /* ** (--) */
 
             arma::vec EUG;       /* *o   (r/s)    Gyro spin axis accel sensitivity */

@@ -20,9 +20,10 @@ namespace sensor {
 
             virtual ~Gyro() {};
 
-            virtual void propagate_error(double int_step, arma::vec3 WBIB, arma::vec3 FSPB) {};
+            virtual void propagate_error(double int_step) {};
 
             virtual arma::vec3 get_computed_WBIB() {};
+            virtual arma::vec3 get_error_of_WBIB() {};
     };
 }
 

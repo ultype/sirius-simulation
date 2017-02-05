@@ -4,8 +4,9 @@
 #include "aux/utility_header.hh"
 #include "sensor/gyro/gyro_rocket6g.hh"
 
-sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3])
-    :   VECTOR_INIT(EUG    , 3),
+sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine)
+    :   newton(&newt), euler(&eul), kinematics(&kine),
+        VECTOR_INIT(EUG    , 3),
         VECTOR_INIT(EWG    , 3),
         VECTOR_INIT(EWBIB  , 3),
         VECTOR_INIT(EWALKG , 3),
@@ -27,7 +28,9 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
     EBIASG = arma::vec3(ebiasg);
 }
 
-void sensor::GyroRocket6G::propagate_error(double int_step, arma::vec3 WBIB, arma::vec3 FSPB){
+void sensor::GyroRocket6G::propagate_error(double int_step){
+    arma::vec3 WBIB = euler->get_WBIB_();
+    arma::vec3 FSPB = newton->get_FSPB_();
     //-------------------------------------------------------------------------
     // computing cluster misalignment error
     arma::mat33 EGB = diagmat(ESCALG) + skew_sym(EMISG);
@@ -52,4 +55,8 @@ void sensor::GyroRocket6G::propagate_error(double int_step, arma::vec3 WBIB, arm
 
 arma::vec3 sensor::GyroRocket6G::get_computed_WBIB(){
     return WBICB;
+}
+
+arma::vec3 sensor::GyroRocket6G::get_error_of_WBIB(){
+    return EWBIB;
 }
