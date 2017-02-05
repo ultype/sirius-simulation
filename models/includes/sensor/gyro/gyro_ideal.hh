@@ -28,14 +28,9 @@ namespace sensor {
 
             virtual void propagate_error(double int_step);
 
-            virtual arma::vec3 get_computed_WBIB();
-            virtual arma::vec3 get_error_of_WBIB();
-
         private:
             /* Routing components */
             _Euler_ * euler;
-
-            arma::vec3 WBICB; /* ** (--) */
     };
 }
 

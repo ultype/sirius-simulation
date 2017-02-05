@@ -13,11 +13,3 @@ void sensor::GyroIdeal::propagate_error(double int_step){
     this->WBICB = euler->get_WBIB_();
     return;
 }
-
-arma::vec3 sensor::GyroIdeal::get_computed_WBIB(){
-    return WBICB;
-}
-
-arma::vec3 sensor::GyroIdeal::get_error_of_WBIB(){
-    return arma::vec3(arma::fill::zeros);
-}

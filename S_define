@@ -104,7 +104,6 @@ class Rocket_SimObject : public Trick::SimObject {
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();
-            (0.001, "scheduled") ins.ins_gyro(0.001);
             (0.001, "scheduled") ins.ins_accl();
             (0.001, "scheduled") ins.ins_grav();
             (0.05, "scheduled") ins.update(0.05);

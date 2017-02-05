@@ -147,18 +147,19 @@ rkt.ins.set_EMISA(0, 0, 0)      #gauss(0, 1.1e-4)
 rkt.ins.set_ESCALA(0, 0, 0)     #gauss(0, 5e-4)
 rkt.ins.set_EBIASA(0, 0, 0)     #gauss(0, 3.56e-3)
 
-#ins gyrp
-rkt.ins.set_EUG(0, 0, 0)
-rkt.ins.set_EWG(0, 0, 0)
-rkt.ins.set_EWBIB(0, 0, 0)
-rkt.ins.set_EWALKG(0, 0, 0)
-rkt.ins.set_EUNBG(0, 0, 0)
-rkt.ins.set_EMISG(0, 0, 0)       #gauss(0, 1.1e-4)
-rkt.ins.set_ESCALG(0, 0, 0)      #gauss(0, 2.e-5)
-rkt.ins.set_EBIASG(0, 0, 0)      #gauss(0, 1.e-6)
+#ins gyro
+# Create a Errorous Gyro
+"""
+EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
+ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
+EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
+gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+"""
+# Create a Ideal Gyro
+gyro = trick.GyroIdeal(rkt.euler);
 
 #ins grav
-rkt.ins.set_EGRAVI(0, 0, 0)
+rkt.ins.set_gyro(gyro);
 
 #GPS
 gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps

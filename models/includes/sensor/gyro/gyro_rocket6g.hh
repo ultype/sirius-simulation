@@ -30,15 +30,11 @@ namespace sensor {
 
             virtual void propagate_error(double int_step);
 
-            virtual arma::vec3 get_computed_WBIB();
-            virtual arma::vec3 get_error_of_WBIB();
-
         private:
+            /* Routing components */
             Newton     * newton;
             _Euler_    * euler;
             Kinematics * kinematics;
-
-            arma::vec3 WBICB;    /* ** (--) */
 
             arma::vec EUG;       /* *o   (r/s)    Gyro spin axis accel sensitivity */
             double _EUG[3];      /* *o   (r/s)    Gyro spin axis accel sensitivity */

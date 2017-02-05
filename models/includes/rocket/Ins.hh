@@ -15,13 +15,13 @@ PROGRAMMERS:
 #include "Kinematics.hh"
 #include "GPS_receiver.hh"
 
+#include "sensor/gyro/gyro.hh"
+
 class GPS_Receiver;
 class Newton;
 class Kinematics;
 class _Euler_;
 class Environment;
-
-
 
 class INS {
     TRICK_INTERFACE(INS);
@@ -32,7 +32,6 @@ class INS {
         void initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *kins, GPS_Receiver *gps);
 
         void ins_accl();
-        void ins_gyro(double int_step);
         void ins_grav();
         void update(double int_step);
 
@@ -41,6 +40,8 @@ class INS {
         Environment *environment;
         Kinematics *kinematics;
         GPS_Receiver *gpsr;
+
+        void set_gyro(sensor::Gyro &gyro);
 
         /* Input File */
         int mins;           /* *io  (--)    INS mode. =0:ideal INS; =1:with INS error */
@@ -64,14 +65,6 @@ class INS {
         Matrix get_EMISA();
         Matrix get_ESCALA();
         Matrix get_EBIASA();
-        Matrix get_EUG();
-        Matrix get_EWG();
-        Matrix get_EWBIB();
-        Matrix get_EWALKG();
-        Matrix get_EUNBG();
-        Matrix get_EMISG();
-        Matrix get_ESCALG();
-        Matrix get_EBIASG();
         Matrix get_EGRAVI();
 
         void set_FSPCB(double, double, double);
@@ -83,14 +76,6 @@ class INS {
         void set_EMISA(double, double, double);
         void set_ESCALA(double, double, double);
         void set_EBIASA(double, double, double);
-        void set_EUG(double, double, double);
-        void set_EWG(double, double, double);
-        void set_EWBIB(double, double, double);
-        void set_EWALKG(double, double, double);
-        void set_EUNBG(double, double, double);
-        void set_EMISG(double, double, double);
-        void set_ESCALG(double, double, double);
-        void set_EBIASG(double, double, double);
         void set_EGRAVI(double, double, double);
 
         Matrix get_TBIC();
@@ -119,14 +104,7 @@ class INS {
         double ebiasa[3];   /* *i   (m/s2)  Acceleration bias */
 
         /* gyro */
-        double eug[3];      /* *i   (r/s)   Gyro spin axis accel sensitivity */
-        double ewg[3];      /* *i   (r/s)   Gyro random walk errors */
-        double ewbib[3];    /* *i   (r/s)   Error in angular vel of body wrt earth */
-        double ewalkg[3];   /* *i   (r/s0.5) Random walk */
-        double eunbg[3];    /* *i   (r)     Gyro cluster misalignment */
-        double emisg[3];    /* *i   (r)     Gyro misalignmt */
-        double escalg[3];   /* *i   (--)    Gyro scale factor */
-        double ebiasg[3];   /* *i   (r/s)   Gyro bias */
+        sensor::Gyro * gyro;
 
         /* grav */
         double egravi[3];   /* *i   (--)    error by gravity */
@@ -143,15 +121,12 @@ class INS {
         double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
         double alppcx;      /* *io  (d)     INS computed total angle of attack */
         double phipcx;      /* *io  (d)     INS computed aero roll angle */
-        double ricid[3];    /* *io  (r)     INS tilt error derivative */
-        double rici[3];     /* *io  (r)     INS tilt error */
         double evbid[3];    /* *io  (m/s)   INS vel error derivative */
         double evbi[3];     /* *io  (m/s)   INS vel error */
         double esbid[3];    /* *io  (m)     INS pos error derivative */
         double esbi[3];     /* *io  (m)     INS pos error */
         double ins_pos_err; /* *io  (m)     INS absolute postion error */
         double ins_vel_err; /* *io  (m/s)   INS absolute velocity error */
-        double ins_tilt_err;/* *io  (r)     INS absolute tilt error */
 };
 
 #endif  // __INS_HH__

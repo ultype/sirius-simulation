@@ -50,13 +50,11 @@ void sensor::GyroRocket6G::propagate_error(double int_step){
     EWBIB = EMSBG + EUG + EWG;
 
     this->WBICB = WBIB + EWBIB;
+
+    /* INS Tile Error Propagation */
+    arma::vec3 RICID_NEW = trans(kinematics->get_TBI_()) * EWBIB;
+    RICI = integrate(RICID_NEW, RICID, RICI, int_step);
+    RICID = RICID_NEW;
+
     return;
-}
-
-arma::vec3 sensor::GyroRocket6G::get_computed_WBIB(){
-    return WBICB;
-}
-
-arma::vec3 sensor::GyroRocket6G::get_error_of_WBIB(){
-    return EWBIB;
 }

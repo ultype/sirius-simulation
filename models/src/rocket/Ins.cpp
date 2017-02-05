@@ -98,9 +98,12 @@ void INS::initialize(Newton *ntn, _Euler_ *elr, Environment *env, Kinematics *ki
     //-------------------------------------------------------------------------
     // loading module-variables
     // initializations
-    RICI.fill(rici);
     EVBI.fill(evbi);
     ESBI.fill(esbi);
+}
+
+void INS::set_gyro(sensor::Gyro &gyro){
+    this->gyro = &gyro;
 }
 
 void INS::ins_accl()
@@ -118,49 +121,6 @@ void INS::ins_accl()
     EFSPB = EWALKA + EBIASA + EAB * FSPB;
     //-------------------------------------------------------------------------
     EFSPB.fill(efspb);
-}
-
-void INS::ins_gyro(double int_step)
-{
-    // local module-variables
-    Matrix EUG(eug);
-    Matrix EWG(ewg);
-    Matrix EWBIB(ewbib);
-    // localizing module-variables
-    // input data
-    Matrix EWALKG(ewalkg);
-    Matrix EUNBG(eunbg);
-    Matrix EMISG(emisg);
-    Matrix ESCALG(escalg);
-    Matrix EBIASG(ebiasg);
-    // input from other modules
-    Matrix WBIB = euler->get_WBIB();
-    Matrix FSPB = newton->get_FSPB();
-    //-------------------------------------------------------------------------
-    // computing cluster misalignment error
-    Matrix EGB = ESCALG.diamat_vec() + EMISG.skew_sym();
-    Matrix EMISCG = EGB * WBIB;
-    Matrix EMSBG = EBIASG + EMISCG;
-
-    // computing gyro spin axis sensitivity (mass unbalance)
-    EUG[0] = EUNBG[0] * FSPB[0];
-    EUG[1] = EUNBG[1] * FSPB[1];
-    EUG[2] = EUNBG[2] * FSPB[2];
-
-    // computing random walk error
-    EWG = EWALKG * (1. / sqrt(int_step));
-
-    // combining all uncertainties
-    EWBIB = EMSBG + EUG + EWG;
-
-    // gyro measured body rates
-
-    //-------------------------------------------------------------------------
-    // loading module-variables
-    // diagnostics
-    EUG.fill(eug);
-    EWG.fill(ewg);
-    EWBIB.fill(ewbib);
 }
 
 void INS::ins_grav()
@@ -200,6 +160,10 @@ void INS::ins_grav()
 // 091130 Euler angle clean-up, PZi
 ///////////////////////////////////////////////////////////////////////////////
 void INS::update(double int_step){
+    assert(gyro && "INS module moust be given a gyro model")
+
+    gyro->propagate_error(int_step);
+
     // local variables
     double lonc(0), latc(0);
     double phipc(0);
@@ -244,16 +208,11 @@ void INS::update(double int_step){
     //int mstar = hyper[800].integer();
     //Matrix URIC = hyper[830].vec();
 
-    Matrix EWBIB(ewbib);
     Matrix FSPCB(fspcb);
     Matrix EGRAVI(egravi);
-    Matrix EUG(eug);
-    Matrix EWG(ewg);
     Matrix EFSPB(efspb);
     Matrix WBICB(wbicb);
     // state variables
-    Matrix RICID(ricid);
-    Matrix RICI(rici);
     Matrix EVBID(evbid);
     Matrix EVBI(evbi);
     Matrix ESBID(esbid);
@@ -269,10 +228,7 @@ void INS::update(double int_step){
         dbic = SBIIC.absolute();
 
         //gyro
-        sensor::Gyro* gyro = new sensor::GyroIdeal();
-        gyro->propagate_error(int_step, WBIB_, FSPB_);
         WBICB = Matrix(gyro->get_computed_WBIB().memptr());
-        delete gyro;
 
         TBIC = TBI;
 
@@ -287,17 +243,13 @@ void INS::update(double int_step){
         dbic = SBIIC.absolute();
 
         // calculating attitude errors
-        // EWBIB=ins_gyro(WBICB, int_step);
 
-        WBICB = WBIB + EWBIB;
-        Matrix RICID_NEW = ~TBI * EWBIB;
-        RICI = integrate(RICID_NEW, RICID, RICI, int_step);
-        RICID = RICID_NEW;
+        WBICB = Matrix(gyro->get_computed_WBIB().memptr());
 
         // computed transformation matrix
         Matrix UNI(3, 3);
         UNI.identity();
-        Matrix TIIC = UNI - RICI.skew_sym();
+        Matrix TIIC = UNI - Matrix(skew_sym(gyro->get_RICI()).memptr());
         TBIC = TBI * TIIC;
 
         // calculating velocity error
@@ -310,9 +262,10 @@ void INS::update(double int_step){
         // integrating velocity error equation
         Matrix TICB = ~TBIC;
         Matrix EVBID_NEW =
-            TICB * EFSPB - RICI.skew_sym() * TICB * FSPCB + EGRAVI;
+            TICB * EFSPB - Matrix(skew_sym(gyro->get_RICI()).memptr()) * TICB * FSPCB + EGRAVI;
         EVBI = integrate(EVBID_NEW, EVBID, EVBI, int_step);
         EVBID = EVBID_NEW;
+
 
         // calculating position error
         Matrix ESBID_NEW = EVBI;
@@ -340,7 +293,6 @@ void INS::update(double int_step){
         // diagnostics
         ins_pos_err = ESBI.absolute();
         ins_vel_err = EVBI.absolute();
-        ins_tilt_err = RICI.absolute();
     }
     // computing geographic velocity in body coordinates from INS
     Matrix VEIC(3, 1);
@@ -450,8 +402,6 @@ void INS::update(double int_step){
     //-------------------------------------------------------------------------
     // loading module-variables
     // state variables
-    RICID.fill(ricid);
-    RICI.fill(rici);
     EVBID.fill(evbid);
     EVBI.fill(evbi);
     ESBID.fill(esbid);
@@ -470,7 +420,6 @@ void INS::update(double int_step){
 
     //hyper[800].gets(mstar);
     // diagnostics
-    EWBIB.fill(ewbib);
     EFSPB.fill(efspb);
     EGRAVI.fill(egravi);
 }
@@ -530,46 +479,6 @@ Matrix INS::get_EBIASA() {
     EBIASA.build_vec3(ebiasa);
     return EBIASA;
 }
-Matrix INS::get_EUG() {
-    Matrix EUG(3, 1);
-    EUG.build_vec3(eug);
-    return EUG;
-}
-Matrix INS::get_EWG() {
-    Matrix EWG(3, 1);
-    EWG.build_vec3(ewg);
-    return EWG;
-}
-Matrix INS::get_EWBIB() {
-    Matrix EWBIB(3, 1);
-    EWBIB.build_vec3(ewbib);
-    return EWBIB;
-}
-Matrix INS::get_EWALKG() {
-    Matrix EWALKG(3, 1);
-    EWALKG.build_vec3(ewalkg);
-    return EWALKG;
-}
-Matrix INS::get_EUNBG() {
-    Matrix EUNBG(3, 1);
-    EUNBG.build_vec3(eunbg);
-    return EUNBG;
-}
-Matrix INS::get_EMISG() {
-    Matrix EMISG(3, 1);
-    EMISG.build_vec3(emisg);
-    return EMISG;
-}
-Matrix INS::get_ESCALG() {
-    Matrix ESCALG(3, 1);
-    ESCALG.build_vec3(escalg);
-    return ESCALG;
-}
-Matrix INS::get_EBIASG() {
-    Matrix EBIASG(3, 1);
-    EBIASG.build_vec3(ebiasg);
-    return EBIASG;
-}
 Matrix INS::get_EGRAVI() {
     Matrix EGRAVI(3, 1);
     EGRAVI.build_vec3(egravi);
@@ -626,46 +535,6 @@ void INS::set_EBIASA(double n0, double n1, double n2) {
     ebiasa[0] = n0;
     ebiasa[1] = n1;
     ebiasa[2] = n2;
-}
-void INS::set_EUG(double n0, double n1, double n2) {
-    eug[0] = n0;
-    eug[1] = n1;
-    eug[2] = n2;
-}
-void INS::set_EWG(double n0, double n1, double n2) {
-    ewg[0] = n0;
-    ewg[1] = n1;
-    ewg[2] = n2;
-}
-void INS::set_EWBIB(double n0, double n1, double n2) {
-    ewbib[0] = n0;
-    ewbib[1] = n1;
-    ewbib[2] = n2;
-}
-void INS::set_EWALKG(double n0, double n1, double n2) {
-    ewalkg[0] = n0;
-    ewalkg[1] = n1;
-    ewalkg[2] = n2;
-}
-void INS::set_EUNBG(double n0, double n1, double n2) {
-    eunbg[0] = n0;
-    eunbg[1] = n1;
-    eunbg[2] = n2;
-}
-void INS::set_EMISG(double n0, double n1, double n2) {
-    emisg[0] = n0;
-    emisg[1] = n1;
-    emisg[2] = n2;
-}
-void INS::set_ESCALG(double n0, double n1, double n2) {
-    escalg[0] = n0;
-    escalg[1] = n1;
-    escalg[2] = n2;
-}
-void INS::set_EBIASG(double n0, double n1, double n2) {
-    ebiasg[0] = n0;
-    ebiasg[1] = n1;
-    ebiasg[2] = n2;
 }
 void INS::set_EGRAVI(double n0, double n1, double n2) {
     egravi[0] = n0;
