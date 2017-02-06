@@ -10,13 +10,37 @@
 #include "sensor/gyro/gyro_rocket6g.hh"
 
 INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps)
-    :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps)
+    :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps),
+        MATRIX_INIT(TDCI, 3, 3),
+        MATRIX_INIT(TBIC, 3, 3),
+        VECTOR_INIT(RICI, 3),
+        VECTOR_INIT(ESBI, 3),
+        VECTOR_INIT(ESBID, 3),
+        VECTOR_INIT(EVBI, 3),
+        VECTOR_INIT(EVBID, 3),
+        VECTOR_INIT(EGRAVI, 3),
+        VECTOR_INIT(VBECD, 3),
+        VECTOR_INIT(SBIIC, 3),
+        VECTOR_INIT(VBIIC, 3),
+        VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
 }
 
 INS::INS(const INS& other)
-    :   newton(other.newton), euler(other.euler), environment(other.environment), kinematics(other.kinematics), gpsr(other.gpsr)
+    :   newton(other.newton), euler(other.euler), environment(other.environment), kinematics(other.kinematics), gpsr(other.gpsr),
+        MATRIX_INIT(TDCI, 3, 3),
+        MATRIX_INIT(TBIC, 3, 3),
+        VECTOR_INIT(RICI, 3),
+        VECTOR_INIT(ESBI, 3),
+        VECTOR_INIT(ESBID, 3),
+        VECTOR_INIT(EVBI, 3),
+        VECTOR_INIT(EVBID, 3),
+        VECTOR_INIT(EGRAVI, 3),
+        VECTOR_INIT(VBECD, 3),
+        VECTOR_INIT(SBIIC, 3),
+        VECTOR_INIT(VBIIC, 3),
+        VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
 }
@@ -35,80 +59,12 @@ INS& INS::operator=(const INS& other){
 }
 
 void INS::default_data(){
+    this->ins_mode = INS_NOT_SET;
+
+    this->EGRAVI.zeros();
 }
 
 void INS::initialize(){
-    // local module-variables
-    Matrix ESBI(3, 1);
-    Matrix EVBI(3, 1);
-    Matrix RICI(3, 1);
-
-    //-------------------------------------------------------------------------
-    // initialization without INS errors (perfect transfer alignment)
-    if (ins_mode = IDEAL_INS) {
-        // do nothing
-    } else {
-        // Initial covariance matrix  (GPS quality)
-        // equipped aircraft. Units: meter, meter/sec, milli-rad.
-        double PP0[9][9] = {
-            20.701,      0.12317,     0.10541,     6.3213E-02,  2.2055E-03,
-            1.7234E-03,  1.0633E-03,  3.4941E-02,  -3.5179E-02,
-
-            0.12317,     20.696,      -0.27174,    4.8366E-03,  5.9463E-02,
-            -1.3367E-03, -3.4903E-02, 2.6112E-03,  -4.2663E-02,
-
-            0.10541,     -0.27174,    114.12,      5.6373E-04,  -8.3147E-03,
-            5.4059E-02,  1.5496E-02,  7.6463E-02,  -3.5302E-03,
-
-            6.3213E-02,  4.8366E-03,  5.6373E-04,  1.9106E-03,  8.0945E-05,
-            1.9810E-06,  2.5755E-04,  2.8346E-03,  -5.6482E-04,
-
-            2.2055E-03,  5.9463E-02,  -8.3147E-03, 8.0945E-05,  1.7201E-03,
-            -1.5760E-05, -2.8341E-03, 2.6478E-04,  -1.0781E-03,
-
-            1.7234E-03,  -1.3367E-03, 5.4059E-02,  1.9810E-06,  -1.5760E-05,
-            3.0070E-03,  4.1963E-04,  -1.3297E-04, 4.1190E-05,
-
-            1.0638E-03,  -3.4903E-02, 1.5496E-02,  2.5755E-04,  -2.8341E-03,
-            4.1963E-04,  5.4490E-02,  -1.8695E-03, 8.9868E-04,
-
-            3.4941E-02,  2.6112E-03,  7.6463E-02,  2.8346E-03,  2.6478E-04,
-            -1.3297E-04, -1.8695E-03, 5.2819E-02,  1.0990E-02,
-
-            -3.5179E-02, -4.2663E-02, -3.5302E-03, -5.6482E-04, -1.0781E-03,
-            4.1190E-05,  8.9868E-04,  1.0990E-02,  0.1291};
-
-        // copying PP0 onto Matrix PP_INIT
-        Matrix PP_INIT(9, 9);
-        for (int p = 0; p < 9; p++) {
-            for (int q = 0; q < 9; q++) {
-                PP_INIT.assign_loc(p, q, PP0[p][q]);
-            }
-        }
-        // getting square root of covariance matrix
-        Matrix APP_INIT = PP_INIT.cholesky();
-
-        // drawing Gaussian 9x1 vector with unit std deviation
-        Matrix GAUSS_INIT(9, 1);
-        for (int r = 0; r < 9; r++) {
-            GAUSS_INIT.assign_loc(r, 0, gauss(0, 1));
-        }
-        // forming stochastic initial state vector
-        Matrix XX_INIT = APP_INIT * GAUSS_INIT;
-        XX_INIT *= (1 + frax_algnmnt);
-
-        // forming subvectors for initialization and converting tilt to radians
-        ESBI.build_vec3(XX_INIT[0], XX_INIT[1], XX_INIT[2]);
-        EVBI.build_vec3(XX_INIT[3], XX_INIT[4], XX_INIT[5]);
-        RICI.build_vec3(XX_INIT[6], XX_INIT[7], XX_INIT[8]);
-        // tilt converted from milliradians to radians
-        RICI *= 0.001;
-    }
-    //-------------------------------------------------------------------------
-    // loading module-variables
-    // initializations
-    EVBI.fill(evbi);
-    ESBI.fill(esbi);
 }
 
 void INS::set_gyro(sensor::Gyro &gyro) { this->gyro = &gyro; }
@@ -117,25 +73,60 @@ void INS::set_accelerometer(sensor::Accelerometer &accel) { this->accel = &accel
 sensor::Gyro& INS::get_gyro() { return *gyro; }
 sensor::Accelerometer& INS::get_accelerometer() { return *accel; }
 
-void INS::set_ideal(){ ins_mode = IDEAL_INS; }
-void INS::set_non_ideal(){ ins_mode = NON_IDEAL_INS; }
+void INS::set_ideal(){
+    ins_mode = IDEAL_INS;
 
-void INS::ins_grav()
-{
-    // local variable
-    Matrix EGRAVI(egravi);
-    Matrix ESBI(esbi);
-    Matrix SBIIC(sbiic);
-    //-------------------------------------------------------------------------
-    double dbi = newton->get_dbi();
-    double dbic = SBIIC.absolute();
+    ESBI.zeros();
+    EVBI.zeros();
+    RICI.zeros();
+
+    return;
+}
+
+/* frax_algnmnt : Fractn to mod initial INS err state: XXO=XXO(1+frax) */
+void INS::set_non_ideal(double frax_algnmnt){
+    ins_mode = NON_IDEAL_INS;
+
+    // Initial covariance matrix  (GPS quality)
+    // equipped aircraft. Units: meter, meter/sec, milli-rad.
+    arma::mat99 PP_INIT = {{20.701      , 0.12317     , 0.10541     , 6.3213E-02  , 2.2055E-03  , 1.7234E-03  , 1.0633E-03  , 3.4941E-02  , -3.5179E-02} ,
+                           {0.12317     , 20.696      , -0.27174    , 4.8366E-03  , 5.9463E-02  , -1.3367E-03 , -3.4903E-02 , 2.6112E-03  , -4.2663E-02} ,
+                           {0.10541     , -0.27174    , 114.12      , 5.6373E-04  , -8.3147E-03 , 5.4059E-02  , 1.5496E-02  , 7.6463E-02  , -3.5302E-03} ,
+                           {6.3213E-02  , 4.8366E-03  , 5.6373E-04  , 1.9106E-03  , 8.0945E-05  , 1.9810E-06  , 2.5755E-04  , 2.8346E-03  , -5.6482E-04} ,
+                           {2.2055E-03  , 5.9463E-02  , -8.3147E-03 , 8.0945E-05  , 1.7201E-03  , -1.5760E-05 , -2.8341E-03 , 2.6478E-04  , -1.0781E-03} ,
+                           {1.7234E-03  , -1.3367E-03 , 5.4059E-02  , 1.9810E-06  , -1.5760E-05 , 3.0070E-03  , 4.1963E-04  , -1.3297E-04 , 4.1190E-05}  ,
+                           {1.0638E-03  , -3.4903E-02 , 1.5496E-02  , 2.5755E-04  , -2.8341E-03 , 4.1963E-04  , 5.4490E-02  , -1.8695E-03 , 8.9868E-04}  ,
+                           {3.4941E-02  , 2.6112E-03  , 7.6463E-02  , 2.8346E-03  , 2.6478E-04  , -1.3297E-04 , -1.8695E-03 , 5.2819E-02  , 1.0990E-02}  ,
+                           {-3.5179E-02 , -4.2663E-02 , -3.5302E-03 , -5.6482E-04 , -1.0781E-03 , 4.1190E-05  , 8.9868E-04  , 1.0990E-02  , 0.1291}};
+
+    // getting square root of covariance matrix
+    arma::mat99 APP_INIT = arma::chol(PP_INIT);
+
+    // drawing Gaussian 9x1 vector with unit std deviation
+    arma::vec9 GAUSS_INIT(arma::fill::randn);
+
+    // forming stochastic initial state vector
+    arma::vec9 XX_INIT = APP_INIT * GAUSS_INIT;
+    XX_INIT *= (1 + frax_algnmnt);
+
+    // forming subvectors for initialization and converting tilt to radians
+    ESBI = XX_INIT.subvec(0, 2);
+    EVBI = XX_INIT.subvec(3, 5);
+    // tilt converted from milliradians to radians
+    RICI = XX_INIT.subvec(6, 8) * 0.001;
+
+    return;
+}
+
+arma::vec3 INS::calculate_gravity_error(double dbi){
+    double dbic = norm(SBIIC);
     double ed = dbic - dbi;
     double dum = GM / pow(dbic, 3);
     if (dbic != 0) {
-        EGRAVI = ESBI * (-dum) - SBIIC * (3 * ed * dum / dbic);
+        return ESBI * (-dum) - SBIIC * (3 * ed * dum / dbic);
+    } else {
+        return arma::vec3(arma::fill::zeros);
     }
-
-    EGRAVI.fill(egravi);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -161,6 +152,7 @@ void INS::update(double int_step){
     assert(accel && "INS module must be given a accelerometer model");
 
     gyro->propagate_error(int_step);
+    accel->propagate_error(int_step);
 
     // local variables
     double lonc(0), latc(0);
@@ -169,104 +161,84 @@ void INS::update(double int_step){
     double psibdc(0), thtbdc(0), phibdc(0);
     double cthtbd(0);
 
-    // local module-variables
-    Matrix VBECB(3, 1);
-    Matrix VBECD(3, 1);
-    // Matrix EFSPB(3,1);
 
-    Matrix TBIC(3, 3);
-    Matrix TDCI(3, 3);
 
-    Matrix WBICI(wbici);
-    // Matrix WBICB(3,1);
-    // localizing module-variables
-    // input data
-    // initialization
-    Matrix VBIIC(vbiic);
-    Matrix SBIIC(sbiic);
     // input from other modules
-    double time = get_rettime();
-    Matrix GRAVG = environment->get_GRAVG();
-    Matrix TBI = kinematics->get_TBI();
-    Matrix WBIB = euler->get_WBIB();
-    arma::vec3 WBIB_ = euler->get_WBIB_();
-    Matrix WBII = euler->get_WBII();
-    Matrix SBII = newton->get_IPos();
-    Matrix VBII = newton->get_IVel();
-    Matrix FSPB = newton->get_FSPB();
-    arma::vec3 FSPB_ = newton->get_FSPB_();
+    double time      = get_rettime();
+    arma::vec3 GRAVG = environment->get_GRAVG_();
+    arma::mat33 TBI  = kinematics->get_TBI_();
+    arma::vec3 WBIB  = euler->get_WBIB_();
+    arma::vec3 WBII  = euler->get_WBII_();
+    arma::vec3 SBII  = newton->get_SBII();
+    arma::vec3 VBII  = newton->get_VBII();
+    arma::vec3 FSPB  = newton->get_FSPB_();
 
     int mroll = 0; // Ambiguous
 
-    //int mgps = hyper[700].integer();
+    arma::vec3 SXH(gpsr->position_state);
+    arma::vec3 VXH(gpsr->velocity_state);
 
-    Matrix SXH(gpsr->position_state);
-    Matrix VXH(gpsr->velocity_state);
+    arma::vec3 WBICB;
+    arma::vec3 FSPCB;
+    arma::vec3 EFSPB;
 
-    //int mstar = hyper[800].integer();
-    //Matrix URIC = hyper[830].vec();
-
-    Matrix FSPCB(fspcb);
-    Matrix EGRAVI(egravi);
-    Matrix WBICB(wbicb);
-    // state variables
-    Matrix EVBID(evbid);
-    Matrix EVBI(evbi);
-    Matrix ESBID(esbid);
-    Matrix ESBI(esbi);
-    // int fsw_count=hyper[577].integer();
-    // int fsw_time_flag=hyper[578].integer();
     //-------------------------------------------------------------------------
     // ideal INS output
+    switch(ins_mode){
+        case IDEAL_INS:
+            // initialization without INS errors (perfect transfer alignment)
+            break;
+        case NON_IDEAL_INS:
+            break;
+        default:
+            assert(false && "Not a proper ins mode!");
+    }
     if (ins_mode == IDEAL_INS) {
         WBICI = WBII;
 
         SBIIC = SBII;
-        dbic = SBIIC.absolute();
+        dbic = norm(SBIIC);
 
         //gyro
-        WBICB = Matrix(gyro->get_computed_WBIB().memptr());
+        WBICB = gyro->get_computed_WBIB();
 
         TBIC = TBI;
 
         //accl
-        FSPCB = Matrix(accel->get_computed_FSPB().memptr());
+        FSPCB = accel->get_computed_FSPB();
 
         VBIIC = VBII;
 
     } else {
         // computing INS derived postion of hyper B wrt center of Earth I
         SBIIC = ESBI + SBII;
-        dbic = SBIIC.absolute();
+        dbic = norm(SBIIC);
 
-        // calculating attitude errors
-
-        WBICB = Matrix(gyro->get_computed_WBIB().memptr());
+        // Gyro Measurement
+        WBICB = gyro->get_computed_WBIB();
 
         // computed transformation matrix
-        Matrix UNI(3, 3);
-        UNI.identity();
-        Matrix TIIC = UNI - Matrix(skew_sym(gyro->get_RICI()).memptr());
+        arma::mat33 UNI(arma::fill::eye);
+        arma::mat33 TIIC = UNI - skew_sym(gyro->get_RICI());
         TBIC = TBI * TIIC;
 
-        // calculating velocity error
-        // accelerometer error (bias,scale factor,misalignment)
-        // EFSPB=ins_accl();
-        // acceleration measurement with random walk effect
-        FSPCB = Matrix(accel->get_computed_FSPB().memptr());
-        Matrix EFSPB = Matrix(accel->get_error_of_computed_FSPB().memptr());
-        // gravitational error
-        // Matrix EGRAVI=ins_grav(ESBI,SBIIC);
+        // Accelerometer Measurement
+        FSPCB = accel->get_computed_FSPB();
+        EFSPB = accel->get_error_of_computed_FSPB();
+
+        // calculate gravitational error
+        this->EGRAVI = calculate_gravity_error(newton->get_dbi());
+
         // integrating velocity error equation
         // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
-        Matrix TICB = ~TBIC;
-        Matrix EVBID_NEW =
-            TICB * EFSPB - Matrix(skew_sym(gyro->get_RICI()).memptr()) * TICB * FSPCB + EGRAVI;
+        arma::mat33 TICB = trans(TBIC);
+        arma::vec3 EVBID_NEW =
+            TICB * EFSPB - skew_sym(gyro->get_RICI()) * TICB * FSPCB + EGRAVI;
         EVBI = integrate(EVBID_NEW, EVBID, EVBI, int_step);
         EVBID = EVBID_NEW;
 
         // calculating position error
-        Matrix ESBID_NEW = EVBI;
+        arma::vec3 ESBID_NEW = EVBI;
         ESBI = integrate(ESBID_NEW, ESBID, ESBI, int_step);
         ESBID = ESBID_NEW;
 
@@ -286,57 +258,58 @@ void INS::update(double int_step){
         // computing INS derived velocity of hyper B wrt inertial frame I
         VBIIC = EVBI + VBII;
         // computing INS derived body rates in inertial coordinates
-        WBICI = ~TBIC * WBICB;
+        WBICI = trans(TBIC) * WBICB;
 
         // diagnostics
-        ins_pos_err = ESBI.absolute();
-        ins_vel_err = EVBI.absolute();
+        ins_pos_err = norm(ESBI);
+        ins_vel_err = norm(EVBI);
     }
+
     // computing geographic velocity in body coordinates from INS
-    Matrix VEIC(3, 1);
-    VEIC[0] = -WEII3 * SBIIC[1];
-    VEIC[1] = WEII3 * SBIIC[0];
-    VEIC[2] = 0;
-    Matrix VBEIC = VBIIC - VEIC;
-    VBECB = TBIC * VBEIC;
-    dvbec = VBECB.absolute();
+    arma::vec3 VEIC;
+    VEIC(0) = -WEII3 * SBIIC(1);
+    VEIC(1) =  WEII3 * SBIIC(0);
+    VEIC(2) =  0;
+    arma::vec3 VBEIC = VBIIC - VEIC;
+    arma::vec3 VBECB = TBIC * VBEIC;
+    dvbec = norm(VBECB);
 
     // decomposing computed body rates
-    ppcx = WBICB[0] * DEG;
-    qqcx = WBICB[1] * DEG;
-    rrcx = WBICB[2] * DEG;
+    ppcx = WBICB(0) * DEG;
+    qqcx = WBICB(1) * DEG;
+    rrcx = WBICB(2) * DEG;
 
     // computing indidence angles from INS
-    double alphac = atan2(VBECB[2], VBECB[0]);
-    double betac = asin(VBECB[1] / dvbec);
+    double alphac = atan2(VBECB(2), VBECB(0));
+    double betac = asin(VBECB(1) / dvbec);
     alphacx = alphac * DEG;
     betacx = betac * DEG;
 
     // incidence angles in load factor plane (aeroballistic)
-    double dum = VBECB[0] / dvbec;
+    double dum = VBECB(0) / dvbec;
     if (fabs(dum) > 1)
         dum = 1 * sign(dum);
     double alppc = acos(dum);
 
-    if (VBECB[1] == 0 && VBECB[2] == 0)
+    if (VBECB(1) == 0 && VBECB(2) == 0)
         phipc = 0.;
     // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
     //       to prevent oscillations
-    else if (fabs(VBECB[1]) < EPS)
-        if (VBECB[2] > 0)
+    else if (fabs(VBECB(1)) < EPS)
+        if (VBECB(2) > 0)
             phipc = 0;
-    if (VBECB[2] < 0)
+    if (VBECB(2) < 0)
         phipc = PI;
     else
-        phipc = atan2(VBECB[1], VBECB[2]);
+        phipc = atan2(VBECB(1), VBECB(2));
     alppcx = alppc * DEG;
     phipcx = phipc * DEG;
 
     // getting long,lat,alt from INS
-    cad_geo84_in(lonc, latc, altc, SBIIC, time);
+    arma_cad_geo84_in(lonc, latc, altc, SBIIC, time);
 
     // getting T.M. of geodetic wrt inertial coord
-    TDCI = cad_tdi84(lonc, latc, altc, time);
+    TDCI = arma_cad_tdi84(lonc, latc, altc, time);
     loncx = lonc * DEG;
     latcx = latc * DEG;
 
@@ -356,12 +329,12 @@ void INS::update(double int_step){
     thtvdcx = thtvdc * DEG;
 
     // computing Euler angles from INS
-    Matrix TBD = TBIC * ~TDCI;
-    double tbd13 = TBD.get_loc(0, 2);
-    double tbd11 = TBD.get_loc(0, 0);
-    double tbd33 = TBD.get_loc(2, 2);
-    double tbd12 = TBD.get_loc(0, 1);
-    double tbd23 = TBD.get_loc(1, 2);
+    arma::mat33 TBD = TBIC * trans(TDCI);
+    double tbd13 = TBD(0, 2);
+    double tbd11 = TBD(0, 0);
+    double tbd33 = TBD(2, 2);
+    double tbd12 = TBD(0, 1);
+    double tbd23 = TBD(1, 2);
 
     //*geodetic Euler angles
     // computed pitch angle: 'thtbdc'
@@ -400,25 +373,12 @@ void INS::update(double int_step){
     //-------------------------------------------------------------------------
     // loading module-variables
     // state variables
-    EVBID.fill(evbid);
-    EVBI.fill(evbi);
-    ESBID.fill(esbid);
-    ESBI.fill(esbi);
     // output to other modules;
-    VBIIC.fill(vbiic);
-    SBIIC.fill(sbiic);
-    WBICI.fill(wbici);
-    WBICB.fill(wbicb);
-    TBIC.fill(tbic);
-    VBECD.fill(vbecd);
-    TDCI.fill(tdci);
-    FSPCB.fill(fspcb);
 
     //hyper[700].gets(mgps);
 
     //hyper[800].gets(mstar);
     // diagnostics
-    EGRAVI.fill(egravi);
 }
 
 double INS::get_dvbec() { return dvbec; }
@@ -432,49 +392,24 @@ double INS::get_thtbdcx() { return thtbdcx; }
 double INS::get_psibdcx() { return psibdcx; }
 
 Matrix INS::get_SBIIC() {
-    Matrix SBIIC(3, 1);
-    SBIIC.build_vec3(sbiic);
+    Matrix SBIIC(_SBIIC);
     return SBIIC;
 }
 Matrix INS::get_VBIIC() {
-    Matrix VBIIC(3, 1);
-    VBIIC.build_vec3(vbiic);
+    Matrix VBIIC(_VBIIC);
     return VBIIC;
 }
 Matrix INS::get_WBICI() {
-    Matrix WBICI(3, 1);
-    WBICI.build_vec3(wbici);
+    Matrix WBICI(_WBICI);
     return WBICI;
 }
 Matrix INS::get_EGRAVI() {
-    Matrix EGRAVI(3, 1);
-    EGRAVI.build_vec3(egravi);
+    Matrix EGRAVI(_EGRAVI);
     return EGRAVI;
 }
 
 Matrix INS::get_TBIC() {
     Matrix TBIC(3, 3);
-    TBIC.build_mat33(tbic);
-    return TBIC;
-}
-
-void INS::set_SBIIC(double n0, double n1, double n2) {
-    sbiic[0] = n0;
-    sbiic[1] = n1;
-    sbiic[2] = n2;
-}
-void INS::set_VBIIC(double n0, double n1, double n2) {
-    vbiic[0] = n0;
-    vbiic[1] = n1;
-    vbiic[2] = n2;
-}
-void INS::set_WBICI(double n0, double n1, double n2) {
-    wbici[0] = n0;
-    wbici[1] = n1;
-    wbici[2] = n2;
-}
-void INS::set_EGRAVI(double n0, double n1, double n2) {
-    egravi[0] = n0;
-    egravi[1] = n1;
-    egravi[2] = n2;
+    TBIC.build_mat33(_TBIC);
+    return ~TBIC;
 }

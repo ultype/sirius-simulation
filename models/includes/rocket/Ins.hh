@@ -32,17 +32,9 @@ class INS {
 
         INS& operator=(const INS& other);
 
-        void default_data();
         void initialize();
 
-        void ins_grav();
         void update(double int_step);
-
-        Newton *newton;
-        _Euler_ *euler;
-        Environment *environment;
-        Kinematics *kinematics;
-        GPS_Receiver *gpsr;
 
         void set_gyro(sensor::Gyro &gyro);
         void set_accelerometer(sensor::Accelerometer &accel);
@@ -51,10 +43,11 @@ class INS {
         sensor::Accelerometer& get_accelerometer();
 
         void set_ideal();
-        void set_non_ideal();
+        void set_non_ideal(double frax_algnmnt);
 
         /* Input File */
         enum INS_TYPE {
+            INS_NOT_SET = -1,
             IDEAL_INS = 0,
             NON_IDEAL_INS = 1
         };
@@ -74,24 +67,57 @@ class INS {
         Matrix get_WBICI();
         Matrix get_EGRAVI();
 
-        void set_SBIIC(double, double, double);
-        void set_VBIIC(double, double, double);
-        void set_WBICI(double, double, double);
-        void set_EGRAVI(double, double, double);
-
         Matrix get_TBIC();
 
     private:
+        /* Internal Getter */
+
+        /* Internal Initializers */
+        void default_data();
+
+        /* Internal Propagator / Calculators */
+        arma::vec3 calculate_gravity_error(double dbi);
+
+        /* Internal Calculators */
+
+        /* Routing references */
+        Newton       * newton;
+        _Euler_      * euler;
+        Environment  * environment;
+        Kinematics   * kinematics;
+        GPS_Receiver * gpsr;
+
+        /* Sensors */
+        sensor::Gyro * gyro;
+        sensor::Accelerometer * accel;
+
+        /* Constants */
+
+        /* State */
         enum INS_TYPE ins_mode;  /* *o  (--)    INS mode. see INS_TYPE */
 
+        /* Propagative Stats */
+
+        /* Generating Outputs */
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
         double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
         double qqcx;        /* *io  (d/s)   INS computed pitch rate */
         double rrcx;        /* *io  (d/s)   INS computed yaw rate */
-        double fspcb[3];    /* *io  (N/kg)  Computed specific force on body */
-        double sbiic[3];    /* *io  (m)     Computed pos of body wrt earth reference point*/
-        double vbiic[3];    /* *io  (m/s)   Computed body vel in earth coor */
-        double wbici[3];    /* *io  (r/s)   Computed inertial body rate in inert coordinate */
-        double tbic[3][3];  /* *io  (--)    Comp T.M. of body wrt earth coordinate */
+
+        arma::mat TBIC;         /* *o  (--)    Computed T.M. of body wrt earth coordinate */
+        double _TBIC[3][3];     /* *o  (--)    Computed T.M. of body wrt earth coordinate */
+
+        arma::vec SBIIC;       /* *o  (m)     Computed pos of body wrt earth reference point*/
+        double   _SBIIC[3];    /* *o  (m)     Computed pos of body wrt earth reference point*/
+
+        arma::vec VBIIC;       /* *o  (m/s)   Computed body vel in earth coor */
+        double   _VBIIC[3];    /* *o  (m/s)   Computed body vel in earth coor */
+
+        arma::vec WBICI;       /* *o  (r/s)   Computed inertial body rate in inert coordinate */
+        double   _WBICI[3];    /* *o  (r/s)   Computed inertial body rate in inert coordinate */
+
         double ppcx;        /* *io  (d/s)   INS computed roll rate */
         double alphacx;     /* *io  (d)     INS computed angle of attack */
         double betacx;      /* *io  (d)     INS computed sideslip angle */
@@ -99,29 +125,37 @@ class INS {
         double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
         double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
 
-        /* Sensors */
-        sensor::Gyro * gyro;
-        sensor::Accelerometer * accel;
-
         /* grav */
-        double egravi[3];   /* *i   (--)    error by gravity */
+        arma::vec EGRAVI;      /* *o   (--)    error by gravity */
+        double   _EGRAVI[3];   /* *o   (--)    error by gravity */
 
-        double frax_algnmnt;/* *io  (--)    Fractn to mod initial INS err state: XXO=XXO(1+frax) */
-        double wbicb[3];    /* *io  (r/s)   Computed inertial body rate in body coordinate */
+        arma::vec RICI;
+        double   _RICI[3];
+
+        arma::vec EVBI;        /* *o  (m/s)   INS vel error */
+        double   _EVBI[3];     /* *o  (m/s)   INS vel error */
+        arma::vec EVBID;       /* *o  (m/s)   INS vel error derivative */
+        double   _EVBID[3];    /* *o  (m/s)   INS vel error derivative */
+
+        arma::vec ESBI;        /* *o  (m)     INS pos error */
+        double   _ESBI[3];     /* *o  (m)     INS pos error */
+        arma::vec ESBID;       /* *o  (m)     INS pos error derivative */
+        double   _ESBID[3];    /* *o  (m)     INS pos error derivative */
+
+        arma::vec VBECD;       /* *o  (m/s)   Geodetic velocity */
+        double   _VBECD[3];    /* *o  (m/s)   Geodetic velocity */
+
+        arma::mat TDCI;        /* *o  (--)    Comp T.M. of geodetic wrt inertial */
+        double   _TDCI[3][3];  /* *o  (--)    Comp T.M. of geodetic wrt inertial */
+
         double loncx;       /* *io  (d)     INS derived longitude */
         double latcx;       /* *io  (d)     INS derived latitude */
         double altc;        /* *io  (m)     INS derived altitude */
-        double vbecd[3];    /* *io  (m/s)   Geodetic velocity */
-        double tdci[3][3];  /* *io  (--)    Comp T.M. of geodetic wrt inertial */
         double thtvdcx;     /* *io  (d)     INS computed vertical flight path angle */
         double psivdcx;     /* *io  (d)     INS computed heading angle */
         double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
         double alppcx;      /* *io  (d)     INS computed total angle of attack */
         double phipcx;      /* *io  (d)     INS computed aero roll angle */
-        double evbid[3];    /* *io  (m/s)   INS vel error derivative */
-        double evbi[3];     /* *io  (m/s)   INS vel error */
-        double esbid[3];    /* *io  (m)     INS pos error derivative */
-        double esbi[3];     /* *io  (m)     INS pos error */
         double ins_pos_err; /* *io  (m)     INS absolute postion error */
         double ins_vel_err; /* *io  (m/s)   INS absolute velocity error */
 };
