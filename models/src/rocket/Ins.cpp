@@ -148,21 +148,21 @@ void INS::update(double int_step){
 
     int mroll = 0; // Ambiguous
 
+    // GPS Measurement
     arma::vec3 SXH(gpsr->position_state);
     arma::vec3 VXH(gpsr->velocity_state);
 
-    arma::vec3 WBICB;
-    arma::vec3 EWBIB;
-    arma::vec3 FSPCB;
-    arma::vec3 EFSPB;
+    // Gyro Measurement
+    arma::vec3 WBICB = gyro->get_computed_WBIB();
+    arma::vec3 EWBIB = gyro->get_error_of_computed_WBIB();
+
+    // Accelerometer Measurement
+    arma::vec3 FSPCB = accel->get_computed_FSPB();
+    arma::vec3 EFSPB = accel->get_error_of_computed_FSPB();
 
     // computing INS derived postion of hyper B wrt center of Earth I
     SBIIC = ESBI + SBII;
     dbic = norm(SBIIC);
-
-    // Gyro Measurement
-    WBICB = gyro->get_computed_WBIB();
-    EWBIB = gyro->get_error_of_computed_WBIB();
 
     /* INS Tile Error Propagation */
     INTEGRATE_D(RICI, TBI * EWBIB);
@@ -172,9 +172,6 @@ void INS::update(double int_step){
     arma::mat33 TIIC = UNI - skew_sym(RICI);
     TBIC = TBI * TIIC;
 
-    // Accelerometer Measurement
-    FSPCB = accel->get_computed_FSPB();
-    EFSPB = accel->get_error_of_computed_FSPB();
 
     // calculate gravitational error
     this->EGRAVI = calculate_gravity_error(newton->get_dbi());
