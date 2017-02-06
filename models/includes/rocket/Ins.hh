@@ -2,11 +2,9 @@
 #define __INS_HH__
 /********************************* TRICK HEADER *******************************
 PURPOSE:
-      (Describe the INS Module On Board)
+      (Describe the INS Module On Board, Error equations based on Zipfel, Figure 10.27, space stabilized INS with GPS updates)
 LIBRARY DEPENDENCY:
       ((../src/rocket/Ins.cpp))
-PROGRAMMERS:
-      (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
 
 #include "Newton.hh"
@@ -46,11 +44,6 @@ class INS {
         void set_non_ideal(double frax_algnmnt);
 
         /* Input File */
-        enum INS_TYPE {
-            INS_NOT_SET = -1,
-            IDEAL_INS = 0,
-            NON_IDEAL_INS = 1
-        };
 
         double get_dvbec();
         double get_qqcx();
@@ -92,9 +85,6 @@ class INS {
         sensor::Accelerometer * accel;
 
         /* Constants */
-
-        /* State */
-        enum INS_TYPE ins_mode;  /* *o  (--)    INS mode. see INS_TYPE */
 
         /* Propagative Stats */
 

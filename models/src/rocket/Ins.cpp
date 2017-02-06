@@ -61,8 +61,6 @@ INS& INS::operator=(const INS& other){
 }
 
 void INS::default_data(){
-    this->ins_mode = INS_NOT_SET;
-
     this->EGRAVI.zeros();
 }
 
@@ -76,7 +74,6 @@ sensor::Gyro& INS::get_gyro() { return *gyro; }
 sensor::Accelerometer& INS::get_accelerometer() { return *accel; }
 
 void INS::set_ideal(){
-    ins_mode = IDEAL_INS;
 
     ESBI.zeros();
     EVBI.zeros();
@@ -87,8 +84,6 @@ void INS::set_ideal(){
 
 /* frax_algnmnt : Fractn to mod initial INS err state: XXO=XXO(1+frax) */
 void INS::set_non_ideal(double frax_algnmnt){
-    ins_mode = NON_IDEAL_INS;
-
     // Initial covariance matrix  (GPS quality)
     // equipped aircraft. Units: meter, meter/sec, milli-rad.
     arma::mat99 PP_INIT = {{20.701      , 0.12317     , 0.10541     , 6.3213E-02  , 2.2055E-03  , 1.7234E-03  , 1.0633E-03  , 3.4941E-02  , -3.5179E-02} ,
@@ -131,24 +126,6 @@ arma::vec3 INS::calculate_gravity_error(double dbi){
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// INS module
-// Member function of class 'Hyper'
-// Error equations based on Zipfel, Figure 10.27
-// space stabilized INS with GPS and star tracker updates
-// when 'mstar'=3 star tracker update received
-// when 'mgps'=3 GPS update received
-//
-// mins = 0 ideal INS (no errors)
-//      = 1 space stabilized INS
-//
-// 030604 Created by Peter H Zipfel
-// 040130 GPS update inserted, PZi
-// 040212 Star tracker update inserted, PZi
-// 050308 Added work-around roll angle singularity, PZi
-// 050623 Roll feedback variant for inverted flight, PZi
-// 091130 Euler angle clean-up, PZi
-///////////////////////////////////////////////////////////////////////////////
 void INS::update(double int_step){
     assert(gyro && "INS module must be given a gyro model");
     assert(accel && "INS module must be given a accelerometer model");
@@ -340,15 +317,6 @@ void INS::update(double int_step){
     psibdcx = DEG * psibdc;
     thtbdcx = DEG * thtbdc;
     phibdcx = DEG * phibdc;
-    //-------------------------------------------------------------------------
-    // loading module-variables
-    // state variables
-    // output to other modules;
-
-    //hyper[700].gets(mgps);
-
-    //hyper[800].gets(mstar);
-    // diagnostics
 }
 
 double INS::get_dvbec() { return dvbec; }
