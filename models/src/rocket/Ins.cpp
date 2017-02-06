@@ -142,13 +142,9 @@ void INS::update(double int_step){
 
     // input from other modules
     double time      = get_rettime();
-    arma::vec3 GRAVG = environment->get_GRAVG_();
-    arma::mat33 TBI  = kinematics->get_TBI_();
-    arma::vec3 WBIB  = euler->get_WBIB_();
-    arma::vec3 WBII  = euler->get_WBII_();
     arma::vec3 SBII  = newton->get_SBII();
     arma::vec3 VBII  = newton->get_VBII();
-    arma::vec3 FSPB  = newton->get_FSPB_();
+    arma::mat33 TBI  = kinematics->get_TBI_();
 
     int mroll = 0; // Ambiguous
 
