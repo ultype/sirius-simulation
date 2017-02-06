@@ -32,6 +32,14 @@ LIBRARY DEPENDENCIES:
 ##include "cad/env/wind_tabular.hh"
 ##include "cad/env/wind_constant.hh"
 
+##include "sensor/gyro/gyro.hh"
+##include "sensor/gyro/gyro_ideal.hh"
+##include "sensor/gyro/gyro_rocket6g.hh"
+
+##include "sensor/accel/accelerometer.hh"
+##include "sensor/accel/accelerometer_ideal.hh"
+##include "sensor/accel/accelerometer_rocket6g.hh"
+
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites sats;
@@ -68,12 +76,13 @@ class Rocket_SimObject : public Trick::SimObject {
         Actuator actuator;
 
         Rocket_SimObject() 
-            :   newton      ( kinematics , euler        , env         , propulsion , force ),
-                kinematics  ( newton     , env          , euler ),
-                euler       ( kinematics , propulsion   , force ),
-                env         ( newton     , aerodynamics , kinematics ),
-                propulsion  ( env ),
-                aerodynamics( kinematics , env          , propulsion , euler , newton , tvc )
+            :   newton      ( kinematics , euler        , env          , propulsion , force ) ,
+                kinematics  ( newton     , env          , euler )      ,
+                euler       ( kinematics , propulsion   , force )      ,
+                env         ( newton     , aerodynamics , kinematics ) ,
+                propulsion  ( env )      ,
+                aerodynamics( kinematics , env          , propulsion   , euler      , newton  , tvc ) ,
+                ins         ( newton     , euler        , env          , kinematics , gpsr )
             {
             ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
@@ -85,7 +94,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
             ("initialization") guidance.initialize(&ins, &newton, &propulsion);
             ("initialization") control.initialize(&ins, &newton, &env, &propulsion, &aerodynamics);
-            ("initialization") ins.initialize(&newton, &euler, &env, &kinematics, &gpsr);
+            ("initialization") ins.initialize();
             ("initialization") tvc.initialize(&env, &kinematics, &control, &propulsion);
             ("initialization") rcs.initialize(&ins, &guidance, &propulsion);
             ("initialization") actuator.initialize(&control);
@@ -100,9 +109,6 @@ class Rocket_SimObject : public Trick::SimObject {
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();
-            (0.001, "scheduled") ins.ins_gyro(0.001);
-            (0.001, "scheduled") ins.ins_accl();
-            (0.001, "scheduled") ins.ins_grav();
             (0.05, "scheduled") ins.update(0.05);
             // (0.001, "scheduled") guidance.guidance(0.001);
             (0.05, "scheduled") control.control(0.05);

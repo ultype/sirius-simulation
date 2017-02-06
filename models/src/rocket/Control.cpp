@@ -121,7 +121,7 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double dmde = aerodynamics->get_dmde();
     double dvbec = ins->get_dvbec();
     double qqcx = ins->get_qqcx();
-    Matrix FSPCB = ins->get_FSPCB();
+    Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
     //-------------------------------------------------------------------------
     // calculating online close loop poles
     waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
@@ -193,7 +193,7 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     double dndr = aerodynamics->get_dndr();
     double dvbe = newton->get_dvbe();
     double rrcx = ins->get_rrcx();
-    Matrix FSPCB = ins->get_FSPCB();
+    Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
 
     //-------------------------------------------------------------------------
     // calculating close loop poles

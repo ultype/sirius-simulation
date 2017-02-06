@@ -168,103 +168,103 @@ void AeroDynamics::aerodynamics_der(){
     double gtvc   = tvc->get_gtvc();
     double parm   = tvc->get_parm();
 
-    Matrix IBBB = propulsion->get_IBBB();
+    arma::mat33 IBBB = propulsion->get_IBBB_();
 
     //MOI components
-    double ibbb11=IBBB.get_loc(0,0);
-    double ibbb22=IBBB.get_loc(1,1);
-    double ibbb33=IBBB.get_loc(2,2);
+    double ibbb11 = IBBB(0,0);
+    double ibbb22 = IBBB(1,1);
+    double ibbb33 = IBBB(2,2);
     //Dimensional derivatives for pitch plane (converted to 1/rad where required)
-    double duml=(pdynmc*refa/vmass)/RAD;
-    dla=duml*cla;
-    dlde=duml*clde;
-    dnd=duml*cn0;
-    double dumm=pdynmc*refa*refd/ibbb22;
-    dma=dumm*cma/RAD;
-    dmq=dumm*(refd/(2*dvba))*cmq;
-    dmde=dumm*cmde/RAD;
+    double duml = (pdynmc * refa / vmass) / RAD;
+    dla = duml * cla;
+    dlde = duml * clde;
+    dnd = duml * cn0;
+    double dumm = pdynmc * refa * refd / ibbb22;
+    dma = dumm * cma / RAD;
+    dmq = dumm * (refd / (2 * dvba)) * cmq;
+    dmde = dumm * cmde / RAD;
 
     //Dimensional derivatives in plane (converted to 1/rad where required)
-    double dumy=pdynmc*refa/vmass;
-    dyb=dumy*cyb/RAD;
-    dydr=dumy*cydr/RAD;
-    double dumn=pdynmc*refa*refd/ibbb33;
-    dnb=dumn*cnb/RAD;
-    dnr=dumn*(refd/(2*dvba))*cnr;
-    dndr=dumn*cndr/RAD;
+    double dumy = pdynmc*refa/vmass;
+    dyb = dumy * cyb / RAD;
+    dydr = dumy * cydr / RAD;
+    double dumn = pdynmc * refa * refd / ibbb33;
+    dnb = dumn * cnb / RAD;
+    dnr = dumn * (refd / (2 * dvba)) * cnr;
+    dndr = dumn * cndr / RAD;
 
     //Dimensional derivatives in roll (converted to 1/rad where required)
-    double dumll=pdynmc*refa*refd/ibbb11;
-    dllp=dumll*(refd/(2*dvba))*cllp;
-    dllda=dumll*cllda/RAD;
+    double dumll = pdynmc*refa*refd/ibbb11;
+    dllp = dumll * (refd / (2 * dvba)) * cllp;
+    dllda = dumll * cllda / RAD;
 
     //TVC control derivatives
-    if(mtvc==1||mtvc==2||mtvc==3){
+    if(mtvc == 1 || mtvc == 2 || mtvc == 3){
         //pitch plane
-        dlde=gtvc*thrust/vmass;
-        dmde=-(parm-xcg)*gtvc*thrust/IBBB.get_loc(2,2);
+        dlde = gtvc * thrust / vmass;
+        dmde = -(parm - xcg) * gtvc * thrust / IBBB(2,2);
 
         //yaw plane
-        dydr=dlde;
-        dndr=dmde;
+        dydr = dlde;
+        dndr = dmde;
     }
     //static margin in pitch (per chord length 'refd')
-    if(cla) stmarg_pitch=-cma/cla;
+    if(cla) stmarg_pitch = -cma / cla;
 
     //static margin in yaw (per span length 'refd')
-    if(cyb) stmarg_yaw=-cnb/cyb;
+    if(cyb) stmarg_yaw = -cnb / cyb;
 
     //diagnostics: pitch plane roots
-    double a11=dmq;
+    double a11 = dmq;
     double a12(0);
     if(dla)
-        a12=dma/dla;
-    double a21=dla;
-    double a22=-dla/dvba;
+        a12 = dma / dla;
+    double a21 = dla;
+    double a22 = -dla / dvba;
 
-    double arg=pow((a11+a22),2)-4.*(a11*a22-a12*a21);
-    if(arg>=0.)
+    double arg = pow((a11 + a22), 2) - 4. * (a11 * a22 - a12 * a21);
+    if(arg >= 0.)
     {
-        wnp=0.;
-        zetp=0.;
-        double dum=a11+a22;
-        realp1=(dum+sqrt(arg))/2;
-        realp2=(dum-sqrt(arg))/2;
-        rpreal=(realp1+realp2)/2;
+        wnp = 0.;
+        zetp = 0.;
+        double dum = a11+a22;
+        realp1 = (dum + sqrt(arg)) / 2;
+        realp2 = (dum - sqrt(arg)) / 2;
+        rpreal = (realp1 + realp2) / 2;
     }
     else
     {
-        realp1=0.;
-        realp2=0.;
-        wnp=sqrt(a11*a22-a12*a21);
-        zetp=-(a11+a22)/(2*wnp);
-        rpreal=-zetp*wnp;
+        realp1 = 0.;
+        realp2 = 0.;
+        wnp = sqrt(a11 * a22 - a12 * a21);
+        zetp = -(a11 + a22) / (2 * wnp);
+        rpreal = -zetp * wnp;
     }
     //diagnostics: yaw plane roots
-    a11=dnr;
+    a11 = dnr;
     if(dyb)
-        a12=dnb/dyb;
+        a12 = dnb / dyb;
     else
-        a12=0;
-    a21=-dyb;
-    a22=dyb/dvba;
-    arg=pow((a11+a22),2)-4*(a11*a22-a12*a21);
-    if(arg>=0.)
+        a12 = 0;
+    a21 = -dyb;
+    a22 = dyb / dvba;
+    arg = pow((a11 + a22), 2) - 4 * (a11 * a22 - a12 * a21);
+    if(arg >= 0.)
     {
-        wny=0.;
-        zety=0.;
-        double dum=a11+a22;
-        realy1=(dum+sqrt(arg))/2;
-        realy2=(dum-sqrt(arg))/2;
-        ryreal=(realy1+realy2)/2;
+        wny = 0.;
+        zety = 0.;
+        double dum = a11 + a22;
+        realy1 = (dum + sqrt(arg)) / 2;
+        realy2 = (dum - sqrt(arg)) / 2;
+        ryreal = (realy1 + realy2) / 2;
     }
     else
     {
-        realy1=0.;
-        realy2=0.;
-        wny=sqrt(a11*a22-a12*a21);
-        zety=-(a11+a22)/(2.*wny);
-        ryreal=-zety*wny;
+        realy1 = 0.;
+        realy2 = 0.;
+        wny = sqrt(a11 * a22 - a12 * a21);
+        zety = -(a11 + a22) / (2. * wny);
+        ryreal = -zety * wny;
     }
 }
 
