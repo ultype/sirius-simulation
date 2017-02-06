@@ -166,6 +166,10 @@ void INS::update(double int_step){
 
     // Gyro Measurement
     WBICB = gyro->get_computed_WBIB();
+    EWBIB = gyro->get_error_of_computed_WBIB();
+
+    /* INS Tile Error Propagation */
+    INTEGRATE_D(RICI, TBI * EWBIB);
 
     // computed transformation matrix
     arma::mat33 UNI(arma::fill::eye);
