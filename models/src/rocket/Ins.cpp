@@ -115,6 +115,19 @@ void INS::set_non_ideal(double frax_algnmnt){
     return;
 }
 
+arma::vec3 INS::calculate_INS_derived_postion(arma::vec3 SBII){
+    // computing INS derived postion of hyper B wrt center of Earth I
+    return ESBI + SBII;
+}
+
+
+arma::mat33 INS::calculate_INS_derived_TBI(arma::mat33 TBI){
+    // computed transformation matrix
+    arma::mat33 UNI(arma::fill::eye);
+    arma::mat33 TIIC = UNI - skew_sym(RICI);
+    return TBI * TIIC;
+}
+
 arma::vec3 INS::calculate_gravity_error(double dbi){
     double dbic = norm(SBIIC);
     double ed = dbic - dbi;
@@ -124,6 +137,10 @@ arma::vec3 INS::calculate_gravity_error(double dbi){
     } else {
         return arma::vec3(arma::fill::zeros);
     }
+}
+
+double INS::calculate_INS_derived_dvbe(){
+    return 0;
 }
 
 void INS::update(double int_step){
@@ -160,18 +177,14 @@ void INS::update(double int_step){
     arma::vec3 FSPCB = accel->get_computed_FSPB();
     arma::vec3 EFSPB = accel->get_error_of_computed_FSPB();
 
-    // computing INS derived postion of hyper B wrt center of Earth I
-    SBIIC = ESBI + SBII;
-    dbic = norm(SBIIC);
+    this->SBIIC = calculate_INS_derived_postion(SBII); //  wrt center of Earth I
+    //dbic = norm(SBIIC);
 
     /* INS Tile Error Propagation */
     INTEGRATE_D(RICI, TBI * EWBIB);
 
     // computed transformation matrix
-    arma::mat33 UNI(arma::fill::eye);
-    arma::mat33 TIIC = UNI - skew_sym(RICI);
-    TBIC = TBI * TIIC;
-
+    this->TBIC = calculate_INS_derived_TBI(TBI);
 
     // calculate gravitational error
     this->EGRAVI = calculate_gravity_error(newton->get_dbi());
@@ -179,7 +192,6 @@ void INS::update(double int_step){
     // integrating velocity error equation
     // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
     arma::mat33 TICB = trans(TBIC);
-
     INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
 
     // calculating position error
@@ -205,23 +217,21 @@ void INS::update(double int_step){
     WBICI = trans(TBIC) * WBICB;
 
     // diagnostics
-    ins_pos_err  = norm(ESBI);
-    ins_vel_err  = norm(EVBI);
-    ins_tilt_err = norm(RICI);
+    //ins_pos_err  = norm(ESBI);
+    //ins_vel_err  = norm(EVBI);
+    //ins_tilt_err = norm(RICI);
 
     // computing geographic velocity in body coordinates from INS
     arma::vec3 VEIC;
     VEIC(0) = -WEII3 * SBIIC(1);
     VEIC(1) =  WEII3 * SBIIC(0);
     VEIC(2) =  0;
-    arma::vec3 VBEIC = VBIIC - VEIC;
-    arma::vec3 VBECB = TBIC * VBEIC;
-    dvbec = norm(VBECB);
 
-    // decomposing computed body rates
-    ppcx = WBICB(0) * DEG;
-    qqcx = WBICB(1) * DEG;
-    rrcx = WBICB(2) * DEG;
+    arma::vec3 VBEIC = VBIIC - VEIC;
+
+    arma::vec3 VBECB = TBIC * VBEIC;
+
+    this->dvbec = norm(VBECB);
 
     // computing indidence angles from INS
     double alphac = atan2(VBECB(2), VBECB(0));
@@ -258,7 +268,7 @@ void INS::update(double int_step){
     latcx = latc * DEG;
 
     // computing geodetic velocity from INS
-    VBECD = TDCI * VBEIC;
+    arma::vec3 VBECD = TDCI * VBEIC;
 
     // computing flight path angles
     if (VBECD[0] == 0 && VBECD[1] == 0) {
@@ -317,9 +327,6 @@ void INS::update(double int_step){
 }
 
 double INS::get_dvbec() { return dvbec; }
-double INS::get_qqcx() { return qqcx; }
-double INS::get_rrcx() { return rrcx; }
-double INS::get_ppcx() { return ppcx; }
 double INS::get_alphacx() { return alphacx; }
 double INS::get_betacx() { return betacx; }
 double INS::get_phibdcx() { return phibdcx; }

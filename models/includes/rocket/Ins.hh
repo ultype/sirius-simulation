@@ -46,9 +46,6 @@ class INS {
         /* Input File */
 
         double get_dvbec();
-        double get_qqcx();
-        double get_rrcx();
-        double get_ppcx();
         double get_alphacx();
         double get_betacx();
         double get_phibdcx();
@@ -69,7 +66,11 @@ class INS {
         void default_data();
 
         /* Internal Propagator / Calculators */
+        arma::vec3 calculate_INS_derived_postion(arma::vec3 SBII);
+        arma::mat33 calculate_INS_derived_TBI(arma::mat33 TBI);
         arma::vec3 calculate_gravity_error(double dbi);
+        double calculate_INS_derived_dvbe();
+
 
         /* Internal Calculators */
 
@@ -87,17 +88,27 @@ class INS {
         /* Constants */
 
         /* Propagative Stats */
+        arma::vec EVBI;        /* *o  (m/s)   INS vel error */
+        double   _EVBI[3];     /* *o  (m/s)   INS vel error */
+
+        arma::vec EVBID;       /* *o  (m/s)   INS vel error derivative */
+        double   _EVBID[3];    /* *o  (m/s)   INS vel error derivative */
+
+        arma::vec ESBI;        /* *o  (m)     INS pos error */
+        double   _ESBI[3];     /* *o  (m)     INS pos error */
+
+        arma::vec ESBID;       /* *o  (m)     INS pos error derivative */
+        double   _ESBID[3];    /* *o  (m)     INS pos error derivative */
+
+        arma::vec RICI;        /* *o  (r)     INS tilt error derivative */
+        double   _RICI[3];     /* *o  (r)     INS tilt error */
+
+        arma::vec RICID;       /* *o  (r)     INS tilt error derivative */
+        double   _RICID[3];    /* *o  (r)     INS tilt error derivative */
 
         /* Generating Outputs */
-
-        /* Non-propagating Diagnostic Variables */
-        /* These can be deleted, but keep to remain trackable in trick simulator */
-        double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
-        double qqcx;        /* *io  (d/s)   INS computed pitch rate */
-        double rrcx;        /* *io  (d/s)   INS computed yaw rate */
-
-        arma::mat TBIC;         /* *o  (--)    Computed T.M. of body wrt earth coordinate */
-        double _TBIC[3][3];     /* *o  (--)    Computed T.M. of body wrt earth coordinate */
+        arma::mat TBIC;        /* *o  (--)    Computed T.M. of body wrt earth coordinate */
+        double _TBIC[3][3];    /* *o  (--)    Computed T.M. of body wrt earth coordinate */
 
         arma::vec SBIIC;       /* *o  (m)     Computed pos of body wrt earth reference point*/
         double   _SBIIC[3];    /* *o  (m)     Computed pos of body wrt earth reference point*/
@@ -108,26 +119,12 @@ class INS {
         arma::vec WBICI;       /* *o  (r/s)   Computed inertial body rate in inert coordinate */
         double   _WBICI[3];    /* *o  (r/s)   Computed inertial body rate in inert coordinate */
 
-        double ppcx;        /* *io  (d/s)   INS computed roll rate */
-        double alphacx;     /* *io  (d)     INS computed angle of attack */
-        double betacx;      /* *io  (d)     INS computed sideslip angle */
-        double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
-        double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
-        double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
+        arma::vec EGRAVI;      /* *o  (--)    error by gravity */
+        double   _EGRAVI[3];   /* *o  (--)    error by gravity */
 
-        /* grav */
-        arma::vec EGRAVI;      /* *o   (--)    error by gravity */
-        double   _EGRAVI[3];   /* *o   (--)    error by gravity */
-
-        arma::vec EVBI;        /* *o  (m/s)   INS vel error */
-        double   _EVBI[3];     /* *o  (m/s)   INS vel error */
-        arma::vec EVBID;       /* *o  (m/s)   INS vel error derivative */
-        double   _EVBID[3];    /* *o  (m/s)   INS vel error derivative */
-
-        arma::vec ESBI;        /* *o  (m)     INS pos error */
-        double   _ESBI[3];     /* *o  (m)     INS pos error */
-        arma::vec ESBID;       /* *o  (m)     INS pos error derivative */
-        double   _ESBID[3];    /* *o  (m)     INS pos error derivative */
+        double loncx;       /* *io  (d)     INS derived longitude */
+        double latcx;       /* *io  (d)     INS derived latitude */
+        double altc;        /* *io  (m)     INS derived altitude */
 
         arma::vec VBECD;       /* *o  (m/s)   Geodetic velocity */
         double   _VBECD[3];    /* *o  (m/s)   Geodetic velocity */
@@ -135,20 +132,25 @@ class INS {
         arma::mat TDCI;        /* *o  (--)    Comp T.M. of geodetic wrt inertial */
         double   _TDCI[3][3];  /* *o  (--)    Comp T.M. of geodetic wrt inertial */
 
-        arma::vec RICI;      /* *o  (r)     INS tilt error derivative */
-        double _RICI[3];     /* *o  (r)     INS tilt error */
+        double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
+        double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */
 
-        arma::vec RICID;     /* *o  (r)     INS tilt error derivative */
-        double _RICID[3];    /* *o  (r)     INS tilt error derivative */
+        double alphacx;     /* *io  (d)     INS computed angle of attack */
+        double betacx;      /* *io  (d)     INS computed sideslip angle */
 
-        double loncx;       /* *io  (d)     INS derived longitude */
-        double latcx;       /* *io  (d)     INS derived latitude */
-        double altc;        /* *io  (m)     INS derived altitude */
         double thtvdcx;     /* *io  (d)     INS computed vertical flight path angle */
         double psivdcx;     /* *io  (d)     INS computed heading angle */
-        double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
+
         double alppcx;      /* *io  (d)     INS computed total angle of attack */
         double phipcx;      /* *io  (d)     INS computed aero roll angle */
+
+        double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
+        double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
+        double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
+
+        /* Non-propagating Diagnostic Variables */
+        /* These can be deleted, but keep to remain trackable in trick simulator */
+
         double ins_pos_err; /* *io  (m)     INS absolute postion error */
         double ins_vel_err; /* *io  (m/s)   INS absolute velocity error */
         double ins_tilt_err; /* *o  (r)     INS absolute tilt error */

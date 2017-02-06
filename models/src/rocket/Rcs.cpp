@@ -52,30 +52,30 @@ void RCS::actuate(){
     // on-off moment thrusters (Schmitt trigger)
     if (rcs_type == 2) {
         // roll angle control (always)
-        e_roll = phibdcomx - (rcs_tau * ins->get_ppcx() + ins->get_phibdcx());
+        e_roll = phibdcomx - (rcs_tau * ins->get_gyro().get_ppcx() + ins->get_phibdcx());
         // on/off output of Schmitt trigger
 
 
         // geodetic Euler angle control
         if (rcs_mode == 1) {
-            e_pitch = thtbdcomx - (rcs_tau * ins->get_qqcx() + ins->get_thtbdcx());
-            e_yaw = psibdcomx - (rcs_tau * ins->get_rrcx() + ins->get_psibdcx());
+            e_pitch = thtbdcomx - (rcs_tau * ins->get_gyro().get_qqcx() + ins->get_thtbdcx());
+            e_yaw = psibdcomx - (rcs_tau * ins->get_gyro().get_rrcx() + ins->get_psibdcx());
         }
 
         // incidence angle control
         if (rcs_mode == 3) {
-            e_pitch = guidance->get_alphacomx() - (rcs_tau * ins->get_qqcx() + ins->get_alphacx());
-            e_yaw = -guidance->get_betacomx() - (rcs_tau * ins->get_rrcx() - ins->get_betacx());
+            e_pitch = guidance->get_alphacomx() - (rcs_tau * ins->get_gyro().get_qqcx() + ins->get_alphacx());
+            e_yaw = -guidance->get_betacomx() - (rcs_tau * ins->get_gyro().get_rrcx() - ins->get_betacx());
         }
         // geodetic yaw angle control
         if (rcs_mode == 4) {
             // e_yaw=psibdcomx-(rcs_tau*rrcx+psibdcx);
-            e_pitch = thtbdcomx - (rcs_tau * ins->get_qqcx() + ins->get_thtbdcx());
+            e_pitch = thtbdcomx - (rcs_tau * ins->get_gyro().get_qqcx() + ins->get_thtbdcx());
         }
         // vector directional control
         else if (rcs_mode == 2) {
-            e_pitch = -rcs_tau * ins->get_qqcx() - UTBC[2] * DEG;
-            e_yaw = -rcs_tau * ins->get_rrcx() + UTBC[1] * DEG;
+            e_pitch = -rcs_tau * ins->get_gyro().get_qqcx() - UTBC[2] * DEG;
+            e_yaw = -rcs_tau * ins->get_gyro().get_rrcx() + UTBC[1] * DEG;
         }
 
 
