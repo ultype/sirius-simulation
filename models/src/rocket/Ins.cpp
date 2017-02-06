@@ -183,93 +183,57 @@ void INS::update(double int_step){
     arma::vec3 FSPCB;
     arma::vec3 EFSPB;
 
-    //-------------------------------------------------------------------------
-    // ideal INS output
-    switch(ins_mode){
-        case IDEAL_INS:
-            // initialization without INS errors (perfect transfer alignment)
-            break;
-        case NON_IDEAL_INS:
-            break;
-        default:
-            assert(false && "Not a proper ins mode!");
+    // computing INS derived postion of hyper B wrt center of Earth I
+    SBIIC = ESBI + SBII;
+    dbic = norm(SBIIC);
+
+    // Gyro Measurement
+    WBICB = gyro->get_computed_WBIB();
+
+    // computed transformation matrix
+    arma::mat33 UNI(arma::fill::eye);
+    arma::mat33 TIIC = UNI - skew_sym(RICI);
+    TBIC = TBI * TIIC;
+
+    // Accelerometer Measurement
+    FSPCB = accel->get_computed_FSPB();
+    EFSPB = accel->get_error_of_computed_FSPB();
+
+    // calculate gravitational error
+    this->EGRAVI = calculate_gravity_error(newton->get_dbi());
+
+    // integrating velocity error equation
+    // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
+    arma::mat33 TICB = trans(TBIC);
+
+    INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
+
+    // calculating position error
+    INTEGRATE_D(ESBI, EVBI);
+
+    // GPS update
+    if (gpsr->gps_update) {
+        // updating INS navigation output
+        SBIIC = SBIIC - SXH;
+        VBIIC = VBIIC - VXH;
+        // resetting INS error states
+        ESBI = ESBI - SXH;
+        EVBI = EVBI - VXH;
+        // returning flag to GPS that update was completed
+        gpsr->gps_update--;
     }
-    if (ins_mode == IDEAL_INS) {
 
-        SBIIC = SBII;
-        dbic = norm(SBIIC);
+    // computing INS derived position of hyper B wrt center of Earth I
+    SBIIC = ESBI + SBII;
+    // computing INS derived velocity of hyper B wrt inertial frame I
+    VBIIC = EVBI + VBII;
+    // computing INS derived body rates in inertial coordinates
+    WBICI = trans(TBIC) * WBICB;
 
-        //gyro
-        WBICB = gyro->get_computed_WBIB();
-        EWBIB = gyro->get_error_of_computed_WBIB();
-
-        /* INS Tile Error Propagation */
-        INTEGRATE_D(RICI, TBI * EWBIB);
-
-        arma::mat33 UNI(arma::fill::eye);
-        arma::mat33 TIIC = UNI - skew_sym(RICI);
-        TBIC = TBI * TIIC;
-
-        WBICI = trans(TBIC) * WBICB;
-
-        //accl
-        FSPCB = accel->get_computed_FSPB();
-        EFSPB = accel->get_error_of_computed_FSPB();
-
-        VBIIC = VBII;
-
-    } else {
-        // computing INS derived postion of hyper B wrt center of Earth I
-        SBIIC = ESBI + SBII;
-        dbic = norm(SBIIC);
-
-        // Gyro Measurement
-        WBICB = gyro->get_computed_WBIB();
-
-        // computed transformation matrix
-        arma::mat33 UNI(arma::fill::eye);
-        arma::mat33 TIIC = UNI - skew_sym(RICI);
-        TBIC = TBI * TIIC;
-
-        // Accelerometer Measurement
-        FSPCB = accel->get_computed_FSPB();
-        EFSPB = accel->get_error_of_computed_FSPB();
-
-        // calculate gravitational error
-        this->EGRAVI = calculate_gravity_error(newton->get_dbi());
-
-        // integrating velocity error equation
-        // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
-        arma::mat33 TICB = trans(TBIC);
-
-        INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
-
-        // calculating position error
-        INTEGRATE_D(ESBI, EVBI);
-
-        // GPS update
-        if (gpsr->gps_update) {
-            // updating INS navigation output
-            SBIIC = SBIIC - SXH;
-            VBIIC = VBIIC - VXH;
-            // resetting INS error states
-            ESBI = ESBI - SXH;
-            EVBI = EVBI - VXH;
-            // returning flag to GPS that update was completed
-            gpsr->gps_update--;
-        }
-
-        // computing INS derived position of hyper B wrt center of Earth I
-        SBIIC = ESBI + SBII;
-        // computing INS derived velocity of hyper B wrt inertial frame I
-        VBIIC = EVBI + VBII;
-        // computing INS derived body rates in inertial coordinates
-        WBICI = trans(TBIC) * WBICB;
-
-        // diagnostics
-        ins_pos_err = norm(ESBI);
-        ins_vel_err = norm(EVBI);
-    }
+    // diagnostics
+    ins_pos_err  = norm(ESBI);
+    ins_vel_err  = norm(EVBI);
+    ins_tilt_err = norm(RICI);
 
     // computing geographic velocity in body coordinates from INS
     arma::vec3 VEIC;
