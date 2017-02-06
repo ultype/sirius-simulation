@@ -161,8 +161,6 @@ void INS::update(double int_step){
     double psibdc(0), thtbdc(0), phibdc(0);
     double cthtbd(0);
 
-
-
     // input from other modules
     double time      = get_rettime();
     arma::vec3 GRAVG = environment->get_GRAVG_();
@@ -194,7 +192,6 @@ void INS::update(double int_step){
             assert(false && "Not a proper ins mode!");
     }
     if (ins_mode == IDEAL_INS) {
-        WBICI = WBII;
 
         SBIIC = SBII;
         dbic = norm(SBIIC);
@@ -202,10 +199,15 @@ void INS::update(double int_step){
         //gyro
         WBICB = gyro->get_computed_WBIB();
 
-        TBIC = TBI;
+        arma::mat33 UNI(arma::fill::eye);
+        arma::mat33 TIIC = UNI - skew_sym(gyro->get_RICI());
+        TBIC = TBI * TIIC;
+
+        WBICI = trans(TBIC) * WBICB;
 
         //accl
         FSPCB = accel->get_computed_FSPB();
+        EFSPB = accel->get_error_of_computed_FSPB();
 
         VBIIC = VBII;
 
@@ -232,15 +234,11 @@ void INS::update(double int_step){
         // integrating velocity error equation
         // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
         arma::mat33 TICB = trans(TBIC);
-        arma::vec3 EVBID_NEW =
-            TICB * EFSPB - skew_sym(gyro->get_RICI()) * TICB * FSPCB + EGRAVI;
-        EVBI = integrate(EVBID_NEW, EVBID, EVBI, int_step);
-        EVBID = EVBID_NEW;
+
+        INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(gyro->get_RICI()) * TICB * FSPCB + EGRAVI);
 
         // calculating position error
-        arma::vec3 ESBID_NEW = EVBI;
-        ESBI = integrate(ESBID_NEW, ESBID, ESBI, int_step);
-        ESBID = ESBID_NEW;
+        INTEGRATE_D(ESBI, EVBI)
 
         // GPS update
         if (gpsr->gps_update) {

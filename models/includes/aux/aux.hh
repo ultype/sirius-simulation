@@ -21,4 +21,18 @@ ICG: (No)
 #define VECTOR_INIT(vec_name, n) \
         vec_name(&_ ## vec_name[0], n, false, true)
 
+#define INTEGRATE_d(in, diff) \
+        do{ \
+            arma::mat in##d_new = diff; \
+            in = integrate(in##d_new, in##d, in, int_step); \
+            in##d = in##d_new; \
+        }while(0)
+
+#define INTEGRATE_D(in, diff) \
+        do{ \
+            arma::mat in##D_NEW = diff; \
+            in = integrate(in##D_NEW, in##D, in, int_step); \
+            in##D = in##D_NEW; \
+        }while(0)
+
 #endif// utility_header__HPP
