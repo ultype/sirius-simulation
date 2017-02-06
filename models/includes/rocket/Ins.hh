@@ -129,9 +129,6 @@ class INS {
         arma::vec EGRAVI;      /* *o   (--)    error by gravity */
         double   _EGRAVI[3];   /* *o   (--)    error by gravity */
 
-        arma::vec RICI;
-        double   _RICI[3];
-
         arma::vec EVBI;        /* *o  (m/s)   INS vel error */
         double   _EVBI[3];     /* *o  (m/s)   INS vel error */
         arma::vec EVBID;       /* *o  (m/s)   INS vel error derivative */
@@ -148,6 +145,12 @@ class INS {
         arma::mat TDCI;        /* *o  (--)    Comp T.M. of geodetic wrt inertial */
         double   _TDCI[3][3];  /* *o  (--)    Comp T.M. of geodetic wrt inertial */
 
+        arma::vec RICI;      /* *o  (r)     INS tilt error derivative */
+        double _RICI[3];     /* *o  (r)     INS tilt error */
+
+        arma::vec RICID;     /* *o  (r)     INS tilt error derivative */
+        double _RICID[3];    /* *o  (r)     INS tilt error derivative */
+
         double loncx;       /* *io  (d)     INS derived longitude */
         double latcx;       /* *io  (d)     INS derived latitude */
         double altc;        /* *io  (m)     INS derived altitude */
@@ -158,6 +161,7 @@ class INS {
         double phipcx;      /* *io  (d)     INS computed aero roll angle */
         double ins_pos_err; /* *io  (m)     INS absolute postion error */
         double ins_vel_err; /* *io  (m/s)   INS absolute velocity error */
+        double ins_tilt_err; /* *o  (r)     INS absolute tilt error */
 };
 
 #endif  // __INS_HH__

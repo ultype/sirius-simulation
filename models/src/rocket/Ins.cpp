@@ -14,6 +14,7 @@ INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Rece
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
+        VECTOR_INIT(RICID, 3),
         VECTOR_INIT(ESBI, 3),
         VECTOR_INIT(ESBID, 3),
         VECTOR_INIT(EVBI, 3),
@@ -32,6 +33,7 @@ INS::INS(const INS& other)
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
+        VECTOR_INIT(RICID, 3),
         VECTOR_INIT(ESBI, 3),
         VECTOR_INIT(ESBID, 3),
         VECTOR_INIT(EVBI, 3),
@@ -177,6 +179,7 @@ void INS::update(double int_step){
     arma::vec3 VXH(gpsr->velocity_state);
 
     arma::vec3 WBICB;
+    arma::vec3 EWBIB;
     arma::vec3 FSPCB;
     arma::vec3 EFSPB;
 
@@ -198,9 +201,13 @@ void INS::update(double int_step){
 
         //gyro
         WBICB = gyro->get_computed_WBIB();
+        EWBIB = gyro->get_error_of_computed_WBIB();
+
+        /* INS Tile Error Propagation */
+        INTEGRATE_D(RICI, TBI * EWBIB);
 
         arma::mat33 UNI(arma::fill::eye);
-        arma::mat33 TIIC = UNI - skew_sym(gyro->get_RICI());
+        arma::mat33 TIIC = UNI - skew_sym(RICI);
         TBIC = TBI * TIIC;
 
         WBICI = trans(TBIC) * WBICB;
@@ -221,7 +228,7 @@ void INS::update(double int_step){
 
         // computed transformation matrix
         arma::mat33 UNI(arma::fill::eye);
-        arma::mat33 TIIC = UNI - skew_sym(gyro->get_RICI());
+        arma::mat33 TIIC = UNI - skew_sym(RICI);
         TBIC = TBI * TIIC;
 
         // Accelerometer Measurement
@@ -235,10 +242,10 @@ void INS::update(double int_step){
         // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
         arma::mat33 TICB = trans(TBIC);
 
-        INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(gyro->get_RICI()) * TICB * FSPCB + EGRAVI);
+        INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
 
         // calculating position error
-        INTEGRATE_D(ESBI, EVBI)
+        INTEGRATE_D(ESBI, EVBI);
 
         // GPS update
         if (gpsr->gps_update) {
@@ -251,6 +258,7 @@ void INS::update(double int_step){
             // returning flag to GPS that update was completed
             gpsr->gps_update--;
         }
+
         // computing INS derived position of hyper B wrt center of Earth I
         SBIIC = ESBI + SBII;
         // computing INS derived velocity of hyper B wrt inertial frame I
