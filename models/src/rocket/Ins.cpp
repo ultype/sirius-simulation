@@ -11,6 +11,7 @@
 
 INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps)
     :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps),
+        MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
@@ -30,6 +31,7 @@ INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Rece
 
 INS::INS(const INS& other)
     :   newton(other.newton), euler(other.euler), environment(other.environment), kinematics(other.kinematics), gpsr(other.gpsr),
+        MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
@@ -60,7 +62,17 @@ INS& INS::operator=(const INS& other){
     return *this;
 }
 
+arma::mat INS::build_WEII(){
+    arma::mat33 WEII;
+    WEII.zeros();
+    WEII(0, 1) = -WEII3;
+    WEII(1, 0) =  WEII3;
+    return WEII;
+}
+
 void INS::default_data(){
+    this->WEII = build_WEII();
+
     this->EGRAVI.zeros();
 }
 
@@ -120,6 +132,15 @@ arma::vec3 INS::calculate_INS_derived_postion(arma::vec3 SBII){
     return ESBI + SBII;
 }
 
+arma::vec3 INS::calculate_INS_derived_velocity(arma::vec3 VBII){
+    // computing INS derived velocity of hyper B wrt inertial frame I
+    return EVBI + VBII;
+}
+
+arma::vec3 INS::calculate_INS_derived_bodyrate(arma::mat33 TBIC, arma::vec3 WBICB){
+    // computing INS derived body rates in inertial coordinates
+    return trans(TBIC) * WBICB;
+}
 
 arma::mat33 INS::calculate_INS_derived_TBI(arma::mat33 TBI){
     // computed transformation matrix
@@ -143,6 +164,27 @@ double INS::calculate_INS_derived_dvbe(){
     return 0;
 }
 
+bool INS::GPS_update(){
+    // GPS update
+    if (gpsr->gps_update) {
+        // GPS Measurement
+        arma::vec3 SXH(gpsr->position_state);
+        arma::vec3 VXH(gpsr->velocity_state);
+
+        // updating INS navigation output
+        SBIIC = SBIIC - SXH;
+        VBIIC = VBIIC - VXH;
+        // resetting INS error states
+        ESBI = ESBI - SXH;
+        EVBI = EVBI - VXH;
+        // returning flag to GPS that update was completed
+        gpsr->gps_update--;
+
+        return true;
+    }
+    return false;
+}
+
 void INS::update(double int_step){
     assert(gyro && "INS module must be given a gyro model");
     assert(accel && "INS module must be given a accelerometer model");
@@ -164,10 +206,6 @@ void INS::update(double int_step){
     arma::mat33 TBI  = kinematics->get_TBI_();
 
     int mroll = 0; // Ambiguous
-
-    // GPS Measurement
-    arma::vec3 SXH(gpsr->position_state);
-    arma::vec3 VXH(gpsr->velocity_state);
 
     // Gyro Measurement
     arma::vec3 WBICB = gyro->get_computed_WBIB();
@@ -197,24 +235,11 @@ void INS::update(double int_step){
     // calculating position error
     INTEGRATE_D(ESBI, EVBI);
 
-    // GPS update
-    if (gpsr->gps_update) {
-        // updating INS navigation output
-        SBIIC = SBIIC - SXH;
-        VBIIC = VBIIC - VXH;
-        // resetting INS error states
-        ESBI = ESBI - SXH;
-        EVBI = EVBI - VXH;
-        // returning flag to GPS that update was completed
-        gpsr->gps_update--;
-    }
+    GPS_update();
 
-    // computing INS derived position of hyper B wrt center of Earth I
-    SBIIC = ESBI + SBII;
-    // computing INS derived velocity of hyper B wrt inertial frame I
-    VBIIC = EVBI + VBII;
-    // computing INS derived body rates in inertial coordinates
-    WBICI = trans(TBIC) * WBICB;
+    this->SBIIC = calculate_INS_derived_postion(SBII);
+    this->VBIIC = calculate_INS_derived_velocity(VBII);
+    this->WBICI = calculate_INS_derived_bodyrate(TBIC, WBICB);
 
     // diagnostics
     //ins_pos_err  = norm(ESBI);
@@ -222,13 +247,8 @@ void INS::update(double int_step){
     //ins_tilt_err = norm(RICI);
 
     // computing geographic velocity in body coordinates from INS
-    arma::vec3 VEIC;
-    VEIC(0) = -WEII3 * SBIIC(1);
-    VEIC(1) =  WEII3 * SBIIC(0);
-    VEIC(2) =  0;
-
+    arma::vec3 VEIC = WEII * SBIIC;
     arma::vec3 VBEIC = VBIIC - VEIC;
-
     arma::vec3 VBECB = TBIC * VBEIC;
 
     this->dvbec = norm(VBECB);
@@ -236,8 +256,8 @@ void INS::update(double int_step){
     // computing indidence angles from INS
     double alphac = atan2(VBECB(2), VBECB(0));
     double betac = asin(VBECB(1) / dvbec);
-    alphacx = alphac * DEG;
-    betacx = betac * DEG;
+    this->alphacx = alphac * DEG;
+    this->betacx = betac * DEG;
 
     // incidence angles in load factor plane (aeroballistic)
     double dum = VBECB(0) / dvbec;

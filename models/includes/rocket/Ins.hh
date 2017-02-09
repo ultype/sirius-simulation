@@ -61,12 +61,18 @@ class INS {
 
     private:
         /* Internal Getter */
+        arma::mat build_WEII();
 
         /* Internal Initializers */
         void default_data();
 
         /* Internal Propagator / Calculators */
+        bool GPS_update();
+
         arma::vec3 calculate_INS_derived_postion(arma::vec3 SBII);
+        arma::vec3 calculate_INS_derived_velocity(arma::vec3 VBII);
+        arma::vec3 calculate_INS_derived_bodyrate(arma::mat33 TBIC, arma::vec3 WBICB);
+
         arma::mat33 calculate_INS_derived_TBI(arma::mat33 TBI);
         arma::vec3 calculate_gravity_error(double dbi);
         double calculate_INS_derived_dvbe();
@@ -86,6 +92,8 @@ class INS {
         sensor::Accelerometer * accel;
 
         /* Constants */
+        arma::mat WEII;        /* *o  (r/s)    Earth's angular velocity (skew-sym) */
+        double   _WEII[3][3];  /* *o  (r/s)    Earth's angular velocity (skew-sym) */
 
         /* Propagative Stats */
         arma::vec EVBI;        /* *o  (m/s)   INS vel error */
