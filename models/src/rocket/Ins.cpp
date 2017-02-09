@@ -203,17 +203,17 @@ double INS::calculate_INS_derived_alpp(arma::vec3 VBECB){
 double INS::calculate_INS_derived_phip(arma::vec3 VBECB){
     double phipc(0);
 
-    if (VBECB(1) == 0 && VBECB(2) == 0)
+    if (VBECB(1) == 0 && VBECB(2) == 0){
+
         phipc = 0.;
-    // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
-    //       to prevent oscillations
-    else if (fabs(VBECB(1)) < EPS)
-        if (VBECB(2) > 0)
-            phipc = 0;
-    if (VBECB(2) < 0)
-        phipc = PI;
-    else
+    } else if (fabs(VBECB(1)) < EPS) {
+        // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
+        //       to prevent oscillations
+        if (VBECB(2) > 0) phipc = 0;
+        if (VBECB(2) < 0) phipc = PI;
+    } else{
         phipc = atan2(VBECB(1), VBECB(2));
+    }
 
     return phipc;
 }
