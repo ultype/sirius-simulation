@@ -79,7 +79,7 @@ void TVC::actuate(double int_step){
             etac = gtvc * delecx * RAD;
             zetc = gtvc * delrcx * RAD;
             // calling second order nozzle dynamics
-            tvc_scnd(eta, zet, etac, zetc, int_step);
+            std::tie(eta, zet) = tvc_scnd(etac, zetc, int_step);
             break;
         default:
             break;
@@ -127,7 +127,9 @@ void TVC::actuate(double int_step){
 // 030608 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double int_step){
+std::tuple<double, double> TVC::tvc_scnd(double etac, double zetc, double int_step){
+    double eta, zet;
+
     // pitch nozzle dynamics
     // limiting position and the nozzle rate derivative
     if (fabs(etas) > tvclimx * RAD) {
@@ -177,6 +179,8 @@ void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double in
     if (iflag && dzeta * dzetad > 0.)
         dzetad = 0.;
     zet = zeta;
+
+    return std::make_tuple(eta, zet);
 }
 
 enum TVC::TVC_TYPE TVC::get_mtvc() { return mtvc; }

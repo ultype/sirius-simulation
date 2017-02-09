@@ -6,6 +6,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/rocket/Tvc.cpp))
 *******************************************************************************/
+#include <tuple>
 
 #include "aux/aux.hh"
 
@@ -33,7 +34,6 @@ class TVC {
         void initialize();
 
         void actuate(double int_step);
-        void tvc_scnd(double &eta, double &zet, double etac, double zetc, double int_step);
 
         enum TVC_TYPE {
             NO_TVC = 0,
@@ -62,6 +62,8 @@ class TVC {
         void default_data();
 
         /* Internal Propagator / Calculators */
+        // returning: eta, zet,
+        std::tuple<double, double> tvc_scnd(double etac, double zetc, double int_step);
 
         /* Internal Calculators */
 
