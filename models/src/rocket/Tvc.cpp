@@ -17,6 +17,46 @@ TVC::TVC(const TVC& other)
         VECTOR_INIT(FMPB, 3)
 {
     this->default_data();
+
+
+    this->mtvc = other.mtvc;
+
+    /* Constants */
+    this->gtvc = other.gtvc;
+
+    this->tvclimx = other.tvclimx;
+    this->dtvclimx = other.dtvclimx;
+    this->wntvc = other.wntvc;
+    this->zettvc = other.zettvc;
+    this->factgtvc = other.factgtvc;
+
+    /* Propagative Stats */
+    this->etas = other.etas;
+    this->etasd = other.etasd;
+
+    this->zeta = other.zeta;
+    this->zetad = other.zetad;
+
+    this->detas = other.detas;
+    this->detasd = other.detasd;
+
+    this->dzeta = other.dzeta;
+    this->dzetad = other.dzetad;
+
+    /* Generating Outputs */
+    this->parm = other.parm;
+
+    this->FPB = other.FPB;
+
+    this->FMPB = other.FMPB;
+
+    this->etax = other.etax;
+    this->zetx = other.zetx;
+
+    /* Non-propagating Diagnostic Variables */
+    /* These can be deleted, but keep to remain trackable in trick simulator */
+    this->etacx = other.etacx;
+    this->zetcx = other.zetcx;
 }
 
 TVC& TVC::operator=(const TVC& other){
@@ -27,6 +67,45 @@ TVC& TVC::operator=(const TVC& other){
     this->kinematics = other.kinematics;
     this->control = other.control;
     this->propulsion = other.propulsion;
+
+    this->mtvc = other.mtvc;
+
+    /* Constants */
+    this->gtvc = other.gtvc;
+
+    this->tvclimx = other.tvclimx;
+    this->dtvclimx = other.dtvclimx;
+    this->wntvc = other.wntvc;
+    this->zettvc = other.zettvc;
+    this->factgtvc = other.factgtvc;
+
+    /* Propagative Stats */
+    this->etas = other.etas;
+    this->etasd = other.etasd;
+
+    this->zeta = other.zeta;
+    this->zetad = other.zetad;
+
+    this->detas = other.detas;
+    this->detasd = other.detasd;
+
+    this->dzeta = other.dzeta;
+    this->dzetad = other.dzetad;
+
+    /* Generating Outputs */
+    this->parm = other.parm;
+
+    this->FPB = other.FPB;
+
+    this->FMPB = other.FMPB;
+
+    this->etax = other.etax;
+    this->zetx = other.zetx;
+
+    /* Non-propagating Diagnostic Variables */
+    /* These can be deleted, but keep to remain trackable in trick simulator */
+    this->etacx = other.etacx;
+    this->zetcx = other.zetcx;
 
     return *this;
 }
