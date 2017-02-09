@@ -3,14 +3,34 @@
 #include "rocket/Tvc.hh"
 #include "sim_services/include/simtime.h"
 
+TVC::TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp)
+    :   environment(&env), kinematics(&kins), control(&con), propulsion(&plp)
+{
+    this->default_data();
+}
+
+TVC::TVC(const TVC& other)
+    :   environment(other.environment), kinematics(other.kinematics), control(other.control), propulsion(other.propulsion)
+{
+    this->default_data();
+}
+
+TVC& TVC::operator=(const TVC& other){
+    if(&other == this)
+        return *this;
+
+    this->environment = other.environment;
+    this->kinematics = other.kinematics;
+    this->control = other.control;
+    this->propulsion = other.propulsion;
+
+    return *this;
+}
+
 void TVC::default_data(){
 }
 
-void TVC::initialize(Environment *env, Kinematics *kins, Control *con, Propulsion *plp){
-    environment = env;
-    kinematics = kins;
-    control = con;
-    propulsion = plp;
+void TVC::initialize(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -5,9 +5,9 @@ PURPOSE:
       (Describe the TVC Module On Board)
 LIBRARY DEPENDENCY:
       ((../src/rocket/Tvc.cpp))
-PROGRAMMERS:
-      (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
+
+#include "aux/aux.hh"
 
 #include "Newton.hh"
 #include "Euler.hh"
@@ -21,14 +21,17 @@ class Kinematics;
 class Control;
 class Environment;
 
-
-
 class TVC {
+    TRICK_INTERFACE(TVC);
+
     public:
-        TVC() {}
+        TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp);
+        TVC(const TVC& other);
+
+        TVC& operator=(const TVC& other);
 
         void default_data();
-        void initialize(Environment *env, Kinematics *kins, Control *con, Propulsion *plp);
+        void initialize();
 
         void actuate(double int_step);
         void tvc_scnd(double &eta, double &zet, double etac, double zetc, double int_step);
