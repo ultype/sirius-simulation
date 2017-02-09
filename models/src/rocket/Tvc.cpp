@@ -47,6 +47,32 @@ void TVC::initialize(){
 //
 // 030608 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
+
+arma::vec3 TVC::calculate_FPB(double eta, double zet, double thrust){
+    arma::vec3 __FPB;
+
+    double seta = sin(eta);
+    double ceta = cos(eta);
+    double czet = cos(zet);
+    double szet = sin(zet);
+    __FPB[0] = ceta * czet * thrust;
+    __FPB[1] = ceta * szet * thrust;
+    __FPB[2] = -seta * thrust;
+
+    return __FPB;
+}
+
+arma::vec3 TVC::calculate_FMPB(double xcg){
+    arma::vec3 __FMPB;
+
+    double arm = parm - xcg;
+    __FMPB[0] = 0;
+    __FMPB[1] = arm * FPB[2];
+    __FMPB[2] = -arm * FPB[1];
+
+    return __FMPB;
+}
+
 void TVC::actuate(double int_step){
     // local variables
     double eta(0), zet(0);
@@ -86,19 +112,10 @@ void TVC::actuate(double int_step){
     }
 
     // thrust forces in body axes
-    double seta = sin(eta);
-    double ceta = cos(eta);
-    double czet = cos(zet);
-    double szet = sin(zet);
-    FPB[0] = ceta * czet * thrust;
-    FPB[1] = ceta * szet * thrust;
-    FPB[2] = -seta * thrust;
+    this->FPB = calculate_FPB(eta, zet, thrust);
 
     // thrust moments in body axes
-    double arm = parm - xcg;
-    FMPB[0] = 0;
-    FMPB[1] = arm * FPB[2];
-    FMPB[2] = -arm * FPB[1];
+    this->FMPB = calculate_FMPB(xcg);
 
     // output
     etax = eta * DEG;

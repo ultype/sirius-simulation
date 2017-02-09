@@ -65,6 +65,9 @@ class TVC {
         // returning: eta, zet,
         std::tuple<double, double> tvc_scnd(double etac, double zetc, double int_step);
 
+        arma::vec3 calculate_FPB(double eta, double zet, double thrust);
+        arma::vec3 calculate_FMPB(double xcg);
+
         /* Internal Calculators */
 
         /* Routing references */
