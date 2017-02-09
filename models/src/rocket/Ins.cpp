@@ -235,6 +235,55 @@ double INS::calculate_INS_derived_phip(arma::vec3 VBECB){
     return phipc;
 }
 
+double INS::calculate_INS_derived_euler_angles(arma::mat33 TBD){
+    double psibdc(0), thtbdc(0), phibdc(0);
+    double cthtbd(0);
+
+    double mroll = 0;
+
+    double tbd13 = TBD(0, 2);
+    double tbd11 = TBD(0, 0);
+    double tbd33 = TBD(2, 2);
+    double tbd12 = TBD(0, 1);
+    double tbd23 = TBD(1, 2);
+
+    //*geodetic Euler angles
+    // computed pitch angle: 'thtbdc'
+    // note: when |tbd13| >= 1, thtbdc = +- pi/2, but cos(thtbdc) is
+    // forced to be a small positive number to prevent division by zero
+    if (fabs(tbd13) < 1) {
+        thtbdc = asin(-tbd13);
+        cthtbd = cos(thtbdc);
+    } else {
+        thtbdc = PI / 2 * sign(-tbd13);
+        cthtbd = EPS;
+    }
+    // computed yaw angle: 'psibdc'
+    double cpsi = tbd11 / cthtbd;
+    if (fabs(cpsi) > 1)
+        cpsi = 1 * sign(cpsi);
+    psibdc = acos(cpsi) * sign(tbd12);
+
+    // computed roll angle: 'phibdc'
+    double cphi = tbd33 / cthtbd;
+    if (fabs(cphi) > 1)
+        cphi = 1 * sign(cphi);
+
+    // selecting the Euler roll angle of flight mechanics (not for thtbdc=90 or
+    // =-90deg)
+    if (mroll == 0 || mroll == 1)
+        // roll feedback for right side up
+        phibdc = acos(cphi) * sign(tbd23);
+    else if (mroll == 2)
+        // roll feedback for inverted flight
+        phibdc = acos(-cphi) * sign(-tbd23);
+
+    this->psibdcx = DEG * psibdc;
+    this->thtbdcx = DEG * thtbdc;
+    this->phibdcx = DEG * phibdc;
+
+}
+
 void INS::update(double int_step){
     assert(gyro && "INS module must be given a gyro model");
     assert(accel && "INS module must be given a accelerometer model");
@@ -327,46 +376,7 @@ void INS::update(double int_step){
 
     // computing Euler angles from INS
     arma::mat33 TBD = TBIC * trans(TDCI);
-    double tbd13 = TBD(0, 2);
-    double tbd11 = TBD(0, 0);
-    double tbd33 = TBD(2, 2);
-    double tbd12 = TBD(0, 1);
-    double tbd23 = TBD(1, 2);
-
-    //*geodetic Euler angles
-    // computed pitch angle: 'thtbdc'
-    // note: when |tbd13| >= 1, thtbdc = +- pi/2, but cos(thtbdc) is
-    // forced to be a small positive number to prevent division by zero
-    if (fabs(tbd13) < 1) {
-        thtbdc = asin(-tbd13);
-        cthtbd = cos(thtbdc);
-    } else {
-        thtbdc = PI / 2 * sign(-tbd13);
-        cthtbd = EPS;
-    }
-    // computed yaw angle: 'psibdc'
-    double cpsi = tbd11 / cthtbd;
-    if (fabs(cpsi) > 1)
-        cpsi = 1 * sign(cpsi);
-    psibdc = acos(cpsi) * sign(tbd12);
-
-    // computed roll angle: 'phibdc'
-    double cphi = tbd33 / cthtbd;
-    if (fabs(cphi) > 1)
-        cphi = 1 * sign(cphi);
-
-    // selecting the Euler roll angle of flight mechanics (not for thtbdc=90 or
-    // =-90deg)
-    if (mroll == 0 || mroll == 1)
-        // roll feedback for right side up
-        phibdc = acos(cphi) * sign(tbd23);
-    else if (mroll == 2)
-        // roll feedback for inverted flight
-        phibdc = acos(-cphi) * sign(-tbd23);
-
-    psibdcx = DEG * psibdc;
-    thtbdcx = DEG * thtbdc;
-    phibdcx = DEG * phibdc;
+    calculate_INS_derived_euler_angles(TBD);
 }
 
 double INS::get_dvbec() { return dvbec; }
@@ -398,3 +408,9 @@ Matrix INS::get_TBIC() {
     TBIC.build_mat33(_TBIC);
     return ~TBIC;
 }
+
+arma::vec3 INS::get_SBIIC_() { return SBIIC; }
+arma::vec3 INS::get_VBIIC_() { return VBIIC; }
+arma::vec3 INS::get_WBICI_() { return WBICI; }
+arma::vec3 INS::get_EGRAVI_() { return EGRAVI; }
+arma::mat33 INS::get_TBIC_() { return TBIC; }

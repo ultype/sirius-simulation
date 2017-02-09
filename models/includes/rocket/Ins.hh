@@ -59,6 +59,12 @@ class INS {
 
         Matrix get_TBIC();
 
+        arma::vec3 get_SBIIC_();
+        arma::vec3 get_VBIIC_();
+        arma::vec3 get_WBICI_();
+        arma::vec3 get_EGRAVI_();
+        arma::mat33 get_TBIC_();
+
     private:
         /* Internal Getter */
         arma::mat build_WEII();
@@ -85,6 +91,8 @@ class INS {
 
         double calculate_INS_derived_psivd(arma::vec3 VBECD);
         double calculate_INS_derived_thtvd(arma::vec3 VBECD);
+
+        double calculate_INS_derived_euler_angles(arma::mat33 TBD);
 
         /* Internal Calculators */
 
