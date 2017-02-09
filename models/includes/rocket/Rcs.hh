@@ -29,9 +29,6 @@ class RCS {
         void rcs_schmitt_thrust();
         int  rcs_schmitt(double input_new, double input, double dead_zone, double hysteresis);
 
-        INS* ins;
-        Guidance *guidance;
-        Propulsion *propulsion;
 
         ///////////////////////////////////////////////////////////////////////////////
         //// mrcs_moment = |rcs_type||rcs_mode|
@@ -82,6 +79,9 @@ class RCS {
         /* Internal Calculators */
 
         /* Routing references */
+        INS        * ins;
+        Guidance   * guidance;
+        Propulsion * propulsion;
 
         /* Constants */
 
