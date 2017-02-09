@@ -47,6 +47,47 @@ INS::INS(const INS& other)
         VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
+
+    this->gyro = new sensor::Gyro(*other.gyro);
+    this->accel = new sensor::Accelerometer(*other.accel);
+
+    /* Propagative Stats */
+    this->EVBI = other.EVBI;
+    this->EVBID = other.EVBID;
+    this->ESBI = other.ESBI;
+    this->ESBID = other.ESBID;
+    this->RICI = other.RICI;
+    this->RICID = other.RICID;
+
+    /* Generating Outputs */
+    this->TBIC = other.TBIC;
+    this->SBIIC = other.SBIIC;
+    this->VBIIC = other.VBIIC;
+    this->WBICI = other.WBICI;
+    this->EGRAVI = other.EGRAVI;
+
+    this->loncx = other.loncx;
+    this->latcx = other.latcx;
+    this->altc = other.altc;
+
+    this->VBECD = other.VBECD;
+    this->TDCI = other.TDCI;
+
+    this->dbic = other.dbic;
+    this->dvbec = other.dvbec;
+
+    this->alphacx = other.alphacx;
+    this->betacx = other.betacx;
+
+    this->thtvdcx = other.thtvdcx;
+    this->psivdcx = other.psivdcx;
+
+    this->alppcx = other.alppcx;
+    this->phipcx = other.phipcx;
+
+    this->phibdcx = other.phibdcx;
+    this->thtbdcx = other.thtbdcx;
+    this->psibdcx = other.psibdcx;
 }
 
 INS& INS::operator=(const INS& other){
@@ -58,6 +99,47 @@ INS& INS::operator=(const INS& other){
     this->environment = other.environment;
     this->kinematics  = other.kinematics;
     this->gpsr        = other.gpsr;
+
+    this->gyro = new sensor::Gyro(*other.gyro);
+    this->accel = new sensor::Accelerometer(*other.accel);
+
+    /* Propagative Stats */
+    this->EVBI = other.EVBI;
+    this->EVBID = other.EVBID;
+    this->ESBI = other.ESBI;
+    this->ESBID = other.ESBID;
+    this->RICI = other.RICI;
+    this->RICID = other.RICID;
+
+    /* Generating Outputs */
+    this->TBIC = other.TBIC;
+    this->SBIIC = other.SBIIC;
+    this->VBIIC = other.VBIIC;
+    this->WBICI = other.WBICI;
+    this->EGRAVI = other.EGRAVI;
+
+    this->loncx = other.loncx;
+    this->latcx = other.latcx;
+    this->altc = other.altc;
+
+    this->VBECD = other.VBECD;
+    this->TDCI = other.TDCI;
+
+    this->dbic = other.dbic;
+    this->dvbec = other.dvbec;
+
+    this->alphacx = other.alphacx;
+    this->betacx = other.betacx;
+
+    this->thtvdcx = other.thtvdcx;
+    this->psivdcx = other.psivdcx;
+
+    this->alppcx = other.alppcx;
+    this->phipcx = other.phipcx;
+
+    this->phibdcx = other.phibdcx;
+    this->thtbdcx = other.thtbdcx;
+    this->psibdcx = other.psibdcx;
 
     return *this;
 }
