@@ -1,13 +1,34 @@
 #include "aux/utility_header.hh"
 #include "rocket/Rcs.hh"
 
+RCS::RCS(INS &i, Guidance &guia, Propulsion &plp)
+    :   ins(&i), guidance(&guia), propulsion(&plp)
+{
+    this->default_data();
+}
+
+RCS::RCS(const RCS& other)
+    :   ins(other.ins), guidance(other.guidance), propulsion(other.propulsion)
+{
+    this->default_data();
+
+}
+
+RCS& RCS::operator=(const RCS& other){
+    if(&other == this)
+        return *this;
+
+    this->ins = other.ins;
+    this->guidance = other.guidance;
+    this->propulsion = other.propulsion;
+
+    return *this;
+}
+
 void RCS::default_data(){
 }
 
-void RCS::initialize(INS *i, Guidance *guia, Propulsion *plp){
-    ins = i;
-    guidance = guia;
-    propulsion = plp;
+void RCS::initialize(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////
