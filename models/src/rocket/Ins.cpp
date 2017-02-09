@@ -185,6 +185,39 @@ bool INS::GPS_update(){
     return false;
 }
 
+double INS::calculate_INS_derived_alpha(arma::vec3 VBECB){
+    return atan2(VBECB(2), VBECB(0));
+}
+
+double INS::calculate_INS_derived_beta(arma::vec3 VBECB){
+    return asin(VBECB(1) / norm(VBECB));
+}
+
+double INS::calculate_INS_derived_alpp(arma::vec3 VBECB){
+    double dum = VBECB(0) / norm(VBECB);
+    if (fabs(dum) > 1)
+        dum = 1 * sign(dum);
+    return acos(dum);
+}
+
+double INS::calculate_INS_derived_phip(arma::vec3 VBECB){
+    double phipc(0);
+
+    if (VBECB(1) == 0 && VBECB(2) == 0)
+        phipc = 0.;
+    // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
+    //       to prevent oscillations
+    else if (fabs(VBECB(1)) < EPS)
+        if (VBECB(2) > 0)
+            phipc = 0;
+    if (VBECB(2) < 0)
+        phipc = PI;
+    else
+        phipc = atan2(VBECB(1), VBECB(2));
+
+    return phipc;
+}
+
 void INS::update(double int_step){
     assert(gyro && "INS module must be given a gyro model");
     assert(accel && "INS module must be given a accelerometer model");
@@ -194,7 +227,6 @@ void INS::update(double int_step){
 
     // local variables
     double lonc(0), latc(0);
-    double phipc(0);
     double psivdc(0), thtvdc(0);
     double psibdc(0), thtbdc(0), phibdc(0);
     double cthtbd(0);
@@ -254,30 +286,12 @@ void INS::update(double int_step){
     this->dvbec = norm(VBECB);
 
     // computing indidence angles from INS
-    double alphac = atan2(VBECB(2), VBECB(0));
-    double betac = asin(VBECB(1) / dvbec);
-    this->alphacx = alphac * DEG;
-    this->betacx = betac * DEG;
+    this->alphacx = calculate_INS_derived_alpha(VBECB) * DEG;
+    this->betacx  = calculate_INS_derived_beta(VBECB) * DEG;
 
     // incidence angles in load factor plane (aeroballistic)
-    double dum = VBECB(0) / dvbec;
-    if (fabs(dum) > 1)
-        dum = 1 * sign(dum);
-    double alppc = acos(dum);
-
-    if (VBECB(1) == 0 && VBECB(2) == 0)
-        phipc = 0.;
-    // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
-    //       to prevent oscillations
-    else if (fabs(VBECB(1)) < EPS)
-        if (VBECB(2) > 0)
-            phipc = 0;
-    if (VBECB(2) < 0)
-        phipc = PI;
-    else
-        phipc = atan2(VBECB(1), VBECB(2));
-    alppcx = alppc * DEG;
-    phipcx = phipc * DEG;
+    this->alppcx = calculate_INS_derived_alpp(VBECB) * DEG;
+    this->phipcx = calculate_INS_derived_phip(VBECB) * DEG;
 
     // getting long,lat,alt from INS
     arma_cad_geo84_in(lonc, latc, altc, SBIIC, time);

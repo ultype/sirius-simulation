@@ -77,6 +77,11 @@ class INS {
         arma::vec3 calculate_gravity_error(double dbi);
         double calculate_INS_derived_dvbe();
 
+        double calculate_INS_derived_alpha(arma::vec3 VBECB);
+        double calculate_INS_derived_beta(arma::vec3 VBECB);
+
+        double calculate_INS_derived_alpp(arma::vec3 VBECB);
+        double calculate_INS_derived_phip(arma::vec3 VBECB);
 
         /* Internal Calculators */
 
