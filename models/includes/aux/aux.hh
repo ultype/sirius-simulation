@@ -23,7 +23,7 @@ ICG: (No)
 
 #define INTEGRATE_d(in, diff) \
         do{ \
-            arma::mat in##d_new = diff; \
+            double in##d_new = diff; \
             in = integrate(in##d_new, in##d, in, int_step); \
             in##d = in##d_new; \
         }while(0)
