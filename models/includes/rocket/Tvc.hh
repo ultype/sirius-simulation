@@ -48,6 +48,12 @@ class TVC {
         double get_gtvc();
         void set_gtvc(double);
 
+        void set_tvclimx(double in);
+        void set_dtvclimx(double in);
+        void set_wntvc(double in);
+        void set_zettvc(double in);
+        void set_factgtvc(double in);
+
         double get_parm();
         Matrix get_FPB();
         Matrix get_FMPB();
@@ -80,13 +86,13 @@ class TVC {
         enum TVC_TYPE mtvc;            /* *o  (--)      see TVC_TYPE */
 
         /* Constants */
-        double gtvc;        /* *io  (--)    TVC nozzle deflection gain n*/
+        double gtvc;        /* *o  (--)    TVC nozzle deflection gain n*/
 
-        double tvclimx;     /* *io  (d)     Nozzle deflection limiter */
-        double dtvclimx;    /* *io  (d/s)   Nozzle deflection rate limiter */
-        double wntvc;       /* *io  (r/s)   Natural frequency of TVC */
-        double zettvc;      /* *io  (--)    Damping of TVC */
-        double factgtvc;    /* *io  (--)    Factor for TVC gain */
+        double tvclimx;     /* *o  (d)     Nozzle deflection limiter */
+        double dtvclimx;    /* *o  (d/s)   Nozzle deflection rate limiter */
+        double wntvc;       /* *o  (r/s)   Natural frequency of TVC */
+        double zettvc;      /* *o  (--)    Damping of TVC */
+        double factgtvc;    /* *o  (--)    Factor for TVC gain */
 
         /* Propagative Stats */
         double etas;        /* *o  (r)     Pitch nozzle deflection */

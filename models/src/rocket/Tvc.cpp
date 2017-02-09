@@ -285,6 +285,12 @@ void TVC::set_mtvc(enum TVC_TYPE in) { mtvc = in; }
 double TVC::get_gtvc() { return gtvc;  }
 void TVC::set_gtvc(double in) { gtvc = in; }
 
+void TVC::set_tvclimx(double in) { tvclimx = in; }
+void TVC::set_dtvclimx(double in) { dtvclimx = in; }
+void TVC::set_wntvc(double in) { wntvc = in; }
+void TVC::set_zettvc(double in) { zettvc = in; }
+void TVC::set_factgtvc(double in) { factgtvc = in; }
+
 double TVC::get_parm() { return parm; }
 
 Matrix TVC::get_FPB() {
