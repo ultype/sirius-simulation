@@ -200,6 +200,23 @@ double INS::calculate_INS_derived_alpp(arma::vec3 VBECB){
     return acos(dum);
 }
 
+double INS::calculate_INS_derived_psivd(arma::vec3 VBECD){
+    if (VBECD(0) == 0 && VBECD(1) == 0) {
+        return 0;
+    } else {
+        return atan2(VBECD(1), VBECD(0));
+    }
+}
+
+double INS::calculate_INS_derived_thtvd(arma::vec3 VBECD){
+    if (VBECD(0) == 0 && VBECD(1) == 0) {
+        return 0;
+    } else {
+        return atan2(-VBECD(2), sqrt(VBECD(0) * VBECD(0) + VBECD(1) * VBECD(1)));
+    }
+
+}
+
 double INS::calculate_INS_derived_phip(arma::vec3 VBECB){
     double phipc(0);
 
@@ -295,26 +312,18 @@ void INS::update(double int_step){
 
     // getting long,lat,alt from INS
     arma_cad_geo84_in(lonc, latc, altc, SBIIC, time);
-
-    // getting T.M. of geodetic wrt inertial coord
-    TDCI = arma_cad_tdi84(lonc, latc, altc, time);
     loncx = lonc * DEG;
     latcx = latc * DEG;
+
+    // getting T.M. of geodetic wrt inertial coord
+    this->TDCI = arma_cad_tdi84(lonc, latc, altc, time);
 
     // computing geodetic velocity from INS
     arma::vec3 VBECD = TDCI * VBEIC;
 
     // computing flight path angles
-    if (VBECD[0] == 0 && VBECD[1] == 0) {
-        psivdc = 0;
-        thtvdc = 0;
-    } else {
-        psivdc = atan2(VBECD[1], VBECD[0]);
-        thtvdc =
-            atan2(-VBECD[2], sqrt(VBECD[0] * VBECD[0] + VBECD[1] * VBECD[1]));
-    }
-    psivdcx = psivdc * DEG;
-    thtvdcx = thtvdc * DEG;
+    this->psivdcx = calculate_INS_derived_psivd(VBECD) * DEG;
+    this->thtvdcx = calculate_INS_derived_thtvd(VBECD) * DEG;
 
     // computing Euler angles from INS
     arma::mat33 TBD = TBIC * trans(TDCI);
