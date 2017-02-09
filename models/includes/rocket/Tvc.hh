@@ -52,6 +52,9 @@ class TVC {
         Matrix get_FPB();
         Matrix get_FMPB();
 
+        arma::vec3 get_FPB_();
+        arma::vec3 get_FMPB_();
+
     private:
         /* Internal Getter */
 
@@ -95,8 +98,12 @@ class TVC {
 
         /* Generating Outputs */
         double parm;        /* *o  (m)     Propulsion moment arm from vehicle nose n*/
-        double fpb[3];      /* *o  (N)     Thrust force in body axes n*/
-        double fmpb[3];     /* *o  (N*m)    Thrust moment in body axes */
+
+        arma::vec FPB;      /* *o  (N)     Thrust force in body axes n*/
+        double   _FPB[3];   /* *o  (N)     Thrust force in body axes n*/
+
+        arma::vec FMPB;     /* *o  (N*m)    Thrust moment in body axes */
+        double   _FMPB[3];  /* *o  (N*m)    Thrust moment in body axes */
 
         double etax;        /* *io  (d)     Nozzle pitch deflection */
         double zetx;        /* *io  (d)     Nozzle yaw deflection */

@@ -4,13 +4,17 @@
 #include "sim_services/include/simtime.h"
 
 TVC::TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp)
-    :   environment(&env), kinematics(&kins), control(&con), propulsion(&plp)
+    :   environment(&env), kinematics(&kins), control(&con), propulsion(&plp),
+        VECTOR_INIT(FPB, 3),
+        VECTOR_INIT(FMPB, 3)
 {
     this->default_data();
 }
 
 TVC::TVC(const TVC& other)
-    :   environment(other.environment), kinematics(other.kinematics), control(other.control), propulsion(other.propulsion)
+    :   environment(other.environment), kinematics(other.kinematics), control(other.control), propulsion(other.propulsion),
+        VECTOR_INIT(FPB, 3),
+        VECTOR_INIT(FMPB, 3)
 {
     this->default_data();
 }
@@ -47,10 +51,6 @@ void TVC::actuate(double int_step){
     // local variables
     double eta(0), zet(0);
     double etac(0), zetc(0);
-
-    // local module-variables
-    Matrix FPB(3, 1);
-    Matrix FMPB(3, 1);
 
     // input from other modules
     double pdynmc = environment->get_pdynmc();
@@ -107,12 +107,6 @@ void TVC::actuate(double int_step){
     // diagnostic
     etacx = etac * DEG;
     zetcx = zetc * DEG;
-
-    //-------------------------------------------------------------------------
-    // loading module-variables
-    // output to other modules
-    FPB.fill(fpb);
-    FMPB.fill(fmpb);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -192,13 +186,19 @@ double TVC::get_gtvc() { return gtvc;  }
 void TVC::set_gtvc(double in) { gtvc = in; }
 
 double TVC::get_parm() { return parm; }
+
 Matrix TVC::get_FPB() {
-    Matrix FPB(3, 1);
-    FPB.build_vec3(fpb);
+    Matrix FPB(_FPB);
     return FPB;
 }
 Matrix TVC::get_FMPB() {
-    Matrix FMPB(3, 1);
-    FMPB.build_vec3(fmpb);
+    Matrix FMPB(_FMPB);
+    return FMPB;
+}
+
+arma::vec3 TVC::get_FPB_() {
+    return FPB;
+}
+arma::vec3 TVC::get_FMPB_() {
     return FMPB;
 }
