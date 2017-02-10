@@ -2,13 +2,17 @@
 #include "rocket/Rcs.hh"
 
 RCS::RCS(INS &i, Guidance &guia, Propulsion &plp)
-    :   ins(&i), guidance(&guia), propulsion(&plp)
+    :   ins(&i), guidance(&guia), propulsion(&plp),
+        VECTOR_INIT(FMRCS, 3),
+        VECTOR_INIT(FARCS, 3)
 {
     this->default_data();
 }
 
 RCS::RCS(const RCS& other)
-    :   ins(other.ins), guidance(other.guidance), propulsion(other.propulsion)
+    :   ins(other.ins), guidance(other.guidance), propulsion(other.propulsion),
+        VECTOR_INIT(FMRCS, 3),
+        VECTOR_INIT(FARCS, 3)
 {
     this->default_data();
 
@@ -59,14 +63,7 @@ void RCS::set_mode(enum RCS::RCS_MODE in){
 ///////////////////////////////////////////////////////////////////////////////
 
 void RCS::actuate(){
-    // local variables
-
-    // local module-variables
-    // double e_roll(0);
-    // double e_pitch(0);
-    // double e_yaw(0);
-
-    Matrix UTBC = guidance->get_UTBC();
+    arma::vec3 UTBC = arma::vec3(guidance->get_UTBC().get_pbody());
     double alphacomx = guidance->get_alphacomx();
     double betacomx  = guidance->get_betacomx();
 
@@ -88,31 +85,26 @@ void RCS::actuate(){
     e_roll = phibdcomx - (rcs_tau * ppcx + phibdcx);
 
     // on/off output of Schmitt trigger
-    // geodetic Euler angle control
     switch(rcs_mode){
         case NO_CONTROL:
             break;
 
         case ALL_GEODETIC_EULUR_ANGLE_CONTROL:
-
             e_pitch = thtbdcomx - (rcs_tau * qqcx + thtbdcx);
             e_yaw   = psibdcomx - (rcs_tau * rrcx + psibdcx);
             break;
 
         case THRUST_VECTOR_DIRECTION_AND_ROLL_ANGLE_CONTROL:
-
             e_pitch = -rcs_tau * qqcx - UTBC[2] * DEG;
             e_yaw   = -rcs_tau * rrcx + UTBC[1] * DEG;
             break;
 
         case INCIDENCE_AND_ROLL_ANGLE_CONTROL:
-
             e_pitch = alphacomx - (rcs_tau * qqcx + alphacx);
             e_yaw   = -betacomx - (rcs_tau * rrcx - betacx);
             break;
 
         case GEODETIC_YAW_ANGLE_CONTROL:
-
             // e_yaw=psibdcomx-(rcs_tau*rrcx+psibdcx);
             e_pitch = thtbdcomx - (rcs_tau * qqcx + thtbdcx);
             break;
@@ -199,29 +191,27 @@ double Hyper::rcs_prop(double input,double limiter)
 //////////////////////////////////////////////////////////////////////////////
 
 void RCS::rcs_schmitt_thrust() {
-    Matrix FMRCS(fmrcs);
-
     int o_roll_save = o_roll;
     o_roll = rcs_schmitt(e_roll, roll_save, dead_zone, hysteresis);
     roll_save = e_roll;
     if (o_roll != o_roll_save)
         roll_count++;
+
     int o_pitch_save = o_pitch;
     o_pitch = rcs_schmitt(e_pitch, pitch_save, dead_zone, hysteresis);
     pitch_save = e_pitch;
     if (o_pitch != o_pitch_save)
         pitch_count++;
+
     int o_yaw_save = o_yaw;
     o_yaw = rcs_schmitt(e_yaw, yaw_save, dead_zone, hysteresis);
     yaw_save = e_yaw;
     if (o_yaw != o_yaw_save)
         yaw_count++;
 
-    FMRCS[0] = o_roll * rcs_thrust * rocket_r;
-    FMRCS[1] = o_pitch * rcs_thrust * (propulsion->get_xcg() - 1);
-    FMRCS[2] = o_yaw * rcs_thrust * (propulsion->get_xcg() - 1);
-
-    FMRCS.fill(fmrcs);
+    FMRCS(0) = o_roll  * rcs_thrust * rocket_r;
+    FMRCS(1) = o_pitch * rcs_thrust * (propulsion->get_xcg() - 1);
+    FMRCS(2) = o_yaw   * rcs_thrust * (propulsion->get_xcg() - 1);
 }
 
 int RCS::rcs_schmitt(double input_new, double input, double dead_zone, double hysteresis) {
@@ -259,12 +249,10 @@ void RCS::set_rcs_pos(double in) { rcs_pos = in; }
 enum RCS::RCS_MODE RCS::get_rcs_mode() { return rcs_mode; }
 
 Matrix RCS::get_FMRCS() {
-    Matrix FMRCS(3, 1);
-    FMRCS.build_vec3(fmrcs);
+    Matrix FMRCS(_FMRCS);
     return FMRCS;
 }
 Matrix RCS::get_FARCS() {
-    Matrix FARCS(3, 1);
-    FARCS.build_vec3(farcs);
+    Matrix FARCS(_FARCS);
     return FARCS;
 }
