@@ -42,19 +42,26 @@ void RCS::default_data(){
 void RCS::initialize(){
 }
 
-void RCS::enable_rcs(double dead_zone, double hysteresis){
-    rcs_type = ON_OFF_RCS;
-
+void RCS::setup_rcs_schmitt_trigger(double dead_zone, double hysteresis){
     this->roll_schi = Schmitt_Trigger(dead_zone, hysteresis);
     this->pitch_schi = Schmitt_Trigger(dead_zone, hysteresis);
     this->yaw_schi = Schmitt_Trigger(dead_zone, hysteresis);
 
-    this->dead_zone = dead_zone;
-    this->hysteresis = hysteresis;
+    this->roll_schi.clear();
+    this->pitch_schi.clear();
+    this->yaw_schi.clear();
+}
+
+void RCS::enable_rcs(){
+    rcs_type = ON_OFF_RCS;
 }
 
 void RCS::disable_rcs(){
     rcs_type = NO_RCS;
+}
+
+bool RCS::isEnabled(){
+    return rcs_type > 0;
 }
 
 void RCS::set_mode(enum RCS::RCS_MODE in){
@@ -228,8 +235,6 @@ void RCS::set_pitch_mom_max(double in) { pitch_mom_max = in; }
 void RCS::set_yaw_mom_max(double in) { yaw_mom_max = in; }
 void RCS::set_thtbdcomx(double in) { thtbdcomx = in; }
 void RCS::set_psibdcomx(double in) { psibdcomx = in; }
-void RCS::set_dead_zone(double in) { dead_zone = in; }
-void RCS::set_hysteresis(double in) { hysteresis = in; }
 void RCS::set_rcs_thrust(double in) { rcs_thrust = in; }
 void RCS::set_rocket_r(double in) { rocket_r = in; }
 void RCS::set_rcs_pos(double in) { rcs_pos = in; }
@@ -242,5 +247,12 @@ Matrix RCS::get_FMRCS() {
 }
 Matrix RCS::get_FARCS() {
     Matrix FARCS(_FARCS);
+    return FARCS;
+}
+
+arma::vec3 RCS::get_FMRCS_(){
+    return FMRCS;
+}
+arma::vec3 RCS::get_FARCS_(){
     return FARCS;
 }

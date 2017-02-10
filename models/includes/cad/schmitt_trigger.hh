@@ -19,6 +19,8 @@ class Schmitt_Trigger {
 
         int trigger(double in);
 
+        void clear();
+
     private:
         double  dead_zone;       /* *o  (--)    Dead zone of Schmitt trigger */
         double  hysteresis;      /* *o  (--)    Hysteresis of Schmitt trigger */

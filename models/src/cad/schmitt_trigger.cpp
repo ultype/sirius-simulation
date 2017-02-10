@@ -9,7 +9,7 @@ Schmitt_Trigger::Schmitt_Trigger(double dead_zone, double hysteresis)
 }
 
 Schmitt_Trigger::Schmitt_Trigger(const Schmitt_Trigger& other){
-    this->saved_value = 0;
+    this->saved_value = other.saved_value;
     this->dead_zone = other.dead_zone;
     this->hysteresis = other.hysteresis;
 }
@@ -18,7 +18,7 @@ Schmitt_Trigger& Schmitt_Trigger::operator=(const Schmitt_Trigger& other){
     if(&other == this)
         return *this;
 
-    this->saved_value = 0;
+    this->saved_value = other.saved_value;
     this->dead_zone = other.dead_zone;
     this->hysteresis = other.hysteresis;
 }
@@ -44,5 +44,11 @@ int Schmitt_Trigger::trigger(double in){
 
     return output;
 
+}
+
+void Schmitt_Trigger::clear(){
+    this->saved_value = 0;
+
+    return;
 }
 
