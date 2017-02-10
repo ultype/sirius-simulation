@@ -51,7 +51,7 @@ void RCS::set_mode(enum RCS::RCS_MODE in){
 // rcs_mode = 0 no control
 //          = 1 all geodetic Euler angle control
 //          = 2 thrust vector direction and roll angle control
-//          = 3 incidence and roll angle control
+//          = 3 incidence and roll angle controml
 //          = 4 geodetic pitch angle control
 //
 //
@@ -67,12 +67,25 @@ void RCS::actuate(){
     // double e_yaw(0);
 
     Matrix UTBC = guidance->get_UTBC();
+    double alphacomx = guidance->get_alphacomx();
+    double betacomx  = guidance->get_betacomx();
+
+    double qqcx = ins->get_gyro().get_qqcx();
+    double ppcx = ins->get_gyro().get_ppcx();
+    double rrcx = ins->get_gyro().get_rrcx();
+
+    double alphacx = ins->get_alphacx();
+    double betacx = ins->get_betacx();
+
+    double thtbdcx = ins->get_thtbdcx();
+    double psibdcx = ins->get_psibdcx();
+    double phibdcx = ins->get_phibdcx();
 
     if(this->rcs_type == NO_RCS) return;
 
     // on-off moment thrusters (Schmitt trigger)
     // roll angle control (always)
-    e_roll = phibdcomx - (rcs_tau * ins->get_gyro().get_ppcx() + ins->get_phibdcx());
+    e_roll = phibdcomx - (rcs_tau * ppcx + phibdcx);
 
     // on/off output of Schmitt trigger
     // geodetic Euler angle control
@@ -82,26 +95,26 @@ void RCS::actuate(){
 
         case ALL_GEODETIC_EULUR_ANGLE_CONTROL:
 
-            e_pitch = thtbdcomx - (rcs_tau * ins->get_gyro().get_qqcx() + ins->get_thtbdcx());
-            e_yaw   = psibdcomx - (rcs_tau * ins->get_gyro().get_rrcx() + ins->get_psibdcx());
+            e_pitch = thtbdcomx - (rcs_tau * qqcx + thtbdcx);
+            e_yaw   = psibdcomx - (rcs_tau * rrcx + psibdcx);
             break;
 
         case THRUST_VECTOR_DIRECTION_AND_ROLL_ANGLE_CONTROL:
 
-            e_pitch = -rcs_tau * ins->get_gyro().get_qqcx() - UTBC[2] * DEG;
-            e_yaw   = -rcs_tau * ins->get_gyro().get_rrcx() + UTBC[1] * DEG;
+            e_pitch = -rcs_tau * qqcx - UTBC[2] * DEG;
+            e_yaw   = -rcs_tau * rrcx + UTBC[1] * DEG;
             break;
 
         case INCIDENCE_AND_ROLL_ANGLE_CONTROL:
 
-            e_pitch = guidance->get_alphacomx() - (rcs_tau * ins->get_gyro().get_qqcx() + ins->get_alphacx());
-            e_yaw   = -guidance->get_betacomx() - (rcs_tau * ins->get_gyro().get_rrcx() - ins->get_betacx());
+            e_pitch = alphacomx - (rcs_tau * qqcx + alphacx);
+            e_yaw   = -betacomx - (rcs_tau * rrcx - betacx);
             break;
 
         case GEODETIC_YAW_ANGLE_CONTROL:
 
             // e_yaw=psibdcomx-(rcs_tau*rrcx+psibdcx);
-            e_pitch = thtbdcomx - (rcs_tau * ins->get_gyro().get_qqcx() + ins->get_thtbdcx());
+            e_pitch = thtbdcomx - (rcs_tau * qqcx + thtbdcx);
             break;
 
     }
