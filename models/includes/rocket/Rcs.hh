@@ -11,6 +11,9 @@ LIBRARY DEPENDENCY:
 #include "Ins.hh"
 #include "Tvc.hh"
 #include "Guidance.hh"
+
+#include "cad/schmitt_trigger.hh"
+
 class Guidance;
 
 class RCS {
@@ -25,7 +28,6 @@ class RCS {
 
         void actuate();
         void rcs_schmitt_thrust();
-        int  rcs_schmitt(double input_new, double input, double dead_zone, double hysteresis);
 
         enum RCS_TYPE {
             NO_RCS = 0,
@@ -47,7 +49,7 @@ class RCS {
         int get_mrcs_moment() { return rcs_type * 10 + rcs_mode;  };
         int get_mrcs_force() { return 0; };
 
-        void enable_rcs();
+        void enable_rcs(double dead_zone, double hysteresis);
         void disable_rcs();
 
         void set_mode(enum RCS_MODE);
@@ -82,6 +84,10 @@ class RCS {
         Guidance   * guidance;
         Propulsion * propulsion;
 
+        Schmitt_Trigger roll_schi;
+        Schmitt_Trigger pitch_schi;
+        Schmitt_Trigger yaw_schi;
+
         /* Constants */
         enum RCS_TYPE rcs_type;  /* *o  (--)   Attitude control, see RCS_TYPE */
         enum RCS_MODE rcs_mode;  /* *o  (--)   Attitude control, see RCS_MODE */
@@ -105,6 +111,7 @@ class RCS {
         double  yaw_mom_max;     /* *io  (N*m)  RCS yawing moment max value */
         double  thtbdcomx;       /* *io  (d)    Pitch angle command */
         double  psibdcomx;       /* *io  (d)    Yaw angle command */
+
         double  dead_zone;       /* *io  (d)    Dead zone of Schmitt trigger */
         double  hysteresis;      /* *io  (d)    Hysteresis of Schmitt trigger */
         double  rcs_thrust;      /* *io  (N)    rcs thrust */

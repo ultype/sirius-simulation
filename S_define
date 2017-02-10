@@ -40,6 +40,8 @@ LIBRARY DEPENDENCIES:
 ##include "sensor/accel/accelerometer_ideal.hh"
 ##include "sensor/accel/accelerometer_rocket6g.hh"
 
+##include "cad/schmitt_trigger.hh"
+
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
         GPS_Satellites sats;

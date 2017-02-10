@@ -1,8 +1,13 @@
 #include "aux/utility_header.hh"
 #include "rocket/Rcs.hh"
 
+#include <iostream>
+
 RCS::RCS(INS &i, Guidance &guia, Propulsion &plp)
     :   ins(&i), guidance(&guia), propulsion(&plp),
+        roll_schi(0, 0),
+        pitch_schi(0, 0),
+        yaw_schi(0, 0),
         VECTOR_INIT(FMRCS, 3),
         VECTOR_INIT(FARCS, 3)
 {
@@ -11,11 +16,13 @@ RCS::RCS(INS &i, Guidance &guia, Propulsion &plp)
 
 RCS::RCS(const RCS& other)
     :   ins(other.ins), guidance(other.guidance), propulsion(other.propulsion),
+        roll_schi(other.roll_schi),
+        pitch_schi(other.pitch_schi),
+        yaw_schi(other.yaw_schi),
         VECTOR_INIT(FMRCS, 3),
         VECTOR_INIT(FARCS, 3)
 {
     this->default_data();
-
 }
 
 RCS& RCS::operator=(const RCS& other){
@@ -35,8 +42,15 @@ void RCS::default_data(){
 void RCS::initialize(){
 }
 
-void RCS::enable_rcs(){
+void RCS::enable_rcs(double dead_zone, double hysteresis){
     rcs_type = ON_OFF_RCS;
+
+    this->roll_schi = Schmitt_Trigger(dead_zone, hysteresis);
+    this->pitch_schi = Schmitt_Trigger(dead_zone, hysteresis);
+    this->yaw_schi = Schmitt_Trigger(dead_zone, hysteresis);
+
+    this->dead_zone = dead_zone;
+    this->hysteresis = hysteresis;
 }
 
 void RCS::disable_rcs(){
@@ -192,46 +206,20 @@ double Hyper::rcs_prop(double input,double limiter)
 
 void RCS::rcs_schmitt_thrust() {
     int o_roll_save = o_roll;
-    o_roll = rcs_schmitt(e_roll, roll_save, dead_zone, hysteresis);
-    roll_save = e_roll;
-    if (o_roll != o_roll_save)
-        roll_count++;
+    o_roll = roll_schi.trigger(e_roll);
+    if (o_roll != o_roll_save) roll_count++;
 
     int o_pitch_save = o_pitch;
-    o_pitch = rcs_schmitt(e_pitch, pitch_save, dead_zone, hysteresis);
-    pitch_save = e_pitch;
-    if (o_pitch != o_pitch_save)
-        pitch_count++;
+    o_pitch = pitch_schi.trigger(e_pitch);
+    if (o_pitch != o_pitch_save) pitch_count++;
 
     int o_yaw_save = o_yaw;
-    o_yaw = rcs_schmitt(e_yaw, yaw_save, dead_zone, hysteresis);
-    yaw_save = e_yaw;
-    if (o_yaw != o_yaw_save)
-        yaw_count++;
+    o_yaw = yaw_schi.trigger(e_yaw);
+    if (o_yaw != o_yaw_save) yaw_count++;
 
     FMRCS(0) = o_roll  * rcs_thrust * rocket_r;
     FMRCS(1) = o_pitch * rcs_thrust * (propulsion->get_xcg() - 1);
     FMRCS(2) = o_yaw   * rcs_thrust * (propulsion->get_xcg() - 1);
-}
-
-int RCS::rcs_schmitt(double input_new, double input, double dead_zone, double hysteresis) {
-    // local variable
-    int output(0);
-
-    // input signal 'trend' (=1 increasing, =-1 decreasing)
-    // input signal 'side' (=-1 left, =1 right)
-    int trend = sign(input_new - input);
-    int side = sign(input);
-    double trigger = (dead_zone * side + hysteresis * trend) / 2;
-
-    if (input >= trigger && side == 1) {
-        output =  1;
-    } else if (input <= trigger && side == -1) {
-        output = -1;
-    } else
-        output = 0;
-
-    return output;
 }
 
 void RCS::set_rcs_tau(double in) { rcs_tau = in; }

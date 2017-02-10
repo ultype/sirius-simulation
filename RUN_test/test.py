@@ -9,7 +9,7 @@ execfile("Modified_data/test.dr")
 rcs_on = trick.new_event("rcs_on")
 rcs_on.set_cycle(0.001)
 rcs_on.condition(0, "trick.exec_get_sim_time() == 5.001")
-rcs_on.action(0, "rkt.rcs.enable_rcs()")
+rcs_on.action(0, "rkt.rcs.enable_rcs(rcs_dead_zone, rcs_hysteresis)")
 trick.add_event(rcs_on)
 rcs_on.activate()
 #Event1:Stage 2 ignition
@@ -234,8 +234,8 @@ rkt.rcs.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, se
 rkt.rcs.set_roll_mom_max(100)      #RCS rolling moment max value - Nm  module rcs
 rkt.rcs.set_pitch_mom_max(200000)  #RCS pitching moment max value - Nm  module rcs
 rkt.rcs.set_yaw_mom_max(200000)    #RCS yawing moment max value - Nm  module rcs
-rkt.rcs.set_dead_zone(0.1)         #Dead zone of Schmitt trigger - deg  module rcs
-rkt.rcs.set_hysteresis(0.1)        #Hysteresis of Schmitt trigger - deg  module rcs
+rcs_dead_zone = 0.1                #Dead zone of Schmitt trigger - deg  module rcs
+rcs_hysteresis = 0.1               #Hysteresis of Schmitt trigger - deg  module rcs
 rkt.rcs.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
 rkt.rcs.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
 rkt.rcs.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs
