@@ -11,5 +11,6 @@ sensor::GyroIdeal::GyroIdeal(_Euler_ &eul)
 
 void sensor::GyroIdeal::propagate_error(double int_step){
     this->WBICB = euler->get_WBIB_();
+    this->EWBIB.zeros();
     return;
 }

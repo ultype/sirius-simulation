@@ -9,7 +9,7 @@ execfile("Modified_data/test.dr")
 rcs_on = trick.new_event("rcs_on")
 rcs_on.set_cycle(0.001)
 rcs_on.condition(0, "trick.exec_get_sim_time() == 5.001")
-rcs_on.action(0, "rkt.rcs.set_mrcs_moment(20)")
+rcs_on.action(0, "rkt.rcs.enable_rcs()")
 trick.add_event(rcs_on)
 rcs_on.activate()
 #Event1:Stage 2 ignition
@@ -33,7 +33,7 @@ speration_1.action(11, "spi            = 290   " )
 speration_1.action(12, "fuel_flow_rate = 29.63 " )
 speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
 
-speration_1.action(14, "rkt.rcs.set_mrcs_moment(23)")
+speration_1.action(14, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 speration_1.action(15, "trick.add_event(speration_2)")
 speration_1.action(16, "speration_2.activate()")
 speration_1.action(17, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv2.txt')")
@@ -74,7 +74,7 @@ speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0
 speration_3.action(16, "trick.add_event(speration_4)")
 speration_3.action(17, "speration_4.activate()")
 speration_3.action(18, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv1.txt')")
-speration_3.action(19, "rkt.rcs.set_mrcs_moment(23)")
+speration_3.action(19, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 #############################################################
 #Event4:MECO
 speration_4=trick.new_event("speration_4")
@@ -230,12 +230,13 @@ rkt.gpsr.factp       = 0  #Factor to modifiy initial P-matrix P(1+factp)=module 
 rkt.gpsr.factq       = 0  #Factor to modifiy the Q-matrix Q(1+factq)=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 #RCS thruster
-rkt.rcs.set_mrcs_moment(00)        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
+rkt.rcs.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
 rkt.rcs.set_roll_mom_max(100)      #RCS rolling moment max value - Nm  module rcs
 rkt.rcs.set_pitch_mom_max(200000)  #RCS pitching moment max value - Nm  module rcs
 rkt.rcs.set_yaw_mom_max(200000)    #RCS yawing moment max value - Nm  module rcs
-rkt.rcs.set_dead_zone(0.1)         #Dead zone of Schmitt trigger - deg  module rcs
-rkt.rcs.set_hysteresis(0.1)        #Hysteresis of Schmitt trigger - deg  module rcs
+dead_zone = 0.1                #Dead zone of Schmitt trigger - deg  module rcs
+hysteresis = 0.1               #Hysteresis of Schmitt trigger - deg  module rcs
+rkt.rcs.setup_rcs_schmitt_trigger(dead_zone, hysteresis);
 rkt.rcs.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
 rkt.rcs.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
 rkt.rcs.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs

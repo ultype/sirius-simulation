@@ -42,9 +42,6 @@ namespace sensor {
             arma::vec EWG;       /* *o   (r/s)    Gyro random walk errors */
             double _EWG[3];      /* *o   (r/s)    Gyro random walk errors */
 
-            arma::vec EWBIB;     /* *o   (r/s)    Error in angular vel of body wrt earth */
-            double _EWBIB[3];    /* *o   (r/s)    Error in angular vel of body wrt earth */
-
             arma::vec EWALKG;    /* *o   (r/s0.5) Random walk */
             double _EWALKG[3];   /* *o   (r/s0.5) Random walk */
 

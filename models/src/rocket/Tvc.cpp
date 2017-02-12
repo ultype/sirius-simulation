@@ -3,23 +3,122 @@
 #include "rocket/Tvc.hh"
 #include "sim_services/include/simtime.h"
 
+TVC::TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp)
+    :   environment(&env), kinematics(&kins), control(&con), propulsion(&plp),
+        VECTOR_INIT(FPB, 3),
+        VECTOR_INIT(FMPB, 3)
+{
+    this->default_data();
+}
+
+TVC::TVC(const TVC& other)
+    :   environment(other.environment), kinematics(other.kinematics), control(other.control), propulsion(other.propulsion),
+        VECTOR_INIT(FPB, 3),
+        VECTOR_INIT(FMPB, 3)
+{
+    this->default_data();
+
+
+    this->mtvc = other.mtvc;
+
+    /* Constants */
+    this->gtvc = other.gtvc;
+
+    this->tvclimx = other.tvclimx;
+    this->dtvclimx = other.dtvclimx;
+    this->wntvc = other.wntvc;
+    this->zettvc = other.zettvc;
+    this->factgtvc = other.factgtvc;
+
+    /* Propagative Stats */
+    this->etas = other.etas;
+    this->etasd = other.etasd;
+
+    this->zeta = other.zeta;
+    this->zetad = other.zetad;
+
+    this->detas = other.detas;
+    this->detasd = other.detasd;
+
+    this->dzeta = other.dzeta;
+    this->dzetad = other.dzetad;
+
+    /* Generating Outputs */
+    this->parm = other.parm;
+
+    this->FPB = other.FPB;
+
+    this->FMPB = other.FMPB;
+
+    this->etax = other.etax;
+    this->zetx = other.zetx;
+
+    /* Non-propagating Diagnostic Variables */
+    /* These can be deleted, but keep to remain trackable in trick simulator */
+    this->etacx = other.etacx;
+    this->zetcx = other.zetcx;
+}
+
+TVC& TVC::operator=(const TVC& other){
+    if(&other == this)
+        return *this;
+
+    this->environment = other.environment;
+    this->kinematics = other.kinematics;
+    this->control = other.control;
+    this->propulsion = other.propulsion;
+
+    this->mtvc = other.mtvc;
+
+    /* Constants */
+    this->gtvc = other.gtvc;
+
+    this->tvclimx = other.tvclimx;
+    this->dtvclimx = other.dtvclimx;
+    this->wntvc = other.wntvc;
+    this->zettvc = other.zettvc;
+    this->factgtvc = other.factgtvc;
+
+    /* Propagative Stats */
+    this->etas = other.etas;
+    this->etasd = other.etasd;
+
+    this->zeta = other.zeta;
+    this->zetad = other.zetad;
+
+    this->detas = other.detas;
+    this->detasd = other.detasd;
+
+    this->dzeta = other.dzeta;
+    this->dzetad = other.dzetad;
+
+    /* Generating Outputs */
+    this->parm = other.parm;
+
+    this->FPB = other.FPB;
+
+    this->FMPB = other.FMPB;
+
+    this->etax = other.etax;
+    this->zetx = other.zetx;
+
+    /* Non-propagating Diagnostic Variables */
+    /* These can be deleted, but keep to remain trackable in trick simulator */
+    this->etacx = other.etacx;
+    this->zetcx = other.zetcx;
+
+    return *this;
+}
+
 void TVC::default_data(){
 }
 
-void TVC::initialize(Environment *env, Kinematics *kins, Control *con, Propulsion *plp){
-    environment = env;
-    kinematics = kins;
-    control = con;
-    propulsion = plp;
+void TVC::initialize(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actuator module
 // Member function of class 'Hyper'
-//     mtvc=0 No TVC
-//         =1 No dynamics
-//         =2 TVC Second order dynamics with rate limiting
-//         =3 same as 2 but with on-line TVC gain
 //
 // This subroutine performs the following functions:
 // (1) Converts from control commands to nozzle deflections
@@ -27,74 +126,75 @@ void TVC::initialize(Environment *env, Kinematics *kins, Control *con, Propulsio
 //
 // 030608 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
+
+arma::vec3 TVC::calculate_FPB(double eta, double zet, double thrust){
+    arma::vec3 __FPB;
+
+    double seta = sin(eta);
+    double ceta = cos(eta);
+    double czet = cos(zet);
+    double szet = sin(zet);
+    __FPB[0] = ceta * czet * thrust;
+    __FPB[1] = ceta * szet * thrust;
+    __FPB[2] = -seta * thrust;
+
+    return __FPB;
+}
+
+arma::vec3 TVC::calculate_FMPB(double xcg){
+    arma::vec3 __FMPB;
+
+    double arm = parm - xcg;
+    __FMPB[0] = 0;
+    __FMPB[1] = arm * FPB[2];
+    __FMPB[2] = -arm * FPB[1];
+
+    return __FMPB;
+}
+
 void TVC::actuate(double int_step){
     // local variables
     double eta(0), zet(0);
     double etac(0), zetc(0);
 
-    // local module-variables
-    Matrix FPB(3, 1);
-    Matrix FMPB(3, 1);
-
     // input from other modules
     double pdynmc = environment->get_pdynmc();
-    double xcg = propulsion->get_xcg();
+    double xcg    = propulsion->get_xcg();
     double thrust = propulsion->get_thrust();
     double delecx = control->get_delecx();
     double delrcx = control->get_delrcx();
     double alphax = kinematics->get_alphax();
-    /*********************************
-    Matrix UTBC=hyper[430].vec();
-    double thtbdcx=hyper[339].real();
-    double psibdcx=hyper[340].real();
-    double thtvdx=hyper[229].real();
-    int mguide=hyper[400].integer();
-    ********************************/
-    //-------------------------------------------------------------------------
-    // return if no tvc
-    if (mtvc == 0)
-        return;
 
-    // variable nozzle reduction gain (low q, high gain)
-    if (mtvc == 3) {
-        if (pdynmc > 1e5)
-            gtvc = 0;
-        else
-            gtvc = (-5.e-6 * pdynmc + 0.5) * (factgtvc + 1);
+    switch(mtvc){
+        case NO_TVC:
+            // return if no tvc
+            return;
+            break;
+        case NO_DYNAMIC_TVC:
+            eta = alphax * RAD;
+            zet = zetc;
+            break;
+        case ONLINE_SECOND_ORDER_TVC:
+            // variable nozzle reduction gain (low q, high gain)
+            if (pdynmc > 1e5)
+                gtvc = 0;
+            else
+                gtvc = (-5.e-6 * pdynmc + 0.5) * (factgtvc + 1);
+        case SECON_ORDER_TVC:
+            etac = gtvc * delecx * RAD;
+            zetc = gtvc * delrcx * RAD;
+            // calling second order nozzle dynamics
+            std::tie(eta, zet) = tvc_scnd(etac, zetc, int_step);
+            break;
+        default:
+            break;
     }
-    // reduction of nozzle deflection command
-    // if(mguide==5)
-    //{
-    // etac=0.01*(UTBC[2]-thtbdcx*RAD-0.5*PI);
-    // zetc=0.0;//atan2(UTBC[1],sqrt(UTBC[2]*UTBC[2]+UTBC[0]*UTBC[0]));
-
-    //}else{
-    etac = gtvc * delecx * RAD;
-    zetc = gtvc * delrcx * RAD;
-    //}
-    // no nozzle dynamics
-    if (mtvc == 1) {
-        eta = alphax * RAD;
-        zet = zetc;
-    }
-    // calling second order nozzle dynamics
-    if (mtvc >= 2)
-        tvc_scnd(eta, zet, etac, zetc, int_step);
 
     // thrust forces in body axes
-    double seta = sin(eta);
-    double ceta = cos(eta);
-    double czet = cos(zet);
-    double szet = sin(zet);
-    FPB[0] = ceta * czet * thrust;
-    FPB[1] = ceta * szet * thrust;
-    FPB[2] = -seta * thrust;
+    this->FPB = calculate_FPB(eta, zet, thrust);
 
     // thrust moments in body axes
-    double arm = parm - xcg;
-    FMPB[0] = 0;
-    FMPB[1] = arm * FPB[2];
-    FMPB[2] = -arm * FPB[1];
+    this->FMPB = calculate_FMPB(xcg);
 
     // output
     etax = eta * DEG;
@@ -103,12 +203,6 @@ void TVC::actuate(double int_step){
     // diagnostic
     etacx = etac * DEG;
     zetcx = zetc * DEG;
-
-    //-------------------------------------------------------------------------
-    // loading module-variables
-    // output to other modules
-    FPB.fill(fpb);
-    FMPB.fill(fmpb);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,7 +223,9 @@ void TVC::actuate(double int_step){
 // 030608 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double int_step){
+std::tuple<double, double> TVC::tvc_scnd(double etac, double zetc, double int_step){
+    double eta, zet;
+
     // pitch nozzle dynamics
     // limiting position and the nozzle rate derivative
     if (fabs(etas) > tvclimx * RAD) {
@@ -144,14 +240,12 @@ void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double in
         detas = dtvclimx * RAD * sign(detas);
     }
     // state integration
-    double etasd_new = detas;
-    etas = integrate(etasd_new, etasd, etas, int_step);
+    INTEGRATE_d(etas, detas);
 
-    etasd = etasd_new;
     double eetas = etac - etas;
-    double detasd_new = wntvc * wntvc * eetas - 2. * zettvc * wntvc * etasd;
-    detas = integrate(detasd_new, detasd, detas, int_step);
-    detasd = detasd_new;
+
+    INTEGRATE_d(detas, wntvc * wntvc * eetas - 2. * zettvc * wntvc * etasd);
+
     // setting nozzle rate derivative to zero if rate is limited
     if (iflag && detas * detasd > 0.)
         detasd = 0.;
@@ -171,29 +265,46 @@ void TVC::tvc_scnd(double &eta, double &zet, double etac, double zetc, double in
         dzeta = dtvclimx * RAD * sign(dzeta);
     }
     // state integration
-    double zetad_new = dzeta;
-    zeta = integrate(zetad_new, zetad, zeta, int_step);
-    zetad = zetad_new;
+    INTEGRATE_d(zeta, dzeta);
+
     double ezeta = zetc - zeta;
-    double dzetad_new = wntvc * wntvc * ezeta - 2. * zettvc * wntvc * zetad;
-    dzeta = integrate(dzetad_new, dzetad, dzeta, int_step);
-    dzetad = dzetad_new;
+
+    INTEGRATE_d(dzeta, wntvc * wntvc * ezeta - 2. * zettvc * wntvc * zetad);
+
     // setting nozzle rate derivative to zero if rate is limited
     if (iflag && dzeta * dzetad > 0.)
         dzetad = 0.;
     zet = zeta;
+
+    return std::make_tuple(eta, zet);
 }
 
-int TVC::get_mtvc() { return mtvc; }
-double TVC::get_gtvc() { return gtvc; }
+enum TVC::TVC_TYPE TVC::get_mtvc() { return mtvc; }
+void TVC::set_mtvc(enum TVC_TYPE in) { mtvc = in; }
+
+double TVC::get_gtvc() { return gtvc;  }
+void TVC::set_gtvc(double in) { gtvc = in; }
+
+void TVC::set_tvclimx(double in) { tvclimx = in; }
+void TVC::set_dtvclimx(double in) { dtvclimx = in; }
+void TVC::set_wntvc(double in) { wntvc = in; }
+void TVC::set_zettvc(double in) { zettvc = in; }
+void TVC::set_factgtvc(double in) { factgtvc = in; }
+
 double TVC::get_parm() { return parm; }
+
 Matrix TVC::get_FPB() {
-    Matrix FPB(3, 1);
-    FPB.build_vec3(fpb);
+    Matrix FPB(_FPB);
     return FPB;
 }
 Matrix TVC::get_FMPB() {
-    Matrix FMPB(3, 1);
-    FMPB.build_vec3(fmpb);
+    Matrix FMPB(_FMPB);
+    return FMPB;
+}
+
+arma::vec3 TVC::get_FPB_() {
+    return FPB;
+}
+arma::vec3 TVC::get_FMPB_() {
     return FMPB;
 }

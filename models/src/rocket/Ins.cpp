@@ -11,9 +11,11 @@
 
 INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps)
     :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps),
+        MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
+        VECTOR_INIT(RICID, 3),
         VECTOR_INIT(ESBI, 3),
         VECTOR_INIT(ESBID, 3),
         VECTOR_INIT(EVBI, 3),
@@ -29,9 +31,11 @@ INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Rece
 
 INS::INS(const INS& other)
     :   newton(other.newton), euler(other.euler), environment(other.environment), kinematics(other.kinematics), gpsr(other.gpsr),
+        MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
+        VECTOR_INIT(RICID, 3),
         VECTOR_INIT(ESBI, 3),
         VECTOR_INIT(ESBID, 3),
         VECTOR_INIT(EVBI, 3),
@@ -43,6 +47,47 @@ INS::INS(const INS& other)
         VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
+
+    this->gyro = new sensor::Gyro(*other.gyro);
+    this->accel = new sensor::Accelerometer(*other.accel);
+
+    /* Propagative Stats */
+    this->EVBI = other.EVBI;
+    this->EVBID = other.EVBID;
+    this->ESBI = other.ESBI;
+    this->ESBID = other.ESBID;
+    this->RICI = other.RICI;
+    this->RICID = other.RICID;
+
+    /* Generating Outputs */
+    this->TBIC = other.TBIC;
+    this->SBIIC = other.SBIIC;
+    this->VBIIC = other.VBIIC;
+    this->WBICI = other.WBICI;
+    this->EGRAVI = other.EGRAVI;
+
+    this->loncx = other.loncx;
+    this->latcx = other.latcx;
+    this->altc = other.altc;
+
+    this->VBECD = other.VBECD;
+    this->TDCI = other.TDCI;
+
+    this->dbic = other.dbic;
+    this->dvbec = other.dvbec;
+
+    this->alphacx = other.alphacx;
+    this->betacx = other.betacx;
+
+    this->thtvdcx = other.thtvdcx;
+    this->psivdcx = other.psivdcx;
+
+    this->alppcx = other.alppcx;
+    this->phipcx = other.phipcx;
+
+    this->phibdcx = other.phibdcx;
+    this->thtbdcx = other.thtbdcx;
+    this->psibdcx = other.psibdcx;
 }
 
 INS& INS::operator=(const INS& other){
@@ -55,11 +100,60 @@ INS& INS::operator=(const INS& other){
     this->kinematics  = other.kinematics;
     this->gpsr        = other.gpsr;
 
+    this->gyro = new sensor::Gyro(*other.gyro);
+    this->accel = new sensor::Accelerometer(*other.accel);
+
+    /* Propagative Stats */
+    this->EVBI = other.EVBI;
+    this->EVBID = other.EVBID;
+    this->ESBI = other.ESBI;
+    this->ESBID = other.ESBID;
+    this->RICI = other.RICI;
+    this->RICID = other.RICID;
+
+    /* Generating Outputs */
+    this->TBIC = other.TBIC;
+    this->SBIIC = other.SBIIC;
+    this->VBIIC = other.VBIIC;
+    this->WBICI = other.WBICI;
+    this->EGRAVI = other.EGRAVI;
+
+    this->loncx = other.loncx;
+    this->latcx = other.latcx;
+    this->altc = other.altc;
+
+    this->VBECD = other.VBECD;
+    this->TDCI = other.TDCI;
+
+    this->dbic = other.dbic;
+    this->dvbec = other.dvbec;
+
+    this->alphacx = other.alphacx;
+    this->betacx = other.betacx;
+
+    this->thtvdcx = other.thtvdcx;
+    this->psivdcx = other.psivdcx;
+
+    this->alppcx = other.alppcx;
+    this->phipcx = other.phipcx;
+
+    this->phibdcx = other.phibdcx;
+    this->thtbdcx = other.thtbdcx;
+    this->psibdcx = other.psibdcx;
+
     return *this;
 }
 
+arma::mat INS::build_WEII(){
+    arma::mat33 WEII;
+    WEII.zeros();
+    WEII(0, 1) = -WEII3;
+    WEII(1, 0) =  WEII3;
+    return WEII;
+}
+
 void INS::default_data(){
-    this->ins_mode = INS_NOT_SET;
+    this->WEII = build_WEII();
 
     this->EGRAVI.zeros();
 }
@@ -74,7 +168,6 @@ sensor::Gyro& INS::get_gyro() { return *gyro; }
 sensor::Accelerometer& INS::get_accelerometer() { return *accel; }
 
 void INS::set_ideal(){
-    ins_mode = IDEAL_INS;
 
     ESBI.zeros();
     EVBI.zeros();
@@ -85,8 +178,6 @@ void INS::set_ideal(){
 
 /* frax_algnmnt : Fractn to mod initial INS err state: XXO=XXO(1+frax) */
 void INS::set_non_ideal(double frax_algnmnt){
-    ins_mode = NON_IDEAL_INS;
-
     // Initial covariance matrix  (GPS quality)
     // equipped aircraft. Units: meter, meter/sec, milli-rad.
     arma::mat99 PP_INIT = {{20.701      , 0.12317     , 0.10541     , 6.3213E-02  , 2.2055E-03  , 1.7234E-03  , 1.0633E-03  , 3.4941E-02  , -3.5179E-02} ,
@@ -118,6 +209,28 @@ void INS::set_non_ideal(double frax_algnmnt){
     return;
 }
 
+arma::vec3 INS::calculate_INS_derived_postion(arma::vec3 SBII){
+    // computing INS derived postion of hyper B wrt center of Earth I
+    return ESBI + SBII;
+}
+
+arma::vec3 INS::calculate_INS_derived_velocity(arma::vec3 VBII){
+    // computing INS derived velocity of hyper B wrt inertial frame I
+    return EVBI + VBII;
+}
+
+arma::vec3 INS::calculate_INS_derived_bodyrate(arma::mat33 TBIC, arma::vec3 WBICB){
+    // computing INS derived body rates in inertial coordinates
+    return trans(TBIC) * WBICB;
+}
+
+arma::mat33 INS::calculate_INS_derived_TBI(arma::mat33 TBI){
+    // computed transformation matrix
+    arma::mat33 UNI(arma::fill::eye);
+    arma::mat33 TIIC = UNI - skew_sym(RICI);
+    return TBI * TIIC;
+}
+
 arma::vec3 INS::calculate_gravity_error(double dbi){
     double dbic = norm(SBIIC);
     double ed = dbic - dbi;
@@ -129,207 +242,87 @@ arma::vec3 INS::calculate_gravity_error(double dbi){
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// INS module
-// Member function of class 'Hyper'
-// Error equations based on Zipfel, Figure 10.27
-// space stabilized INS with GPS and star tracker updates
-// when 'mstar'=3 star tracker update received
-// when 'mgps'=3 GPS update received
-//
-// mins = 0 ideal INS (no errors)
-//      = 1 space stabilized INS
-//
-// 030604 Created by Peter H Zipfel
-// 040130 GPS update inserted, PZi
-// 040212 Star tracker update inserted, PZi
-// 050308 Added work-around roll angle singularity, PZi
-// 050623 Roll feedback variant for inverted flight, PZi
-// 091130 Euler angle clean-up, PZi
-///////////////////////////////////////////////////////////////////////////////
-void INS::update(double int_step){
-    assert(gyro && "INS module must be given a gyro model");
-    assert(accel && "INS module must be given a accelerometer model");
+double INS::calculate_INS_derived_dvbe(){
+    return 0;
+}
 
-    gyro->propagate_error(int_step);
-    accel->propagate_error(int_step);
+bool INS::GPS_update(){
+    // GPS update
+    if (gpsr->gps_update) {
+        // GPS Measurement
+        arma::vec3 SXH(gpsr->position_state);
+        arma::vec3 VXH(gpsr->velocity_state);
 
-    // local variables
-    double lonc(0), latc(0);
+        // updating INS navigation output
+        SBIIC = SBIIC - SXH;
+        VBIIC = VBIIC - VXH;
+        // resetting INS error states
+        ESBI = ESBI - SXH;
+        EVBI = EVBI - VXH;
+        // returning flag to GPS that update was completed
+        gpsr->gps_update--;
+
+        return true;
+    }
+    return false;
+}
+
+double INS::calculate_INS_derived_alpha(arma::vec3 VBECB){
+    return atan2(VBECB(2), VBECB(0));
+}
+
+double INS::calculate_INS_derived_beta(arma::vec3 VBECB){
+    return asin(VBECB(1) / norm(VBECB));
+}
+
+double INS::calculate_INS_derived_alpp(arma::vec3 VBECB){
+    double dum = VBECB(0) / norm(VBECB);
+    if (fabs(dum) > 1)
+        dum = 1 * sign(dum);
+    return acos(dum);
+}
+
+double INS::calculate_INS_derived_psivd(arma::vec3 VBECD){
+    if (VBECD(0) == 0 && VBECD(1) == 0) {
+        return 0;
+    } else {
+        return atan2(VBECD(1), VBECD(0));
+    }
+}
+
+double INS::calculate_INS_derived_thtvd(arma::vec3 VBECD){
+    if (VBECD(0) == 0 && VBECD(1) == 0) {
+        return 0;
+    } else {
+        return atan2(-VBECD(2), sqrt(VBECD(0) * VBECD(0) + VBECD(1) * VBECD(1)));
+    }
+
+}
+
+double INS::calculate_INS_derived_phip(arma::vec3 VBECB){
     double phipc(0);
-    double psivdc(0), thtvdc(0);
+
+    if (VBECB(1) == 0 && VBECB(2) == 0){
+
+        phipc = 0.;
+    } else if (fabs(VBECB(1)) < EPS) {
+        // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
+        //       to prevent oscillations
+        if (VBECB(2) > 0) phipc = 0;
+        if (VBECB(2) < 0) phipc = PI;
+    } else{
+        phipc = atan2(VBECB(1), VBECB(2));
+    }
+
+    return phipc;
+}
+
+double INS::calculate_INS_derived_euler_angles(arma::mat33 TBD){
     double psibdc(0), thtbdc(0), phibdc(0);
     double cthtbd(0);
 
+    double mroll = 0;
 
-
-    // input from other modules
-    double time      = get_rettime();
-    arma::vec3 GRAVG = environment->get_GRAVG_();
-    arma::mat33 TBI  = kinematics->get_TBI_();
-    arma::vec3 WBIB  = euler->get_WBIB_();
-    arma::vec3 WBII  = euler->get_WBII_();
-    arma::vec3 SBII  = newton->get_SBII();
-    arma::vec3 VBII  = newton->get_VBII();
-    arma::vec3 FSPB  = newton->get_FSPB_();
-
-    int mroll = 0; // Ambiguous
-
-    arma::vec3 SXH(gpsr->position_state);
-    arma::vec3 VXH(gpsr->velocity_state);
-
-    arma::vec3 WBICB;
-    arma::vec3 FSPCB;
-    arma::vec3 EFSPB;
-
-    //-------------------------------------------------------------------------
-    // ideal INS output
-    switch(ins_mode){
-        case IDEAL_INS:
-            // initialization without INS errors (perfect transfer alignment)
-            break;
-        case NON_IDEAL_INS:
-            break;
-        default:
-            assert(false && "Not a proper ins mode!");
-    }
-    if (ins_mode == IDEAL_INS) {
-        WBICI = WBII;
-
-        SBIIC = SBII;
-        dbic = norm(SBIIC);
-
-        //gyro
-        WBICB = gyro->get_computed_WBIB();
-
-        TBIC = TBI;
-
-        //accl
-        FSPCB = accel->get_computed_FSPB();
-
-        VBIIC = VBII;
-
-    } else {
-        // computing INS derived postion of hyper B wrt center of Earth I
-        SBIIC = ESBI + SBII;
-        dbic = norm(SBIIC);
-
-        // Gyro Measurement
-        WBICB = gyro->get_computed_WBIB();
-
-        // computed transformation matrix
-        arma::mat33 UNI(arma::fill::eye);
-        arma::mat33 TIIC = UNI - skew_sym(gyro->get_RICI());
-        TBIC = TBI * TIIC;
-
-        // Accelerometer Measurement
-        FSPCB = accel->get_computed_FSPB();
-        EFSPB = accel->get_error_of_computed_FSPB();
-
-        // calculate gravitational error
-        this->EGRAVI = calculate_gravity_error(newton->get_dbi());
-
-        // integrating velocity error equation
-        // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
-        arma::mat33 TICB = trans(TBIC);
-        arma::vec3 EVBID_NEW =
-            TICB * EFSPB - skew_sym(gyro->get_RICI()) * TICB * FSPCB + EGRAVI;
-        EVBI = integrate(EVBID_NEW, EVBID, EVBI, int_step);
-        EVBID = EVBID_NEW;
-
-        // calculating position error
-        arma::vec3 ESBID_NEW = EVBI;
-        ESBI = integrate(ESBID_NEW, ESBID, ESBI, int_step);
-        ESBID = ESBID_NEW;
-
-        // GPS update
-        if (gpsr->gps_update) {
-            // updating INS navigation output
-            SBIIC = SBIIC - SXH;
-            VBIIC = VBIIC - VXH;
-            // resetting INS error states
-            ESBI = ESBI - SXH;
-            EVBI = EVBI - VXH;
-            // returning flag to GPS that update was completed
-            gpsr->gps_update--;
-        }
-        // computing INS derived position of hyper B wrt center of Earth I
-        SBIIC = ESBI + SBII;
-        // computing INS derived velocity of hyper B wrt inertial frame I
-        VBIIC = EVBI + VBII;
-        // computing INS derived body rates in inertial coordinates
-        WBICI = trans(TBIC) * WBICB;
-
-        // diagnostics
-        ins_pos_err = norm(ESBI);
-        ins_vel_err = norm(EVBI);
-    }
-
-    // computing geographic velocity in body coordinates from INS
-    arma::vec3 VEIC;
-    VEIC(0) = -WEII3 * SBIIC(1);
-    VEIC(1) =  WEII3 * SBIIC(0);
-    VEIC(2) =  0;
-    arma::vec3 VBEIC = VBIIC - VEIC;
-    arma::vec3 VBECB = TBIC * VBEIC;
-    dvbec = norm(VBECB);
-
-    // decomposing computed body rates
-    ppcx = WBICB(0) * DEG;
-    qqcx = WBICB(1) * DEG;
-    rrcx = WBICB(2) * DEG;
-
-    // computing indidence angles from INS
-    double alphac = atan2(VBECB(2), VBECB(0));
-    double betac = asin(VBECB(1) / dvbec);
-    alphacx = alphac * DEG;
-    betacx = betac * DEG;
-
-    // incidence angles in load factor plane (aeroballistic)
-    double dum = VBECB(0) / dvbec;
-    if (fabs(dum) > 1)
-        dum = 1 * sign(dum);
-    double alppc = acos(dum);
-
-    if (VBECB(1) == 0 && VBECB(2) == 0)
-        phipc = 0.;
-    // note: if vbeb2 is <EPS the value if phipc is forced to be 0 or PI
-    //       to prevent oscillations
-    else if (fabs(VBECB(1)) < EPS)
-        if (VBECB(2) > 0)
-            phipc = 0;
-    if (VBECB(2) < 0)
-        phipc = PI;
-    else
-        phipc = atan2(VBECB(1), VBECB(2));
-    alppcx = alppc * DEG;
-    phipcx = phipc * DEG;
-
-    // getting long,lat,alt from INS
-    arma_cad_geo84_in(lonc, latc, altc, SBIIC, time);
-
-    // getting T.M. of geodetic wrt inertial coord
-    TDCI = arma_cad_tdi84(lonc, latc, altc, time);
-    loncx = lonc * DEG;
-    latcx = latc * DEG;
-
-    // computing geodetic velocity from INS
-    VBECD = TDCI * VBEIC;
-
-    // computing flight path angles
-    if (VBECD[0] == 0 && VBECD[1] == 0) {
-        psivdc = 0;
-        thtvdc = 0;
-    } else {
-        psivdc = atan2(VBECD[1], VBECD[0]);
-        thtvdc =
-            atan2(-VBECD[2], sqrt(VBECD[0] * VBECD[0] + VBECD[1] * VBECD[1]));
-    }
-    psivdcx = psivdc * DEG;
-    thtvdcx = thtvdc * DEG;
-
-    // computing Euler angles from INS
-    arma::mat33 TBD = TBIC * trans(TDCI);
     double tbd13 = TBD(0, 2);
     double tbd11 = TBD(0, 0);
     double tbd33 = TBD(2, 2);
@@ -367,24 +360,108 @@ void INS::update(double int_step){
         // roll feedback for inverted flight
         phibdc = acos(-cphi) * sign(-tbd23);
 
-    psibdcx = DEG * psibdc;
-    thtbdcx = DEG * thtbdc;
-    phibdcx = DEG * phibdc;
-    //-------------------------------------------------------------------------
-    // loading module-variables
-    // state variables
-    // output to other modules;
+    this->psibdcx = DEG * psibdc;
+    this->thtbdcx = DEG * thtbdc;
+    this->phibdcx = DEG * phibdc;
 
-    //hyper[700].gets(mgps);
+}
 
-    //hyper[800].gets(mstar);
+void INS::update(double int_step){
+    assert(gyro && "INS module must be given a gyro model");
+    assert(accel && "INS module must be given a accelerometer model");
+
+    gyro->propagate_error(int_step);
+    accel->propagate_error(int_step);
+
+    // local variables
+    double lonc(0), latc(0);
+    double psivdc(0), thtvdc(0);
+    double psibdc(0), thtbdc(0), phibdc(0);
+    double cthtbd(0);
+
+    // input from other modules
+    double time      = get_rettime();
+    arma::vec3 SBII  = newton->get_SBII();
+    arma::vec3 VBII  = newton->get_VBII();
+    arma::mat33 TBI  = kinematics->get_TBI_();
+
+    int mroll = 0; // Ambiguous
+
+    // Gyro Measurement
+    arma::vec3 WBICB = gyro->get_computed_WBIB();
+    arma::vec3 EWBIB = gyro->get_error_of_computed_WBIB();
+
+    // Accelerometer Measurement
+    arma::vec3 FSPCB = accel->get_computed_FSPB();
+    arma::vec3 EFSPB = accel->get_error_of_computed_FSPB();
+
+    this->SBIIC = calculate_INS_derived_postion(SBII); //  wrt center of Earth I
+    //dbic = norm(SBIIC);
+
+    /* INS Tile Error Propagation */
+    INTEGRATE_D(RICI, TBI * EWBIB);
+
+    // computed transformation matrix
+    this->TBIC = calculate_INS_derived_TBI(TBI);
+
+    // calculate gravitational error
+    this->EGRAVI = calculate_gravity_error(newton->get_dbi());
+
+    // integrating velocity error equation
+    // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
+    arma::mat33 TICB = trans(TBIC);
+    INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
+
+    // calculating position error
+    INTEGRATE_D(ESBI, EVBI);
+
+    GPS_update();
+
+    this->SBIIC = calculate_INS_derived_postion(SBII);
+    this->VBIIC = calculate_INS_derived_velocity(VBII);
+    this->WBICI = calculate_INS_derived_bodyrate(TBIC, WBICB);
+
     // diagnostics
+    //ins_pos_err  = norm(ESBI);
+    //ins_vel_err  = norm(EVBI);
+    //ins_tilt_err = norm(RICI);
+
+    // computing geographic velocity in body coordinates from INS
+    arma::vec3 VEIC = WEII * SBIIC;
+    arma::vec3 VBEIC = VBIIC - VEIC;
+    arma::vec3 VBECB = TBIC * VBEIC;
+
+    this->dvbec = norm(VBECB);
+
+    // computing indidence angles from INS
+    this->alphacx = calculate_INS_derived_alpha(VBECB) * DEG;
+    this->betacx  = calculate_INS_derived_beta(VBECB) * DEG;
+
+    // incidence angles in load factor plane (aeroballistic)
+    this->alppcx = calculate_INS_derived_alpp(VBECB) * DEG;
+    this->phipcx = calculate_INS_derived_phip(VBECB) * DEG;
+
+    // getting long,lat,alt from INS
+    arma_cad_geo84_in(lonc, latc, altc, SBIIC, time);
+    loncx = lonc * DEG;
+    latcx = latc * DEG;
+
+    // getting T.M. of geodetic wrt inertial coord
+    this->TDCI = arma_cad_tdi84(lonc, latc, altc, time);
+
+    // computing geodetic velocity from INS
+    arma::vec3 VBECD = TDCI * VBEIC;
+
+    // computing flight path angles
+    this->psivdcx = calculate_INS_derived_psivd(VBECD) * DEG;
+    this->thtvdcx = calculate_INS_derived_thtvd(VBECD) * DEG;
+
+    // computing Euler angles from INS
+    arma::mat33 TBD = TBIC * trans(TDCI);
+    calculate_INS_derived_euler_angles(TBD);
 }
 
 double INS::get_dvbec() { return dvbec; }
-double INS::get_qqcx() { return qqcx; }
-double INS::get_rrcx() { return rrcx; }
-double INS::get_ppcx() { return ppcx; }
 double INS::get_alphacx() { return alphacx; }
 double INS::get_betacx() { return betacx; }
 double INS::get_phibdcx() { return phibdcx; }
@@ -413,3 +490,9 @@ Matrix INS::get_TBIC() {
     TBIC.build_mat33(_TBIC);
     return ~TBIC;
 }
+
+arma::vec3 INS::get_SBIIC_() { return SBIIC; }
+arma::vec3 INS::get_VBIIC_() { return VBIIC; }
+arma::vec3 INS::get_WBICI_() { return WBICI; }
+arma::vec3 INS::get_EGRAVI_() { return EGRAVI; }
+arma::mat33 INS::get_TBIC_() { return TBIC; }

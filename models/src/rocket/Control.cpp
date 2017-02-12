@@ -120,7 +120,7 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double dmq = aerodynamics->get_dmq();
     double dmde = aerodynamics->get_dmde();
     double dvbec = ins->get_dvbec();
-    double qqcx = ins->get_qqcx();
+    double qqcx = ins->get_gyro().get_qqcx();
     Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
     //-------------------------------------------------------------------------
     // calculating online close loop poles
@@ -192,7 +192,7 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     double dnr = aerodynamics->get_dnr();
     double dndr = aerodynamics->get_dndr();
     double dvbe = newton->get_dvbe();
-    double rrcx = ins->get_rrcx();
+    double rrcx = ins->get_gyro().get_rrcx();
     Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
 
     //-------------------------------------------------------------------------
@@ -248,7 +248,7 @@ double Control::control_pitch_rate(double qqdx){
     double dmde = aerodynamics->get_dmde();
     double dvbec = ins->get_dvbec();
     double dnd = aerodynamics->get_dnd();
-    double qqcx = ins->get_qqcx();
+    double qqcx = ins->get_gyro().get_qqcx();
 
     //-------------------------------------------------------------------------
     // parameters of open loop angular rate transfer function

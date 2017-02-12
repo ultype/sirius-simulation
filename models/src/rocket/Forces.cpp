@@ -22,8 +22,9 @@ void Forces::forces()
     double pdynmc=environment->get_pdynmc();
     double mprop=propulsion->get_mprop();
     double thrust=propulsion->get_thrust();
-    double mrcs_moment=rcs->get_mrcs_moment();
-    double mrcs_force=rcs->get_mrcs_force();
+    bool rcs_enabled = rcs->isEnabled();
+    enum RCS::RCS_MODE rcs_mode = rcs->get_rcs_mode();
+    //double mrcs_force=rcs->get_mrcs_force();
     double refa=Aerodynamics->get_refa();
     double refd=Aerodynamics->get_refd();
     double cy=Aerodynamics->get_cy();
@@ -67,11 +68,11 @@ void Forces::forces()
         FAPB[0]=FAPB[0]+thrust;
 
     //adding force components from RCS
-    if(mrcs_force==1||mrcs_force==2)
-        FAPB=FAPB+FARCS;
+    //if(mrcs_force==1||mrcs_force==2)
+        //FAPB=FAPB+FARCS;
 
     //adding moment components from RCS
-    if(mrcs_moment>0&&mrcs_moment<=23)
+    if(rcs_enabled && rcs_mode != RCS::GEODETIC_YAW_ANGLE_CONTROL)
         FMB=FMB+FMRCS;
 
 

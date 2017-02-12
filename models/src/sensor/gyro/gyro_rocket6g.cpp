@@ -8,7 +8,6 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
     :   newton(&newt), euler(&eul), kinematics(&kine),
         VECTOR_INIT(EUG    , 3),
         VECTOR_INIT(EWG    , 3),
-        VECTOR_INIT(EWBIB  , 3),
         VECTOR_INIT(EWALKG , 3),
         VECTOR_INIT(EUNBG  , 3),
         VECTOR_INIT(EMISG  , 3),
@@ -19,7 +18,6 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
 
     EUG.zeros();
     EWG.zeros();
-    EWBIB.zeros();
     EWALKG.zeros();
     EUNBG.zeros();
 
@@ -47,14 +45,9 @@ void sensor::GyroRocket6G::propagate_error(double int_step){
     EWG = EWALKG * (1. / sqrt(int_step));
 
     // combining all uncertainties
-    EWBIB = EMSBG + EUG + EWG;
+    this->EWBIB = EMSBG + EUG + EWG;
 
     this->WBICB = WBIB + EWBIB;
-
-    /* INS Tile Error Propagation */
-    arma::vec3 RICID_NEW = trans(kinematics->get_TBI_()) * EWBIB;
-    RICI = integrate(RICID_NEW, RICID, RICI, int_step);
-    RICID = RICID_NEW;
 
     return;
 }
