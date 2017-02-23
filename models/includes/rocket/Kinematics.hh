@@ -56,6 +56,7 @@ class Kinematics{
 
         /* Internal Propagator / Calculators */
         void propagate_TBI(double int_step, arma::vec3 WBIB);
+        void propagate_TBI_Q(double int_step, arma::vec3 WBIB);
 
         arma::mat calculate_TBD(double lonx, double latx, double alt);
 
@@ -81,6 +82,9 @@ class Kinematics{
 
         arma::mat TBID;     /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
         double _TBID[3][3]; /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
+
+        arma::vec TBI_Q;    /* *io (--)    Transformation Matrix of body coord wrt inertia coord (Quaternion) */
+        arma::vec TBID_Q;   /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative (Quaternion) */
 
         /* Generating Outputs */
         double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/

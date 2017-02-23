@@ -77,6 +77,14 @@ void Kinematics::load_angle(double yaw, double roll, double pitch) {
     arma::mat current_TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     TBI = TBD * current_TDI;
 
+    arma::vec tbid_q(4);
+    tbid_q(0) = 0.0;
+    tbid_q(1) = 0.0;
+    tbid_q(2) = 0.0;
+    tbid_q(3) = 0.0;
+    this->TBI_Q = Matrix2Quaternion(this->TBI);
+    this->TBID_Q = tbid_q;
+
 }
 
 void Kinematics::initialize(){
@@ -101,7 +109,8 @@ void Kinematics::propagate(double int_step){
     arma::vec VBII = newton->get_VBII();
 
     propagate_TBI(int_step, WBIB);
-
+    //propagate_TBI_Q(int_step, WBIB);
+    //this->TBI = Quaternion2Matrix(this->TBI_Q);
     this->TBD = calculate_TBD(lonx, latx, alt);
 
     //*incidence angles using wind vector VAED in geodetic coord
@@ -140,6 +149,23 @@ void Kinematics::propagate_TBI(double int_step, arma::vec3 WBIB) {
     double e2 = EE(1,1);
     double e3 = EE(2,2);
     this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
+
+}
+
+void Kinematics::propagate_TBI_Q(double int_step, arma::vec3 WBIB)
+{
+    arma::vec TBID_Q_NEW(4);
+    double quat_metric = TBI_Q(0) * TBI_Q(0) + TBI_Q(1) * TBI_Q(1) +TBI_Q(2) * TBI_Q(2) +TBI_Q(3) * TBI_Q(3);
+    double erq = 1. -quat_metric;
+
+    TBID_Q_NEW(0) = 0.5 * (-WBIB(0) * TBI_Q(1) - WBIB(1) * TBI_Q(2) - WBIB(2) * TBI_Q(3)) + 50. * erq * TBI_Q(0);
+    TBID_Q_NEW(1) = 0.5 * (WBIB(0) * TBI_Q(0) + WBIB(2) * TBI_Q(2) - WBIB(1) * TBI_Q(3)) + 50. * erq * TBI_Q(1);
+    TBID_Q_NEW(2) = 0.5 * (WBIB(1) * TBI_Q(0) - WBIB(2) * TBI_Q(1) + WBIB(0) * TBI_Q(3)) + 50. * erq * TBI_Q(2);
+    TBID_Q_NEW(3) = 0.5 * (WBIB(2) * TBI_Q(0) + WBIB(1) * TBI_Q(1) - WBIB(0) * TBI_Q(2)) + 50. * erq * TBI_Q(3);
+
+    TBI_Q = integrate(TBID_Q_NEW, TBID_Q, TBI_Q, int_step);
+
+    this->TBID_Q = TBID_Q_NEW;
 
 }
 
