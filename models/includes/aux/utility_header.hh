@@ -551,6 +551,8 @@ Matrix cad_tip(const double &incl,
                const double &lon_anode,
                const double &arg_peri);
 
+arma::vec Matrix2Quaternion(arma::mat Matrix_in);
+arma::mat Quaternion2Matrix(arma::vec Quaternion_in);
 /* Stochastic functions */
 
 /**
@@ -654,6 +656,8 @@ arma::mat integrate(arma::mat &DYDX_NEW,
                  arma::mat &Y,
                  const double int_step);
 
+arma::vec integrate(arma::vec &DYDX_NEW, 
+                arma::vec &DYDX, arma::vec &Y, const double int_step);
 /**
  * \brief US Standard Atmosphere 1976.
  *

@@ -1829,6 +1829,37 @@ Matrix cad_grav84(Matrix SBII, const double &time)
     return GRAVG;
 }
 
+arma::vec Matrix2Quaternion(arma::mat Matrix_in)
+{
+    double q_square;
+    arma::vec Quaternion(4);
+
+    q_square = fabs(1.0 + Matrix_in(0,0) + Matrix_in(1,1) + Matrix_in(2,2));
+
+    Quaternion(0) = 0.5 * sqrt(q_square);
+    Quaternion(1) = 0.25 * (Matrix_in(2,1) - Matrix_in(1,2)) / Quaternion[0];
+    Quaternion(2) = 0.25 * (Matrix_in(0,2) - Matrix_in(2,0)) / Quaternion[0];
+    Quaternion(3) = 0.25 * (Matrix_in(1,0) - Matrix_in(0,1)) / Quaternion[0];
+
+    return Quaternion;
+}
+
+arma::mat Quaternion2Matrix(arma::vec Quaternion_in)
+{
+    arma::mat Matrix_out(3,3);
+
+    Matrix_out(0,0) = 2. * (Quaternion_in(0) * Quaternion_in(0) + Quaternion_in(1) * Quaternion_in(1)) - 1.;
+    Matrix_out(0,1) = 2. * (Quaternion_in(1) * Quaternion_in(2) + Quaternion_in(0) * Quaternion_in(3));
+    Matrix_out(0,2) = 2. * (Quaternion_in(1) * Quaternion_in(3) - Quaternion_in(0) * Quaternion_in(2));
+    Matrix_out(1,0) = 2. * (Quaternion_in(1) * Quaternion_in(2) - Quaternion_in(0) * Quaternion_in(3));
+    Matrix_out(1,1) = 2. * (Quaternion_in(0) * Quaternion_in(0) + Quaternion_in(2) * Quaternion_in(2)) - 1.;
+    Matrix_out(1,2) = 2. * (Quaternion_in(2) * Quaternion_in(3) + Quaternion_in(0) * Quaternion_in(2));
+    Matrix_out(2,0) = 2. * (Quaternion_in(1) * Quaternion_in(3) + Quaternion_in(0) * Quaternion_in(2));
+    Matrix_out(2,1) = 2. * (Quaternion_in(2) * Quaternion_in(3) - Quaternion_in(0) * Quaternion_in(1));
+    Matrix_out(2,2) = 2. * (Quaternion_in(0) * Quaternion_in(0) + Quaternion_in(3) * Quaternion_in(3)) - 1.;
+
+    return Matrix_out;
+}
 
 arma::vec3 arma_cad_grav84(arma::vec3 SBII, const double &time)
 {
@@ -2987,6 +3018,23 @@ arma::mat integrate(arma::mat &DYDX_NEW,
             RESULT(r, c) =
                 integrate(DYDX_NEW(r, c), DYDX(r, c),
                                 Y(r, c), int_step);
+
+    return RESULT;
+}
+
+arma::vec integrate(arma::vec &DYDX_NEW, 
+                arma::vec &DYDX, arma::vec &Y, const double int_step)
+{
+    int nrow = Y.n_rows;
+    int nrow1 = DYDX_NEW.n_rows;
+    int nrow2 = DYDX.n_rows;
+    
+    assert((nrow == nrow1 && nrow == nrow2) && " *** Error: incompatible row-dimensions in 'integrate()' *** ");
+
+    arma::vec RESULT(nrow);
+    for (int r = 0;r < nrow;r++){
+        RESULT(r) = integrate(DYDX_NEW(r), DYDX(r), Y(r), int_step);
+    }
 
     return RESULT;
 }

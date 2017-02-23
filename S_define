@@ -21,6 +21,7 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Force.hh"
 ##include "rocket/Propulsion.hh"
 ##include "rocket/Aerodynamics.hh"
+##include "rocket/Time_management.hh"
 
 ##include "cad/env/atmosphere.hh"
 ##include "cad/env/atmosphere_nasa2002.hh"
@@ -76,6 +77,7 @@ class Rocket_SimObject : public Trick::SimObject {
         TVC tvc;
         RCS rcs;
         Actuator actuator;
+        time_management time;
 
         Rocket_SimObject() 
             :   newton      ( kinematics , euler        , env          , propulsion   , force ) ,
