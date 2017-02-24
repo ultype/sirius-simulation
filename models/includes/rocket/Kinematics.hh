@@ -84,7 +84,10 @@ class Kinematics{
         double _TBID[3][3]; /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative */
 
         arma::vec TBI_Q;    /* *io (--)    Transformation Matrix of body coord wrt inertia coord (Quaternion) */
+        double _TBI_Q[4];   /* *io (--)    Transformation Matrix of body coord wrt inertia coord (Quaternion) */
+        
         arma::vec TBID_Q;   /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative (Quaternion) */
+        double _TBID_Q[4];  /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative (Quaternion) */
 
         /* Generating Outputs */
         double ortho_error; /* *io (--)    Direction cosine matrix orthogonality error*/

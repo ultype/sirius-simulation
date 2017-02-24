@@ -7,7 +7,9 @@ Kinematics::Kinematics(Newton &newt, Environment &env, _Euler_ &eul)
     :   newton(&newt), euler(&eul), environment(&env),
         MATRIX_INIT(TBD, 3, 3),
         MATRIX_INIT(TBI, 3, 3),
-        MATRIX_INIT(TBID, 3, 3)
+        MATRIX_INIT(TBID, 3, 3),
+        VECTOR_INIT(TBI_Q, 4),
+        VECTOR_INIT(TBID_Q, 4)
 {
     this->default_data();
 }
@@ -16,7 +18,9 @@ Kinematics::Kinematics(const Kinematics& other)
     :   newton(other.newton), euler(other.euler), environment(other.environment),
         MATRIX_INIT(TBD, 3, 3),
         MATRIX_INIT(TBI, 3, 3),
-        MATRIX_INIT(TBID, 3, 3)
+        MATRIX_INIT(TBID, 3, 3),
+        VECTOR_INIT(TBI_Q, 4),
+        VECTOR_INIT(TBID_Q, 4)
 {
     this->default_data();
 
@@ -24,6 +28,8 @@ Kinematics::Kinematics(const Kinematics& other)
     this->TBD = other.TBD;
     this->TBI = other.TBI;
     this->TBID = other.TBID;
+    this->TBI_Q = other.TBI_Q;
+    this->TBID_Q = other.TBID_Q;
 
     this->alphax = other.alphax;
     this->betax = other.betax;
@@ -49,6 +55,8 @@ Kinematics& Kinematics::operator=(const Kinematics& other){
     this->TBD = other.TBD;
     this->TBI = other.TBI;
     this->TBID = other.TBID;
+    this->TBI_Q = other.TBI_Q;
+    this->TBID_Q = other.TBID_Q;
     this->alphax = other.alphax;
     this->betax = other.betax;
     this->alppx = other.alppx;
@@ -76,14 +84,8 @@ void Kinematics::load_angle(double yaw, double roll, double pitch) {
 
     arma::mat current_TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     TBI = TBD * current_TDI;
-
-    arma::vec tbid_q(4);
-    tbid_q(0) = 0.0;
-    tbid_q(1) = 0.0;
-    tbid_q(2) = 0.0;
-    tbid_q(3) = 0.0;
-    this->TBI_Q = Matrix2Quaternion(this->TBI);
-    this->TBID_Q = tbid_q;
+    
+    this->TBI_Q = Matrix2Quaternion(this->TBI);  //Convert Direct Cosine Matrix to Quaternion
 
 }
 
@@ -94,8 +96,6 @@ void Kinematics::default_data(){
 }
 
 void Kinematics::propagate(double int_step){
-    double cthtbd = 0;
-    double phip = 0;
 
     double dvba = environment->get_dvba();
     double lonx = newton->get_lonx();
@@ -103,14 +103,15 @@ void Kinematics::propagate(double int_step){
     double alt  = newton->get_alt();
 
     arma::vec WBIB = euler->get_WBIB_();
+
     arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
 
     arma::vec VBED = newton->get_VBED_();
     arma::vec VBII = newton->get_VBII();
+    
+    /* Propagate Quaternion */
+    propagate_TBI_Q(int_step, WBIB);  
 
-    propagate_TBI(int_step, WBIB);
-    //propagate_TBI_Q(int_step, WBIB);
-    //this->TBI = Quaternion2Matrix(this->TBI_Q);
     this->TBD = calculate_TBD(lonx, latx, alt);
 
     //*incidence angles using wind vector VAED in geodetic coord
@@ -155,18 +156,29 @@ void Kinematics::propagate_TBI(double int_step, arma::vec3 WBIB) {
 void Kinematics::propagate_TBI_Q(double int_step, arma::vec3 WBIB)
 {
     arma::vec TBID_Q_NEW(4);
-    double quat_metric = TBI_Q(0) * TBI_Q(0) + TBI_Q(1) * TBI_Q(1) +TBI_Q(2) * TBI_Q(2) +TBI_Q(3) * TBI_Q(3);
-    double erq = 1. -quat_metric;
+    /* Prepare for orthonormalization */
+    double quat_metric = TBI_Q(0) * TBI_Q(0) + TBI_Q(1) * TBI_Q(1) + TBI_Q(2) * TBI_Q(2) + TBI_Q(3) * TBI_Q(3);
+    double erq = 1. - quat_metric;
 
+    /* Calculate Previous states */
     TBID_Q_NEW(0) = 0.5 * (-WBIB(0) * TBI_Q(1) - WBIB(1) * TBI_Q(2) - WBIB(2) * TBI_Q(3)) + 50. * erq * TBI_Q(0);
     TBID_Q_NEW(1) = 0.5 * (WBIB(0) * TBI_Q(0) + WBIB(2) * TBI_Q(2) - WBIB(1) * TBI_Q(3)) + 50. * erq * TBI_Q(1);
     TBID_Q_NEW(2) = 0.5 * (WBIB(1) * TBI_Q(0) - WBIB(2) * TBI_Q(1) + WBIB(0) * TBI_Q(3)) + 50. * erq * TBI_Q(2);
     TBID_Q_NEW(3) = 0.5 * (WBIB(2) * TBI_Q(0) + WBIB(1) * TBI_Q(1) - WBIB(0) * TBI_Q(2)) + 50. * erq * TBI_Q(3);
 
-    TBI_Q = integrate(TBID_Q_NEW, TBID_Q, TBI_Q, int_step);
-
+    this->TBI_Q = integrate(TBID_Q_NEW, this->TBID_Q, this->TBI_Q, int_step);
+    
     this->TBID_Q = TBID_Q_NEW;
 
+    this->TBI = Quaternion2Matrix(this->TBI_Q);  //Convert Quaternion to Matrix
+
+    //TBI orthogonality check
+    arma::mat TIB = trans(TBI);
+    arma::mat UBI = TIB * TBI;
+    double e1 = UBI(0,0) - 1.;
+    double e2 = UBI(1,1) - 1.;
+    double e3 = UBI(2,2) - 1.;
+    this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
 }
 
 arma::mat Kinematics::calculate_TBD(double lonx, double latx, double alt) {
