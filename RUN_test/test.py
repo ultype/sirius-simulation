@@ -105,7 +105,7 @@ rkt.kinematics.load_angle(psibdx, phibdx, thtbdx)
 
 alpha0x    = 0    #Initial angle-of-attack   - deg  module newton
 beta0x     = 0    #Initial sideslip angle    - deg  module newton
-dvbe       = 2    #Vehicle geographic speed  - m/s  module newton
+dvbe       = 1    #Vehicle geographic speed  - m/s  module newton
 rkt.newton.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 
 rkt.euler.load_angular_velocity(0, 0, 0)

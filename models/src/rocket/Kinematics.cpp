@@ -113,14 +113,17 @@ void Kinematics::propagate(double int_step){
     propagate_TBI_Q(int_step, WBIB);  
 
     this->TBD = calculate_TBD(lonx, latx, alt);
+    
+    if(newton->get_liftoff()==1){
+        arma::vec3 VBAB = TBD * (VBED - VAED);
+        this->alphax = calculate_alphax(VBAB);
+        this->betax  = calculate_betax(VBAB, dvba);
 
+        this->alppx = calculate_alppx(VBAB, dvba);
+        this->phipx = calculate_phipx(VBAB);
+    }
     //*incidence angles using wind vector VAED in geodetic coord
-    arma::vec3 VBAB = TBD * (VBED - VAED);
-    this->alphax = calculate_alphax(VBAB);
-    this->betax  = calculate_betax(VBAB, dvba);
-
-    this->alppx = calculate_alppx(VBAB, dvba);
-    this->phipx = calculate_phipx(VBAB);
+    
 
     //*diagnostic: calculating the inertial incidence angles
     arma::vec3 VBIB = TBI * VBII;

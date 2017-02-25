@@ -96,6 +96,8 @@ void Newton::default_data(){
 }
 
 void Newton::initialize(){
+    this->ABII = this->WEII * (this->WEII * this->SBII);
+    liftoff = 0;
 }
 
 arma::mat Newton::build_WEII(){
@@ -151,9 +153,11 @@ void Newton::propagate(double int_step){
     this->FSPB = calculate_fspb(FAPB, vmass);
 
     propagate_position_speed_acceleration(int_step);
-
-    propagate_aeroloss(int_step);
-    propagate_gravityloss(int_step);
+    if(liftoff == 1){
+        propagate_aeroloss(int_step);
+        propagate_gravityloss(int_step);    
+    }
+    
 }
 
 arma::vec3 Newton::calculate_fspb(arma::vec3 FAPB, double vmass){
@@ -170,6 +174,16 @@ void Newton::propagate_position_speed_acceleration(double int_step){
 
     /* Prograte S, V, A status */
     arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
+    /* To check wether the rocket liftoff */
+    if(liftoff==0){
+        if(norm(FSPB) - norm(GRAVG)>0){
+            liftoff = 1;
+        }else{
+            NEXT_ACC = this->WEII * (this->WEII * this->SBII);
+        }
+
+    }
+
     arma::mat NEXT_VEL = integrate(NEXT_ACC, ABII, VBII, int_step);
     SBII = integrate(NEXT_VEL, VBII, SBII, int_step);
     ABII = NEXT_ACC;
@@ -217,12 +231,15 @@ void Newton::update_diagnostic_attributes(double int_step){
 
     _ayx =  FSPB(1) / AGRAV;
     _anx = -FSPB(2) / AGRAV;
+    
+    if(liftoff == 1){
+        //T.M. of geographic velocity wrt geodetic coordinates
+        arma::mat TVD(&_TVD[0][0], 3, 3, false, true);
+        TVD = build_transform_matrix(_psivdx * RAD, _thtvdx * RAD);
 
-    //T.M. of geographic velocity wrt geodetic coordinates
-    arma::mat TVD(&_TVD[0][0], 3, 3, false, true);
-    TVD = build_transform_matrix(_psivdx * RAD, _thtvdx * RAD);
-
-    orbital(SBII, VBII, get_dbi());
+        orbital(SBII, VBII, get_dbi());
+    }
+    
 }
 
 void Newton::orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi)
@@ -284,3 +301,5 @@ double Newton::get_psivdx(){
 arma::vec Newton::get_VBII() { return VBII; }
 
 arma::vec Newton::get_SBII() { return SBII; }
+
+unsigned int Newton::get_liftoff() { return liftoff; }
