@@ -76,8 +76,7 @@ void _Euler_::propagate(double int_step)
     arma::vec3 FMB(forces->get_FMB().get_pbody());
 
     // XXX: Trans
-    arma::mat33 IBBB = (propulsion->get_IBBB().get_pbody());
-    IBBB = trans(IBBB);
+    arma::mat33 IBBB = propulsion->get_IBBB_();
 
     arma::mat33 TBI = kinematics->get_TBI_();
 

@@ -1,87 +1,11 @@
 #execfile("Modified_data/realtime.py")
 #execfile("Modified_data/rocket.dr")
 execfile("Modified_data/test.dr")
-#trick.exec_set_enable_freeze(True)
-#trick.exec_set_freeze_command(True)
-#trick.sim_control_panel_set_enabled(True)
+# trick.exec_set_enable_freeze(True)
+# trick.exec_set_freeze_command(True)
+# trick.sim_control_panel_set_enabled(True)
 ##########################################################
-#Event0:rcs_on
-rcs_on = trick.new_event("rcs_on")
-rcs_on.set_cycle(0.001)
-rcs_on.condition(0, "trick.exec_get_sim_time() == 5.001")
-rcs_on.action(0, "rkt.rcs.enable_rcs()")
-trick.add_event(rcs_on)
-rcs_on.activate()
-#Event1:Stage 2 ignition
-speration_1 = trick.new_event("speration_1")
-speration_1.set_cycle(0.001)
-speration_1.condition(0, "trick.exec_get_sim_time() == 101.001")
-speration_1.action(0, "rkt.aerodynamics.set_refa(1.13)")
-speration_1.action(1, "rkt.propulsion.set_aexit(0)")
-speration_1.action(2, "rkt.aerodynamics.set_xcg_ref(3.429)")
 
-speration_1.action(3, "rkt.propulsion.set_vmass0(3893)")
-speration_1.action(4, "rkt.propulsion.set_fmass0(2963)")
-
-speration_1.action(5,  "xcg_0          = 5.829 " )
-speration_1.action(6,  "xcg_1          = 4.683 " )
-speration_1.action(7,  "moi_roll_0     = 615.2 " )
-speration_1.action(8,  "moi_roll_1     = 151.0 " )
-speration_1.action(9,  "moi_trans_0    = 7407.4" )
-speration_1.action(10, "moi_trans_1    = 3752.1" )
-speration_1.action(11, "spi            = 290   " )
-speration_1.action(12, "fuel_flow_rate = 29.63 " )
-speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
-
-speration_1.action(14, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
-speration_1.action(15, "trick.add_event(speration_2)")
-speration_1.action(16, "speration_2.activate()")
-speration_1.action(17, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv2.txt')")
-trick.add_event(speration_1)
-speration_1.activate()
-###############################################################
-#Event2:Fairing speration
-speration_2=trick.new_event("speration_2")
-speration_2.set_cycle(0.001)
-speration_2.condition(0, "trick.exec_get_sim_time() == 170.001")
-speration_2.action(0, "rkt.propulsion.set_vmass0(3863)")
-speration_2.action(1, "trick.add_event(speration_3)")
-speration_2.action(2, "speration_3.activate()")
-##############################################################
-#Event3:Stage 3 ignition
-speration_3=trick.new_event("speration_3")
-speration_3.set_cycle(0.001)
-speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
-speration_3.action(0, "rkt.rcs.set_rcs_thrust(10)")
-speration_3.action(1, "rkt.aerodynamics.set_xcg_ref(3.2489)")
-speration_3.action(2, "rkt.rcs.set_roll_mom_max(10)")
-speration_3.action(3, "rkt.rcs.set_pitch_mom_max(100)")
-speration_3.action(4, "rkt.rcs.set_yaw_mom_max(20)")
-
-speration_3.action(5, "rkt.propulsion.set_vmass0(490)")
-speration_3.action(6, "rkt.propulsion.set_fmass0(360)")
-
-speration_3.action(7,  "xcg_0          = 1.942" )
-speration_3.action(8,  "xcg_1          = 2.02 " )
-speration_3.action(9, "moi_roll_0     = 72.7 " )
-speration_3.action(10, "moi_roll_1     = 61.9 " )
-speration_3.action(11, "moi_trans_0    = 140.7" )
-speration_3.action(12, "moi_trans_1    = 88.8 " )
-speration_3.action(13, "spi            = 300  " )
-speration_3.action(14, "fuel_flow_rate = 3.33 " )
-speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
-
-speration_3.action(16, "trick.add_event(speration_4)")
-speration_3.action(17, "speration_4.activate()")
-speration_3.action(18, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv1.txt')")
-speration_3.action(19, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
-#############################################################
-#Event4:MECO
-speration_4=trick.new_event("speration_4")
-speration_4.set_cycle(0.05)
-speration_4.condition(0, "rkt.newton.get_dvbi() > 7613.5")
-speration_4.action(0, "rkt.propulsion.set_no_thrust()")
-speration_4.action(1, "rkt.propulsion.set_vmass0(0)")
 #############################################################
 #Realtime setting
 # trick.exec_set_thread_cpu_affinity(0,0)
@@ -105,7 +29,7 @@ rkt.kinematics.load_angle(psibdx, phibdx, thtbdx)
 
 alpha0x    = 0    #Initial angle-of-attack   - deg  module newton
 beta0x     = 0    #Initial sideslip angle    - deg  module newton
-dvbe       = 1    #Vehicle geographic speed  - m/s  module newton
+dvbe       = 0    #Vehicle geographic speed  - m/s  module newton
 rkt.newton.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 
 rkt.euler.load_angular_velocity(0, 0, 0)
@@ -134,8 +58,8 @@ moi_trans_0    = 244537.9 # vehicle initial transverse moi
 moi_trans_1    = 87392.2  # vehicle final transverse moi
 spi            = 255.0    # Specific impusle
 fuel_flow_rate = 88.89    # fuel flow rate
-rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)
 
+rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)# get variable for input file
 rkt.propulsion.set_aexit(0.258242843) #nozzle exhaust area
 rkt.propulsion.set_payload(98) #payload mass
 
@@ -247,5 +171,91 @@ rkt.rcs.set_rocket_r(0.68)         #rocket's radius - m  module rcs
 alphacomx = 0   #Alpha command - deg  module guidance
 betacomx = 0    #Beta command - deg  module guidance
 rkt.guidance.set_degree(alphacomx, betacomx)
+######################################################################################################
 
-trick.stop(700)
+start = trick.new_event("start")
+start.set_cycle(0.001)
+start.condition(0,"trick.exec_get_sim_time() == 180.001")
+start.action(0,"rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
+trick.add_event(start)
+start.activate()
+#Event0:rcs_on
+rcs_on = trick.new_event("rcs_on")
+rcs_on.set_cycle(0.001)
+rcs_on.condition(0, "trick.exec_get_sim_time() == 185.001")
+rcs_on.action(0, "rkt.rcs.enable_rcs()")
+trick.add_event(rcs_on)
+rcs_on.activate()
+#Event1:Stage 2 ignition
+speration_1 = trick.new_event("speration_1")
+speration_1.set_cycle(0.001)
+speration_1.condition(0, "trick.exec_get_sim_time() == 281.001")
+speration_1.action(0, "rkt.aerodynamics.set_refa(1.13)")
+speration_1.action(1, "rkt.propulsion.set_aexit(0)")
+speration_1.action(2, "rkt.aerodynamics.set_xcg_ref(3.429)")
+
+speration_1.action(3, "rkt.propulsion.set_vmass0(3893)")
+speration_1.action(4, "rkt.propulsion.set_fmass0(2963)")
+
+speration_1.action(5,  "xcg_0          = 5.829 " )
+speration_1.action(6,  "xcg_1          = 4.683 " )
+speration_1.action(7,  "moi_roll_0     = 615.2 " )
+speration_1.action(8,  "moi_roll_1     = 151.0 " )
+speration_1.action(9,  "moi_trans_0    = 7407.4" )
+speration_1.action(10, "moi_trans_1    = 3752.1" )
+speration_1.action(11, "spi            = 290   " )
+speration_1.action(12, "fuel_flow_rate = 29.63 " )
+speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
+
+speration_1.action(14, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+speration_1.action(15, "trick.add_event(speration_2)")
+speration_1.action(16, "speration_2.activate()")
+speration_1.action(17, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv2.txt')")
+trick.add_event(speration_1)
+speration_1.activate()
+###############################################################
+#Event2:Fairing speration
+speration_2=trick.new_event("speration_2")
+speration_2.set_cycle(0.001)
+speration_2.condition(0, "trick.exec_get_sim_time() == 350.001")
+speration_2.action(0, "rkt.propulsion.set_vmass0(3863)")
+speration_2.action(1, "trick.add_event(speration_3)")
+speration_2.action(2, "speration_3.activate()")
+##############################################################
+#Event3:Stage 3 ignition
+speration_3=trick.new_event("speration_3")
+speration_3.set_cycle(0.001)
+speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
+speration_3.action(0, "rkt.rcs.set_rcs_thrust(10)")
+speration_3.action(1, "rkt.aerodynamics.set_xcg_ref(3.2489)")
+speration_3.action(2, "rkt.rcs.set_roll_mom_max(10)")
+speration_3.action(3, "rkt.rcs.set_pitch_mom_max(100)")
+speration_3.action(4, "rkt.rcs.set_yaw_mom_max(20)")
+
+speration_3.action(5, "rkt.propulsion.set_vmass0(490)")
+speration_3.action(6, "rkt.propulsion.set_fmass0(360)")
+
+speration_3.action(7,  "xcg_0          = 1.942" )
+speration_3.action(8,  "xcg_1          = 2.02 " )
+speration_3.action(9, "moi_roll_0     = 72.7 " )
+speration_3.action(10, "moi_roll_1     = 61.9 " )
+speration_3.action(11, "moi_trans_0    = 140.7" )
+speration_3.action(12, "moi_trans_1    = 88.8 " )
+speration_3.action(13, "spi            = 300  " )
+speration_3.action(14, "fuel_flow_rate = 3.33 " )
+speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
+
+speration_3.action(16, "trick.add_event(speration_4)")
+speration_3.action(17, "speration_4.activate()")
+speration_3.action(18, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv1.txt')")
+speration_3.action(19, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+#############################################################
+#Event4:MECO
+speration_4=trick.new_event("speration_4")
+speration_4.set_cycle(0.05)
+speration_4.condition(0, "rkt.newton.get_dvbi() > 7613.5")
+speration_4.action(0, "rkt.propulsion.set_no_thrust()")
+speration_4.action(1, "rkt.propulsion.set_vmass0(0)")
+######################################################################################################
+
+trick.stop(880)

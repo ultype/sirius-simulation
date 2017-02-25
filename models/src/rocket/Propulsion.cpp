@@ -62,6 +62,21 @@ void Propulsion::set_input_thrust(double xcg0, double xcg1,
     this->spi            = spi;
 }
 
+void Propulsion::get_input_file_var(double xcg0, double xcg1,
+                                    double moi_roll0, double moi_roll1,
+                                    double moi_trans0, double moi_trans1,
+                                    double spi, double fuel_flow_rate)
+{
+    this->xcg_0          = xcg0;
+    this->xcg_1          = xcg1;
+    this->moi_roll_0     = moi_roll0;
+    this->moi_roll_1     = moi_roll1;
+    this->moi_trans_0    = moi_trans0;
+    this->moi_trans_1    = moi_trans1;
+    this->fuel_flow_rate = fuel_flow_rate;
+    this->spi            = spi;
+}
+
 void Propulsion::set_ltg_thrust(){
     this->thrust_state = LTG_THRUST;
 }
@@ -81,6 +96,7 @@ void Propulsion::propagate(double int_step)
             thrust = 0;
             fmasse = 0;
             //fmassr=0; //Somehow comment out in trick version
+            this->IBBB = get_IBBB0();
 
             break;
         case INPUT_THRUST:
@@ -176,7 +192,7 @@ double Propulsion::get_fmassr() { return fmassr; }
 
 Matrix Propulsion::get_IBBB() {
     Matrix IBBB(_IBBB);
-    return ~IBBB;
+    return IBBB;
 }
 
 arma::mat33 Propulsion::get_IBBB_() {
