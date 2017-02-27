@@ -10,7 +10,9 @@ PROGRAMMERS:
 *******************************************************************************/
 #include "aux/global_constants.hh"
 #include "aux/utility_header.hh"
+#include "aux/aux.hh"
 #include <ctime>
+#include "sim_services/include/simtime.h"
 
 struct GPS		/* GPS Weeks and Second of Week */
 {
@@ -42,41 +44,53 @@ struct CUC		/* CCSDS Unsegmented time Code */
 
 class time_management{
 
-public:
+	TRICK_INTERFACE(time_management);
 
-	void jddate(int jd,int i,int j,int k);
-	void doy2dom(unsigned int year, unsigned int doy, unsigned int *m, unsigned int *dom); /* Convert Day of year to Day of month */
-	void mjd_to_gps(double mjd, GPS *gpsptr); /* Transform MJD to GPS time format ONLY! No GPS to UTC correction */
-	void caldoy_to_gps(CALDATE *calptr, GPS *gpsptr); 
-	void mjd_to_caldate(double mjd, CALDATE *calptr);/* Create a CalDate using MJD. From Montenbruck C++ code. */
-	void gps_to_caldate(GPS *gpsptr, CALDATE *calptr);/* Leap seconds have *NOT* been taken into account */
-	void gps_increment(GPS *gpsptr, double sec); 
-	void increment(GPS *gpsptr, CALDATE *calptr, double sec);
-	void gps_to_utc(GPS *gpsptr, CALDATE *calptr);/* Leap seconds have been taken into account */
-	void utc_to_gps(CALDATE *calptr, GPS *gpsptr);
-	void unix_to_gps(time_t unix_time, GPS *gpsptr);
-	void cuc_to_gps(CUC *cucptr, GPS *gpsptr);
-	void gps_to_cuc(GPS *gpsptr, CUC *cucptr);
-	void gps_diff(GPS *gpsptr1, GPS *gpsptr2, GPS *gpsptr_out);/* Calculate 2 GPS time difference */
-	void dm_time(GPS *DM_current_gps_time, GPS *DM_current_utc_time, 
-						double DM_time, double &DM_Julian_Date);/* convert simulation time to gps time */
+	public:
+		time_management();
+		~time_management(){};
+		void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
 
-	int tai_utc(double mjd); /*Return the difference between TAI and UTC (known as leap seconds)*/
-	int jd(int i,int j,int k);
-	int ymd2day(int year,int month,int dayOfMonth);
-	int caldate_to_jdn(CALDATE *calptr);
+	private:
 
-	double gps_utc_diff(GPS *gpsptr);/* Calculate difference between GPS time & UTC time */
-	double caldate_to_mjd(CALDATE *calptr); 
-	double time_fmod(double a, double b);
-	double gps_to_mjd(GPS *gpsptr); /* Leap seconds have *NOT* been taken into account */
+		GPS gpstime;
+		CALDATE caldate;
 
-	unsigned int day2doy(unsigned int year, unsigned int month, unsigned int mday); /* Convert YY-MM-DD to Day of Year */
-	
-	time_t gps_to_unix(GPS *gpsptr);
 
-	float cuc_diff(CUC *cucptr1, CUC *cucptr2);
 
+
+		void jddate(int jd,int i,int j,int k);
+		void doy2dom(unsigned int year, unsigned int doy, unsigned int *m, unsigned int *dom); /* Convert Day of year to Day of month */
+		void mjd_to_gps(double mjd, GPS *gpsptr); /* Transform MJD to GPS time format ONLY! No GPS to UTC correction */
+		void caldoy_to_gps(CALDATE *calptr, GPS *gpsptr); 
+		void mjd_to_caldate(double mjd, CALDATE *calptr);/* Create a CalDate using MJD. From Montenbruck C++ code. */
+		void gps_to_caldate(GPS *gpsptr, CALDATE *calptr);/* Leap seconds have *NOT* been taken into account */
+		void gps_increment(GPS *gpsptr, double sec); 
+		void increment(GPS *gpsptr, CALDATE *calptr, double sec);
+		void gps_to_utc(GPS *gpsptr, CALDATE *calptr);/* Leap seconds have been taken into account */
+		void utc_to_gps(CALDATE *calptr, GPS *gpsptr);
+		void unix_to_gps(time_t unix_time, GPS *gpsptr);
+		void cuc_to_gps(CUC *cucptr, GPS *gpsptr);
+		void gps_to_cuc(GPS *gpsptr, CUC *cucptr);
+		void gps_diff(GPS *gpsptr1, GPS *gpsptr2, GPS *gpsptr_out);/* Calculate 2 GPS time difference */
+		void dm_time(GPS *DM_current_gps_time, GPS *DM_current_utc_time, 
+							double DM_time, double &DM_Julian_Date);/* convert simulation time to gps time */
+
+		int tai_utc(double mjd); /*Return the difference between TAI and UTC (known as leap seconds)*/
+		int jd(int i,int j,int k);
+		int ymd2day(int year,int month,int dayOfMonth);
+		int caldate_to_jdn(CALDATE *calptr);
+
+		double gps_utc_diff(GPS *gpsptr);/* Calculate difference between GPS time & UTC time */
+		double caldate_to_mjd(CALDATE *calptr); 
+		double time_fmod(double a, double b);
+		double gps_to_mjd(GPS *gpsptr); /* Leap seconds have *NOT* been taken into account */
+
+		unsigned int day2doy(unsigned int year, unsigned int month, unsigned int mday); /* Convert YY-MM-DD to Day of Year */
+		
+		time_t gps_to_unix(GPS *gpsptr);
+
+		float cuc_diff(CUC *cucptr1, CUC *cucptr2);
 };
 
 

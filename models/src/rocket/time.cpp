@@ -1,5 +1,18 @@
 #include "rocket/Time_management.hh"
 
+time_management::time_management()
+{
+    caldate.Year = 0;
+    caldate.DOY = 0;
+    caldate.Hour = 0;
+    caldate.Min = 0;
+    caldate.Sec = 0;
+    caldate.Day = 0;
+    caldate.Month = 0;
+
+    gpstime.Week = 0;
+    gpstime.SOW = 0;
+}
 
 double time_management::time_fmod(double a, double b)
 {
@@ -560,7 +573,7 @@ void time_management::dm_time(GPS *DM_current_gps_time, GPS *DM_current_utc_time
 
 int time_management::ymd2day(int year,int month,int dayOfMonth)  
 {
-        int dayOfYear;
+    int dayOfYear;
 
     int regu_month_day[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
     int leap_month_day[12] = {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335};
@@ -592,4 +605,16 @@ void time_management::jddate(int jd,int i,int j,int k)
         l = j/11;
         j = (int) (j + 2 - 12*l);
         i = (int) (100*(n-49) + i + l);
+}
+//Load simulation start time in Calender date form and UTC time and convert into gps time form
+void time_management::load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec)
+{
+    this->caldate.Year = Year;
+    this->caldate.DOY = DOY;
+    this->caldate.Hour = Hour;
+    this->caldate.Min = Min;
+    this->caldate.Sec = Sec;
+
+    caldoy_to_gps(&caldate, &gpstime);//convert into gps time
+    //cout<<gpstime.Week<<"\t"<<gpstime.SOW<<endl;
 }

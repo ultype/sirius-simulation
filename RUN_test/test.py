@@ -16,6 +16,16 @@ execfile("Modified_data/test.dr")
 # trick.itimer_enable()
 ##############################################################
 
+##############################################################
+#Set simulation start time
+Year = 2017
+DOY = 58
+Hour = 12
+Min = 54
+Sec = 0
+rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
+
+
 #SLV
 lonx       = 120.893501 # Vehicle longitude - deg  module newton
 latx       = 22.138917  # Vehicle latitude  - deg  module newton
