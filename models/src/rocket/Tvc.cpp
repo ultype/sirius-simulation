@@ -293,18 +293,5 @@ void TVC::set_factgtvc(double in) { factgtvc = in; }
 
 double TVC::get_parm() { return parm; }
 
-Matrix TVC::get_FPB() {
-    Matrix FPB(_FPB);
-    return FPB;
-}
-Matrix TVC::get_FMPB() {
-    Matrix FMPB(_FMPB);
-    return FMPB;
-}
-
-arma::vec3 TVC::get_FPB_() {
-    return FPB;
-}
-arma::vec3 TVC::get_FMPB_() {
-    return FMPB;
-}
+arma::vec3 TVC::get_FPB() { return FPB; }
+arma::vec3 TVC::get_FMPB() { return FMPB; }

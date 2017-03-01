@@ -52,18 +52,11 @@ class INS {
         double get_thtbdcx();
         double get_psibdcx();
 
-        Matrix get_SBIIC();
-        Matrix get_VBIIC();
-        Matrix get_WBICI();
-        Matrix get_EGRAVI();
-
-        Matrix get_TBIC();
-
-        arma::vec3 get_SBIIC_();
-        arma::vec3 get_VBIIC_();
-        arma::vec3 get_WBICI_();
-        arma::vec3 get_EGRAVI_();
-        arma::mat33 get_TBIC_();
+        arma::vec3 get_SBIIC();
+        arma::vec3 get_VBIIC();
+        arma::vec3 get_WBICI();
+        arma::vec3 get_EGRAVI();
+        arma::mat33 get_TBIC();
 
     private:
         /* Internal Getter */

@@ -94,10 +94,10 @@ void Kinematics::propagate(double int_step){
     double latx = newton->get_latx();
     double alt  = newton->get_alt();
 
-    arma::vec WBIB = euler->get_WBIB_();
-    arma::vec VAED = arma::vec3(environment->get_VAED().get_pbody());
+    arma::vec WBIB = euler->get_WBIB();
+    arma::vec VAED = environment->get_VAED();
 
-    arma::vec VBED = newton->get_VBED_();
+    arma::vec VBED = newton->get_VBED();
     arma::vec VBII = newton->get_VBII();
 
     propagate_TBI(int_step, WBIB);
@@ -257,22 +257,6 @@ double Kinematics::get_phibdx() {
     return DEG * phibd;
 }
 
-Matrix Kinematics::get_TBD() {
-    Matrix TBD(3, 3);
-    TBD.build_mat33(_TBD);
-    return ~TBD;
-}
+arma::mat Kinematics::get_TBD() { return TBD; }
 
-Matrix Kinematics::get_TBI() {
-    Matrix TBI(3, 3);
-    TBI.build_mat33(_TBI);
-    return ~TBI;
-}
-
-arma::mat Kinematics::get_TBD_() {
-    return TBD;
-}
-
-arma::mat Kinematics::get_TBI_() {
-    return TBI;
-}
+arma::mat Kinematics::get_TBI() { return TBI; }

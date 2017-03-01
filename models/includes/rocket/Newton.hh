@@ -49,15 +49,12 @@ class Newton {
         double get_dvbi();
         double get_thtvdx();
         double get_psivdx();
-        Matrix get_IPos();
-        Matrix get_IVel();
-        Matrix get_FSPB();
-        arma::vec3 get_FSPB_();
-        Matrix get_VBED();
 
-        arma::vec get_SBII();
-        arma::vec get_VBII();
-        arma::vec get_VBED_();
+        arma::vec3 get_FSPB();
+
+        arma::vec3 get_SBII();
+        arma::vec3 get_VBII();
+        arma::vec3 get_VBED();
 
         // XXX: Use getter and setters
         /* Interfacing Variabes */

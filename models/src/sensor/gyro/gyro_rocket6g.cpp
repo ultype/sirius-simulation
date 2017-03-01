@@ -27,8 +27,8 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
 }
 
 void sensor::GyroRocket6G::propagate_error(double int_step){
-    arma::vec3 WBIB = euler->get_WBIB_();
-    arma::vec3 FSPB = newton->get_FSPB_();
+    arma::vec3 WBIB = euler->get_WBIB();
+    arma::vec3 FSPB = newton->get_FSPB();
     //-------------------------------------------------------------------------
     // computing cluster misalignment error
     arma::mat33 EGB = diagmat(ESCALG) + skew_sym(EMISG);

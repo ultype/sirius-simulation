@@ -55,7 +55,7 @@ _Euler_& _Euler_::operator=(const _Euler_& other){
 }
 
 void _Euler_::load_angular_velocity(double ppx, double qqx, double rrx){
-    arma::mat33 TBI = kinematics->get_TBI_();
+    arma::mat33 TBI = kinematics->get_TBI();
 
     //body rate wrt Earth frame in body coordinates
     this->WBEB = {ppx * RAD, qqx * RAD, rrx * RAD};
@@ -73,13 +73,11 @@ void _Euler_::default_data(){
 
 void _Euler_::propagate(double int_step)
 {
-    arma::vec3 FMB(forces->get_FMB().get_pbody());
+    arma::vec3 FMB = forces->get_FMB();
 
-    // XXX: Trans
-    arma::mat33 IBBB = (propulsion->get_IBBB().get_pbody());
-    IBBB = trans(IBBB);
+    arma::mat33 IBBB = propulsion->get_IBBB();
 
-    arma::mat33 TBI = kinematics->get_TBI_();
+    arma::mat33 TBI = kinematics->get_TBI();
 
     propagate_WBIB(int_step, FMB, IBBB);
 
@@ -113,24 +111,8 @@ void _Euler_::update_diagnostic_attributes(double int_step){
 }
 
 double _Euler_::get_ppx() { return this->WBEB(0) * DEG; }
-
 double _Euler_::get_qqx() { return this->WBEB(1) * DEG; }
-
 double _Euler_::get_rrx() { return this->WBEB(2) * DEG; }
 
-arma::vec3 _Euler_::get_WBII_() { return this->WBII; }
-
-arma::vec3 _Euler_::get_WBIB_() { return this->WBIB; }
-
-Matrix _Euler_::get_WBII()
-{
-    Matrix WBII(_WBII);
-    return WBII;
-}
-
-Matrix _Euler_::get_WBIB()
-{
-    Matrix WBIB(_WBIB);
-    return WBIB;
-}
-
+arma::vec3 _Euler_::get_WBII() { return this->WBII; }
+arma::vec3 _Euler_::get_WBIB() { return this->WBIB; }

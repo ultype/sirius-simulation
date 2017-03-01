@@ -377,6 +377,8 @@ public:
     Matrix vec9_mat33();
 };
 
+arma::vec3 pol_from_cart(arma::vec3 in);
+
 // Module utility functions
 
 /// @return the sign of the function

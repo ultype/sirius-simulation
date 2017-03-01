@@ -7,6 +7,6 @@ sensor::AccelerometerIdeal::AccelerometerIdeal(Newton &newt)
 }
 
 void sensor::AccelerometerIdeal::propagate_error(double int_step){
-    this->FSPCB = newton->get_FSPB_();
+    this->FSPCB = newton->get_FSPB();
     this->EFSPB.zeros();
 }

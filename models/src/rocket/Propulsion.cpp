@@ -174,11 +174,4 @@ double Propulsion::get_xcg() { return xcg; }
 double Propulsion::get_thrust() { return thrust; }
 double Propulsion::get_fmassr() { return fmassr; }
 
-Matrix Propulsion::get_IBBB() {
-    Matrix IBBB(_IBBB);
-    return ~IBBB;
-}
-
-arma::mat33 Propulsion::get_IBBB_() {
-    return IBBB;
-}
+arma::mat33 Propulsion::get_IBBB() { return IBBB; }

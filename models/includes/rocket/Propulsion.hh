@@ -46,8 +46,8 @@ class Propulsion{
         double get_xcg();
         double get_thrust();
         double get_fmassr();
-        Matrix get_IBBB();
-        arma::mat33 get_IBBB_();
+
+        arma::mat33 get_IBBB();
 
         /* Input File */
         void set_vmass0(double);

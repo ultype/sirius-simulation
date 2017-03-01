@@ -168,7 +168,7 @@ void AeroDynamics::aerodynamics_der(){
     double gtvc   = tvc->get_gtvc();
     double parm   = tvc->get_parm();
 
-    arma::mat33 IBBB = propulsion->get_IBBB_();
+    arma::mat33 IBBB = propulsion->get_IBBB();
 
     //MOI components
     double ibbb11 = IBBB(0,0);

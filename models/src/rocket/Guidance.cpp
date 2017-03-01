@@ -60,7 +60,10 @@ void Guidance::guidance(double int_step)
 
     int mprop = propulsion->get_mprop();
     Matrix UTBC(utbc);
-    Matrix TBIC = ins->get_TBIC();
+    //XXX: Fix me
+    Matrix TBIC(3, 3);
+    memcpy(TBIC.get_pbody(), ins->get_TBIC().memptr(), sizeof(double) * 9);
+    TBIC = ~TBIC;
     //-------------------------------------------------------------------------
     // zeroing UTBC,if no guidance
     if (mguide == 0)
@@ -179,9 +182,14 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
     double dvbi = newton->get_dvbi();
     double thtvdx = newton->get_thtvdx();
     double fmassr = propulsion->get_fmassr();
-    Matrix VBIIC = ins->get_VBIIC();
-    Matrix SBIIC = ins->get_SBIIC();
-    Matrix TBIC = ins->get_TBIC();
+    Matrix VBIIC = Matrix(ins->get_VBIIC().memptr());
+    Matrix SBIIC = Matrix(ins->get_SBIIC().memptr());
+
+    //XXX: Fix me
+    Matrix TBIC(3, 3);
+    memcpy(TBIC.get_pbody(), ins->get_TBIC().memptr(), sizeof(double) * 9);
+    TBIC = ~TBIC;
+
     Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
     //-------------------------------------------------------------------------
     // preparing necessary variables

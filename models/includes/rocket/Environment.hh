@@ -53,10 +53,8 @@ class Environment{
         double get_grav();
         double get_press();
 
-        Matrix get_GRAVG();
-        Matrix get_VAED();
-        arma::vec3 get_GRAVG_();
-        arma::vec3 get_VAED_();
+        arma::vec3 get_GRAVG();
+        arma::vec3 get_VAED();
 
     private:
         /* Internal Getter */

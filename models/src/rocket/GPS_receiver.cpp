@@ -126,7 +126,7 @@ void GPS_Receiver::get_quadriga(){
     Matrix SBII(3, 1);
     int visible_count(0);
 
-    SBII.build_vec3(newton->get_IPos()[0], newton->get_IPos()[1], newton->get_IPos()[2]);
+    SBII.build_vec3(newton->get_SBII()[0], newton->get_SBII()[1], newton->get_SBII()[2]);
 
     for (i = 0; i < 24; i++) {
         SSII[0] = ssii[i][0];
@@ -448,14 +448,14 @@ void GPS_Receiver::measure(){
 
         Matrix SBII(3, 1);
         Matrix VBII(3, 1);
-        Matrix WBII = euler->get_WBII();
-        SBII.build_vec3(newton->get_IPos()[0], newton->get_IPos()[1], newton->get_IPos()[2]);
-        VBII.build_vec3(newton->get_IVel()[0], newton->get_IVel()[1], newton->get_IVel()[2]);
+        Matrix WBII = Matrix(euler->get_WBII().memptr());
+        SBII.build_vec3(newton->get_SBII()[0], newton->get_SBII()[1], newton->get_SBII()[2]);
+        VBII.build_vec3(newton->get_VBII()[0], newton->get_VBII()[1], newton->get_VBII()[2]);
 
 
-        Matrix SBIIC = ins->get_SBIIC();
-        Matrix VBIIC = ins->get_VBIIC();
-        Matrix WBICI = ins->get_WBICI();
+        Matrix SBIIC = Matrix(ins->get_SBIIC().memptr());
+        Matrix VBIIC = Matrix(ins->get_VBIIC().memptr());
+        Matrix WBICI = Matrix(ins->get_WBICI().memptr());
 
         // calculating true range to SV
         Matrix SSBI(3, 1);

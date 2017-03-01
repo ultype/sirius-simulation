@@ -383,7 +383,7 @@ void INS::update(double int_step){
     double time      = get_rettime();
     arma::vec3 SBII  = newton->get_SBII();
     arma::vec3 VBII  = newton->get_VBII();
-    arma::mat33 TBI  = kinematics->get_TBI_();
+    arma::mat33 TBI  = kinematics->get_TBI();
 
     int mroll = 0; // Ambiguous
 
@@ -468,31 +468,8 @@ double INS::get_phibdcx() { return phibdcx; }
 double INS::get_thtbdcx() { return thtbdcx; }
 double INS::get_psibdcx() { return psibdcx; }
 
-Matrix INS::get_SBIIC() {
-    Matrix SBIIC(_SBIIC);
-    return SBIIC;
-}
-Matrix INS::get_VBIIC() {
-    Matrix VBIIC(_VBIIC);
-    return VBIIC;
-}
-Matrix INS::get_WBICI() {
-    Matrix WBICI(_WBICI);
-    return WBICI;
-}
-Matrix INS::get_EGRAVI() {
-    Matrix EGRAVI(_EGRAVI);
-    return EGRAVI;
-}
-
-Matrix INS::get_TBIC() {
-    Matrix TBIC(3, 3);
-    TBIC.build_mat33(_TBIC);
-    return ~TBIC;
-}
-
-arma::vec3 INS::get_SBIIC_() { return SBIIC; }
-arma::vec3 INS::get_VBIIC_() { return VBIIC; }
-arma::vec3 INS::get_WBICI_() { return WBICI; }
-arma::vec3 INS::get_EGRAVI_() { return EGRAVI; }
-arma::mat33 INS::get_TBIC_() { return TBIC; }
+arma::vec3 INS::get_SBIIC() { return SBIIC; }
+arma::vec3 INS::get_VBIIC() { return VBIIC; }
+arma::vec3 INS::get_WBICI() { return WBICI; }
+arma::vec3 INS::get_EGRAVI() { return EGRAVI; }
+arma::mat33 INS::get_TBIC() { return TBIC; }

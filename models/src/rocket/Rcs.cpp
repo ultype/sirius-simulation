@@ -267,18 +267,5 @@ void RCS::set_rcs_pos(double in) { rcs_pos = in; }
 
 enum RCS::RCS_MODE RCS::get_rcs_mode() { return rcs_mode; }
 
-Matrix RCS::get_FMRCS() {
-    Matrix FMRCS(_FMRCS);
-    return FMRCS;
-}
-Matrix RCS::get_FARCS() {
-    Matrix FARCS(_FARCS);
-    return FARCS;
-}
-
-arma::vec3 RCS::get_FMRCS_(){
-    return FMRCS;
-}
-arma::vec3 RCS::get_FARCS_(){
-    return FARCS;
-}
+arma::vec3 RCS::get_FMRCS(){ return FMRCS; }
+arma::vec3 RCS::get_FARCS(){ return FARCS; }

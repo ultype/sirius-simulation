@@ -113,11 +113,11 @@ void Environment::set_wind_turbulunce(double turb_length, double turb_sigma,
 }
 
 void Environment::propagate(double int_step) {
-    arma::vec3 VBED = newton->get_VBED_();
+    arma::vec3 VBED = newton->get_VBED();
     arma::vec3 SBII = newton->get_SBII();
     double alt = newton->get_alt();
 
-    arma::mat TBD = kinematics->get_TBD_();
+    arma::mat TBD = kinematics->get_TBD();
     double alppx = kinematics->get_alppx();
     double phipx = kinematics->get_phipx();
 
@@ -155,15 +155,5 @@ double Environment::get_dvba() { return dvba; }
 
 double Environment::get_grav() { return norm(GRAVG); }
 
-arma::vec3 Environment::get_GRAVG_() { return GRAVG; }
-arma::vec3 Environment::get_VAED_() { return wind->get_VAED(); }
-
-Matrix Environment::get_GRAVG() {
-    Matrix GRAVG(_GRAVG);
-    return GRAVG;
-}
-Matrix Environment::get_VAED() {
-    Matrix VAED(wind->get_VAED().memptr());
-    return VAED;
-}
-
+arma::vec3 Environment::get_GRAVG() { return GRAVG; }
+arma::vec3 Environment::get_VAED() { return wind->get_VAED(); }

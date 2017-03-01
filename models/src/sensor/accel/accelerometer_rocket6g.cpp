@@ -17,7 +17,7 @@ sensor::AccelerometerRocket6G::AccelerometerRocket6G(double emisa[3], double esc
 }
 
 void sensor::AccelerometerRocket6G::propagate_error(double int_step){
-    arma::vec3 FSPB = newton->get_FSPB_();
+    arma::vec3 FSPB = newton->get_FSPB();
 
     // accelerometer error (bias,scale factor,misalignment)
     // acceleration measurement with random walk effect

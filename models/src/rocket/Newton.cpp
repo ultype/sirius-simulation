@@ -137,7 +137,7 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
 
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
     arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
-    arma::mat33 TBD = kinematics->get_TBD_();
+    arma::mat33 TBD = kinematics->get_TBD();
     //Geodetic velocity
     arma::mat VBED = trans(TBD) * VBEB;
 
@@ -146,7 +146,7 @@ void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
 
 void Newton::propagate(double int_step){
     double vmass = propulsion->get_vmass();
-    arma::vec3 FAPB(forces->get_fapb_ptr());
+    arma::vec3 FAPB = forces->get_FAPB();
 
     this->FSPB = calculate_fspb(FAPB, vmass);
 
@@ -164,9 +164,9 @@ arma::vec3 Newton::calculate_fspb(arma::vec3 FAPB, double vmass){
 void Newton::propagate_position_speed_acceleration(double int_step){
     double lon, lat, al;
 
-    arma::mat33 TBI(kinematics->get_TBI_());
+    arma::mat33 TBI = kinematics->get_TBI();
 
-    arma::vec3 GRAVG = environment->get_GRAVG_();
+    arma::vec3 GRAVG = environment->get_GRAVG();
 
     /* Prograte S, V, A status */
     arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
@@ -186,8 +186,7 @@ void Newton::propagate_position_speed_acceleration(double int_step){
 }
 
 void Newton::propagate_aeroloss(double int_step){
-    //XXX: Need fixing
-    arma::vec3 FAP(forces->get_fap_ptr());
+    arma::vec3 FAP = forces->get_FAP();
 
     //calculate aero loss`:`
     FAP = FAP * (1. / propulsion->get_vmass());
@@ -235,52 +234,17 @@ void Newton::orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi)
 }
 
 double Newton::get_alt() { return alt; }
-
 double Newton::get_lonx() { return lonx; }
-
 double Newton::get_latx() { return latx; }
 
-Matrix Newton::get_IPos() { return Matrix(_SBII); }
-
-Matrix Newton::get_IVel() { return Matrix(_VBII); }
-
-/* Use stored Value due to coherence with other models */
-Matrix Newton::get_FSPB() { return Matrix(_FSPB); }
-
-arma::vec3 Newton::get_FSPB_() { return FSPB; }
-
-Matrix Newton::get_VBED() {
-    arma::mat VBED = TDI * (VBII - WEII * SBII);
-
-    Matrix __VBED(VBED.memptr());
-    return __VBED;
-}
-
-arma::vec Newton::get_VBED_() {
-    arma::mat VBED = TDI * (VBII - WEII * SBII);
-
-    return VBED;
-}
-
 double Newton::get_dbi() { return norm(SBII); }
-
 double Newton::get_dvbi() { return norm(VBII); }
+double Newton::get_dvbe() { return pol_from_cart(get_VBED())(0); }
+double Newton::get_thtvdx(){ return DEG * pol_from_cart(get_VBED())(2); }
+double Newton::get_psivdx(){ return DEG * pol_from_cart(get_VBED())(1); }
 
-double Newton::get_dvbe(){
-    Matrix VBED = get_VBED();
-    return VBED.pol_from_cart().get_loc(0, 0);
-}
-
-double Newton::get_thtvdx(){
-    Matrix VBED = get_VBED();
-    return DEG * VBED.pol_from_cart().get_loc(2, 0);
-}
-
-double Newton::get_psivdx(){
-    Matrix VBED = get_VBED();
-    return DEG * VBED.pol_from_cart().get_loc(1, 0);
-}
-
-arma::vec Newton::get_VBII() { return VBII; }
-
-arma::vec Newton::get_SBII() { return SBII; }
+arma::vec3 Newton::get_VBED() { return TDI * (VBII - WEII * SBII); }
+arma::vec3 Newton::get_VBII() { return VBII; }
+arma::vec3 Newton::get_SBII() { return SBII; }
+/* Use stored Value due to coherence with other models */
+arma::vec3 Newton::get_FSPB() { return FSPB; }

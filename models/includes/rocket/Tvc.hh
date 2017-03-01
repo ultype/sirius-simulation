@@ -55,11 +55,9 @@ class TVC {
         void set_factgtvc(double in);
 
         double get_parm();
-        Matrix get_FPB();
-        Matrix get_FMPB();
 
-        arma::vec3 get_FPB_();
-        arma::vec3 get_FMPB_();
+        arma::vec3 get_FPB();
+        arma::vec3 get_FMPB();
 
     private:
         /* Internal Getter */

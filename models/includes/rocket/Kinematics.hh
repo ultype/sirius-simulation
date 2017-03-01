@@ -32,10 +32,9 @@ class Kinematics{
         void propagate(double int_step);
         void update_diagnostic_attributes(double int_step);
 
-        Matrix get_TBD();
-        Matrix get_TBI();
-        arma::mat get_TBD_();
-        arma::mat get_TBI_();
+        arma::mat get_TBD();
+        arma::mat get_TBI();
+
         double get_alppx();
         double get_phipx();
         double get_alphax();

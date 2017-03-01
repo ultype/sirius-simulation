@@ -57,8 +57,8 @@ void Forces::collect_forces_and_propagate(){
 
     bool rcs_enabled            = rcs->isEnabled();
     enum RCS::RCS_MODE rcs_mode = rcs->get_rcs_mode();
-    arma::vec3 FMRCS            = rcs->get_FMRCS_();
-    arma::vec3 FARCS            = rcs->get_FARCS_();
+    arma::vec3 FMRCS            = rcs->get_FMRCS();
+    arma::vec3 FARCS            = rcs->get_FARCS();
 
     double refa = aerodynamics->get_refa();
     double refd = aerodynamics->get_refd();
@@ -70,8 +70,8 @@ void Forces::collect_forces_and_propagate(){
     double cz   = aerodynamics->get_cz();
 
     enum TVC::TVC_TYPE mtvc = tvc->get_mtvc();
-    arma::vec3 FPB          = tvc->get_FPB_();
-    arma::vec3 FMPB         = tvc->get_FMPB_();
+    arma::vec3 FPB          = tvc->get_FPB();
+    arma::vec3 FMPB         = tvc->get_FMPB();
     /*************************************************************/
 
     //total non-gravitational forces
@@ -101,24 +101,6 @@ void Forces::collect_forces_and_propagate(){
     }
 }
 
-double* Forces::get_fapb_ptr() { return _FAPB; }
-double* Forces::get_fap_ptr() { return _FAP; }
-
-Matrix Forces::get_FAPB() {
-    Matrix FAPB(_FAPB);
-    return FAPB;
-}
-
-Matrix Forces::get_FAP() {
-    Matrix FAP(_FAP);
-    return FAP;
-}
-
-Matrix Forces::get_FMB() {
-    Matrix FMB(_FMB);
-    return FMB;
-}
-
-arma::vec Forces::get_FAPB_() { return FAPB; }
-arma::vec Forces::get_FAP_() { return FAP; }
-arma::vec Forces::get_FMB_() { return FMB; }
+arma::vec Forces::get_FAPB() { return FAPB; }
+arma::vec Forces::get_FAP() { return FAP; }
+arma::vec Forces::get_FMB() { return FMB; }

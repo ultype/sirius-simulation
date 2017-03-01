@@ -1109,6 +1109,41 @@ Matrix Matrix::pol_from_cart()
 
     return POLAR;
 }
+
+arma::vec3 pol_from_cart(arma::vec3 in)
+{
+    double d = 0.0;
+    double azimuth = 0.0;
+    double elevation = 0.0;
+    double denom;
+    arma::vec3 POLAR;
+
+    double v1 = in(0);
+    double v2 = in(1);
+    double v3 = in(2);
+
+    d = sqrt(v1 * v1 + v2 * v2 + v3 * v3);
+    azimuth = atan2(v2, v1);
+
+    denom = sqrt(v1 * v1 + v2 * v2);
+    if (denom > 0.)
+        elevation = atan2(-v3, denom);
+    else {
+        if (v3 > 0)
+            elevation = -PI / 2.;
+        if (v3 < 0)
+            elevation = PI / 2.;
+        if (v3 == 0)
+            elevation = 0.;
+    }
+
+    POLAR(0) = d;
+    POLAR(1) = azimuth;
+    POLAR(2) = elevation;
+
+    return POLAR;
+}
+
 /*
 ///////////////////////////////////////////////////////////////////////////////
 //Puts # of cols into private member Matrix::col_num of MAT

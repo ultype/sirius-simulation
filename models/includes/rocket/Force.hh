@@ -38,16 +38,9 @@ class Forces {
 
         void collect_forces_and_propagate();
 
-        Matrix get_FAPB();
-        arma::vec get_FAPB_();
-        double* get_fapb_ptr();
-
-        Matrix get_FAP();
-        arma::vec get_FAP_();
-        double* get_fap_ptr();
-
-        Matrix get_FMB();
-        arma::vec get_FMB_();
+        arma::vec get_FAPB();
+        arma::vec get_FAP();
+        arma::vec get_FMB();
 
     private:
         /* Internal Getter */

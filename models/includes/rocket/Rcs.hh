@@ -52,11 +52,8 @@ class RCS {
         void set_mode(enum RCS_MODE);
         enum RCS_MODE get_rcs_mode();
 
-        Matrix get_FMRCS();
-        Matrix get_FARCS();
-
-        arma::vec3 get_FMRCS_();
-        arma::vec3 get_FARCS_();
+        arma::vec3 get_FMRCS();
+        arma::vec3 get_FARCS();
 
         /* Input File */
         void set_rcs_tau(double);
