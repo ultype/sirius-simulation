@@ -62,7 +62,7 @@ class Rocket_SimObject : public Trick::SimObject {
         _Euler_ euler;
 
         Kinematics kinematics;
-        Forces force;
+        Forces forces;
 
         AeroDynamics aerodynamics;
         Propulsion propulsion;
@@ -78,15 +78,16 @@ class Rocket_SimObject : public Trick::SimObject {
         Actuator actuator;
 
         Rocket_SimObject() 
-            :   newton      ( kinematics , euler        , env          , propulsion   , force ) ,
+            :   newton      ( kinematics , euler        , env          , propulsion   , forces ) ,
                 kinematics  ( newton     , env          , euler )      ,
-                euler       ( kinematics , propulsion   , force )      ,
+                euler       ( kinematics , propulsion   , forces )     ,
                 env         ( newton     , aerodynamics , kinematics ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton  , tvc ) ,
                 ins         ( newton     , euler        , env          , kinematics   , gpsr )  ,
                 tvc         ( env        , kinematics   , control      , propulsion ) ,
-                rcs         ( ins        , guidance     , propulsion )
+                rcs         ( ins        , guidance     , propulsion ) ,
+                forces      ( env        , propulsion   , rcs          , aerodynamics , tvc )
             {
             ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
@@ -103,7 +104,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") rcs.initialize();
             ("initialization") actuator.initialize(&control);
             ("initialization") propulsion.initialize();
-            ("initialization") force.init_force(&env, &propulsion, &rcs, &aerodynamics, &tvc);
+            ("initialization") forces.initialize();
 
             (0.001, "scheduled") gpsr.update_markov(0.001);
             (0.001, "scheduled") kinematics.propagate(0.001);
@@ -119,7 +120,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "scheduled") tvc.actuate(0.001);
             (0.05, "scheduled") rcs.actuate();
             (0.001, "scheduled") rcs.rcs_schmitt_thrust();
-            (0.001, "scheduled") force.forces();
+            (0.001, "scheduled") forces.collect_forces_and_propagate();
             (0.001, "scheduled") newton.propagate(0.001);
             (0.001, "scheduled") euler.propagate(0.001);
 

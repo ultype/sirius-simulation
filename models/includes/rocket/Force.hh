@@ -23,31 +23,64 @@ class RCS;
 class TVC;
 class Environment;
 
-class Forces{
+class Forces {
+    TRICK_INTERFACE(Forces);
+
     public:
         Forces(){};
-         void init_force(Environment* env, Propulsion* prop, RCS* rcs
-             , AeroDynamics* aero, TVC* tvc);
-         void forces();
 
-         Environment *environment;
-         Propulsion *propulsion;
-         RCS *rcs;
-         AeroDynamics *Aerodynamics;
-         TVC *tvc;
+        Forces(Environment& env, Propulsion& prop, RCS& rcs, AeroDynamics& aero, TVC& tvc);
+        Forces(const Forces& other);
 
-         Matrix get_FAPB();
-         double* get_fapb_ptr();
+        Forces& operator=(const Forces& other);
 
-         Matrix get_FAP();
-         double* get_fap_ptr();
+        void initialize();
 
-         Matrix get_FMB();
+        void collect_forces_and_propagate();
+
+        Matrix get_FAPB();
+        arma::vec get_FAPB_();
+        double* get_fapb_ptr();
+
+        Matrix get_FAP();
+        arma::vec get_FAP_();
+        double* get_fap_ptr();
+
+        Matrix get_FMB();
+        arma::vec get_FMB_();
 
     private:
-        double fapb[3];         /* *io (N)      Aerodynamic and propulsion forces in body axes */
-        double fap[3];          /* *io (N)      Aerodynamic force in body axes */
-        double fmb[3];          /* *io (N*m)    Aerodynamic and propulsion moment in body axes */
+        /* Internal Getter */
+
+        /* Internal Initializers */
+        void default_data();
+
+        /* Internal Propagator / Calculators */
+
+        /* Internal Calculators */
+
+        /* Routing references */
+        Environment  * environment;
+        Propulsion   * propulsion;
+        RCS          * rcs;
+        AeroDynamics * aerodynamics;
+        TVC          * tvc;
+
+        /* Input */
+
+        /* Constants */
+
+        /* Propagative Stats */
+
+        /* Generating Outputs */
+        arma::vec FAPB;         /* *o (N)      Aerodynamic and propulsion forces in body axes */
+        double _FAPB[3];        /* *o (N)      Aerodynamic and propulsion forces in body axes */
+
+        arma::vec FAP;          /* *o (N)      Aerodynamic force in body axes */
+        double _FAP[3];         /* *o (N)      Aerodynamic force in body axes */
+
+        arma::vec FMB;          /* *o (N*m)    Aerodynamic and propulsion moment in body axes */
+        double _FMB[3];         /* *o (N*m)    Aerodynamic and propulsion moment in body axes */
 
 };
 
