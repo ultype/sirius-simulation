@@ -23,6 +23,40 @@ RCS::RCS(const RCS& other)
         VECTOR_INIT(FARCS, 3)
 {
     this->default_data();
+
+    this->roll_schi = other.roll_schi;
+    this->pitch_schi = other.pitch_schi;
+    this->yaw_schi = other.yaw_schi;
+
+    this->thtbdcomx = other.thtbdcomx;
+    this->psibdcomx = other.psibdcomx;
+    this->phibdcomx = other.phibdcomx;
+
+    this->rcs_type = other.rcs_type;
+    this->rcs_mode = other.rcs_mode;
+
+    this->rcs_tau       = other.rcs_tau;
+    this->roll_mom_max  = other.roll_mom_max;
+    this->pitch_mom_max = other.pitch_mom_max;
+    this->yaw_mom_max   = other.yaw_mom_max;
+    this->rcs_thrust    = other.rcs_thrust;
+    this->rocket_r      = other.rocket_r;
+    this->rcs_pos       = other.rcs_pos;
+
+    this->FMRCS = other.FMRCS;
+    this->FARCS = other.FARCS;
+
+    this->e_roll  = other.e_roll;
+    this->e_pitch = other.e_pitch;
+    this->e_yaw   = other.e_yaw;
+
+    this->o_roll  = other.o_roll;
+    this->o_pitch = other.o_pitch;
+    this->o_yaw   = other.o_yaw;
+
+    this->roll_count  = other.roll_count;
+    this->pitch_count = other.pitch_count;
+    this->yaw_count   = other.yaw_count;
 }
 
 RCS& RCS::operator=(const RCS& other){
@@ -32,6 +66,40 @@ RCS& RCS::operator=(const RCS& other){
     this->ins = other.ins;
     this->guidance = other.guidance;
     this->propulsion = other.propulsion;
+
+    this->roll_schi = other.roll_schi;
+    this->pitch_schi = other.pitch_schi;
+    this->yaw_schi = other.yaw_schi;
+
+    this->thtbdcomx = other.thtbdcomx;
+    this->psibdcomx = other.psibdcomx;
+    this->phibdcomx = other.phibdcomx;
+
+    this->rcs_type = other.rcs_type;
+    this->rcs_mode = other.rcs_mode;
+
+    this->rcs_tau       = other.rcs_tau;
+    this->roll_mom_max  = other.roll_mom_max;
+    this->pitch_mom_max = other.pitch_mom_max;
+    this->yaw_mom_max   = other.yaw_mom_max;
+    this->rcs_thrust    = other.rcs_thrust;
+    this->rocket_r      = other.rocket_r;
+    this->rcs_pos       = other.rcs_pos;
+
+    this->FMRCS = other.FMRCS;
+    this->FARCS = other.FARCS;
+
+    this->e_roll  = other.e_roll;
+    this->e_pitch = other.e_pitch;
+    this->e_yaw   = other.e_yaw;
+
+    this->o_roll  = other.o_roll;
+    this->o_pitch = other.o_pitch;
+    this->o_yaw   = other.o_yaw;
+
+    this->roll_count  = other.roll_count;
+    this->pitch_count = other.pitch_count;
+    this->yaw_count   = other.yaw_count;
 
     return *this;
 }
