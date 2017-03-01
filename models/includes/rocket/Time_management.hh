@@ -50,11 +50,16 @@ class time_management{
 		time_management();
 		~time_management(){};
 		void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
+		void dm_time();/* convert simulation time to gps time */
 
 	private:
 
 		GPS gpstime;
+		GPS utctime;
 		CALDATE caldate;
+
+		double Julian_Date;
+
 
 
 
@@ -73,8 +78,7 @@ class time_management{
 		void cuc_to_gps(CUC *cucptr, GPS *gpsptr);
 		void gps_to_cuc(GPS *gpsptr, CUC *cucptr);
 		void gps_diff(GPS *gpsptr1, GPS *gpsptr2, GPS *gpsptr_out);/* Calculate 2 GPS time difference */
-		void dm_time(GPS *DM_current_gps_time, GPS *DM_current_utc_time, 
-							double DM_time, double &DM_Julian_Date);/* convert simulation time to gps time */
+		
 
 		int tai_utc(double mjd); /*Return the difference between TAI and UTC (known as leap seconds)*/
 		int jd(int i,int j,int k);

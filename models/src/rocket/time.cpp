@@ -554,21 +554,23 @@ double time_management::gps_utc_diff(GPS *gpsptr)
 	return (gps_utc);
 }
 
-void time_management::dm_time(GPS *DM_current_gps_time, GPS *DM_current_utc_time, double DM_time, double &DM_Julian_Date)/* convert simulation time to gps time */
+void time_management::dm_time()/* convert simulation time to gps time */
 {
 	
 	/* Get current GPS time */
 	/* deduct DM_dt because PV comes from dm_att() output of previous cycle */
-	gps_increment(DM_current_gps_time, DM_time);
+	gps_increment(&gpstime, 0.001);
 
-	DM_current_utc_time->Week = DM_current_gps_time->Week;
-	DM_current_utc_time->SOW  = DM_current_gps_time->SOW;
+	utctime.Week = gpstime.Week;
+	utctime.SOW  = gpstime.SOW;
 
 	/* Convert GPS time to UTC time, UTC < GPS */
-	gps_increment(DM_current_utc_time, -gps_utc_diff(DM_current_gps_time));
+	gps_increment(&utctime, -gps_utc_diff(&gpstime));
 
 	/* Convert GPS time to MJD & JD time */
-	DM_Julian_Date = gps_to_mjd(DM_current_utc_time) + 2400000.5;	/* DM_Julian_Date : Julian Date */
+	Julian_Date = gps_to_mjd(&utctime) + 2400000.5;	/* DM_Julian_Date : Julian Date */
+    gps_to_caldate(&gpstime, &caldate);
+    cout<<"Year: "<<caldate.Year<<'\t'<<"Month: "<<caldate.Month<<'\t'<<"Day: "<<caldate.Day<<'\t'<<"Min: "<<caldate.Min<<'\t'<<"Sec: "<<caldate.Sec<<endl;
 }
 
 int time_management::ymd2day(int year,int month,int dayOfMonth)  
