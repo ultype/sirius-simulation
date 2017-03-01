@@ -18,6 +18,10 @@ Forces::Forces(const Forces& other)
         VECTOR_INIT(FMB, 3)
 {
     this->default_data();
+
+    this->FAP = other.FAP;
+    this->FAPB = other.FAPB;
+    this->FMB = other.FMB;
 }
 
 Forces& Forces::operator=(const Forces& other){
@@ -29,6 +33,10 @@ Forces& Forces::operator=(const Forces& other){
     this->rcs = other.rcs;
     this->aerodynamics = other.aerodynamics;
     this->tvc = other.tvc;
+
+    this->FAP = other.FAP;
+    this->FAPB = other.FAPB;
+    this->FMB = other.FMB;
 
     return *this;
 }
