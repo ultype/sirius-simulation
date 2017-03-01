@@ -37,8 +37,7 @@ void Forces::default_data(){
 }
 
 
-void Forces::initialize()
-{
+void Forces::initialize(){
 }
 
 void Forces::collect_forces_and_propagate(){
@@ -68,36 +67,30 @@ void Forces::collect_forces_and_propagate(){
     /*************************************************************/
 
     //total non-gravitational forces
-    FAPB(0, 0) = pdynmc*refa*cx;
-    FAPB(1, 0) = pdynmc*refa*cy;
-    FAPB(2, 0) = pdynmc*refa*cz;
+    FAPB = pdynmc * refa * arma::vec({cx, cy, cz});
 
     //aerodynamic loss
-    FAP(0, 0) = pdynmc*refa*cx;
-    FAP(1, 0) = pdynmc*refa*cy;
-    FAP(2, 0) = pdynmc*refa*cz;
+    FAP = pdynmc * refa * arma::vec({cx, cy, cz});
 
     //aerodynamic moment
-    FMB(0, 0) = pdynmc*refa*refd*cll;
-    FMB(1, 0) = pdynmc*refa*refd*clm;
-    FMB(2, 0) = pdynmc*refa*refd*cln;
+    FMB = pdynmc * refa * refd * arma::vec({cll, clm, cln});
 
     //adding thrust modified by TVC or otherwise just plain thrust if mprop > 0
     if(mtvc != TVC::NO_TVC){
-        FAPB=FAPB+FPB;
-        FMB=FMB+FMPB;
+        FAPB += FPB;
+        FMB += FMPB;
+    }else if(thrust_type != Propulsion::NO_THRUST){
+        FAPB(0) += thrust;
     }
-    else if(thrust_type != Propulsion::NO_THRUST)
-        FAPB[0]=FAPB[0]+thrust;
 
     //adding force components from RCS
     //if(rcs_enabled && (rcs_mode == ALL_GEODETIC_EULUR_ANGLE_CONTROL || rcs_mode = THRUST_VECTOR_DIRECTION_AND_ROLL_ANGLE_CONTROL))
         //FAPB=FAPB+FARCS;
 
     //adding moment components from RCS
-    if(rcs_enabled && rcs_mode != RCS::GEODETIC_YAW_ANGLE_CONTROL)
-        FMB=FMB+FMRCS;
-
+    if(rcs_enabled && rcs_mode != RCS::GEODETIC_YAW_ANGLE_CONTROL){
+        FMB += FMRCS;
+    }
 }
 
 double* Forces::get_fapb_ptr() { return _FAPB; }
