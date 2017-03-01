@@ -58,11 +58,7 @@ class RCS {
         arma::vec3 get_FMRCS_();
         arma::vec3 get_FARCS_();
 
-        // XXX: backward capability
-        int get_mrcs_moment() { return rcs_type * 10 + rcs_mode;  };
-
         /* Input File */
-
         void set_rcs_tau(double);
         void set_roll_mom_max(double);
         void set_pitch_mom_max(double);
