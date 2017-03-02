@@ -380,9 +380,6 @@ public:
 
 // Module utility functions
 
-/// @return the sign of the function
-int sign(const double &variable);
-
 /// @return the angle between two 3x1 vectors
 double angle(Matrix VEC1, Matrix VEC2);
 

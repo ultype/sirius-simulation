@@ -7,6 +7,7 @@
 
 #include <armadillo>
 
+#include "math/utility.hh"
 #include "math/matrix/utility.hh"
 
 #include "cad/utility.hh"

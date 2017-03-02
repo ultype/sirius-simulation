@@ -41,6 +41,7 @@
 #include <cmath>
 #include <stdlib.h>
 #include <assert.h>
+#include "math/utility.hh"
 #include "aux/utility_header.hh"
 #include <iomanip>
 //#include "global_header.hh"
@@ -1306,22 +1307,6 @@ double angle(Matrix VEC1, Matrix VEC2)
 
     return acos(argument);
 }
-///////////////////////////////////////////////////////////////////////////////
-// Returns the sign of the variable
-// Example: value_signed=value*sign(variable)
-// 010824 Created by Peter H Zipfel
-///////////////////////////////////////////////////////////////////////////////
-int sign(const double &variable)
-{
-    int sign = 0;
-    if (variable < 0.)
-        sign = -1;
-    if (variable >= 0.)
-        sign = 1;
-
-    return sign;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the T.M. of the psi->tht->phi sequence
 // Euler angle transformation matrix of flight mechanics

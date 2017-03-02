@@ -1,5 +1,7 @@
 #include "cad/schmitt_trigger.hh"
 
+#include "math/utility.hh"
+
 #include "aux/utility_header.hh"
 
 Schmitt_Trigger::Schmitt_Trigger(double dead_zone, double hysteresis)

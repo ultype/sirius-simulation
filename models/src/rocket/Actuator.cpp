@@ -1,4 +1,5 @@
 #include "rocket/Actuator.hh"
+#include "math/utility.hh"
 
 void Actuator::default_data(){
 }

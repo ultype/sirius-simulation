@@ -2,6 +2,7 @@
 
 #include "cad/utility.hh"
 
+#include "math/utility.hh"
 #include "math/matrix/utility.hh"
 
 #include "rocket/Kinematics.hh"
