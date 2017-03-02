@@ -408,25 +408,6 @@ Matrix integrate(Matrix &DYDX_NEW,
                  Matrix &Y,
                  const double int_step);
 
-/**
- * \brief US Standard Atmosphere 1976.
- *
- * Calculates the atmospheric properties density, pressure and temperature
- * up to 85 km.
- */
-void atmosphere76(double &rho, double &press, double &tempk, const double balt);
-
-/**
- * \brief Calculates the atmospheric properties density, pressure and
- *        temperature up to 1000 km (NASA Marshall).
- */
-int us76_nasa2002(double alt_km,
-                  double *rho,
-                  double *press,
-                  double *tempk,
-                  double *vsound);
-
-
 class Table
 {
     private:
