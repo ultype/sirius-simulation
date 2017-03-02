@@ -31,11 +31,11 @@ void AeroDynamics::load_aerotable(char* filename){
     read_tables(filename, aerotable);
 }
 
-double AeroDynamics::set_xcg_ref(double in) { xcg_ref = in; }
-double AeroDynamics::set_alplimx(double in) { alplimx = in; }
-double AeroDynamics::set_alimitx(double in) { alimitx = in; }
-double AeroDynamics::set_refa(double in) { refa = in; }
-double AeroDynamics::set_refd(double in) { refd = in; }
+void AeroDynamics::set_xcg_ref(double in) { xcg_ref = in; }
+void AeroDynamics::set_alplimx(double in) { alplimx = in; }
+void AeroDynamics::set_alimitx(double in) { alimitx = in; }
+void AeroDynamics::set_refa(double in) { refa = in; }
+void AeroDynamics::set_refd(double in) { refd = in; }
 
 void AeroDynamics::calculate_aero(double int_step){
     /* only calculate when rocket liftoff */

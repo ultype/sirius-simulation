@@ -13,6 +13,8 @@ PROGRAMMERS:
 #include "aux/aux.hh"
 #include <ctime>
 #include "sim_services/include/simtime.h"
+#include "Environment.hh"
+#include <iomanip>
 
 struct GPS		/* GPS Weeks and Second of Week */
 {
@@ -45,9 +47,11 @@ struct CUC		/* CCSDS Unsegmented time Code */
 class time_management{
 
 	TRICK_INTERFACE(time_management);
+	friend class Environment;
 
 	public:
 		time_management();
+		time_management(const time_management &other);
 		~time_management(){};
 		void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
 		void dm_time();/* convert simulation time to gps time */

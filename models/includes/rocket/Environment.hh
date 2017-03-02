@@ -16,12 +16,16 @@ PROGRAMMERS:
 
 #include "cad/env/atmosphere.hh"
 #include "cad/env/wind.hh"
+#include "Time_management.hh"
+#include "rocket/dm_delta_ut.hh"
+
+class time_management;
 
 class Environment{
     TRICK_INTERFACE(Environment);
 
     public:
-        Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine);
+       Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine, time_management &Time);
         Environment(const Environment& other);
         ~Environment();
 
@@ -44,6 +48,7 @@ class Environment{
         void initialize();
         void propagate(double int_step);
         void update_diagnostic_attributes(double int_step);
+        void dm_RNP();
 
         double get_rho();
         double get_vmach();
@@ -72,6 +77,7 @@ class Environment{
         Newton       * newton;
         Kinematics   * kinematics;
         AeroDynamics * aerodynamics;
+        time_management *time;
 
         /* Constants */
         cad::Atmosphere * atmosphere;
@@ -81,8 +87,9 @@ class Environment{
 
         /* Generating Outputs */
         arma::vec GRAVG;    /* *o (m/s2)       Gravity acceleration in geocentric coord */
+        arma::mat TEI;    /* *io  (--)         Transformation matrix for ECI to ECEF */
         double _GRAVG[3];   /* *o (m/s2)       Gravity acceleration in geocentric coord */
-
+        double _TEI[3][3];  /* *io  (--)       Transformation matrix for ECI to ECEF */
         double vmach;       /* *o (--)         Mach number */
         double pdynmc;      /* *o (pa)         Dynamic pressure */
         double dvba;        /* *o (m/s)        Vehicle speed wrt air */
@@ -91,6 +98,9 @@ class Environment{
         /* These can be deleted, but keep to remain trackable in trick simulator */
         double gravg;       /* *o (m/s2)       Magnitude of gravity acceleration */
         double tempc;       /* *o (c)          Atmospheric temperature - Centigrade*/
+        double DM_sidereal_time; /* *io  (r)  temps_sideral */
+        double DM_Julian_century; /* *io  (--)  Julian_century */
+        double DM_w_precessing; /* *io  (--)  w_precessing */
 };
 
 #endif  // __environment_HH__

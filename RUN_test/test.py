@@ -17,11 +17,11 @@ execfile("Modified_data/test.dr")
 ##############################################################
 
 ##############################################################
-#Set simulation start time
+#Set simulation start time 
 Year = 2017
-DOY = 58
-Hour = 12
-Min = 54
+DOY = 61
+Hour = 3
+Min = 30
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
 

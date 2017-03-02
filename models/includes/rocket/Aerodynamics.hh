@@ -56,11 +56,11 @@ class AeroDynamics{
         double get_cz();
 
         /* Input File */
-        double set_xcg_ref(double);     /* *io (m)      Reference cg location from nose - m*/
-        double set_alplimx(double);     /* *io (d)      Alpha limiter for vehicle - deg*/
-        double set_alimitx(double);     /* *io (--)     Structural  limiter for vehicle*/
-        double set_refa(double);        /* *io (m2)     Reference area for aero coefficients - m^2*/
-        double set_refd(double);        /* *io (m)      Reference length for aero coefficients - m*/
+        void set_xcg_ref(double);     /* *io (m)      Reference cg location from nose - m*/
+        void set_alplimx(double);     /* *io (d)      Alpha limiter for vehicle - deg*/
+        void set_alimitx(double);     /* *io (--)     Structural  limiter for vehicle*/
+        void set_refa(double);        /* *io (m2)     Reference area for aero coefficients - m^2*/
+        void set_refd(double);        /* *io (m)      Reference length for aero coefficients - m*/
 
     private:
         void aerodynamics_der();

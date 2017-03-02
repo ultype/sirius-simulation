@@ -83,7 +83,7 @@ class Rocket_SimObject : public Trick::SimObject {
             :   newton      ( kinematics , euler        , env          , propulsion   , force ) ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , force )      ,
-                env         ( newton     , aerodynamics , kinematics ) ,
+                env         ( newton     , aerodynamics , kinematics , time) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton  , tvc ) ,
                 ins         ( newton     , euler        , env          , kinematics   , gpsr )  ,

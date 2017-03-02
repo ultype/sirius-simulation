@@ -14,6 +14,14 @@ time_management::time_management()
     gpstime.SOW = 0;
 }
 
+time_management::time_management(const time_management &other)
+{
+    this->gpstime = other.gpstime;
+    this->utctime = other.utctime;
+    this->caldate = other.caldate;
+    this->Julian_Date = other.Julian_Date;
+}
+
 double time_management::time_fmod(double a, double b)
 {
 	double temp, absu;
@@ -559,18 +567,21 @@ void time_management::dm_time()/* convert simulation time to gps time */
 	
 	/* Get current GPS time */
 	/* deduct DM_dt because PV comes from dm_att() output of previous cycle */
-	gps_increment(&gpstime, 0.001);
+	gps_increment(&utctime, 0.001);
 
-	utctime.Week = gpstime.Week;
-	utctime.SOW  = gpstime.SOW;
+	gpstime.Week = utctime.Week;
+	gpstime.SOW  = utctime.SOW;
 
-	/* Convert GPS time to UTC time, UTC < GPS */
-	gps_increment(&utctime, -gps_utc_diff(&gpstime));
+	/* Convert UTC time to GPS time, UTC < GPS */
+	gps_increment(&gpstime, gps_utc_diff(&gpstime));
 
-	/* Convert GPS time to MJD & JD time */
+	/* Convert UTC time to MJD & JD time */
 	Julian_Date = gps_to_mjd(&utctime) + 2400000.5;	/* DM_Julian_Date : Julian Date */
-    gps_to_caldate(&gpstime, &caldate);
-    cout<<"Year: "<<caldate.Year<<'\t'<<"Month: "<<caldate.Month<<'\t'<<"Day: "<<caldate.Day<<'\t'<<"Min: "<<caldate.Min<<'\t'<<"Sec: "<<caldate.Sec<<endl;
+    gps_to_caldate(&utctime, &caldate); //Convert UTC(GPS form) time to calendar Date
+    gps_to_utc(&gpstime, &caldate);
+    //cout<<setprecision(10)<<"gps week: "<<gpstime.Week<<'\t'<<"gps sow :"<<gpstime.SOW<<'\t'<<"utc week:"<<utctime.Week<<'\t'<<"utc sow :"<<utctime.SOW<<endl;
+    // cout<<setprecision(10)<<"Year: "<<caldate.Year<<'\t'<<"Month: "<<caldate.Month<<'\t'<<"Day: "<<caldate.Day<<'\t'<<"Min: "<<caldate.Min<<'\t'<<"Sec: "<<caldate.Sec<<endl;
+    //cout<<setprecision(20)<<"Julian_Date: "<<Julian_Date<<endl;
 }
 
 int time_management::ymd2day(int year,int month,int dayOfMonth)  
@@ -617,6 +628,8 @@ void time_management::load_start_time(unsigned int Year, unsigned int DOY, unsig
     this->caldate.Min = Min;
     this->caldate.Sec = Sec;
 
-    caldoy_to_gps(&caldate, &gpstime);//convert into gps time
-    //cout<<gpstime.Week<<"\t"<<gpstime.SOW<<endl;
+    caldoy_to_gps(&caldate, &utctime);//convert into gps time
+    /* Convert UTC time to MJD & JD time */
+    Julian_Date = gps_to_mjd(&utctime) + 2400000.5; /* DM_Julian_Date : Julian Date */
+
 }
