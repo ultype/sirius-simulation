@@ -1,6 +1,8 @@
 #include <armadillo>
 #include <cstring>
 
+#include "math/matrix/utility.hh"
+
 #include "aux/utility_header.hh"
 #include "sensor/gyro/gyro_rocket6g.hh"
 

@@ -2,6 +2,8 @@
 
 #include "cad/utility.hh"
 
+#include "math/matrix/utility.hh"
+
 #include "aux/utility_header.hh"
 
 #include "rocket/Ins.hh"

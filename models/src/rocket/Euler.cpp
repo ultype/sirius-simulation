@@ -1,9 +1,7 @@
 #include "rocket/Euler.hh"
-#include "trick_utils/math/include/quat_macros.h"
-#include "trick_utils/math/include/matrix_macros.h"
-#include "trick_utils/math/include/vector_macros.h"
-#include "trick_utils/math/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
+
+#include "math/matrix/utility.hh"
 
 _Euler_::_Euler_(Kinematics& kine, Propulsion& prop, Forces& forc)
     :   kinematics(&kine), propulsion(&prop), forces(&forc),

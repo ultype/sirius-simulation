@@ -1,6 +1,8 @@
 #include "rocket/Newton.hh"
 #include "sim_services/include/simtime.h"
 
+#include "math/matrix/utility.hh"
+
 #include "cad/utility.hh"
 
 #include "aux/utility_header.hh"
@@ -221,7 +223,7 @@ void Newton::update_diagnostic_attributes(double int_step){
 
     //T.M. of geographic velocity wrt geodetic coordinates
     arma::mat TVD(&_TVD[0][0], 3, 3, false, true);
-    TVD = build_transform_matrix(_psivdx * RAD, _thtvdx * RAD);
+    TVD = build_psivg_thtvg_TM(_psivdx * RAD, _thtvdx * RAD);
 
     orbital(SBII, VBII, get_dbi());
 }

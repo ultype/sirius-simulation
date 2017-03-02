@@ -1,5 +1,7 @@
 #include "sensor/accel/accelerometer_rocket6g.hh"
 
+#include "math/matrix/utility.hh"
+
 sensor::AccelerometerRocket6G::AccelerometerRocket6G(double emisa[3], double escala[3], double ebiasa[3], Newton &newt)
     :   newton(&newt),
         VECTOR_INIT(EWALKA, 3),

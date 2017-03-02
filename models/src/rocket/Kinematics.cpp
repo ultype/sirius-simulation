@@ -2,6 +2,8 @@
 
 #include "cad/utility.hh"
 
+#include "math/matrix/utility.hh"
+
 #include "rocket/Kinematics.hh"
 #include "sim_services/include/simtime.h"
 
@@ -74,7 +76,7 @@ void Kinematics::load_angle(double yaw, double roll, double pitch) {
     double latx = newton->get_latx();
     double alt  = newton->get_alt();
 
-    TBD = build_euler_transform_matrix(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
+    TBD = build_psi_tht_phi_TM(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
 
     arma::mat current_TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     TBI = TBD * current_TDI;

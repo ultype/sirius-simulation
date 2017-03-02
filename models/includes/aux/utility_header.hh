@@ -377,7 +377,6 @@ public:
     Matrix vec9_mat33();
 };
 
-arma::vec3 pol_from_cart(arma::vec3 in);
 
 // Module utility functions
 
@@ -386,17 +385,6 @@ int sign(const double &variable);
 
 /// @return the angle between two 3x1 vectors
 double angle(Matrix VEC1, Matrix VEC2);
-
-/// @return skew symmetric matrix of a Vector3
-arma::mat33 skew_sym(arma::vec3 vec);
-
-/// @return the T.M. of the psivg -> thtvg sequence
-Matrix mat2tr(const double &psivg, const double &thtvg);
-arma::mat33 build_transform_matrix(const double &psivg, const double &thtvg);
-
-/// @return the Euler T.M. of the psi->tht->phi sequence
-Matrix mat3tr(const double &psi, const double &tht, const double &phi);
-arma::mat33 build_euler_transform_matrix(const double &psi, const double &tht, const double &phi);
 
 /** Calculates geodetic longitude, latitude, and altitude from inertial
  *  displacment vector.

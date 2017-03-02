@@ -22,6 +22,9 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Propulsion.hh"
 ##include "rocket/Aerodynamics.hh"
 
+##include "cad/utility.hh"
+##include "cad/schmitt_trigger.hh"
+
 ##include "cad/env/atmosphere.hh"
 ##include "cad/env/atmosphere_nasa2002.hh"
 ##include "cad/env/atmosphere76.hh"
@@ -40,7 +43,8 @@ LIBRARY DEPENDENCIES:
 ##include "sensor/accel/accelerometer_ideal.hh"
 ##include "sensor/accel/accelerometer_rocket6g.hh"
 
-##include "cad/schmitt_trigger.hh"
+##include "math/matrix/utility.hh"
+
 
 class GPS_SAT_SimObject : public Trick::SimObject {
     public:
