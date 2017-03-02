@@ -7,6 +7,7 @@
 
 #include "aux/global_constants.hh"
 #include "aux/utility_header.hh"
+#include "math/stochastic.hh"
 
 #include "rocket/GPS_satellites.hh"
 #include "rocket/Newton.hh"
