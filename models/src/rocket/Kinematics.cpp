@@ -133,9 +133,7 @@ void Kinematics::update_diagnostic_attributes(double int_step) {
 
 void Kinematics::propagate_TBI(double int_step, arma::vec3 WBIB) {
     //*integrating direction cosine matrix
-    arma::mat TBID_NEW = trans(skew_sym(WBIB)) * this->TBI;
-    this->TBI = integrate(TBID_NEW, TBID, TBI, int_step);
-    this->TBID = TBID_NEW;
+    INTEGRATE_MAT(TBI, trans(skew_sym(WBIB)) * this->TBI);
 
     //orthonormalizing TBI
     arma::mat EE = arma::eye(3, 3) - TBI * trans(TBI);

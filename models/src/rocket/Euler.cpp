@@ -88,11 +88,9 @@ void _Euler_::propagate(double int_step)
 }
 
 void _Euler_::propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB){
-    //integrating the angular velocity acc wrt the inertial frame in body coord
+    // integrating the angular velocity acc wrt the inertial frame in body coord
     // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm test
-    arma::vec3 WACC_NEXT = arma::solve(IBBB, (FMB - skew_sym(this->WBIB) * IBBB * this->WBIB));
-    this->WBIB = integrate(WACC_NEXT, WBIBD, WBIB, int_step);
-    this->WBIBD = WACC_NEXT;
+    INTEGRATE_MAT(WBIB, arma::solve(IBBB, (FMB - skew_sym(this->WBIB) * IBBB * this->WBIB)));
 }
 
 arma::vec3 _Euler_::calculate_WBII(arma::mat33 TBI){

@@ -33,7 +33,7 @@ void Propulsion::initialize(){
 }
 
 void Propulsion::default_data(){
-    this->fmassd = 0;
+    this->fmassed = 0;
     this->thrust = 0;
     this->fmasse = 0;
 
@@ -78,7 +78,7 @@ void Propulsion::propagate(double int_step)
     //no thrusting
     switch(this->thrust_state){
         case NO_THRUST:
-            fmassd = 0;
+            fmassed = 0;
             thrust = 0;
             fmasse = 0;
             //fmassr=0; //Somehow comment out in trick version
@@ -123,9 +123,7 @@ void Propulsion::propagate_thrust_delta_v(double int_step){
 }
 
 void Propulsion::propagate_fmasse(double int_step, double press, double psl){
-    double fmassd_next = (this->thrust - (psl - press) * this->aexit) / (this->spi * AGRAV); //thrust/(spi*AGRAV)
-    this->fmasse = integrate(fmassd_next, this->fmassd, this->fmasse, int_step);
-    this->fmassd = fmassd_next;
+    INTEGRATE(fmasse, (this->thrust - (psl - press) * this->aexit) / (this->spi * AGRAV)); // thrust/(spi*AGRAV)
 }
 double Propulsion::calculate_thrust(double press, double psl){
     return this->spi * this->fuel_flow_rate * AGRAV + (psl - press) * this->aexit;

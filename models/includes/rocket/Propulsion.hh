@@ -99,7 +99,7 @@ class Propulsion{
 
         /* Propagative Stats */
         double fmasse;              /* *o (kg)     Fuel mass expended (zero initialization required)*/
-        double fmassd;              /* *o (kg/s)   Fuel mass expended derivative*/
+        double fmassed;              /* *o (kg/s)   Fuel mass expended derivative*/
         double thrust_delta_v;      /* *o (m/s)    delta v*/
 
         /* Generating Outputs */
