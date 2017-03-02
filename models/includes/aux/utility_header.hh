@@ -398,12 +398,6 @@ arma::mat33 build_transform_matrix(const double &psivg, const double &thtvg);
 Matrix mat3tr(const double &psi, const double &tht, const double &phi);
 arma::mat33 build_euler_transform_matrix(const double &psi, const double &tht, const double &phi);
 
-/// @return great circle distance between two point on a spherical Earth
-double cad_distance(const double &lon1,
-                    const double &lat1,
-                    const double &lon2,
-                    const double &lat2);
-
 /** Calculates geodetic longitude, latitude, and altitude from inertial
  *  displacment vector.
  */
@@ -412,74 +406,6 @@ void cad_geo84_in(double &lon,
                   double &alt,
                   const Matrix SBII,
                   const double &time);
-
-void arma_cad_geo84_in(double &lon,
-                  double &lat,
-                  double &alt,
-                  arma::vec3 SBII,
-                  const double &time);
-
-/// Calculates geodetic velocity vector from inertial states
-void cad_geo84vel_in(double &dvbe,
-                     double &psivdx,
-                     double &thtvdx,
-                     Matrix SBII,
-                     Matrix VBII,
-                     const double &time);
-
-/** Calculates geocentric lon, lat, alt from inertial displacement vector,
- *  spherical Earth
- */
-void cad_geoc_in(double &lonc,
-                 double &latc,
-                 double &altc,
-                 Matrix SBII,
-                 const double &time);
-
-void arma_cad_geoc_in(double &lonc,
-                 double &latc,
-                 double &altc,
-                 arma::vec3 SBII,
-                 const double &time);
-
-/// @return geocentric lon, lat, alt from displacement vector in Earth coord
-Matrix cad_geoc_ine(Matrix SBIE);
-
-/// @return Earth gravitational acceleration in geocentric coord, using the
-///         WGS 84 ellipsoid
-Matrix cad_grav84(Matrix SBII, const double &time);
-
-arma::vec3 arma_cad_grav84(arma::vec3 SBII, const double &time);
-
-/// @return the inertial diplacement vector from longitude, latitude and
-///         altitude (WGS84)
-Matrix cad_in_geo84(const double lon,
-                    const double lat,
-                    const double alt,
-                    const double &time);
-
-arma::vec3 arma_cad_in_geo84(const double lon,
-                             const double lat,
-                             const double alt,
-                             const double &time);
-
-/// @return the inertial displacement vector from geocentric longitude,
-///         latitude and altitude
-Matrix cad_in_geoc(const double &lon,
-                   const double &lat,
-                   const double &alt,
-                   const double &time);
-
-/// Calculates inertial displacement and velocity vectors from orbital elements
-int cad_in_orb(Matrix &SBII,
-               Matrix &VBII,
-               const double &semi,
-               const double &ecc,
-               const double &inclx,
-               const double &lon_anodex,
-               const double &arg_perix,
-               const double &true_anomx);
-
 /** Projects initial state through 'tgo' to final state along a
  *  Keplerian trajectory
  */
@@ -488,70 +414,6 @@ int cad_kepler(Matrix &SPII,
                Matrix SBII,
                Matrix VBII,
                const double &tgo);
-
-/** Projects initial state through 'tgo' to final state along a
- *  Keplerian trajectory
- */
-int cad_kepler1(Matrix &SPII,
-                Matrix &VPII,
-                const Matrix SBII,
-                const Matrix VBII,
-                const double &tgo);
-
-/// Calculates utility functions c(z) and s(z) for cad_kepler()
-void cadkepler1_ucs(double &c, double &s, const double &z);
-
-/// Calculates the orbital elements from inertial displacement and velocity
-int cad_orb_in(double &semi,
-               double &ecc,
-               double &inclx,
-               double &lon_anodex,
-               double &arg_perix,
-               double &true_anomx,
-               Matrix &SBII,
-               Matrix &VBII);
-
-int arma_cad_orb_in(double &semi,
-                   double &ecc,
-                   double &inclx,
-                   double &lon_anodex,
-                   double &arg_perix,
-                   double &true_anomx,
-                   arma::vec3 &SBII,
-                   arma::vec3 &VBII);
-
-/// @return the T.M. of geodetic wrt inertial coordinates
-Matrix cad_tdi84(const double &lon,
-                 const double &lat,
-                 const double &alt,
-                 const double &time);
-
-arma::mat33 arma_cad_tdi84(const double &lon,
-                           const double &lat,
-                           const double &alt,
-                           const double &time);
-
-/// @return the T.M. of earth wrt inertial coordinates
-Matrix cad_tei(const double &time);
-
-/// @return the T.M. of geographic wrt earth coordinates
-Matrix cad_tge(const double &lon, const double &lat);
-
-/// @return the T.M. of geographic (geocentric) wrt inertial
-Matrix cad_tgi84(const double &lon,
-                 const double &lat,
-                 const double &alt,
-                 const double &time);
-
-arma::mat33 arma_cad_tgi84(const double &lon,
-                           const double &lat,
-                           const double &alt,
-                           const double &time);
-
-/// @return the transformation matrix of inertial wrt perifocal coordinates
-Matrix cad_tip(const double &incl,
-               const double &lon_anode,
-               const double &arg_peri);
 
 /* Stochastic functions */
 

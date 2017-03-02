@@ -1,6 +1,8 @@
 #include "rocket/Newton.hh"
 #include "sim_services/include/simtime.h"
 
+#include "cad/utility.hh"
+
 #include "aux/utility_header.hh"
 #include "aux/aux.hh"
 
@@ -125,11 +127,11 @@ void Newton::load_location(double lonx, double latx, double alt){
     this->alt = alt;
 
     //converting geodetic lonx, latx, alt to SBII
-    SBII = arma_cad_in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
+    SBII = cad::in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
 
     //building inertial velocity
-    TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    TGI = arma_cad_tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
 }
 
 void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
@@ -176,13 +178,13 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     VBII = NEXT_VEL;
 
     //Calculate lon lat alt
-    arma_cad_geo84_in(lon, lat, al, SBII, get_rettime());
+    cad::geo84_in(lon, lat, al, SBII, get_rettime());
     this->lonx = lon * DEG;
     this->latx = lat * DEG;
     this->alt  = al;
 
-    TDI = arma_cad_tdi84(lon, lat, al, get_rettime());
-    TGI = arma_cad_tgi84(lon, lat, al, get_rettime());
+    TDI = cad::tdi84(lon, lat, al, get_rettime());
+    TGI = cad::tgi84(lon, lat, al, get_rettime());
 }
 
 void Newton::propagate_aeroloss(double int_step){
@@ -227,7 +229,7 @@ void Newton::update_diagnostic_attributes(double int_step){
 void Newton::orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi)
 {
     //calculate orbital elements
-    int cadorbin_flag = arma_cad_orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
+    int cadorbin_flag = cad::orb_in(_semi_major, _eccentricity, _inclination, _lon_anodex, _arg_perix, _true_anomx, SBII, VBII);
     _ha = (1. + _eccentricity) * _semi_major - REARTH;
     _hp = (1. - _eccentricity) * _semi_major - REARTH;
     _ref_alt = dbi - REARTH;

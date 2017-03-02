@@ -1,5 +1,7 @@
 #include <cassert>
 
+#include "cad/utility.hh"
+
 #include "aux/utility_header.hh"
 
 #include "rocket/Ins.hh"
@@ -442,12 +444,12 @@ void INS::update(double int_step){
     this->phipcx = calculate_INS_derived_phip(VBECB) * DEG;
 
     // getting long,lat,alt from INS
-    arma_cad_geo84_in(lonc, latc, altc, SBIIC, time);
+    cad::geo84_in(lonc, latc, altc, SBIIC, time);
     loncx = lonc * DEG;
     latcx = latc * DEG;
 
     // getting T.M. of geodetic wrt inertial coord
-    this->TDCI = arma_cad_tdi84(lonc, latc, altc, time);
+    this->TDCI = cad::tdi84(lonc, latc, altc, time);
 
     // computing geodetic velocity from INS
     arma::vec3 VBECD = TDCI * VBEIC;

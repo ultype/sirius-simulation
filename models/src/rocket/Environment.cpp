@@ -3,6 +3,8 @@
 #include "rocket/Environment.hh"
 #include "sim_services/include/simtime.h"
 
+#include "cad/utility.hh"
+
 #include "cad/env/atmosphere.hh"
 #include "cad/env/atmosphere76.hh"
 #include "cad/env/atmosphere_nasa2002.hh"
@@ -121,7 +123,7 @@ void Environment::propagate(double int_step) {
     double alppx = kinematics->get_alppx();
     double phipx = kinematics->get_phipx();
 
-    this->GRAVG = arma_cad_grav84(SBII, get_rettime());
+    this->GRAVG = cad::grav84(SBII, get_rettime());
 
     atmosphere->set_altitude(alt);
 

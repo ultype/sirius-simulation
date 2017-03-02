@@ -1,5 +1,7 @@
 #include <iomanip>
 
+#include "cad/utility.hh"
+
 #include "rocket/Kinematics.hh"
 #include "sim_services/include/simtime.h"
 
@@ -74,7 +76,7 @@ void Kinematics::load_angle(double yaw, double roll, double pitch) {
 
     TBD = build_euler_transform_matrix(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
 
-    arma::mat current_TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    arma::mat current_TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     TBI = TBD * current_TDI;
 
 }
@@ -145,7 +147,7 @@ void Kinematics::propagate_TBI(double int_step, arma::vec3 WBIB) {
 
 arma::mat Kinematics::calculate_TBD(double lonx, double latx, double alt) {
     //_Euler_ angles
-    arma::mat TDI = arma_cad_tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    arma::mat TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
     return this->TBI * trans(TDI);
 }
 
