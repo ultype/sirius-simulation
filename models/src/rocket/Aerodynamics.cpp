@@ -28,7 +28,7 @@ void AeroDynamics::initialize(){
 }
 
 void AeroDynamics::load_aerotable(char* filename){
-    read_tables(filename, aerotable);
+    aerotable = Datadeck(filename);
 }
 
 double AeroDynamics::set_xcg_ref(double in) { xcg_ref = in; }

@@ -55,10 +55,6 @@ double const FOOT = 3.280834;           ///< conversion factor m->ft
 double const NMILES = 5.399568e-4;      ///< conversion factor m->nm
                                         /**@}*/
 
-// sizing of arrays
-int const CHARN = 50;   ///< character numbers in variable names
-int const CHARL = 220;  ///< character numbers in a line
-
 /* verify the following array sizes.
  * If too small, dynamic memory allocation will fail!
  */

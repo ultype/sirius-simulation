@@ -9,6 +9,7 @@ LIBRARY DEPENDENCY:
 
 #include "aux/utility_header.hh"
 #include "cad/env/atmosphere.hh"
+#include "cad/datadeck.hh"
 
 namespace cad {
     class Atmosphere_weatherdeck : public Atmosphere

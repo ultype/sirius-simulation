@@ -23,6 +23,7 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Aerodynamics.hh"
 
 ##include "cad/utility.hh"
+##include "cad/datadeck.hh"
 ##include "cad/schmitt_trigger.hh"
 
 ##include "cad/env/atmosphere.hh"

@@ -3,13 +3,11 @@
 #include <cstring>
 
 cad::Wind_Tabular::Wind_Tabular(char* filepath, double twind, double vertical_wind)
-    :   Wind(twind, vertical_wind)
+    :   Wind(twind, vertical_wind), weathertable(filepath)
 {
     strcpy(name, "Tabular Wind");
 
     altitude = 0;
-
-    read_tables(filepath, weathertable);
 
     vwind = 0;
     psiwdx = 0;

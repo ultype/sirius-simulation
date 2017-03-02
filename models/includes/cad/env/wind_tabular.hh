@@ -8,6 +8,7 @@ LIBRARY DEPENDENCY:
 *******************************************************************************/
 
 #include "aux/utility_header.hh"
+#include "cad/datadeck.hh"
 #include "cad/env/wind.hh"
 
 namespace cad {

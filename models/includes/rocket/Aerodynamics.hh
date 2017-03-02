@@ -10,6 +10,7 @@ PROGRAMMERS:
 *******************************************************************************/
 
 #include "aux/utility_header.hh"
+#include "cad/datadeck.hh"
 #include "Euler.hh"
 #include "Tvc.hh"
 #include "Environment.hh"

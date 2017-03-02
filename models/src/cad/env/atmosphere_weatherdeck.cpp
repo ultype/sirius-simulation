@@ -1,10 +1,12 @@
 #include "cad/env/atmosphere_weatherdeck.hh"
+#include "cad/datadeck.hh"
 
 #include <cstring>
 
-cad::Atmosphere_weatherdeck::Atmosphere_weatherdeck(char* filepath) {
+cad::Atmosphere_weatherdeck::Atmosphere_weatherdeck(char* filepath)
+    :    weathertable(filepath)
+{
     strcpy(name, "Atmosphere Weather Deck");
-    read_tables(filepath, weathertable);
 
     altitude = 0;
 
