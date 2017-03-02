@@ -1,5 +1,6 @@
 #include "aux/utility_header.hh"
 #include "math/utility.hh"
+#include "math/integrate.hh"
 
 #include "rocket/Tvc.hh"
 #include "sim_services/include/simtime.h"
@@ -241,11 +242,11 @@ std::tuple<double, double> TVC::tvc_scnd(double etac, double zetc, double int_st
         detas = dtvclimx * RAD * sign(detas);
     }
     // state integration
-    INTEGRATE_d(etas, detas);
+    INTEGRATE(etas, detas);
 
     double eetas = etac - etas;
 
-    INTEGRATE_d(detas, wntvc * wntvc * eetas - 2. * zettvc * wntvc * etasd);
+    INTEGRATE(detas, wntvc * wntvc * eetas - 2. * zettvc * wntvc * etasd);
 
     // setting nozzle rate derivative to zero if rate is limited
     if (iflag && detas * detasd > 0.)
@@ -266,11 +267,11 @@ std::tuple<double, double> TVC::tvc_scnd(double etac, double zetc, double int_st
         dzeta = dtvclimx * RAD * sign(dzeta);
     }
     // state integration
-    INTEGRATE_d(zeta, dzeta);
+    INTEGRATE(zeta, dzeta);
 
     double ezeta = zetc - zeta;
 
-    INTEGRATE_d(dzeta, wntvc * wntvc * ezeta - 2. * zettvc * wntvc * zetad);
+    INTEGRATE(dzeta, wntvc * wntvc * ezeta - 2. * zettvc * wntvc * zetad);
 
     // setting nozzle rate derivative to zero if rate is limited
     if (iflag && dzeta * dzetad > 0.)

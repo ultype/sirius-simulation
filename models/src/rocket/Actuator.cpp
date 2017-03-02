@@ -1,5 +1,6 @@
 #include "rocket/Actuator.hh"
 #include "math/utility.hh"
+#include "math/integrate.hh"
 
 void Actuator::default_data(){
 }

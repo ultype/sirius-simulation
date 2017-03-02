@@ -1,5 +1,6 @@
 #include "rocket/Control.hh"
 
+#include "math/integrate.hh"
 #include "math/utility.hh"
 
 void Control::default_data(){

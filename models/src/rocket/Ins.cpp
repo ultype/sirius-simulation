@@ -3,6 +3,7 @@
 #include "cad/utility.hh"
 
 #include "math/utility.hh"
+#include "math/integrate.hh"
 #include "math/matrix/utility.hh"
 
 #include "aux/utility_header.hh"
@@ -404,7 +405,7 @@ void INS::update(double int_step){
     //dbic = norm(SBIIC);
 
     /* INS Tile Error Propagation */
-    INTEGRATE_D(RICI, TBI * EWBIB);
+    INTEGRATE_MAT(RICI, TBI * EWBIB);
 
     // computed transformation matrix
     this->TBIC = calculate_INS_derived_TBI(TBI);
@@ -415,10 +416,10 @@ void INS::update(double int_step){
     // integrating velocity error equation
     // XXX: How come INS integrates the Errorous Velocity based on EFSPB?
     arma::mat33 TICB = trans(TBIC);
-    INTEGRATE_D(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
+    INTEGRATE_MAT(EVBI, TICB * EFSPB - skew_sym(RICI) * TICB * FSPCB + EGRAVI);
 
     // calculating position error
-    INTEGRATE_D(ESBI, EVBI);
+    INTEGRATE_MAT(ESBI, EVBI);
 
     GPS_update();
 

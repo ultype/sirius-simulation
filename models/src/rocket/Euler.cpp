@@ -1,6 +1,7 @@
 #include "rocket/Euler.hh"
 #include "sim_services/include/simtime.h"
 
+#include "math/integrate.hh"
 #include "math/matrix/utility.hh"
 
 _Euler_::_Euler_(Kinematics& kine, Propulsion& prop, Forces& forc)

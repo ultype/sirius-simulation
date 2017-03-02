@@ -1,6 +1,7 @@
 #include "cad/env/wind.hh"
 #include "aux/global_constants.hh"
 #include "aux/utility_header.hh"
+#include "math/integrate.hh"
 
 #include <cstdlib>
 

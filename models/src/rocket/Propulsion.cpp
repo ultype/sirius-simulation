@@ -1,4 +1,5 @@
 #include "aux/utility_header.hh"
+#include "math/integrate.hh"
 
 #include "rocket/Propulsion.hh"
 #include "sim_services/include/simtime.h"

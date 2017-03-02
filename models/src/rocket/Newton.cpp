@@ -1,6 +1,7 @@
 #include "rocket/Newton.hh"
 #include "sim_services/include/simtime.h"
 
+#include "math/integrate.hh"
 #include "math/matrix/utility.hh"
 
 #include "cad/utility.hh"

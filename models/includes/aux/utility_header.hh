@@ -478,29 +478,11 @@ double uniform(double min, double max);
 double unituni();
 
 /**
- * \brief Integration of scalar state variable.
- * Modified Euler Midpoint method
- * Example first order lag:
- *   phid_new=(phic-phi)/tphi;
- *   phi=integrate(phid_new,phid,phi,int_step);
- *   phid=phid_new;
- */
-double integrate(const double &dydx_new,
-                 const double &dydx,
-                 const double &y,
-                 const double &int_step);
-
-/**
  * \brief Integration of Matrix MAT(r,c).
  */
 Matrix integrate(Matrix &DYDX_NEW,
                  Matrix &DYDX,
                  Matrix &Y,
-                 const double int_step);
-
-arma::mat integrate(arma::mat &DYDX_NEW,
-                 arma::mat &DYDX,
-                 arma::mat &Y,
                  const double int_step);
 
 /**

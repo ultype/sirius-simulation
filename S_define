@@ -44,6 +44,7 @@ LIBRARY DEPENDENCIES:
 ##include "sensor/accel/accelerometer_rocket6g.hh"
 
 ##include "math/utility.hh"
+##include "math/integrate.hh"
 ##include "math/matrix/utility.hh"
 
 
