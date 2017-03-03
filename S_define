@@ -89,22 +89,22 @@ class Rocket_SimObject : public Trick::SimObject {
             :   newton      ( kinematics , euler        , env          , propulsion   , forces ) ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
+                gpsr        ( newton     , euler        , *gps_sats    , ins )        ,
                 env         ( newton     , aerodynamics , kinematics ) ,
                 propulsion  ( env )      ,
-                aerodynamics( kinematics , env          , propulsion   , euler        , newton  , tvc ) ,
-                ins         ( newton     , euler        , env          , kinematics   , gpsr )  ,
+                aerodynamics( kinematics , env          , propulsion   , euler        , newton   , tvc ) ,
+                ins         ( newton     , euler        , env          , kinematics   , gpsr )   ,
                 tvc         ( env        , kinematics   , control      , propulsion ) ,
                 rcs         ( ins        , guidance     , propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc )
             {
-            ("default_data") gpsr.default_data();
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();
             ("initialization") env.initialize();
             ("initialization") aerodynamics.initialize();
             ("initialization") newton.initialize();
             ("initialization") euler.initialize();
-            ("initialization") gpsr.initialize(&newton, &euler, gps_sats, &ins, 0.001);
+            ("initialization") gpsr.initialize(0.001);
             ("initialization") guidance.initialize(&ins, &newton, &propulsion);
             ("initialization") control.initialize(&ins, &newton, &env, &propulsion, &aerodynamics);
             ("initialization") ins.initialize();

@@ -256,8 +256,8 @@ bool INS::GPS_update(){
     // GPS update
     if (gpsr->gps_update) {
         // GPS Measurement
-        arma::vec3 SXH(gpsr->position_state);
-        arma::vec3 VXH(gpsr->velocity_state);
+        arma::vec3 SXH = gpsr->get_SXH();
+        arma::vec3 VXH = gpsr->get_VXH();
 
         // updating INS navigation output
         SBIIC = SBIIC - SXH;

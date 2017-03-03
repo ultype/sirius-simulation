@@ -8,6 +8,11 @@
 #include "aux/global_constants.hh"
 #include "aux/utility_header.hh"
 #include "math/stochastic.hh"
+#include "math/matrix/utility.hh"
+
+#include "cad/utility.hh"
+
+#include <armadillo>
 
 #include "rocket/GPS_satellites.hh"
 #include "rocket/Newton.hh"
@@ -15,90 +20,83 @@
 #include "rocket/Earth.hh"
 #include "rocket/Ins.hh"
 
-INS::INS(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS &i)
-    :   newton(&ntn), euler(&elr), gps_sats(&sats), ins(&i)
+GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS &i)
+    :   newton(&ntn), euler(&elr), gps_sats(&sats), ins(&i),
+        MATRIX_INIT(PP, 8, 8),
+        VECTOR_INIT(SXH, 3),
+        VECTOR_INIT(VXH, 3),
+        VECTOR_INIT(CXH, 3)
 {
     this->default_data();
 }
 
-INS::INS(const INS& other)
-    :   newton(other.newton), euler(other.euler), gps_sats(other.gps_sats), ins(other.ins)
+GPS_Receiver::GPS_Receiver(const GPS_Receiver& other)
+    :   newton(other.newton), euler(other.euler), gps_sats(other.gps_sats), ins(other.ins),
+        MATRIX_INIT(PP, 8, 8),
+        VECTOR_INIT(SXH, 3),
+        VECTOR_INIT(VXH, 3),
+        VECTOR_INIT(CXH, 3)
 {
     this->default_data();
 }
 
-INS& INS::operator=(const INS& other){
+GPS_Receiver& GPS_Receiver::operator=(const GPS_Receiver& other){
     if(&other == this)
         return *this;
 
-    this->newton = other.newton
-    this->euler = other.euler
-    this->gps_sats = other.gps_sats
-    this->ins = other.ins
+    this->newton   = other.newton;
+    this->euler    = other.euler;
+    this->gps_sats = other.gps_sats;
+    this->ins      = other.ins;
 
     return *this;
 }
 
 void GPS_Receiver::default_data(){
-}
-
-void GPS_Receiver::initialize(double int_step){
     gps_update = 0;
-
-    Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
-
-    for (int i = 0; i < 3; i++) {
-        PP.assign_loc(i, i, pow(ppos * (1 + factp), 2));
-        PP.assign_loc(i + 3, i + 3, pow(pvel * (1 + factp), 2));
-    }
-    PP.assign_loc(6, 6, pow(pclockb * (1 + factp), 2));
-    PP.assign_loc(7, 7, pow(pclockf * (1 + factp), 2));
-
-    // fundamental dynamic matrix of filter - constant throughout
-    FF.assign_loc(0, 3, 1);
-    FF.assign_loc(1, 4, 1);
-    FF.assign_loc(2, 5, 1);
-    FF.assign_loc(6, 7, 1);
-    FF.assign_loc(7, 7, -1 / uctime_cor);
-
-    // state transition matrix - constant throughout
-    Matrix EYE(8, 8);
-    PHI = EYE.identity() + FF * int_step + FF * FF * (int_step * int_step / 2);
 
     // setting inital acquisition flag
     gps_acq = false;
+}
+
+void GPS_Receiver::setup_state_covariance_matrix(double factp, double pclockb, double pclockf){
+    PP = arma::mat88(arma::fill::zeros);
+    for (int i = 0; i < 3; i++) {
+        PP(i, i)         = pow(ppos * (1 + factp), 2);
+        PP(i + 3, i + 3) = pow(pvel * (1 + factp), 2);
+    }
+    PP(6, 6) =  pow(pclockb * (1 + factp), 2);
+    PP(7, 7) =  pow(pclockf * (1 + factp), 2);
+
+    return;
+}
+
+void GPS_Receiver::setup_error_covariance_matrix(double factq, double qclockb, double qclockf){
+    this->factq = factq;
+    this->qclockb = qclockb;
+    this->qclockf = qclockf;
+
+    return;
+}
+
+void GPS_Receiver::setup_fundamental_dynamic_matrix(double uctime_cor){
+    // fundamental dynamic matrix of filter - constant throughout
+    FF = arma::mat88(arma::fill::zeros);
+    FF(0, 3) = 1;
+    FF(1, 4) = 1;
+    FF(2, 5) = 1;
+    FF(6, 7) = 1;
+    FF(7, 7) = -1 / uctime_cor;
+
+    return;
+}
+
+void GPS_Receiver::initialize(double int_step){
+    // state transition matrix - constant throughout
+    PHI = arma::mat88(arma::fill::eye) + FF * int_step + FF * FF * (int_step * int_step / 2);
 
     // initializing update clock
     gps_epoch = get_rettime();
-
-    // assembling covariance matrix from saved 3x3 matrices
-    Matrix VEC1 = PP1.vec9_mat33();
-    Matrix VEC2 = PP2.vec9_mat33();
-    Matrix VEC3 = PP3.vec9_mat33();
-    Matrix VEC4 = PP4.vec9_mat33();
-    Matrix VEC5 = PP5.vec9_mat33();
-    Matrix VEC6 = PP6.vec9_mat33();
-    Matrix VEC7 = PP7.vec9_mat33();
-    Matrix VEC8 = PP8.vec9_mat33();
-    // decomposing covariance matrix for saving as 3x3 matrices
-    for (int n = 0; n < 8; n++) {
-        VEC1.assign_loc(n, 0, PP.get_loc(0, n));
-        VEC2.assign_loc(n, 0, PP.get_loc(1, n));
-        VEC3.assign_loc(n, 0, PP.get_loc(2, n));
-        VEC4.assign_loc(n, 0, PP.get_loc(3, n));
-        VEC5.assign_loc(n, 0, PP.get_loc(4, n));
-        VEC6.assign_loc(n, 0, PP.get_loc(5, n));
-        VEC7.assign_loc(n, 0, PP.get_loc(6, n));
-        VEC8.assign_loc(n, 0, PP.get_loc(7, n));
-    }
-    PP1 = VEC1.mat33_vec9();
-    PP2 = VEC2.mat33_vec9();
-    PP3 = VEC3.mat33_vec9();
-    PP4 = VEC4.mat33_vec9();
-    PP5 = VEC5.mat33_vec9();
-    PP6 = VEC6.mat33_vec9();
-    PP7 = VEC7.mat33_vec9();
-    PP8 = VEC8.mat33_vec9();
 }
 
 void GPS_Receiver::update_markov(double int_step){
@@ -142,11 +140,9 @@ void GPS_Receiver::get_quadriga(){
     }
 
     // determining visible satellites
-    Matrix SSII(3, 1);
-    Matrix SBII(3, 1);
+    arma::vec3 SSII;
+    arma::vec3 SBII = newton->get_SBII();
     int visible_count(0);
-
-    SBII.build_vec3(newton->get_SBII()[0], newton->get_SBII()[1], newton->get_SBII()[2]);
 
     for (i = 0; i < 24; i++) {
         SSII[0] = ssii[i][0];
@@ -172,7 +168,7 @@ void GPS_Receiver::get_quadriga(){
             // (rmin can go negative if delta-epsilon>90deg; this can happen
             // when the user is opposite (or nearly opposite) of the SV;
             // this is always a no-visibility case)
-            double dbi = SBII.absolute();
+            double dbi = norm(SBII);
             if (rmin > 0 && rmin < dbi) {
                 ssii[i][3] = i + 1;
                 visible_count++;
@@ -215,10 +211,10 @@ void GPS_Receiver::get_quadriga(){
                 for (int i3 = i2 + 1; i3 < nm1; i3++) {
                     for (int i4 = i3 + 1; i4 < visible_count; i4++) {
                         // pullling the quadriga inertial coordinates
-                        Matrix SSII1(3, 1);
-                        Matrix SSII2(3, 1);
-                        Matrix SSII3(3, 1);
-                        Matrix SSII4(3, 1);
+                        arma::vec3 SSII1;
+                        arma::vec3 SSII2;
+                        arma::vec3 SSII3;
+                        arma::vec3 SSII4;
                         for (m = 0; m < 3; m++) {
                             SSII1[m] = *(ssii_vis + 4 * i1 + m);
                             SSII2[m] = *(ssii_vis + 4 * i2 + m);
@@ -227,26 +223,21 @@ void GPS_Receiver::get_quadriga(){
                         }
                         // calculating user wrt the SV displacement unit
                         // vectors
-                        Matrix UNI1 = (SBII - SSII1).univec3();
-                        Matrix UNI2 = (SBII - SSII2).univec3();
-                        Matrix UNI3 = (SBII - SSII3).univec3();
-                        Matrix UNI4 = (SBII - SSII4).univec3();
+                        arma::vec UNI1 = normalise(SBII - SSII1);
+                        arma::vec UNI2 = normalise(SBII - SSII2);
+                        arma::vec UNI3 = normalise(SBII - SSII3);
+                        arma::vec UNI4 = normalise(SBII - SSII4);
 
                         // building the GPS 'H' matrix
-                        Matrix HGPS(4, 4);
-                        HGPS.ones();
-                        for (m = 0; m < 3; m++) {
-                            HGPS.assign_loc(0, m, UNI1[m]);
-                            HGPS.assign_loc(1, m, UNI2[m]);
-                            HGPS.assign_loc(2, m, UNI3[m]);
-                            HGPS.assign_loc(3, m, UNI4[m]);
-                        }
+                        arma::mat44 HGPS(arma::fill::ones);
+                        HGPS.col(0) = UNI1;
+                        HGPS.col(1) = UNI2;
+                        HGPS.col(2) = UNI3;
+                        HGPS.col(3) = UNI4;
                         // calculating GDOP
-                        Matrix COV(4, 4);
-                        COV = (HGPS * HGPS.trans()).inverse();
-                        double gdop_local =
-                            sqrt(COV.get_loc(0, 0) + COV.get_loc(1, 1) +
-                                 COV.get_loc(2, 2) + COV.get_loc(3, 3));
+                        arma::mat44 COV;
+                        COV = arma::inv(HGPS * arma::trans(HGPS));
+                        double gdop_local = sqrt(sum(COV.diag()));
 
                         // save slot # of quadriga SVs if GDOP has decreased
                         if (gdop_local < gdop) {
@@ -301,28 +292,7 @@ void GPS_Receiver::get_quadriga(){
 }
 
 void GPS_Receiver::filter_extrapolation(double int_step){
-    Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
-    Matrix QQ(8, 8);  // local
-
-    Matrix VEC1 = PP1.vec9_mat33();
-    Matrix VEC2 = PP2.vec9_mat33();
-    Matrix VEC3 = PP3.vec9_mat33();
-    Matrix VEC4 = PP4.vec9_mat33();
-    Matrix VEC5 = PP5.vec9_mat33();
-    Matrix VEC6 = PP6.vec9_mat33();
-    Matrix VEC7 = PP7.vec9_mat33();
-    Matrix VEC8 = PP8.vec9_mat33();
-    for (int n = 0; n < 8; n++) {
-        // VECx, x=0...7, is the x-th row of PP (8th element is zero)
-        PP.assign_loc(0, n, VEC1.get_loc(n, 0));
-        PP.assign_loc(1, n, VEC2.get_loc(n, 0));
-        PP.assign_loc(2, n, VEC3.get_loc(n, 0));
-        PP.assign_loc(3, n, VEC4.get_loc(n, 0));
-        PP.assign_loc(4, n, VEC5.get_loc(n, 0));
-        PP.assign_loc(5, n, VEC6.get_loc(n, 0));
-        PP.assign_loc(6, n, VEC7.get_loc(n, 0));
-        PP.assign_loc(7, n, VEC8.get_loc(n, 0));
-    }
+    arma::mat88 QQ(arma::fill::zeros);  // local
 
     //*** user-clock frequency and bias error growth between updates ***
     // integrating 'ucfreq_noise' Markov process to
@@ -336,37 +306,19 @@ void GPS_Receiver::filter_extrapolation(double int_step){
     //*** filter extrapolation ***
     // dynamic error covariance matrix
     for (int i = 0; i < 3; i++) {
-        QQ.assign_loc(i, i, pow(qpos * (1 + factq), 2));
-        QQ.assign_loc(i + 3, i + 3, pow(qvel * (1 + factq), 2));
+        QQ(i, i)         = pow(qpos * (1 + factq), 2);
+        QQ(i + 3, i + 3) = pow(qvel * (1 + factq), 2);
     }
-    QQ.assign_loc(6, 6, pow(qclockb * (1 + factq), 2));
-    QQ.assign_loc(7, 7, pow(qclockf * (1 + factq), 2));
+    QQ(6, 6) = pow(qclockb * (1 + factq), 2);
+    QQ(7, 7) = pow(qclockf * (1 + factq), 2);
 
     // covariance estimate extrapolation
-    PP = PHI * (PP + QQ * (int_step / 2)) * ~PHI + QQ * (int_step / 2);
-    // diagnostics: st. deviations of the diagonals of the covariance matrix
-    std_pos = sqrt(PP.get_loc(0, 0));
-    std_vel = sqrt(PP.get_loc(3, 3));
-    std_ucbias = sqrt(PP.get_loc(6, 6));
+    PP = PHI * (PP + QQ * (int_step / 2)) * trans(PHI) + QQ * (int_step / 2);
 
-    for (int n = 0; n < 8; n++) {
-        VEC1.assign_loc(n, 0, PP.get_loc(0, n));
-        VEC2.assign_loc(n, 0, PP.get_loc(1, n));
-        VEC3.assign_loc(n, 0, PP.get_loc(2, n));
-        VEC4.assign_loc(n, 0, PP.get_loc(3, n));
-        VEC5.assign_loc(n, 0, PP.get_loc(4, n));
-        VEC6.assign_loc(n, 0, PP.get_loc(5, n));
-        VEC7.assign_loc(n, 0, PP.get_loc(6, n));
-        VEC8.assign_loc(n, 0, PP.get_loc(7, n));
-    }
-    PP1 = VEC1.mat33_vec9();
-    PP2 = VEC2.mat33_vec9();
-    PP3 = VEC3.mat33_vec9();
-    PP4 = VEC4.mat33_vec9();
-    PP5 = VEC5.mat33_vec9();
-    PP6 = VEC6.mat33_vec9();
-    PP7 = VEC7.mat33_vec9();
-    PP8 = VEC8.mat33_vec9();
+    // diagnostics: st. deviations of the diagonals of the covariance matrix
+    std_pos = sqrt(PP(0, 0));
+    std_vel = sqrt(PP(3, 3));
+    std_ucbias = sqrt(PP(6, 6));
 }
 
 void GPS_Receiver::measure(){
@@ -392,38 +344,11 @@ void GPS_Receiver::measure(){
 
     /* GPS Update and Measurement */
     double slotm(0);
-    Matrix SXH(3, 1);
-    SXH.build_vec3(position_state[0], position_state[1], position_state[2]);
-    Matrix VXH(3, 1);
-    VXH.build_vec3(velocity_state[0], velocity_state[1], velocity_state[2]);
-    Matrix CXH(3, 1);
-    CXH.build_vec3(clock_state[0], clock_state[1], 0);
 
-    Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
-    Matrix ZZ(8, 1);
-    Matrix XH(8, 1);          // local
-    Matrix RR(8, 8);          // local
-    Matrix HH(8, 8);          // local
-
-    Matrix VEC1 = PP1.vec9_mat33();
-    Matrix VEC2 = PP2.vec9_mat33();
-    Matrix VEC3 = PP3.vec9_mat33();
-    Matrix VEC4 = PP4.vec9_mat33();
-    Matrix VEC5 = PP5.vec9_mat33();
-    Matrix VEC6 = PP6.vec9_mat33();
-    Matrix VEC7 = PP7.vec9_mat33();
-    Matrix VEC8 = PP8.vec9_mat33();
-    for (int n = 0; n < 8; n++) {
-        // VECx, x=0...7, is the x-th row of PP (8th element is zero)
-        PP.assign_loc(0, n, VEC1.get_loc(n, 0));
-        PP.assign_loc(1, n, VEC2.get_loc(n, 0));
-        PP.assign_loc(2, n, VEC3.get_loc(n, 0));
-        PP.assign_loc(3, n, VEC4.get_loc(n, 0));
-        PP.assign_loc(4, n, VEC5.get_loc(n, 0));
-        PP.assign_loc(5, n, VEC6.get_loc(n, 0));
-        PP.assign_loc(6, n, VEC7.get_loc(n, 0));
-        PP.assign_loc(7, n, VEC8.get_loc(n, 0));
-    }
+    arma::vec8 ZZ(arma::fill::zeros);
+    arma::vec8 XH(arma::fill::zeros);           // local
+    arma::mat88 RR(arma::fill::zeros);          // local
+    arma::mat88 HH(arma::fill::zeros);          // local
 
     // ***
     // SV propagation and quadriga selection 'ssii_quad'
@@ -435,7 +360,7 @@ void GPS_Receiver::measure(){
     // Pseudo-range and range-rate measurements
     for (int i = 0; i < 4; i++) {
         // unpacking i-th SV inertial position
-        Matrix SSII(3, 1);
+        arma::vec3 SSII;
         for (int j = 0; j < 3; j++) {
             SSII[j] = *(ssii_quad + 4 * i + j);
         }
@@ -443,79 +368,77 @@ void GPS_Receiver::measure(){
         // diagnostics: getting long, lat, alt of the four quadriga SVs for
         // plotting in GLOBE
         double lon(0), lat(0), alt(0);
-        cad_geo84_in(lon, lat, alt, SSII, gps_sats->time);
-        if (i == 0) {
-            lon1 = lon * DEG;
-            lat1 = lat * DEG;
-            alt1 = alt;
-        };
-        if (i == 1) {
-            lon2 = lon * DEG;
-            lat2 = lat * DEG;
-            alt2 = alt;
-        };
-        if (i == 2) {
-            lon3 = lon * DEG;
-            lat3 = lat * DEG;
-            alt3 = alt;
-        };
-        if (i == 3) {
-            lon4 = lon * DEG;
-            lat4 = lat * DEG;
-            alt4 = alt;
-        };
-        // Z150126 - end
+        cad::geo84_in(lon, lat, alt, SSII, gps_sats->time);
+        switch(i){
+            case 0:
+                lon1 = lon * DEG;
+                lat1 = lat * DEG;
+                alt1 = alt;
+                break;
+            case 1:
+                lon2 = lon * DEG;
+                lat2 = lat * DEG;
+                alt2 = alt;
+                break;
+            case 2:
+                lon3 = lon * DEG;
+                lat3 = lat * DEG;
+                alt3 = alt;
+                break;
+            case 3:
+                lon4 = lon * DEG;
+                lat4 = lat * DEG;
+                alt4 = alt;
+                break;
+        }
 
-        Matrix SBII(3, 1);
-        Matrix VBII(3, 1);
-        Matrix WBII = Matrix(euler->get_WBII().memptr());
-        SBII.build_vec3(newton->get_SBII()[0], newton->get_SBII()[1], newton->get_SBII()[2]);
-        VBII.build_vec3(newton->get_VBII()[0], newton->get_VBII()[1], newton->get_VBII()[2]);
+        arma::vec3 SBII = newton->get_SBII();
+        arma::vec3 VBII = newton->get_VBII();
+        arma::vec3 WBII = euler->get_WBII();
 
-
-        Matrix SBIIC = Matrix(ins->get_SBIIC().memptr());
-        Matrix VBIIC = Matrix(ins->get_VBIIC().memptr());
-        Matrix WBICI = Matrix(ins->get_WBICI().memptr());
+        arma::vec3 SBIIC = ins->get_SBIIC();
+        arma::vec3 VBIIC = ins->get_VBIIC();
+        arma::vec3 WBICI = ins->get_WBICI();
 
         // calculating true range to SV
-        Matrix SSBI(3, 1);
+        arma::vec3 SSBI;
 
         SSBI = SSII - SBII;
-        double dsb = SSBI.absolute();
+        double dsb = norm(SSBI);
 
         // measured pseudo-range
         double dsb_meas = dsb + PR_BIAS[i] + PR_NOISE[i] + ucbias_error;
 
         // unpacking i-th SV inertial velocity
-        Matrix VSII(3, 1);
+        arma::vec3 VSII;
         for (int j = 0; j < 3; j++) {
             VSII[j] = *(vsii_quad + 3 * i + j);
         }
         // velocity of SV wrt user
-        Matrix VSBI(3, 1);
-        VSBI = VSII - VBII - WBII.skew_sym() * SSBI;
+        arma::vec3 VSBI;
+        VSBI = VSII - VBII - skew_sym(WBII) * SSBI;
 
         // calculating true range-rate to SV
-        Matrix USSBI(3, 1);
+        arma::vec3 USSBI;
         USSBI = SSBI * (1 / dsb);
-        double dvsb = VSBI ^ USSBI;
+        double dvsb = dot(VSBI, USSBI);
 
         // measured delta-range rate
         double dvsb_meas = dvsb + DR_NOISE[i] + ucfreq_error;
 
         // INS derived range measurements
-        Matrix SSBIC(3, 1);
+        arma::vec3 SSBIC;
         SSBIC = SSII - SBIIC;
-        double dsbc = SSBIC.absolute();
+        double dsbc = norm(SSBIC);
 
         // INS derived range-rate measurements
         // velocity of SV wrt user
-        Matrix VSBIC(3, 1);
-        VSBIC = VSII - VBIIC - WBICI.skew_sym() * SSBIC;
+        arma::vec3 VSBIC;
+        VSBIC = VSII - VBIIC - skew_sym(WBICI) * SSBIC;
         // calculating range-rate to SV
-        Matrix USSBIC(3, 1);
+        arma::vec3 USSBIC;
         USSBIC = SSBIC * (1 / dsb);
-        double dvsbc = VSBIC ^ USSBIC;
+        double dvsbc = dot(VSBIC, USSBIC);
 
         // loading measurement residuals into measurement vector
         // ZZ[0->3] range meas resid of SV's;
@@ -525,11 +448,11 @@ void GPS_Receiver::measure(){
 
         // observation matrix of filter
         for (int j = 0; j < 3; j++) {
-            HH.assign_loc(i, j, USSBI.get_loc(j, 0));
-            HH.assign_loc(i + 4, j + 3, USSBI.get_loc(j, 0) * gps_step);
+            HH(i, j) = USSBI(j, 0);
+            HH(i + 4, j + 3) = USSBI(j, 0) * gps_step;
         }
-        HH.assign_loc(i, 6, 1);
-        HH.assign_loc(i + 4, 7, gps_step);
+        HH(i, 6) = 1;
+        HH(i + 4, 7) = gps_step;
 
         // for diagnostics: loading the 4 SV slot # of the quadriga
         *(slot + i) = *(ssii_quad + 4 * i + 3);
@@ -548,63 +471,40 @@ void GPS_Receiver::measure(){
     }
     //*** filter correction and update (to INS: 'SXH' and 'VXH') ***
     // filter gain
-    Matrix KK(8, 8);
+    arma::mat88 KK(arma::fill::zeros);
 
     // measurement noise covariance matrix
     for (int i = 0; i < 4; i++) {
-        RR.assign_loc(i, i, pow(rpos * (1 + factr), 2));
-        RR.assign_loc(i + 4, i + 4, pow(rvel * (1 + factr), 2));
+        RR(i, i) = pow(rpos * (1 + factr), 2);
+        RR(i + 4, i + 4) = pow(rvel * (1 + factr), 2);
     }
     // Kalman gain
-    KK = PP * ~HH * (HH * PP * ~HH + RR).inverse();
+    KK = arma::inv(PP * arma::trans(HH) * (HH * PP * arma::trans(HH) + RR));
     // state correction
     XH = KK * ZZ;
     // covariance correction for next cycle
-    Matrix EYE(8, 8);
-    PP = (EYE.identity() - KK * HH) * PP;
+    PP = (arma::mat88(arma::fill::eye) - KK * HH) * PP;
 
     // clock error bias update
-    ucbias_error = ucbias_error - XH.get_loc(6, 0);
+    ucbias_error = ucbias_error - XH(6, 0);
 
     // diagnostics of 1st SV of quadriga saved to plot file
-    gps_pos_meas = ZZ.get_loc(0, 0);
-    gps_vel_meas = ZZ.get_loc(4, 0);
+    gps_pos_meas = ZZ(0, 0);
+    gps_vel_meas = ZZ(4, 0);
 
     // decomposing state vector for output
     for (int m = 0; m < 3; m++) {
-        SXH.assign_loc(m, 0, XH.get_loc(m, 0));
-        VXH.assign_loc(m, 0, XH.get_loc(m + 3, 0));
+        SXH(m, 0) = XH(m, 0);
+        VXH(m, 0) = XH(m + 3, 0);
     }
-    CXH.assign_loc(0, 0, XH.get_loc(6, 0));
-    CXH.assign_loc(1, 0, XH.get_loc(7, 0));
+    CXH(0, 0) = XH(6, 0);
+    CXH(1, 0) = XH(7, 0);
 
     // diagnostic
-    state_pos = SXH.absolute();
-    state_vel = VXH.absolute();
-
-    for (int i = 0; i < 3; i++){
-        position_state[i] = SXH.get_loc(i, 0);
-        velocity_state[i] = VXH.get_loc(i, 0);
-        clock_state[i] = CXH.get_loc(i, 0);
-    }
-
-    for (int n = 0; n < 8; n++) {
-        VEC1.assign_loc(n, 0, PP.get_loc(0, n));
-        VEC2.assign_loc(n, 0, PP.get_loc(1, n));
-        VEC3.assign_loc(n, 0, PP.get_loc(2, n));
-        VEC4.assign_loc(n, 0, PP.get_loc(3, n));
-        VEC5.assign_loc(n, 0, PP.get_loc(4, n));
-        VEC6.assign_loc(n, 0, PP.get_loc(5, n));
-        VEC7.assign_loc(n, 0, PP.get_loc(6, n));
-        VEC8.assign_loc(n, 0, PP.get_loc(7, n));
-    }
-    PP1 = VEC1.mat33_vec9();
-    PP2 = VEC2.mat33_vec9();
-    PP3 = VEC3.mat33_vec9();
-    PP4 = VEC4.mat33_vec9();
-    PP5 = VEC5.mat33_vec9();
-    PP6 = VEC6.mat33_vec9();
-    PP7 = VEC7.mat33_vec9();
-    PP8 = VEC8.mat33_vec9();
-
+    state_pos = norm(SXH);
+    state_vel = norm(VXH);
 }
+
+arma::vec3 GPS_Receiver::get_SXH() { return SXH; };
+arma::vec3 GPS_Receiver::get_VXH() { return VXH; };
+arma::vec3 GPS_Receiver::get_CXH() { return CXH; };

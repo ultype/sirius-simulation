@@ -27,6 +27,19 @@ class GPS_Receiver {
 
         GPS_Receiver& operator=(const GPS_Receiver& other);
 
+        /* factp    (--)      Factor to modifiy initial P-matrix P(1+factp) */
+        /* pclockb  (m)       Init 1sig clock bias error of state cov matrix */
+        /* pclockf  (m/s)     Init 1sig clock freq error of state cov matrix */
+        void setup_state_covariance_matrix(double factp, double pclockb, double pclockf);
+
+        /* factq    (--)      Factor to modifiy the Q-matrix Q(1+factq) */
+        /* qclockb  (m)       1sig clock bias error of process cov matrix */
+        /* qclockf  (m/s)     1sig clock freq error of process cov matrix */
+        void setup_error_covariance_matrix(double factq, double qclockb, double qclockf);
+
+        /* uctime_cor (s)       User clock correlation time constant */
+        void setup_fundamental_dynamic_matrix(double uctime_cor);
+
         void initialize(double int_step);
         void update_markov(double);
 
@@ -35,20 +48,14 @@ class GPS_Receiver {
         void filter_extrapolation(double);
         void measure();
 
-        Newton *newton;
-        _Euler_ *euler;
-        GPS_Satellites *gps_sats;
-        INS *ins;
-
-        double position_state[3];  /* *o (m)        Position state (inertial coor) */
-        double velocity_state[3];  /* *o (m)        Velocity state (inertial coor) */
         int gps_update;       /* *o (--)       GPS update? > 0 updated */
+
+        arma::vec3 get_SXH();
+        arma::vec3 get_VXH();
+        arma::vec3 get_CXH();
 
         /* Input File */
         double slot[4];         /* *o (--)       SV slot#  of quadriga */
-
-        /* XXX: GPS Executing Parameter */
-        /* These will be affected by S_define */
 
         /* GPS Device parameters */
         double del_rearth;      /* *i (m)       GPS Receiver LOS Minimum distance */
@@ -71,44 +78,48 @@ class GPS_Receiver {
         double DR_NOISE_bcor[4];     /* *i (--)     Delta-range noise bcor */
 
         /* GPS EKF Parameters */
-        double uctime_cor;      /* *i (s)       User clock correlation time constant */
         double ppos;            /* *i (m)       Init 1sig pos values of state cov matrix */
         double pvel;            /* *i (m/s)     Init 1sig vel values of state cov matrix */
-        double pclockb;         /* *i (m)       Init 1sig clock bias error of state cov matrix */
-        double pclockf;         /* *i (m/s)     Init 1sig clock freq error of state cov matrix */
         double qpos;            /* *i (m)       1sig pos values of process cov matrix */
         double qvel;            /* *i (m/s)     1sig vel values of process cov matrix */
-        double qclockb;         /* *i (m)       1sig clock bias error of process cov matrix */
-        double qclockf;         /* *i (m/s)     1sig clock freq error of process cov matrix */
         double rpos;            /* *i (m)       1sig pos value of meas cov matrix */
         double rvel;            /* *i (m/s)     1sig vel value of meas cov matrix */
-        double factp;           /* *i (--)      Factor to modifiy initial P-matrix P(1+factp) */
-        double factq;           /* *i (--)      Factor to modifiy the Q-matrix Q(1+factq) */
         double factr;           /* *i (--)      Factor to modifiy the R-matrix R(1+factr) */
     private:
         void default_data();
+
+        Newton         * newton;
+        _Euler_        * euler;
+        GPS_Satellites * gps_sats;
+        INS            * ins;
 
         /* Internal variables */
         bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
         double gps_epoch;           /* ** (s)       GPS update epoch time since launch */
         double time_gps;            /* ** (s)       GPS time passed */
-        Matrix FF = Matrix(8, 8);   /* ** (--)      Constant*/
-        Matrix PHI = Matrix(8, 8);  /* ** (--)      Constant*/
 
-        //XXX: use C array, for check-pointing and variable server
-        Matrix PP1 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 1st row */
-        Matrix PP2 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 2st row */
-        Matrix PP3 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 3st row */
-        Matrix PP4 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 4st row */
-        Matrix PP5 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 5st row */
-        Matrix PP6 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 6st row */
-        Matrix PP7 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 7st row */
-        Matrix PP8 = Matrix(3, 3);  /* ** (--)      Covariance Matrix 8st row */
+        arma::mat88 FF;             /* *o (--)      Constant*/
+        arma::mat88 PHI;            /* *o (--)      Constant*/
+
+        arma::mat PP;               /* *o (--)      Covariance Matrix */
+        double _PP[8][8];           /* *o (--)      Covariance Matrix */
+
+        double factq;               /* *o (--)      Factor to modifiy the Q-matrix Q(1+factq) */
+        double qclockb;             /* *o (m)       1sig clock bias error of process cov matrix */
+        double qclockf;             /* *o (m/s)     1sig clock freq error of process cov matrix */
 
         double slotsum;         /* ** (--)      Sum of stored slot numbers of quadriga */
 
-        /* GPS Outputs */
+        arma::vec SXH;       /* *o (m)        Position state (inertial coor) */
+        double   _SXH[3];    /* *o (m)        Position state (inertial coor) */
 
+        arma::vec VXH;      /* *o (m)        Velocity state (inertial coor) */
+        double   _VXH[3];   /* *o (m)        Velocity state (inertial coor) */
+
+        arma::vec CXH;      /* *o (--)       CLock state */
+        double   _CXH[3];   /* *o (--)       CLock state */
+
+        /* GPS Outputs */
         double gdop;            /* *o (m)        Geometric dillution of precision of quadriga */
         double ssii_quad[16];   /* *o (m)        Best quadriga inertial coordinates and their slot# */
         double vsii_quad[12];   /* *o (m/s)      Best quadriga inertial velocities */
@@ -132,9 +143,6 @@ class GPS_Receiver {
         double alt2;            /* *o (m)        Quadriga 2nd alt */
         double alt3;            /* *o (m)        Quadriga 3rd alt */
         double alt4;            /* *o (m)        quadriga 4th alt */
-
-
-        double clock_state[3];     /* *o (--)       CLock state */
 
         double gps_pos_meas;    /* *o (m)        */
         double gps_vel_meas;    /* *o (m)        */
