@@ -22,10 +22,12 @@ class GPS_Receiver {
     TRICK_INTERFACE(GPS_Receiver);
 
     public:
-        GPS_Receiver() {}
+        GPS_Receiver(Newton&, _Euler_&, GPS_Satellites&, INS&);
+        GPS_Receiver(const GPS_Receiver& other);
 
-        void default_data();
-        void initialize(Newton*, _Euler_*, GPS_Satellites*, INS*, double);
+        GPS_Receiver& operator=(const GPS_Receiver& other);
+
+        void initialize(double int_step);
         void update_markov(double);
 
         void get_quadriga();
@@ -84,6 +86,8 @@ class GPS_Receiver {
         double factq;           /* *i (--)      Factor to modifiy the Q-matrix Q(1+factq) */
         double factr;           /* *i (--)      Factor to modifiy the R-matrix R(1+factr) */
     private:
+        void default_data();
+
         /* Internal variables */
         bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
         double gps_epoch;           /* ** (s)       GPS update epoch time since launch */

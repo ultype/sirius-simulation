@@ -15,15 +15,34 @@
 #include "rocket/Earth.hh"
 #include "rocket/Ins.hh"
 
+INS::INS(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS &i)
+    :   newton(&ntn), euler(&elr), gps_sats(&sats), ins(&i)
+{
+    this->default_data();
+}
+
+INS::INS(const INS& other)
+    :   newton(other.newton), euler(other.euler), gps_sats(other.gps_sats), ins(other.ins)
+{
+    this->default_data();
+}
+
+INS& INS::operator=(const INS& other){
+    if(&other == this)
+        return *this;
+
+    this->newton = other.newton
+    this->euler = other.euler
+    this->gps_sats = other.gps_sats
+    this->ins = other.ins
+
+    return *this;
+}
+
 void GPS_Receiver::default_data(){
 }
 
-void GPS_Receiver::initialize(Newton* ntn, _Euler_* elr, GPS_Satellites* sats, INS* i, double int_step){
-    newton = ntn;
-    euler = elr;
-    gps_sats = sats;
-    ins = i;
-
+void GPS_Receiver::initialize(double int_step){
     gps_update = 0;
 
     Matrix PP(8, 8);  // recursive, must be saved; separated into 8 PPx(3x3)
