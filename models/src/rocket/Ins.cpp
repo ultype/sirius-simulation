@@ -376,9 +376,6 @@ void INS::update(double int_step){
     assert(gyro && "INS module must be given a gyro model");
     assert(accel && "INS module must be given a accelerometer model");
 
-    gyro->propagate_error(int_step);
-    accel->propagate_error(int_step);
-
     // local variables
     double lonc(0), latc(0);
     double psivdc(0), thtvdc(0);
