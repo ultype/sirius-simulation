@@ -54,6 +54,7 @@ class AeroDynamics{
         double get_cln();
         double get_cx();
         double get_cz();
+        double get_dlde();
 
         /* Input File */
         void set_xcg_ref(double);     /* *io (m)      Reference cg location from nose - m*/

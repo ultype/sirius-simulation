@@ -278,3 +278,85 @@ double Control::control_pitch_rate(double qqdx){
 
     return delecx;
 }
+
+
+double Control::control_gamma(double thtvdcomx)
+{
+    //local variables
+    Matrix AA(3,3);
+    Matrix BB(3,1);
+    Matrix DP(3,3);
+    Matrix DD(3,1);
+    Matrix HH(3,1);
+
+    //local module-variables
+    Matrix GAINGAM(3,1);
+    double gainff=0;
+
+    //localizing module-variables
+    //input data
+    double pgam = 4.;
+    double wgam = 2.;
+    double zgam = 0.7;
+    //input from other modules
+    double dvbe=newton->get_dvbe();
+    double dla=aerodynamics->get_dla();
+    double dlde=aerodynamics->get_dlde();
+    double dma=aerodynamics->get_dma();
+    double dmq=aerodynamics->get_dmq();
+    double dmde=aerodynamics->get_dmde(); 
+    double qqcx=ins->get_gyro().get_qqcx();
+    double dvbec=hyper[330].real();
+    double thtvdcx=hyper[332].real();
+    double thtbdcx=hyper[339].real();
+    //--------------------------------------------------------------------------
+
+    //prevent division by zero
+    if(dvbec==0)dvbec=dvbe;
+    
+    //building fundamental matrices (body rate, acceleration, fin deflection)
+    AA.build_mat33(dmq,dma,-dma,1.,0.,0.,0.,dla/dvbec,-dla/dvbec);
+    BB.build_vec3(dmde,0.,dlde/dvbec);
+
+    //feedback gains from closed-loop pole placement
+    double am=2.*zgam*wgam+pgam;
+    double bm=wgam*wgam+2.*zgam*wgam*pgam;
+    double cm=wgam*wgam*pgam;
+    double v11=dmde;
+    double v12=0.;
+    double v13=dlde/dvbec;
+    double v21=dmde*dla/dvbec-dlde*dma/dvbec;
+    double v22=dmde;
+    double v23=-dmq*dlde/dvbec;
+    double v31=0.;
+    double v32=v21;
+    double v33=v21;
+    DP.build_mat33(v11,v12,v13,v21,v22,v23,v31,v32,v33);
+    DD.build_vec3(am+dmq-dla/dvbec,bm+dma+dmq*dla/dvbec,cm);
+    Matrix DPI=DP.inverse();
+    GAINGAM=DPI*DD;
+
+    //steady-state feed-forward gain to achieve unit gamma response
+    Matrix DUM33=AA-BB*~GAINGAM;
+    Matrix IDUM33=DUM33.inverse();
+    Matrix DUM3=IDUM33*BB;
+    HH.build_vec3(0.,0.,1.);
+    double denom=HH^DUM3;
+    gainff=-1./denom;
+
+    //pitch control command
+    double thtc=gainff*thtvdcomx*RAD;
+    double qqf=GAINGAM.get_loc(0,0)*qqcx*RAD;
+    double thtbgf=GAINGAM.get_loc(1,0)*thtbdcx*RAD;
+    double thtugf=GAINGAM.get_loc(2,0)*thtvdcx*RAD;
+    double delec=thtc-(qqf+thtbgf+thtugf);
+    double delecx=delec*DEG;
+
+    //--------------------------------------------------------------------------
+    //loading module-variables
+    //diagnostics
+    hyper[566].gets_vec(GAINGAM);
+    hyper[567].gets(gainff);
+
+    return delecx;
+}

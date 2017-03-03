@@ -289,3 +289,4 @@ double AeroDynamics::get_clm() { return clm; }
 double AeroDynamics::get_cln() { return cln; }
 double AeroDynamics::get_cx() { return cx; }
 double AeroDynamics::get_cz() { return cz; }
+double AeroDynamics::get_dlde() { return dlde; }

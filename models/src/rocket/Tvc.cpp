@@ -290,6 +290,7 @@ void TVC::set_dtvclimx(double in) { dtvclimx = in; }
 void TVC::set_wntvc(double in) { wntvc = in; }
 void TVC::set_zettvc(double in) { zettvc = in; }
 void TVC::set_factgtvc(double in) { factgtvc = in; }
+void TVC::set_parm(double in) { parm = in; }
 
 double TVC::get_parm() { return parm; }
 
