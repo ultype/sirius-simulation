@@ -19,7 +19,11 @@ namespace sensor {
         TRICK_INTERFACE(sensor__AccelerometerIdeal);
 
         public:
-            char name[256];
+
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Accelerometer>(*this);
+            }
 
             AccelerometerIdeal(Newton &newt);
 

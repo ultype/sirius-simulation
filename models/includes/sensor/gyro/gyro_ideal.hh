@@ -20,7 +20,10 @@ namespace sensor {
         TRICK_INTERFACE(sensor__GyroIdeal);
 
         public:
-            char name[256];
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Gyro>(*this);
+            }
 
             GyroIdeal(_Euler_ &eul);
 

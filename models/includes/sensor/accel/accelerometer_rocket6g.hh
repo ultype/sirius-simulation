@@ -19,7 +19,16 @@ namespace sensor {
         TRICK_INTERFACE(sensor__AccelerometerRocket6G);
 
         public:
-            char name[256];
+
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Accelerometer>(*this);
+
+                ar & _EWALKA;
+                ar & _EMISA;
+                ar & _ESCALA;
+                ar & _EBIASA;
+            }
 
             AccelerometerRocket6G(double emisa[3], double escala[3], double ebiasa[3], Newton &newt);
 

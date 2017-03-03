@@ -6,6 +6,8 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/rocket/Ins.cpp))
 *******************************************************************************/
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include "Newton.hh"
 #include "Euler.hh"
@@ -25,6 +27,9 @@ class Environment;
 class INS {
     TRICK_INTERFACE(INS);
     public:
+        template<class Archive>
+        void serialize(Archive & archive, const unsigned int version);
+
         INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps);
         INS(const INS& other);
 

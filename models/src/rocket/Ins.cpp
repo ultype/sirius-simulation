@@ -15,6 +15,53 @@
 #include "sensor/gyro/gyro_ideal.hh"
 #include "sensor/gyro/gyro_rocket6g.hh"
 
+#include "sensor/accel/accelerometer.hh"
+#include "sensor/accel/accelerometer_ideal.hh"
+#include "sensor/accel/accelerometer_rocket6g.hh"
+
+#include <boost/serialization/export.hpp>
+
+#include <fstream>
+
+template<class Archive>
+void INS::serialize(Archive & ar, const unsigned int version){
+    ar.template register_type<sensor::GyroIdeal>();
+    ar.template register_type<sensor::GyroRocket6G>();
+
+    ar.template register_type<sensor::AccelerometerIdeal>();
+    ar.template register_type<sensor::AccelerometerRocket6G>();
+
+    ar & gyro;
+    ar & accel;
+    ar & _EVBI;
+    ar & _EVBID;
+    ar & _ESBI;
+    ar & _ESBID;
+    ar & _RICI;
+    ar & _RICID;
+    ar & _TBIC;
+    ar & _SBIIC;
+    ar & _VBIIC;
+    ar & _WBICI;
+    ar & _EGRAVI;
+    ar & loncx;
+    ar & latcx;
+    ar & altc;
+    ar & _VBECD;
+    ar & _TDCI;
+    ar & dbic;
+    ar & dvbec;
+    ar & alphacx;
+    ar & betacx;
+    ar & thtvdcx;
+    ar & psivdcx;
+    ar & alppcx;
+    ar & phipcx;
+    ar & phibdcx;
+    ar & thtbdcx;
+    ar & psibdcx;
+}
+
 INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps)
     :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps),
         MATRIX_INIT(WEII, 3, 3),

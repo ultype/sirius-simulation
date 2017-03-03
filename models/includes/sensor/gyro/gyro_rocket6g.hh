@@ -22,7 +22,18 @@ namespace sensor {
         TRICK_INTERFACE(sensor__GyroRocket6G);
 
         public:
-            char name[256];
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Gyro>(*this);
+
+                ar & _EUG;
+                ar & _EWG;
+                ar & _EWALKG;
+                ar & _EUNBG;
+                ar & _EMISG;
+                ar & _ESCALG;
+                ar & _EBIASG;
+            }
 
             GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine);
 
