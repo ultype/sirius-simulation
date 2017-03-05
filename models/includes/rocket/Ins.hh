@@ -51,6 +51,7 @@ class INS {
         double get_phibdcx();
         double get_thtbdcx();
         double get_psibdcx();
+        double get_thtvdcx();
 
         Matrix get_SBIIC();
         Matrix get_VBIIC();

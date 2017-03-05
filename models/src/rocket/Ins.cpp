@@ -467,6 +467,7 @@ double INS::get_betacx() { return betacx; }
 double INS::get_phibdcx() { return phibdcx; }
 double INS::get_thtbdcx() { return thtbdcx; }
 double INS::get_psibdcx() { return psibdcx; }
+double INS::get_thtvdcx() { return thtvdcx; }
 
 Matrix INS::get_SBIIC() {
     Matrix SBIIC(_SBIIC);

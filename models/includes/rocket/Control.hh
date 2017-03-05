@@ -24,7 +24,7 @@ class Control {
     TRICK_INTERFACE(Control);
 
     public:
-        Control() {}
+        Control();
 
         void default_data();
         void initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero);
@@ -33,6 +33,7 @@ class Control {
         double control_normal_accel(double ancomx, double int_step);
         double control_yaw_accel(double alcomx, double int_step);
         double control_pitch_rate(double qqdx);
+        double control_gamma(double thtvdcomx);
 
         Environment *environment;
         AeroDynamics *aerodynamics;
@@ -93,6 +94,10 @@ class Control {
         double  ancomx;         /* *io (--)     Pitch (normal) acceleration command */
         double  qqdx;           /* *io (--)     Desired pitch rate", "control */
         double  grate;          /* *io (--)     grate */
+        double gainff;
+
+        arma::mat GAINGAM;      /* *io  (--)    Gain */
+        double _GAINGAM[3][3];  /* 8io  (--)    Gain */
 };
 
 #endif  // __CONTROL_HH__
