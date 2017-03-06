@@ -1,9 +1,9 @@
 #execfile("Modified_data/realtime.py")
 #execfile("Modified_data/rocket.dr")
 execfile("Modified_data/test.dr")
-trick.exec_set_enable_freeze(True)
-trick.exec_set_freeze_command(True)
-trick.sim_control_panel_set_enabled(True)
+# trick.exec_set_enable_freeze(True)
+# trick.exec_set_freeze_command(True)
+# trick.sim_control_panel_set_enabled(True)
 ##########################################################
 
 #############################################################
@@ -84,7 +84,8 @@ wntvc = 100
 zettvc = 0.7
 factgtvc = 0
 parm = 19.25
-mtvc = "NO_TVC"
+mtvc = rkt.tvc.NO_DYNAMIC_TVC
+gtvc = 1.0
 rkt.tvc.set_tvclimx(tvclimx)
 rkt.tvc.set_dtvclimx(dtvclimx)
 rkt.tvc.set_wntvc(wntvc)
@@ -92,7 +93,21 @@ rkt.tvc.set_zettvc(zettvc)
 rkt.tvc.set_factgtvc(factgtvc)
 rkt.tvc.set_parm(parm)
 rkt.tvc.set_mtvc(mtvc)
+rkt.tvc.set_gtvc(gtvc)
 #####################################################################################
+
+#####################################################################################
+#Control
+maut = 55 
+thtvdcomx = 88
+delmix = 7.0;
+drlmix = 7.0;
+
+rkt.control.set_thtvdcomx(thtvdcomx)
+rkt.control.set_delimx(delmix)
+rkt.control.set_drlimx(drlmix)
+#####################################################################################
+
 #####################################################################################
 #INS
 """
@@ -209,7 +224,12 @@ betacomx = 0    #Beta command - deg  module guidance
 rkt.guidance.set_degree(alphacomx, betacomx)
 ######################################################################################################
 
-
-
+control = trick.new_event("control")
+control.set_cycle(0.001)
+control.condition(0,"trick.exec_get_sim_time() == 5.001")
+control.action(0, "rkt.control.set_maut(maut)")
+control.action(1, "rkt.control.set_thtvdcomx(thtvdcomx)")
+trick.add_event(control)
+control.activate()
 
 trick.stop(100)

@@ -5,7 +5,7 @@ void Control::default_data(){
 
 double  Control::get_delecx() { return delecx; }
 double  Control::get_delrcx() { return delrcx; }
-Control::Control()  :   MATRIX_INIT(GAINGAM, 3, 3)
+Control::Control()  :   MATRIX_INIT(GAINGAM, 3, 1)
 {
     
 }
@@ -69,6 +69,10 @@ void Control::control(double int_step){
     if (mautp == 4) {
         if (mprop)
             delecx = control_pitch_rate(qqdx);
+    }
+    if (mautp == 5){
+        if(mprop)
+            delecx = control_gamma(thtvdcomx);
     }
     // limiting control commands
     if (fabs(delecx) > delimx)
@@ -299,9 +303,9 @@ double Control::control_gamma(double thtvdcomx)
 
     //localizing module-variables
     //input data
-    double pgam = 4.;
-    double wgam = 2.;
-    double zgam = 0.7;
+    double pgam = 3.0;
+    double wgam = 0.202;
+    double zgam = 1.0;
     //input from other modules
     double dvbe=newton->get_dvbe();
     double dla=aerodynamics->get_dla();
@@ -366,6 +370,7 @@ double Control::control_gamma(double thtvdcomx)
     arma::mat DPI=inv(DP);
     GAINGAM=DPI*DD;
 
+
     //steady-state feed-forward gain to achieve unit gamma response
     arma::mat DUM33=AA-BB*trans(GAINGAM);
     arma::mat IDUM33=inv(DUM33);
@@ -394,3 +399,9 @@ double Control::control_gamma(double thtvdcomx)
 
     return delecx;
 }
+
+
+void Control::set_thtvdcomx(double in) { this->thtvdcomx = in; }
+void Control::set_maut(double in) { this->maut = in; }
+void Control::set_delimx(double in) { this->delimx = in; }
+void Control::set_drlimx(double in) { this->drlimx = in; }
