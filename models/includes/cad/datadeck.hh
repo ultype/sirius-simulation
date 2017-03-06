@@ -6,8 +6,10 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../../src/cad/datadeck.cpp))
 *******************************************************************************/
+#include <boost/serialization/vector.hpp>
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -25,18 +27,28 @@ class Table
         int var2_dim;
         int var3_dim;
     public:
-        double *var1_values;
-        double *var2_values;
-        double *var3_values;
-        double *data;
+        std::vector<double> var1_values;
+        std::vector<double> var2_values;
+        std::vector<double> var3_values;
+        std::vector<double> data;
+
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & name;
+            ar & dim;
+            ar & var1_dim;
+            ar & var2_dim;
+            ar & var3_dim;
+
+            ar & var1_values;
+            ar & var2_values;
+            ar & var3_values;
+            ar & data;
+        }
 
         Table(){}
         virtual ~Table()
         {
-            delete [] var1_values;
-            delete [] var2_values;
-            delete [] var3_values;
-            delete [] data;
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -135,9 +147,16 @@ class Datadeck
         string title;
         int capacity;
         int tbl_counter;
-        Table **table_ptr;
+        std::vector<Table*> table_ptr;
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & title;
+            ar & capacity;
+            ar & tbl_counter;
+            ar & table_ptr;
+        }
 
         Datadeck(){}
         Datadeck(char *file_name);
@@ -147,7 +166,11 @@ class Datadeck
         //Allocating memory  table deck title
         //030711 Created by Peter H Zipfel
         ///////////////////////////////////////////////////////////////////////////////
-        void alloc_mem(){table_ptr=new Table *[capacity];}
+        void alloc_mem(){
+            table_ptr = std::vector<Table*>(capacity);
+            for(int i = 0; i < capacity; i++)
+                table_ptr[i] = new Table();
+        }
 
         ///////////////////////////////////////////////////////////////////////////////
         //Setting table deck title
@@ -248,7 +271,7 @@ class Datadeck
         //
         //010628 Created by Peter H Zipfel
         ///////////////////////////////////////////////////////////////////////////////
-        int find_index(int max,double value,double *list);
+        int find_index(int max,double value, std::vector<double> list);
 
         ///////////////////////////////////////////////////////////////////////////////
         //Linear one-dimensional interpolation

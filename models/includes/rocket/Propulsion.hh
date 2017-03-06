@@ -18,6 +18,43 @@ class Propulsion{
     TRICK_INTERFACE(Propulsion);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & environment;
+
+            /* Constants */
+            ar & xcg_0;
+            ar & xcg_1;
+            ar & moi_roll_0;
+            ar & moi_roll_1;
+            ar & moi_trans_0;
+            ar & moi_trans_1;
+            ar & fuel_flow_rate;
+            ar & spi;
+
+            ar & aexit;
+            ar & payload;
+
+            ar & vmass0;
+            ar & fmass0;
+
+            /* State */
+            ar & thrust_state;
+
+            /* Propagative Stats */
+            ar & fmasse;
+            ar & fmassed;
+            ar & thrust_delta_v;
+
+            /* Generating Outputs */
+            ar & fmassr;
+            ar & thrust;
+            ar & vmass;
+
+            ar & xcg;
+            ar & _IBBB;
+        }
+
         Propulsion(Environment& env);
         Propulsion(const Propulsion& other);
 

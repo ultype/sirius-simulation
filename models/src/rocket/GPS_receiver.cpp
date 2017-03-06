@@ -23,6 +23,8 @@
 GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS &i)
     :   newton(&ntn), euler(&elr), gps_sats(&sats), ins(&i),
         MATRIX_INIT(PP, 8, 8),
+        MATRIX_INIT(FF, 8, 8),
+        MATRIX_INIT(PHI, 8, 8),
         VECTOR_INIT(SXH, 3),
         VECTOR_INIT(VXH, 3),
         VECTOR_INIT(CXH, 3)
@@ -33,11 +35,92 @@ GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS 
 GPS_Receiver::GPS_Receiver(const GPS_Receiver& other)
     :   newton(other.newton), euler(other.euler), gps_sats(other.gps_sats), ins(other.ins),
         MATRIX_INIT(PP, 8, 8),
+        MATRIX_INIT(FF, 8, 8),
+        MATRIX_INIT(PHI, 8, 8),
         VECTOR_INIT(SXH, 3),
         VECTOR_INIT(VXH, 3),
         VECTOR_INIT(CXH, 3)
 {
     this->default_data();
+
+    /* Input File */
+    memcpy(this->slot, other.slot, sizeof(this->slot));
+
+    /* GPS Device parameters */
+    this->del_rearth = other.del_rearth;
+    this->gps_acqtime = other.gps_acqtime;
+    this->gps_step = other.gps_step;
+
+    this->ucfreq_noise = other.ucfreq_noise;
+    this->ucfreq_noise_sigma = other.ucfreq_noise_sigma;
+    this->ucfreq_noise_bcor = other.ucfreq_noise_bcor;
+    this->ucbias_error = other.ucbias_error;
+
+    memcpy(this->PR_BIAS        , other.PR_BIAS        , sizeof(this->PR_BIAS));
+    memcpy(this->PR_NOISE       , other.PR_NOISE       , sizeof(this->PR_NOISE));
+    memcpy(this->PR_NOISE_sigma , other.PR_NOISE_sigma , sizeof(this->PR_NOISE_sigma));
+    memcpy(this->PR_NOISE_bcor  , other.PR_NOISE_bcor  , sizeof(this->PR_NOISE_bcor));
+    memcpy(this->DR_NOISE       , other.DR_NOISE       , sizeof(this->DR_NOISE));
+    memcpy(this->DR_NOISE_sigma , other.DR_NOISE_sigma , sizeof(this->DR_NOISE_sigma));
+    memcpy(this->DR_NOISE_bcor  , other.DR_NOISE_bcor  , sizeof(this->DR_NOISE_bcor));
+
+    /* GPS EKF Parameters */
+    this->ppos = other.ppos;
+    this->pvel = other.pvel;
+    this->qpos = other.qpos;
+    this->qvel = other.qvel;
+    this->rpos = other.rpos;
+    this->rvel = other.rvel;
+    this->factr = other.factr;
+
+    /* Internal variables */
+    this->gps_acq = this->gps_acq;
+    this->gps_epoch = other.gps_epoch;
+    this->time_gps = other.time_gps;
+
+    this->FF = other.FF;
+    this->PHI = other.PHI;
+    this->PP = other.PP;
+
+    this->factq = other.factq;
+    this->qclockb = other.qclockb;
+    this->qclockf = other.qclockf;
+
+    this->slotsum = other.slotsum;
+
+    this->SXH = other.SXH;
+    this->VXH = other.VXH;
+    this->CXH = other.CXH;
+
+    /* GPS Outputs */
+    this->gdop = other.gdop;
+    memcpy(this->ssii_quad, other.ssii_quad, sizeof(this->ssii_quad));
+    memcpy(this->vsii_quad, other.vsii_quad, sizeof(this->vsii_quad));
+
+    this->ucfreq_error = other.ucfreq_error;
+    this->ucfreqm = other.ucfreqm;
+
+    this->std_pos = other.std_pos;
+    this->std_vel = other.std_vel;
+    this->std_ucbias = other.std_ucbias;
+
+    this->lat1 = other.lat1;
+    this->lat2 = other.lat2;
+    this->lat3 = other.lat3;
+    this->lat4 = other.lat4;
+    this->lon1 = other.lon1;
+    this->lon2 = other.lon2;
+    this->lon3 = other.lon3;
+    this->lon4 = other.lon4;
+    this->alt1 = other.alt1;
+    this->alt2 = other.alt2;
+    this->alt3 = other.alt3;
+    this->alt4 = other.alt4;
+
+    this->gps_pos_meas = other.gps_pos_meas;
+    this->gps_vel_meas = other.gps_vel_meas;
+    this->state_pos = other.state_pos;
+    this->state_vel = other.state_vel;
 }
 
 GPS_Receiver& GPS_Receiver::operator=(const GPS_Receiver& other){
@@ -48,6 +131,85 @@ GPS_Receiver& GPS_Receiver::operator=(const GPS_Receiver& other){
     this->euler    = other.euler;
     this->gps_sats = other.gps_sats;
     this->ins      = other.ins;
+
+    /* Input File */
+    memcpy(this->slot, other.slot, sizeof(this->slot));
+
+    /* GPS Device parameters */
+    this->del_rearth = other.del_rearth;
+    this->gps_acqtime = other.gps_acqtime;
+    this->gps_step = other.gps_step;
+
+    this->ucfreq_noise = other.ucfreq_noise;
+    this->ucfreq_noise_sigma = other.ucfreq_noise_sigma;
+    this->ucfreq_noise_bcor = other.ucfreq_noise_bcor;
+    this->ucbias_error = other.ucbias_error;
+
+    memcpy(this->PR_BIAS        , other.PR_BIAS        , sizeof(this->PR_BIAS));
+    memcpy(this->PR_NOISE       , other.PR_NOISE       , sizeof(this->PR_NOISE));
+    memcpy(this->PR_NOISE_sigma , other.PR_NOISE_sigma , sizeof(this->PR_NOISE_sigma));
+    memcpy(this->PR_NOISE_bcor  , other.PR_NOISE_bcor  , sizeof(this->PR_NOISE_bcor));
+    memcpy(this->DR_NOISE       , other.DR_NOISE       , sizeof(this->DR_NOISE));
+    memcpy(this->DR_NOISE_sigma , other.DR_NOISE_sigma , sizeof(this->DR_NOISE_sigma));
+    memcpy(this->DR_NOISE_bcor  , other.DR_NOISE_bcor  , sizeof(this->DR_NOISE_bcor));
+
+    /* GPS EKF Parameters */
+    this->ppos = other.ppos;
+    this->pvel = other.pvel;
+    this->qpos = other.qpos;
+    this->qvel = other.qvel;
+    this->rpos = other.rpos;
+    this->rvel = other.rvel;
+    this->factr = other.factr;
+
+    /* Internal variables */
+    this->gps_acq = this->gps_acq;
+    this->gps_epoch = other.gps_epoch;
+    this->time_gps = other.time_gps;
+
+    this->FF = other.FF;
+    this->PHI = other.PHI;
+    this->PP = other.PP;
+
+    this->factq = other.factq;
+    this->qclockb = other.qclockb;
+    this->qclockf = other.qclockf;
+
+    this->slotsum = other.slotsum;
+
+    this->SXH = other.SXH;
+    this->VXH = other.VXH;
+    this->CXH = other.CXH;
+
+    /* GPS Outputs */
+    this->gdop = other.gdop;
+    memcpy(this->ssii_quad, other.ssii_quad, sizeof(this->ssii_quad));
+    memcpy(this->vsii_quad, other.vsii_quad, sizeof(this->vsii_quad));
+
+    this->ucfreq_error = other.ucfreq_error;
+    this->ucfreqm = other.ucfreqm;
+
+    this->std_pos = other.std_pos;
+    this->std_vel = other.std_vel;
+    this->std_ucbias = other.std_ucbias;
+
+    this->lat1 = other.lat1;
+    this->lat2 = other.lat2;
+    this->lat3 = other.lat3;
+    this->lat4 = other.lat4;
+    this->lon1 = other.lon1;
+    this->lon2 = other.lon2;
+    this->lon3 = other.lon3;
+    this->lon4 = other.lon4;
+    this->alt1 = other.alt1;
+    this->alt2 = other.alt2;
+    this->alt3 = other.alt3;
+    this->alt4 = other.alt4;
+
+    this->gps_pos_meas = other.gps_pos_meas;
+    this->gps_vel_meas = other.gps_vel_meas;
+    this->state_pos = other.state_pos;
+    this->state_vel = other.state_vel;
 
     return *this;
 }

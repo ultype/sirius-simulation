@@ -4,6 +4,8 @@
 PURPOSE:
       (Accelerometer model interface definition)
 *******************************************************************************/
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include <armadillo>
 #include <aux/aux.hh>
@@ -18,7 +20,7 @@ namespace sensor {
             void serialize(Archive & ar, const unsigned int version){
                 ar & _FSPCB;
                 ar & _EFSPB;
-            }
+            };
 
             char name[256];
 

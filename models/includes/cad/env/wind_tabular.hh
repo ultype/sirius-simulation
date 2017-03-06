@@ -15,6 +15,11 @@ namespace cad {
     class Wind_Tabular : public Wind
     {
         public:
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Wind>(*this);
+            };
+
             Wind_Tabular(char* filepath, double twind, double vertical_wind);
 
             virtual ~Wind_Tabular();

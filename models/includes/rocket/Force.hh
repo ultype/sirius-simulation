@@ -27,6 +27,19 @@ class Forces {
     TRICK_INTERFACE(Forces);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & environment;
+            ar & propulsion;
+            ar & rcs;
+            ar & aerodynamics;
+            ar & tvc;
+
+            ar & _FAP;
+            ar & _FAPB;
+            ar & _FMB;
+        }
+
         Forces(){};
 
         Forces(Environment& env, Propulsion& prop, RCS& rcs, AeroDynamics& aero, TVC& tvc);

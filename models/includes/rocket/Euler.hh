@@ -26,6 +26,19 @@ class _Euler_ {
     TRICK_INTERFACE(_Euler_);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & kinematics;
+            ar & propulsion;
+            ar & forces;
+
+            ar & _WBIB;
+            ar & _WBIBD;
+
+            ar & _WBII;
+            ar & _WBEB;
+        }
+
         _Euler_(Kinematics& kine, Propulsion& prop, Forces& forc);
         _Euler_(const _Euler_& other);
 

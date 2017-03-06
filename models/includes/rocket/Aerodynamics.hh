@@ -25,6 +25,77 @@ class AeroDynamics{
     TRICK_INTERFACE(AeroDynamics);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & kinematics;
+            ar & environment;
+            ar & propulsion;
+            ar & euler;
+            ar & newton;
+            ar & tvc;
+
+            ar & aerotable;
+
+            ar & xcg_ref;
+            ar & alplimx;
+            ar & alimitx;
+            ar & refa;
+            ar & refd;
+            ar & dyb;
+            ar & dma;
+            ar & dnb;
+            ar & dnd;
+            ar & dmq;
+            ar & dnr;
+            ar & dmde;
+            ar & dndr;
+            ar & gymax;
+            ar & dla;
+            ar & cy;
+            ar & cll;
+            ar & clm;
+            ar & cln;
+            ar & cx;
+            ar & cz;
+
+            ar & ca0;
+            ar & caa;
+            ar & cn0;
+            ar & clm0;
+            ar & clmq;
+            ar & cla;
+            ar & clde;
+            ar & cyb;
+            ar & cydr;
+            ar & cllda;
+            ar & cllp;
+            ar & cma;
+            ar & cmde;
+            ar & cmq;
+            ar & cnb;
+            ar & cndr;
+            ar & cnr;
+            ar & stmarg_yaw;
+            ar & stmarg_pitch;
+            ar & dlde;
+            ar & dydr;
+            ar & dllp;
+            ar & dllda;
+            ar & realp1;
+            ar & realp2;
+            ar & wnp;
+            ar & zetp;
+            ar & rpreal;
+            ar & realy1;
+            ar & realy2;
+            ar & wny;
+            ar & zety;
+            ar & ryreal;
+            ar & gnavail;
+            ar & gyavail;
+            ar & gnmax;
+        }
+
         AeroDynamics(Kinematics &kine,  Environment &env,
                      Propulsion &prop,  _Euler_     &eul,
                      Newton     &newt,  TVC         &t);

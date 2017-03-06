@@ -23,7 +23,7 @@ namespace sensor {
                 ar & qqcx;
                 ar & rrcx;
                 ar & ppcx;
-            }
+            };
 
             char name[256];
 

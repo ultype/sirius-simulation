@@ -20,7 +20,6 @@ TVC::TVC(const TVC& other)
 {
     this->default_data();
 
-
     this->mtvc = other.mtvc;
 
     /* Constants */

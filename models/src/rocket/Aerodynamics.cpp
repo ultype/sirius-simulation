@@ -14,13 +14,141 @@ AeroDynamics::AeroDynamics(const AeroDynamics& other)
         propulsion(other.propulsion), euler(other.euler),
         newton(other.newton), tvc(other.tvc)
 {
+    this->aerotable = other.aerotable;
 
+    this->xcg_ref = other.xcg_ref;
+    this->alplimx = other.alplimx;
+    this->alimitx = other.alimitx;
+    this->refa = other.refa;
+    this->refd = other.refd;
+    this->dyb = other.dyb;
+    this->dma = other.dma;
+    this->dnb = other.dnb;
+    this->dnd = other.dnd;
+    this->dmq = other.dmq;
+    this->dnr = other.dnr;
+    this->dmde = other.dmde;
+    this->dndr = other.dndr;
+    this->gymax = other.gymax;
+    this->dla = other.dla;
+    this->cy = other.cy;
+    this->cll = other.cll;
+    this->clm = other.clm;
+    this->cln = other.cln;
+    this->cx = other.cx;
+    this->cz = other.cz;
+
+    this->ca0 = other.ca0;
+    this->caa = other.caa;
+    this->cn0 = other.cn0;
+    this->clm0 = other.clm0;
+    this->clmq = other.clmq;
+    this->cla = other.cla;
+    this->clde = other.clde;
+    this->cyb = other.cyb;
+    this->cydr = other.cydr;
+    this->cllda = other.cllda;
+    this->cllp = other.cllp;
+    this->cma = other.cma;
+    this->cmde = other.cmde;
+    this->cmq = other.cmq;
+    this->cnb = other.cnb;
+    this->cndr = other.cndr;
+    this->cnr = other.cnr;
+    this->stmarg_yaw = other.stmarg_yaw;
+    this->stmarg_pitch = other.stmarg_pitch;
+    this->dlde = other.dlde;
+    this->dydr = other.dydr;
+    this->dllp = other.dllp;
+    this->dllda = other.dllda;
+    this->realp1 = other.realp1;
+    this->realp2 = other.realp2;
+    this->wnp = other.wnp;
+    this->zetp = other.zetp;
+    this->rpreal = other.rpreal;
+    this->realy1 = other.realy1;
+    this->realy2 = other.realy2;
+    this->wny = other.wny;
+    this->zety = other.zety;
+    this->ryreal = other.ryreal;
+    this->gnavail = other.gnavail;
+    this->gyavail = other.gyavail;
+    this->gnmax = other.gnmax;
 }
 
 AeroDynamics& AeroDynamics::operator=(const AeroDynamics& other){
     if(&other == this)
         return *this;
 
+    this->kinematics = other.kinematics;
+    this->environment = other.environment;
+    this->propulsion = other.propulsion;
+    this->euler = other.euler;
+    this->newton = other.newton;
+    this->tvc = other.tvc;
+
+    this->aerotable = other.aerotable;
+
+    this->xcg_ref = other.xcg_ref;
+    this->alplimx = other.alplimx;
+    this->alimitx = other.alimitx;
+    this->refa = other.refa;
+    this->refd = other.refd;
+    this->dyb = other.dyb;
+    this->dma = other.dma;
+    this->dnb = other.dnb;
+    this->dnd = other.dnd;
+    this->dmq = other.dmq;
+    this->dnr = other.dnr;
+    this->dmde = other.dmde;
+    this->dndr = other.dndr;
+    this->gymax = other.gymax;
+    this->dla = other.dla;
+    this->cy = other.cy;
+    this->cll = other.cll;
+    this->clm = other.clm;
+    this->cln = other.cln;
+    this->cx = other.cx;
+    this->cz = other.cz;
+
+    this->ca0 = other.ca0;
+    this->caa = other.caa;
+    this->cn0 = other.cn0;
+    this->clm0 = other.clm0;
+    this->clmq = other.clmq;
+    this->cla = other.cla;
+    this->clde = other.clde;
+    this->cyb = other.cyb;
+    this->cydr = other.cydr;
+    this->cllda = other.cllda;
+    this->cllp = other.cllp;
+    this->cma = other.cma;
+    this->cmde = other.cmde;
+    this->cmq = other.cmq;
+    this->cnb = other.cnb;
+    this->cndr = other.cndr;
+    this->cnr = other.cnr;
+    this->stmarg_yaw = other.stmarg_yaw;
+    this->stmarg_pitch = other.stmarg_pitch;
+    this->dlde = other.dlde;
+    this->dydr = other.dydr;
+    this->dllp = other.dllp;
+    this->dllda = other.dllda;
+    this->realp1 = other.realp1;
+    this->realp2 = other.realp2;
+    this->wnp = other.wnp;
+    this->zetp = other.zetp;
+    this->rpreal = other.rpreal;
+    this->realy1 = other.realy1;
+    this->realy2 = other.realy2;
+    this->wny = other.wny;
+    this->zety = other.zety;
+    this->ryreal = other.ryreal;
+    this->gnavail = other.gnavail;
+    this->gyavail = other.gyavail;
+    this->gnmax = other.gnmax;
+
+    return *this;
 }
 
 

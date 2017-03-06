@@ -14,6 +14,10 @@ LIBRARY DEPENDENCY:
 
 #include "rocket/Euler.hh"
 
+#include <boost/archive/text_oarchive.hpp>
+
+class _Euler_;
+
 namespace sensor {
     class GyroIdeal : public Gyro
     {
@@ -23,7 +27,9 @@ namespace sensor {
             template<class Archive>
             void serialize(Archive & ar, const unsigned int version){
                 ar & boost::serialization::base_object<Gyro>(*this);
-            }
+
+                ar & euler;
+            };
 
             GyroIdeal(_Euler_ &eul);
 

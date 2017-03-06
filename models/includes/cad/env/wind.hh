@@ -6,6 +6,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../../../src/cad/env/wind.cpp))
 *******************************************************************************/
+#include <boost/archive/text_oarchive.hpp>
 
 #include <armadillo>
 #include <aux/aux.hh>
@@ -16,6 +17,34 @@ namespace cad {
         TRICK_INTERFACE(cad__Wind);
 
         public:
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & has_turbulance;
+
+                ar & twind;
+                ar & altitude;
+
+                ar & vertical_wind_speed;
+
+                ar & vwind;
+                ar & psiwdx;
+
+                ar & _VAED;
+
+                ar & _VAEDS;
+
+                ar & _VAEDSD;
+
+                ar & turb_length;
+                ar & turb_sigma;
+                ar & taux1;
+                ar & taux1d;
+                ar & taux2;
+                ar & taux2d;
+                ar & tau;
+                ar & gauss_value;
+            };
+
             char name[256];
 
             Wind(double twind, double vertical_wind);

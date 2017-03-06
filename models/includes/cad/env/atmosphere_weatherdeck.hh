@@ -15,6 +15,11 @@ namespace cad {
     class Atmosphere_weatherdeck : public Atmosphere
     {
         public:
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Atmosphere>(*this);
+            };
+
             Atmosphere_weatherdeck(char* filepath);
 
             virtual ~Atmosphere_weatherdeck();

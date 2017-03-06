@@ -4,6 +4,7 @@
 PURPOSE:
       (Atmosphere model interface definition)
 *******************************************************************************/
+#include <boost/archive/text_oarchive.hpp>
 
 #include "aux/aux.hh"
 
@@ -13,6 +14,19 @@ namespace cad {
         TRICK_INTERFACE(cad__Atmosphere);
 
         public:
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & altitude;
+
+                ar & tempk;
+                ar & density;
+                ar & pressure;
+                ar & vsound;
+
+                ar & vwind;
+                ar & dwind;
+            };
+
             char name[256];
 
             Atmosphere() {};

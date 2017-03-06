@@ -29,6 +29,29 @@ class Newton {
     TRICK_INTERFACE(Newton);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & kinematics;
+            ar & environment;
+            ar & euler;
+            ar & propulsion;
+            ar & forces;
+
+            ar & alt;
+            ar & lonx;
+            ar & latx;
+            ar & _SBII;
+            ar & _VBII;
+            ar & _ABII;
+
+            ar & _TGI;
+            ar & _TDI;
+            ar & aero_loss;
+            ar & gravity_loss;
+
+            ar & _FSPB;
+        }
+
         Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc);
         Newton(const Newton& other);
 

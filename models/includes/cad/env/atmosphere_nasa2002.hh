@@ -6,6 +6,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../../../src/cad/env/atmosphere_nasa2002.cpp))
 *******************************************************************************/
+#include <boost/archive/text_oarchive.hpp>
 
 #include "cad/env/atmosphere.hh"
 
@@ -13,6 +14,11 @@ namespace cad {
     class Atmosphere_nasa2002 : public Atmosphere
     {
         public:
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version){
+                ar & boost::serialization::base_object<Atmosphere>(*this);
+            };
+
             Atmosphere_nasa2002();
 
             virtual ~Atmosphere_nasa2002();

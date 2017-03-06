@@ -22,6 +22,88 @@ class GPS_Receiver {
     TRICK_INTERFACE(GPS_Receiver);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            /* Input File */
+            ar & slot;
+
+            /* GPS Device parameters */
+            ar & del_rearth;
+            ar & gps_acqtime;
+            ar & gps_step;
+
+            ar & ucfreq_noise;
+            ar & ucfreq_noise_sigma;
+            ar & ucfreq_noise_bcor;
+            ar & ucbias_error;
+
+            ar & PR_BIAS;
+            ar & PR_NOISE;
+            ar & PR_NOISE_sigma;
+            ar & PR_NOISE_bcor;
+            ar & DR_NOISE;
+            ar & DR_NOISE_sigma;
+            ar & DR_NOISE_bcor;
+
+            /* GPS EKF Parameters */
+            ar & ppos;
+            ar & pvel;
+            ar & qpos;
+            ar & qvel;
+            ar & rpos;
+            ar & rvel;
+            ar & factr;
+
+            /* Internal variables */
+            ar & gps_acq;
+            ar & gps_epoch;
+            ar & time_gps;
+
+            ar & _FF;
+            ar & _PHI;
+            ar & _PP;
+
+            ar & factq;
+            ar & qclockb;
+            ar & qclockf;
+
+            ar & slotsum;
+
+            ar & _SXH;
+            ar & _VXH;
+            ar & _CXH;
+
+            /* GPS Outputs */
+            ar & gdop;
+            ar & ssii_quad;
+            ar & vsii_quad;
+
+            ar & ucfreq_error;
+            ar & ucfreqm;
+
+            ar & std_pos;
+            ar & std_vel;
+            ar & std_ucbias;
+
+            ar & lat1;
+            ar & lat2;
+            ar & lat3;
+            ar & lat4;
+            ar & lon1;
+            ar & lon2;
+            ar & lon3;
+            ar & lon4;
+            ar & alt1;
+            ar & alt2;
+            ar & alt3;
+            ar & alt4;
+
+            ar & gps_pos_meas;
+            ar & gps_vel_meas;
+            ar & state_pos;
+            ar & state_vel;
+        }
+
         GPS_Receiver(Newton&, _Euler_&, GPS_Satellites&, INS&);
         GPS_Receiver(const GPS_Receiver& other);
 
@@ -98,8 +180,11 @@ class GPS_Receiver {
         double gps_epoch;           /* ** (s)       GPS update epoch time since launch */
         double time_gps;            /* ** (s)       GPS time passed */
 
-        arma::mat88 FF;             /* *o (--)      Constant*/
-        arma::mat88 PHI;            /* *o (--)      Constant*/
+        arma::mat FF;             /* *o (--)      Constant*/
+        double _FF[8][8];             /* *o (--)      Constant*/
+
+        arma::mat PHI;            /* *o (--)      Constant*/
+        double _PHI[8][8];            /* *o (--)      Constant*/
 
         arma::mat PP;               /* *o (--)      Covariance Matrix */
         double _PP[8][8];           /* *o (--)      Covariance Matrix */

@@ -12,6 +12,14 @@ LIBRARY DEPENDENCY:
 class Schmitt_Trigger {
     TRICK_INTERFACE(Schmitt_Trigger);
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar &  dead_zone;
+            ar &  hysteresis;
+
+            ar &  saved_value;
+        }
+
         Schmitt_Trigger(double dead_zone, double hysteresis);
         Schmitt_Trigger(const Schmitt_Trigger& other);
 

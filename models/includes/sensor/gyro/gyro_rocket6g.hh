@@ -16,6 +16,12 @@ LIBRARY DEPENDENCY:
 #include "rocket/Euler.hh"
 #include "rocket/Kinematics.hh"
 
+#include <boost/archive/text_oarchive.hpp>
+
+class Kinematics;
+class Newton;
+class _Euler_;
+
 namespace sensor {
     class GyroRocket6G : public Gyro
     {
@@ -26,6 +32,10 @@ namespace sensor {
             void serialize(Archive & ar, const unsigned int version){
                 ar & boost::serialization::base_object<Gyro>(*this);
 
+                ar & newton;
+                ar & euler;
+                ar & kinematics;
+
                 ar & _EUG;
                 ar & _EWG;
                 ar & _EWALKG;
@@ -33,7 +43,7 @@ namespace sensor {
                 ar & _EMISG;
                 ar & _ESCALG;
                 ar & _EBIASG;
-            }
+            };
 
             GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine);
 

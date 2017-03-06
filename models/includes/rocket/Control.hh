@@ -24,6 +24,43 @@ class Control {
     TRICK_INTERFACE(Control);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & delecx;
+            ar & delrcx;
+
+            ar & maut;
+            ar & mfreeze;
+            ar & waclp;
+            ar & zaclp;
+            ar & paclp;
+            ar & delimx;
+            ar & drlimx;
+            ar & yyd;
+            ar & yy;
+            ar & zzd;
+            ar & zz;
+            ar & alcomx_actual;
+            ar & ancomx_actual;
+            ar & gainfp;
+            ar & gainp;
+            ar & gainl;
+            ar & gkp;
+            ar & gkphi;
+            ar & isetc2;
+            ar & wacly;
+            ar & zacly;
+            ar & pacly;
+            ar & gainy;
+            ar & gainfy;
+            ar & factwaclp;
+            ar & factwacly;
+            ar & alcomx;
+            ar & ancomx;
+            ar & qqdx;
+            ar & grate;
+        }
+
         Control() {}
 
         void default_data();

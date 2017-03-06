@@ -19,6 +19,47 @@ class Guidance;
 class RCS {
     TRICK_INTERFACE(RCS);
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & ins;
+            ar & guidance;
+            ar & propulsion;
+
+            ar & roll_schi;
+            ar & pitch_schi;
+            ar & yaw_schi;
+
+            ar & thtbdcomx;
+            ar & psibdcomx;
+            ar & phibdcomx;
+
+            ar & rcs_type;
+            ar & rcs_mode;
+
+            ar & rcs_tau;
+            ar & roll_mom_max;
+            ar & pitch_mom_max;
+            ar & yaw_mom_max;
+            ar & rcs_thrust;
+            ar & rocket_r;
+            ar & rcs_pos;
+
+            ar & _FMRCS;
+            ar & _FARCS;
+
+            ar & e_roll;
+            ar & e_pitch;
+            ar & e_yaw;
+
+            ar & o_roll;
+            ar & o_pitch;
+            ar & o_yaw;
+
+            ar & roll_count;
+            ar & pitch_count;
+            ar & yaw_count;
+        }
+
         RCS(INS &i, Guidance &guia, Propulsion &plp);
         RCS(const RCS& other);
 

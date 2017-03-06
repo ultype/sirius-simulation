@@ -22,6 +22,27 @@ class Kinematics{
     TRICK_INTERFACE(Kinematics);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & newton;
+            ar & environment;
+            ar & euler;
+
+            ar & _TBD;
+            ar & _TBI;
+            ar & _TBID;
+            ar & alphax;
+            ar & betax;
+            ar & alppx;
+            ar & phipx;
+            ar & psibdx;
+            ar & thtbdx;
+            ar & phibdx;
+            ar & ortho_error;
+            ar & alphaix;
+            ar & betaix;
+        }
+
         Kinematics(Newton &newt, Environment &env, _Euler_ &eul);
         Kinematics(const Kinematics& other);
 

@@ -15,12 +15,42 @@ PROGRAMMERS:
 #include "Aerodynamics.hh"
 
 #include "cad/env/atmosphere.hh"
+#include "cad/env/atmosphere76.hh"
+#include "cad/env/atmosphere_nasa2002.hh"
+#include "cad/env/atmosphere_weatherdeck.hh"
+
 #include "cad/env/wind.hh"
+#include "cad/env/wind_no.hh"
+#include "cad/env/wind_tabular.hh"
+#include "cad/env/wind_constant.hh"
 
 class Environment{
     TRICK_INTERFACE(Environment);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar.template register_type<cad::Atmosphere76>();
+            ar.template register_type<cad::Atmosphere_nasa2002>();
+            ar.template register_type<cad::Atmosphere_weatherdeck>();
+
+            ar.template register_type<cad::Wind_No>();
+            ar.template register_type<cad::Wind_Constant>();
+            ar.template register_type<cad::Wind_Tabular>();
+
+            ar & atmosphere;
+            ar & wind;
+
+            ar & kinematics  ;
+            ar & newton      ;
+            ar & aerodynamics;
+
+            ar & _GRAVG;
+            ar & vmach;
+            ar & pdynmc;
+            ar & dvba;
+        }
+
         Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine);
         Environment(const Environment& other);
         ~Environment();

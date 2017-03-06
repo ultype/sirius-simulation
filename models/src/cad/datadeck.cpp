@@ -90,10 +90,10 @@ Datadeck::Datadeck(char *file_name)
         tbl_stream.getline(line_clear,CHARL,'\n');
 
         //allocating memory for variables and data arrays
-        table->var1_values=new double [var_dim[0]];
-        table->var2_values=new double [var_dim[1]];
-        table->var3_values=new double [var_dim[2]];
-        table->data=new double[var_dim[0]*var_dim[1]*var_dim[2]];
+        table->var1_values = std::vector<double>(var_dim[0]);
+        table->var2_values = std::vector<double>(var_dim[1]);
+        table->var3_values = std::vector<double>(var_dim[2]);
+        table->data = std::vector<double>(var_dim[0] * var_dim[1] * var_dim[2]);
 
         //determining max number of rows of data
         int num_rows=var_dim[0];
@@ -231,7 +231,7 @@ double Datadeck::look_up(string name,double value1,double value2,double value3)
 //
 //030717 Created by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
-int Datadeck::find_index(int max,double value,double *list)
+int Datadeck::find_index(int max,double value, std::vector<double> list)
 {
     if(value>=list[max])
         return max;

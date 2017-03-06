@@ -17,7 +17,37 @@ Propulsion::Propulsion(const Propulsion& other)
 {
     this->default_data();
 
+    /* Constants */
+    this->xcg_0 = other.xcg_0;
+    this->xcg_1 = other.xcg_1;
+    this->moi_roll_0 = other.moi_roll_0;
+    this->moi_roll_1 = other.moi_roll_1;
+    this->moi_trans_0 = other.moi_trans_0;
+    this->moi_trans_1 = other.moi_trans_1;
+    this->fuel_flow_rate = other.fuel_flow_rate;
+    this->spi = other.spi;
+
+    this->aexit = other.aexit;
+    this->payload = other.payload;
+
+    this->vmass0 = other.vmass0;
+    this->fmass0 = other.fmass0;
+
+    /* State */
+    this->thrust_state = other.thrust_state;
+
     /* Propagative Stats */
+    this->fmasse = other.fmasse;
+    this->fmassed = other.fmassed;
+    this->thrust_delta_v = other.thrust_delta_v;
+
+    /* Generating Outputs */
+    this->fmassr = other.fmassr;
+    this->thrust = other.thrust;
+    this->vmass = other.vmass;
+
+    this->xcg = other.xcg;
+    this->IBBB = other.IBBB;
 }
 
 Propulsion& Propulsion::operator=(const Propulsion& other){
@@ -25,6 +55,38 @@ Propulsion& Propulsion::operator=(const Propulsion& other){
         return *this;
 
     this->environment = other.environment;
+
+    /* Constants */
+    this->xcg_0 = other.xcg_0;
+    this->xcg_1 = other.xcg_1;
+    this->moi_roll_0 = other.moi_roll_0;
+    this->moi_roll_1 = other.moi_roll_1;
+    this->moi_trans_0 = other.moi_trans_0;
+    this->moi_trans_1 = other.moi_trans_1;
+    this->fuel_flow_rate = other.fuel_flow_rate;
+    this->spi = other.spi;
+
+    this->aexit = other.aexit;
+    this->payload = other.payload;
+
+    this->vmass0 = other.vmass0;
+    this->fmass0 = other.fmass0;
+
+    /* State */
+    this->thrust_state = other.thrust_state;
+
+    /* Propagative Stats */
+    this->fmasse = other.fmasse;
+    this->fmassed = other.fmassed;
+    this->thrust_delta_v = other.thrust_delta_v;
+
+    /* Generating Outputs */
+    this->fmassr = other.fmassr;
+    this->thrust = other.thrust;
+    this->vmass = other.vmass;
+
+    this->xcg = other.xcg;
+    this->IBBB = other.IBBB;
 
     return *this;
 }

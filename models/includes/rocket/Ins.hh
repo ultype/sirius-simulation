@@ -6,9 +6,6 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/rocket/Ins.cpp))
 *******************************************************************************/
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 #include "Newton.hh"
 #include "Euler.hh"
 #include "Environment.hh"
@@ -16,7 +13,12 @@ LIBRARY DEPENDENCY:
 #include "GPS_receiver.hh"
 
 #include "sensor/gyro/gyro.hh"
+#include "sensor/gyro/gyro_ideal.hh"
+#include "sensor/gyro/gyro_rocket6g.hh"
+
 #include "sensor/accel/accelerometer.hh"
+#include "sensor/accel/accelerometer_ideal.hh"
+#include "sensor/accel/accelerometer_rocket6g.hh"
 
 class GPS_Receiver;
 class Newton;
@@ -24,11 +26,62 @@ class Kinematics;
 class _Euler_;
 class Environment;
 
+namespace sensor{
+    class GyroIdeal;
+    class GyroRocket6G;
+
+    class AccelerometerIdeal;
+    class AccelerometerRocket6G;
+}
+
 class INS {
     TRICK_INTERFACE(INS);
     public:
         template<class Archive>
-        void serialize(Archive & archive, const unsigned int version);
+        void serialize(Archive & ar, const unsigned int version){
+            ar.template register_type<sensor::GyroIdeal>();
+            ar.template register_type<sensor::GyroRocket6G>();
+
+            ar.template register_type<sensor::AccelerometerIdeal>();
+            ar.template register_type<sensor::AccelerometerRocket6G>();
+
+            ar & gyro;
+            ar & accel;
+
+            ar & newton;
+            ar & euler;
+            ar & environment;
+            ar & kinematics;
+            ar & gpsr;
+
+            ar & _EVBI;
+            ar & _EVBID;
+            ar & _ESBI;
+            ar & _ESBID;
+            ar & _RICI;
+            ar & _RICID;
+            ar & _TBIC;
+            ar & _SBIIC;
+            ar & _VBIIC;
+            ar & _WBICI;
+            ar & _EGRAVI;
+            ar & loncx;
+            ar & latcx;
+            ar & altc;
+            ar & _VBECD;
+            ar & _TDCI;
+            ar & dbic;
+            ar & dvbec;
+            ar & alphacx;
+            ar & betacx;
+            ar & thtvdcx;
+            ar & psivdcx;
+            ar & alppcx;
+            ar & phipcx;
+            ar & phibdcx;
+            ar & thtbdcx;
+            ar & psibdcx;
+        }
 
         INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps);
         INS(const INS& other);

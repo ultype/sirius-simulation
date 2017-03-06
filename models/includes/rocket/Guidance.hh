@@ -18,6 +18,72 @@ class Guidance {
     TRICK_INTERFACE(Guidance);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            /* Propagative Stats */
+            ar & utbc;
+
+            /* Diagnostic */
+            ar & utic;
+
+            /* Set by input.py */
+            ar & alphacomx;
+            ar & betacomx;
+
+            /* Internally set parameter */
+            ar & init_flag;
+            ar & inisw_flag;
+            ar & skip_flag;
+            ar & ipas_flag;
+            ar & ipas2_flag;
+            ar & print_flag;
+            ar & time_ltg;
+
+            ar & ltg_count;
+
+            /* Externally set parameter */
+            ar & mguide;
+            ar & ltg_step;
+
+            ar & rbias;
+            ar & beco_flag;
+            ar & dbi_desired;
+            ar & dvbi_desired;
+            ar & thtvdx_desired;
+            ar & num_stages;
+            ar & delay_ignition;
+            ar & amin;
+            ar & char_time1;
+            ar & char_time2;
+            ar & char_time3;
+            ar & exhaust_vel1;
+            ar & exhaust_vel2;
+            ar & exhaust_vel3;
+            ar & burnout_epoch1;
+            ar & burnout_epoch2;
+            ar & burnout_epoch3;
+            ar & lamd_limit;
+            ar & rgrav;
+            ar & rgo;
+            ar & vgo;
+            ar & sdii;
+            ar & ud;
+            ar & uy;
+            ar & uz;
+            ar & vgom;
+            ar & tgo;
+            ar & nst;
+            ar & ulam;
+            ar & _lamd;
+            ar & nstmax;
+            ar & lamd;
+            ar & dpd;
+            ar & dbd;
+            ar & ddb;
+            ar & dvdb;
+            ar & thtvddbx;
+        }
+
         Guidance() {}
         Guidance(const Guidance& other);
 

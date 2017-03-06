@@ -26,6 +26,53 @@ class TVC {
     TRICK_INTERFACE(TVC);
 
     public:
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & environment;
+            ar & kinematics;
+            ar & control;
+            ar & propulsion;
+
+            ar & mtvc;
+
+            /* Constants */
+            ar & gtvc;
+
+            ar & tvclimx;
+            ar & dtvclimx;
+            ar & wntvc;
+            ar & zettvc;
+            ar & factgtvc;
+
+            /* Propagative Stats */
+            ar & etas;
+            ar & etasd;
+
+            ar & zeta;
+            ar & zetad;
+
+            ar & detas;
+            ar & detasd;
+
+            ar & dzeta;
+            ar & dzetad;
+
+            /* Generating Outputs */
+            ar & parm;
+
+            ar & _FPB;
+
+            ar & _FMPB;
+
+            ar & etax;
+            ar & zetx;
+
+            /* Non-propagating Diagnostic Variables */
+            /* These can be deleted, but keep to remain trackable in trick simulator */
+            ar & etacx;
+            ar & zetcx;
+        }
+
         TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp);
         TVC(const TVC& other);
 
