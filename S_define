@@ -86,14 +86,15 @@ class Rocket_SimObject : public Trick::SimObject {
         Actuator actuator;
 
         Rocket_SimObject() 
-            :   newton      ( kinematics , euler        , env          , propulsion   , forces ) ,
+            :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
                 gpsr        ( newton     , euler        , *gps_sats    , ins )        ,
+                control     ( ins        , newton       , env          , propulsion   , aerodynamics) ,
                 env         ( newton     , aerodynamics , kinematics ) ,
                 propulsion  ( env )      ,
-                aerodynamics( kinematics , env          , propulsion   , euler        , newton   , tvc ) ,
-                ins         ( newton     , euler        , env          , kinematics   , gpsr )   ,
+                aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
+                ins         ( newton     , euler        , env          , kinematics   , gpsr )        ,
                 tvc         ( env        , kinematics   , control      , propulsion ) ,
                 rcs         ( ins        , guidance     , propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc )
@@ -106,7 +107,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") euler.initialize();
             ("initialization") gpsr.initialize(0.001);
             ("initialization") guidance.initialize(&ins, &newton, &propulsion);
-            ("initialization") control.initialize(&ins, &newton, &env, &propulsion, &aerodynamics);
+            ("initialization") control.initialize();
             ("initialization") ins.initialize();
             ("initialization") tvc.initialize();
             ("initialization") rcs.initialize();

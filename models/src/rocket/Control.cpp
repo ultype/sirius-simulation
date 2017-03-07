@@ -3,18 +3,42 @@
 #include "math/integrate.hh"
 #include "math/utility.hh"
 
+Control::Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDynamics& aero)
+    :   ins(&i), propulsion(&plp), newton(&ntn), environment(&env), aerodynamics(&aero),
+        VECTOR_INIT(GAINFP, 3),
+        VECTOR_INIT(GAINFY, 3)
+{
+    this->default_data();
+}
+
+Control::Control(const Control& other)
+    :   ins(other.ins), propulsion(other.propulsion), newton(other.newton), environment(other.environment), aerodynamics(other.aerodynamics),
+        VECTOR_INIT(GAINFP, 3),
+        VECTOR_INIT(GAINFY, 3)
+{
+    this->default_data();
+}
+
+Control& Control::operator=(const Control& other){
+    if(&other == this)
+        return *this;
+
+    this->ins = other.ins;
+    this->environment = other.environment;
+    this->newton = other.newton;
+    this->propulsion = other.propulsion;
+    this->aerodynamics = other.aerodynamics;
+
+    return *this;
+}
+
 void Control::default_data(){
 }
 
 double  Control::get_delecx() { return delecx; }
 double  Control::get_delrcx() { return delrcx; }
 
-void Control::initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero){
-    ins = i;
-    environment = env;
-    newton = ntn;
-    propulsion = plp;
-    aerodynamics = aero;
+void Control::initialize(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,7 +130,6 @@ void Control::control(double int_step){
 ///////////////////////////////////////////////////////////////////////////////
 
 double Control::control_normal_accel(double ancomx, double int_step){
-    Matrix GAINFP(3, 1);
     double gainfb1(0);
     double gainfb2(0);
     double gainfb3(0);
@@ -124,7 +147,7 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double dmde = aerodynamics->get_dmde();
     double dvbec = ins->get_dvbec();
     double qqcx = ins->get_gyro().get_qqcx();
-    Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
+    arma::vec3 FSPCB = ins->get_accelerometer().get_computed_FSPB();
     //-------------------------------------------------------------------------
     // calculating online close loop poles
     waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
@@ -154,10 +177,9 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double delecx = dqc * DEG;
 
     // diagnostic output
-    GAINFP.build_vec3(gainfb1, gainfb2, gainfb3);
+    GAINFP = arma::vec3({gainfb1, gainfb2, gainfb3});
     //--------------------------------------------------------------------------
     // loading module-variables
-    GAINFP.fill(gainfp);
 
     return delecx;
 }
@@ -185,9 +207,6 @@ double Control::control_normal_accel(double ancomx, double int_step){
 ///////////////////////////////////////////////////////////////////////////////
 
 double Control::control_yaw_accel(double alcomx, double int_step){
-    // local module-variables
-    Matrix GAINFY(3, 1);
-
     // input from other modules
     double pdynmc = environment->get_pdynmc();
     double dyb = aerodynamics->get_dyb();
@@ -196,7 +215,7 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     double dndr = aerodynamics->get_dndr();
     double dvbe = newton->get_dvbe();
     double rrcx = ins->get_gyro().get_rrcx();
-    Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
+    arma::vec3 FSPCB = ins->get_accelerometer().get_computed_FSPB();
 
     //-------------------------------------------------------------------------
     // calculating close loop poles
@@ -212,7 +231,7 @@ double Control::control_yaw_accel(double alcomx, double int_step){
                      gainy;
 
     // yaw loop acceleration controller, yaw control command
-    double fspb2 = FSPCB.get_loc(1, 0);
+    double fspb2 = FSPCB(1, 0);
     double yyd_new = AGRAV * alcomx - fspb2;
     yy = integrate(yyd_new, yyd, yy, int_step);
     yyd = yyd_new;
@@ -221,9 +240,8 @@ double Control::control_yaw_accel(double alcomx, double int_step){
     double drcx = drc * DEG;
 
     // diagnostic output
-    GAINFY.build_vec3(gainfb1, gainfb2, gainfb3);
+    GAINFY = arma::vec3({gainfb1, gainfb2, gainfb3});
     //--------------------------------------------------------------------------
-    GAINFY.fill(gainfy);
 
     return drcx;
 }

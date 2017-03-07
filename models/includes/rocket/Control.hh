@@ -42,7 +42,7 @@ class Control {
             ar & zz;
             ar & alcomx_actual;
             ar & ancomx_actual;
-            ar & gainfp;
+            ar & _GAINFP;
             ar & gainp;
             ar & gainl;
             ar & gkp;
@@ -52,7 +52,7 @@ class Control {
             ar & zacly;
             ar & pacly;
             ar & gainy;
-            ar & gainfy;
+            ar & _GAINFY;
             ar & factwaclp;
             ar & factwacly;
             ar & alcomx;
@@ -61,21 +61,17 @@ class Control {
             ar & grate;
         }
 
-        Control() {}
+        Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDynamics& aero);
+        Control(const Control& other);
 
-        void default_data();
-        void initialize(INS *i, Newton *ntn, Environment *env, Propulsion *plp, AeroDynamics *aero);
+        Control& operator=(const Control& other);
+
+        void initialize();
 
         void control(double int_step);
         double control_normal_accel(double ancomx, double int_step);
         double control_yaw_accel(double alcomx, double int_step);
         double control_pitch_rate(double qqdx);
-
-        Environment *environment;
-        AeroDynamics *aerodynamics;
-        INS* ins;
-        Newton *newton;
-        Propulsion *propulsion;
 
         ///////////////////////////////////////////////////////////////////////////////
         // Definition of control module-variables
@@ -97,6 +93,14 @@ class Control {
         double  get_delrcx();
 
     private:
+        void default_data();
+
+        Environment  * environment;
+        AeroDynamics * aerodynamics;
+        INS          * ins;
+        Newton       * newton;
+        Propulsion   * propulsion;
+
         double  delecx;         /* *io (d)      Pitch command deflection */ // n
         double  delrcx;         /* *io (d)      Yaw command deflection */   // n
 
@@ -113,7 +117,8 @@ class Control {
         double  zz;             /* *io (m/s)    Pitch feed-forward integration variable */
         double  alcomx_actual;  /* *io (--)     Later accel com limited by 'betalimx' */
         double  ancomx_actual;  /* *io (--)     Normal accel com limited by 'alplimx' */
-        double  gainfp[3];      /* *io (--)     Feedback gains of pitch accel controller */
+        arma::vec GAINFP;       /* *io (--)     Feedback gains of pitch accel controller */
+        double   _GAINFP[3];    /* *io (--)     Feedback gains of pitch accel controller */
         double  gainp;          /* *io (s2/m)   Proportional gain in pitch acceleration loop */
         double  gainl;          /* *io (--)     Gain in lateral acceleration loop */
         double  gkp;            /* *io (s)      Gain of roll rate feedback */
@@ -123,7 +128,8 @@ class Control {
         double  zacly;          /* *io (--)     Damping of accel close loop pole, yaw */
         double  pacly;          /* *io (--)     Close loop real pole, yaw */
         double  gainy;          /* *io (--)     Gain in lateral acceleration loop */
-        double  gainfy[3];      /* *io (--)     Feedback gains of yaw accel controller */
+        arma::vec GAINFY;       /* *io (--)     Feedback gains of yaw accel controller */
+        double   _GAINFY[3];    /* *io (--)     Feedback gains of yaw accel controller */
         double  factwaclp;      /* *io (--)     Factor to mod 'waclp': waclp*(1+factwacl) */
         double  factwacly;      /* *io (--)     Factor to mod 'wacly': wacly*(1+factwacl) */
         double  alcomx;         /* *io (--)     Lateral (horizontal) acceleration command */
