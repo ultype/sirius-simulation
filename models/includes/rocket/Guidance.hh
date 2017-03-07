@@ -84,13 +84,13 @@ class Guidance {
             ar & thtvddbx;
         }
 
-        Guidance() {}
+    Guidance(INS& i, Newton& ntn, Propulsion& plp);
         Guidance(const Guidance& other);
 
         Guidance& operator= (const Guidance& other);
 
         void default_data();
-        void initialize(INS *i, Newton *ntn, Propulsion *plp);
+        void initialize();
 
         void guidance(double int_step);
 

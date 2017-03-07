@@ -2,10 +2,14 @@
 
 #include "sim_services/include/simtime.h"
 
+Guidance::Guidance(INS& i, Newton& ntn, Propulsion& plp)
+    : ins(&i), newton(&ntn), propulsion(&plp)
+{
+    this->default_data();
+}
+
 Guidance::Guidance(const Guidance& other)
-    : ins(other.ins),
-      newton(other.newton),
-      propulsion(other.propulsion)
+    : ins(other.ins), newton(other.newton), propulsion(other.propulsion)
 {
     this->default_data();
 
@@ -35,10 +39,7 @@ void Guidance::default_data(){
     ltg_count = 0;
 }
 
-void Guidance::initialize(INS *i, Newton *ntn, Propulsion *plp){
-    ins = i;
-    newton = ntn;
-    propulsion = plp;
+void Guidance::initialize(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////
