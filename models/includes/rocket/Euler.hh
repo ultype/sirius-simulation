@@ -11,7 +11,6 @@ PROGRAMMERS:
 #include <armadillo>
 
 #include "aux/global_constants.hh"
-#include "aux/utility_header.hh"
 #include "Environment.hh"
 #include "Kinematics.hh"
 #include "Newton.hh"

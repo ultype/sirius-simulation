@@ -6,8 +6,6 @@
 #include "math/integrate.hh"
 #include "math/matrix/utility.hh"
 
-#include "aux/utility_header.hh"
-
 #include "rocket/Ins.hh"
 #include "sim_services/include/simtime.h"
 

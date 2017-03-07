@@ -8,7 +8,7 @@ PURPOSE:
 #include <armadillo>
 #include <aux/aux.hh>
 
-#include "aux/utility_header.hh"
+#include "aux/global_constants.hh"
 
 namespace sensor {
     class Gyro

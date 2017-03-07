@@ -3,7 +3,6 @@
 
 #include "math/matrix/utility.hh"
 
-#include "aux/utility_header.hh"
 #include "sensor/gyro/gyro_rocket6g.hh"
 
 sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine)

@@ -7,7 +7,6 @@ LIBRARY DEPENDENCY:
       ((../../../src/cad/env/atmosphere_weatherdeck.cpp))
 *******************************************************************************/
 
-#include "aux/utility_header.hh"
 #include "cad/env/atmosphere.hh"
 #include "cad/datadeck.hh"
 

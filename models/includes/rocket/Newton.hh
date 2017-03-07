@@ -12,7 +12,6 @@ PROGRAMMERS:
 #include <armadillo>
 
 #include "aux/global_constants.hh"
-#include "aux/utility_header.hh"
 #include "aux/aux.hh"
 
 #include "Environment.hh"

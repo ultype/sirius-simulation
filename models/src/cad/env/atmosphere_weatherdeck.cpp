@@ -1,6 +1,8 @@
 #include "cad/env/atmosphere_weatherdeck.hh"
 #include "cad/datadeck.hh"
 
+#include "aux/global_constants.hh"
+
 #include <cstring>
 
 cad::Atmosphere_weatherdeck::Atmosphere_weatherdeck(char* filepath)

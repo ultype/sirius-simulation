@@ -9,7 +9,6 @@ PROGRAMMERS:
       ((Lai Jun Xu))
 *******************************************************************************/
 #include "aux/global_constants.hh"
-#include "aux/utility_header.hh"
 #include "Environment.hh"
 #include "Rcs.hh"
 #include "Tvc.hh"

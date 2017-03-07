@@ -9,7 +9,6 @@ PROGRAMMERS:
       (((Jun-Xu Lai) () () () ))
 *******************************************************************************/
 
-#include "aux/utility_header.hh"
 #include "cad/datadeck.hh"
 #include "Euler.hh"
 #include "Tvc.hh"

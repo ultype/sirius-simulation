@@ -1,4 +1,3 @@
-#include "aux/utility_header.hh"
 
 #include "rocket/Environment.hh"
 #include "sim_services/include/simtime.h"

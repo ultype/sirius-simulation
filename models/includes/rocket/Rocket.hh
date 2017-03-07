@@ -9,7 +9,6 @@ PROGRAMMERS:
       (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
 
-#include "aux/utility_header.hh"
 
 class Rocket {
     public:

@@ -11,7 +11,6 @@
 #include "math/matrix/utility.hh"
 
 #include "cad/utility.hh"
-#include "aux/utility_header.hh"
 #include "aux/global_constants.hh"
 
 ///////////////////////////////////////////////////////////////////////////////

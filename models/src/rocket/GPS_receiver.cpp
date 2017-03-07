@@ -6,7 +6,6 @@
 #include "sim_services/include/simtime.h"
 
 #include "aux/global_constants.hh"
-#include "aux/utility_header.hh"
 #include "math/stochastic.hh"
 #include "math/matrix/utility.hh"
 

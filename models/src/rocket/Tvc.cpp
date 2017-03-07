@@ -1,4 +1,3 @@
-#include "aux/utility_header.hh"
 #include "math/utility.hh"
 #include "math/integrate.hh"
 

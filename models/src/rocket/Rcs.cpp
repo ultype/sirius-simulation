@@ -1,4 +1,3 @@
-#include "aux/utility_header.hh"
 #include "rocket/Rcs.hh"
 
 #include <iostream>

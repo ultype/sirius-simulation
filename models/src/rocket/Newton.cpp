@@ -6,7 +6,6 @@
 
 #include "cad/utility.hh"
 
-#include "aux/utility_header.hh"
 #include "aux/aux.hh"
 
 Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &prop, Forces &forc)

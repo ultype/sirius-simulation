@@ -2,8 +2,6 @@
 
 #include "math/utility.hh"
 
-#include "aux/utility_header.hh"
-
 Schmitt_Trigger::Schmitt_Trigger(double dead_zone, double hysteresis)
     :   dead_zone(dead_zone), hysteresis(hysteresis)
 {
