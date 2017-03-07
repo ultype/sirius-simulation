@@ -1,9 +1,9 @@
 #execfile("Modified_data/realtime.py")
 #execfile("Modified_data/rocket.dr")
 execfile("Modified_data/test.dr")
-# trick.exec_set_enable_freeze(True)
-# trick.exec_set_freeze_command(True)
-# trick.sim_control_panel_set_enabled(True)
+trick.exec_set_enable_freeze(True)
+trick.exec_set_freeze_command(True)
+trick.sim_control_panel_set_enabled(True)
 ##########################################################
 
 #############################################################
@@ -20,7 +20,7 @@ execfile("Modified_data/test.dr")
 #Set simulation start time 
 Year = 2017
 DOY = 61
-Hour = 3
+Hour = 18
 Min = 30
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)

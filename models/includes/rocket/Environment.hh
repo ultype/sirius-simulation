@@ -64,6 +64,9 @@ class Environment{
         arma::vec3 get_VAED_();
 
     private:
+
+        arma::vec AccelHarmonic (arma::vec3 SBII, double CS[21][21],
+                    int n_max, int m_max);
         /* Internal Getter */
 
         /* Internal Initializers */
