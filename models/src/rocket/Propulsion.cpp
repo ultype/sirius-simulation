@@ -94,9 +94,9 @@ void Propulsion::propagate(double int_step)
         case NO_THRUST:
             fmassd = 0;
             thrust = 0;
-            fmasse = 0;
+            //fmasse = 0;
             //fmassr=0; //Somehow comment out in trick version
-            this->IBBB = get_IBBB0();
+            //this->IBBB = get_IBBB0();
 
             break;
         case INPUT_THRUST:
@@ -120,17 +120,15 @@ void Propulsion::propagate(double int_step)
                 this->thrust = 0;
             }
 
-            //interpolating cg as a function of fuel expended
-            this->xcg = calculate_xcg();
-
-            //interpolating moment of inertia tensor as a function of fuel expended
-            this->IBBB = calculate_IBBB();
-
             break;
     }
 
     //calculating vehicle mass, mass flow, and fuel mass remaining
     vmass = payload + vmass0 - fmasse;
+    //interpolating cg as a function of fuel expended
+    this->xcg = calculate_xcg();
+    //interpolating moment of inertia tensor as a function of fuel expended
+    this->IBBB = calculate_IBBB();
 }
 
 void Propulsion::propagate_thrust_delta_v(double int_step){
