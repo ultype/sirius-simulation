@@ -15,7 +15,6 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Ins.hh"
 ##include "rocket/Tvc.hh"
 ##include "rocket/Rcs.hh"
-##include "rocket/Actuator.hh"
 ##include "rocket/Control.hh"
 ##include "rocket/Guidance.hh"
 ##include "rocket/Force.hh"
@@ -83,7 +82,6 @@ class Rocket_SimObject : public Trick::SimObject {
 
         TVC tvc;
         RCS rcs;
-        Actuator actuator;
 
         Rocket_SimObject() 
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
@@ -112,7 +110,6 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") ins.initialize();
             ("initialization") tvc.initialize();
             ("initialization") rcs.initialize();
-            ("initialization") actuator.initialize(&control);
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
 
