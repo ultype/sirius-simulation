@@ -829,13 +829,10 @@ arma::vec Environment::AccelHarmonic (arma::vec3 SBII, double CS[21][21],
     double x0,y0,z0;            /* Normalized coordinates */
     double ax,ay,az;            /* Acceleration vector */
     double C,S;                 /* Gravitational coefficients */
-    //double r_bf[3];               
-    arma::vec r_bf(3);            /* Body-fixed position */
-    arma::vec a_bf(3);            /* Body-fixed acceleration */
+                 
+    arma::vec r_bf(3);            /* Earth-fixed position */
+    arma::vec a_bf(3);            /* Earth-fixed acceleration */
     arma::mat TGI = newton->get_TGI();
-    //double a_bf[3];               
-    //double tmp_matrix[3][3];
-    //arma::mat33 tmp_matrix;
 
 
     double V[N_JGM3+2][N_JGM3+2] =
@@ -850,8 +847,7 @@ arma::vec Environment::AccelHarmonic (arma::vec3 SBII, double CS[21][21],
     
        
   
-    /* Body-fixed position */
-    //gpsr.Matrix_by_Vector(E, r, r_bf);
+    /* Earth-fixed position */
     r_bf = TEI * SBII;
   
     /* Auxiliary quantities */
@@ -950,7 +946,7 @@ arma::vec Environment::AccelHarmonic (arma::vec3 SBII, double CS[21][21],
     /* Inertial acceleration */
     // gpsr.Matrix_Transpose(E, tmp_matrix);
     arma::vec tmp_vec = trans(TEI) * a_bf;
-    //tmp_vec = TGI * tmp_vec;
+    tmp_vec = TGI * tmp_vec;
     // return trans(TEI) * a_bf;
     return tmp_vec;
     //gpsr.Matrix_by_Vector(tmp_matrix, a_bf, acc);

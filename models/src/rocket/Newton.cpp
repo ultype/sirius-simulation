@@ -173,7 +173,7 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     arma::vec3 GRAVG = environment->get_GRAVG_();
 
     /* Prograte S, V, A status */
-    arma::mat NEXT_ACC = trans(TBI) * FSPB + GRAVG;
+    arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
     /* To check wether the rocket liftoff */
     if(liftoff==0){
         if(norm(FSPB) - norm(GRAVG)>0){
