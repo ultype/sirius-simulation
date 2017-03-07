@@ -1,15 +1,41 @@
 #include "rocket/Guidance.hh"
 
+#include "cad/utility.hh"
+
 #include "sim_services/include/simtime.h"
 
 Guidance::Guidance(INS& i, Newton& ntn, Propulsion& plp)
-    : ins(&i), newton(&ntn), propulsion(&plp)
+    :   ins(&i), newton(&ntn), propulsion(&plp),
+        VECTOR_INIT(UTBC, 3),
+        VECTOR_INIT(UTIC, 3),
+        VECTOR_INIT(RBIAS, 3),
+        VECTOR_INIT(RGRAV, 3),
+        VECTOR_INIT(RGO, 3),
+        VECTOR_INIT(VGO, 3),
+        VECTOR_INIT(SDII, 3),
+        VECTOR_INIT(UD, 3),
+        VECTOR_INIT(UY, 3),
+        VECTOR_INIT(UZ, 3),
+        VECTOR_INIT(ULAM, 3),
+        VECTOR_INIT(LAMD, 3)
 {
     this->default_data();
 }
 
 Guidance::Guidance(const Guidance& other)
-    : ins(other.ins), newton(other.newton), propulsion(other.propulsion)
+   :    ins(other.ins), newton(other.newton), propulsion(other.propulsion),
+        VECTOR_INIT(UTBC, 3),
+        VECTOR_INIT(UTIC, 3),
+        VECTOR_INIT(RBIAS, 3),
+        VECTOR_INIT(RGRAV, 3),
+        VECTOR_INIT(RGO, 3),
+        VECTOR_INIT(VGO, 3),
+        VECTOR_INIT(SDII, 3),
+        VECTOR_INIT(UD, 3),
+        VECTOR_INIT(UY, 3),
+        VECTOR_INIT(UZ, 3),
+        VECTOR_INIT(ULAM, 3),
+        VECTOR_INIT(LAMD, 3)
 {
     this->default_data();
 
@@ -57,18 +83,13 @@ void Guidance::initialize(){
 void Guidance::guidance(double int_step)
 {
     // local module variable
-    Matrix UTIC(3, 1);
 
     int mprop = propulsion->get_mprop();
-    Matrix UTBC(utbc);
-    //XXX: Fix me
-    Matrix TBIC(3, 3);
-    memcpy(TBIC.get_pbody(), ins->get_TBIC().memptr(), sizeof(double) * 9);
-    TBIC = ~TBIC;
+    arma::mat33 TBIC = ins->get_TBIC();
     //-------------------------------------------------------------------------
     // zeroing UTBC,if no guidance
     if (mguide == 0)
-        UTBC.zero();
+        UTBC.zeros();
 
     // LTG guidance, starting LTG clock
     if (mguide == 5) {
@@ -96,9 +117,6 @@ void Guidance::guidance(double int_step)
             propulsion->set_ltg_thrust();
             break;
     }
-    UTBC.fill(utbc);
-    // diagnostics
-    UTIC.fill(utic);
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Linear tangent guidance (LTG) for ascent
@@ -124,30 +142,30 @@ void Guidance::guidance(double int_step)
 // 040319 Converted from FORTRAN by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
+arma::vec3 Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
 {
     // local variables
     // Parameter output 'guidance_ltg_crct()'
-    Matrix VMISS(3, 1);  // velocity miss - m/s
+    arma::vec3 VMISS;  // velocity miss - m/s
     // Parameter input 'guidance_ltg_crct()'
-    Matrix SPII(3, 1);  // predicted inertial position vector - m
-    Matrix VPII(3, 1);  // predicted inertial velocity vector - m/s
+    arma::vec3 SPII;  // predicted inertial position vector - m
+    arma::vec3 VPII;  // predicted inertial velocity vector - m/s
     // Paramter output of 'guidance_ltg_tgo()'
     double tgop(0);        // time-to-go of previous computation cycle - s
-    Matrix BURNTN(3, 1);   // burn time duration left in n-th stage
+    arma::vec3 BURNTN;   // burn time duration left in n-th stage
                            // -> used in '_igrl()' - s
-    Matrix L_IGRLN(3, 1);  // velocity to-be-gained by n-th stage at 'time_ltg'
+    arma::vec3 L_IGRLN;  // velocity to-be-gained by n-th stage at 'time_ltg'
                            // -> used in '_igrl()' - m/s
-    Matrix TGON(3, 1);     // burn durations remaining, summed over n-th and
+    arma::vec3 TGON;     // burn durations remaining, summed over n-th and
                            // previous stages, towards reaching end-state - s
     double l_igrl(0);      // L-integral (velocity to be gained - m/s)
     int nstmax(0);         // maximum # of stages needed , used in '_igrl()'
     // Parameter input/output of 'guidance_ltg_tgo()'
-    Matrix TAUN(3, 1);  // characteristic time of stages - s
+    arma::vec3 TAUN;  // characteristic time of stages - s
     // Parameter input of 'guidance_ltg_tgo()'
-    Matrix VEXN(3, 1);  // exhaust velocity of n-th stage - m/s
+    arma::vec3 VEXN;  // exhaust velocity of n-th stage - m/s
     // burn out time of stages - s
-    Matrix BOTN(4, 1);  // burn-out time epoch of n-th stage,
+    arma::vec4 BOTN;  // burn-out time epoch of n-th stage,
                         // in 'time_ltg' clock time - s
     //(0-th stage is dummy stage with BOTN[0]=0, has dimension BOTN(4,1))
     double vgom(0);   // desired velocity to be gained (absolute value) - m/s
@@ -161,41 +179,23 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
     double j_over_l(0);  // j_over_l= time remaining - s
     double tlam(0);      // time of thrust integraton - s
     double qprime(0);    // conditioned q-integral - m*s
-    // Parameter output 'guidance_ltg_trate()'
-    Matrix ULAM(3, 1);  // unit thrust vector in direction of VGO - ND
-    Matrix LAMD(3, 1);  // derivative of unit thrust vector - 1/s
 
-    // local module-variables
-    Matrix UTIC(3, 1);
-
-    // restoring saved variables
-    Matrix RBIAS(rbias);
-    Matrix RGRAV(rgrav);
-    Matrix RGO(rgo);
-    Matrix VGO(vgo);
-    Matrix SDII(sdii);
-    Matrix UD(ud);
-    Matrix UY(uy);
-    Matrix UZ(uz);
     // input from other modules
     double time = get_rettime();
     double dbi = newton->get_dbi();
     double dvbi = newton->get_dvbi();
     double thtvdx = newton->get_thtvdx();
     double fmassr = propulsion->get_fmassr();
-    Matrix VBIIC = Matrix(ins->get_VBIIC().memptr());
-    Matrix SBIIC = Matrix(ins->get_SBIIC().memptr());
+    arma::vec3 VBIIC = ins->get_VBIIC();
+    arma::vec3 SBIIC = ins->get_SBIIC();
 
-    //XXX: Fix me
-    Matrix TBIC(3, 3);
-    memcpy(TBIC.get_pbody(), ins->get_TBIC().memptr(), sizeof(double) * 9);
-    TBIC = ~TBIC;
+    arma::mat33 TBIC = ins->get_TBIC();
 
-    Matrix FSPCB = Matrix(ins->get_accelerometer().get_computed_FSPB().memptr());
+    arma::vec3 FSPCB = ins->get_accelerometer().get_computed_FSPB();
     //-------------------------------------------------------------------------
     // preparing necessary variables
-    Matrix ABII = ~TBIC * FSPCB;
-    amag1 = ABII.absolute();
+    arma::vec3 ABII = trans(TBIC) * FSPCB;
+    amag1 = norm(ABII);
 
     // initializing
     if (inisw_flag) {
@@ -215,11 +215,11 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
         VGO = VGO - ABII * ltg_step;
 
     // velocity-to-go magnitude
-    vgom = VGO.absolute();
+    vgom = norm(VGO);
 
     // building data vector of the stages
-    TAUN.build_vec3(char_time1, char_time2, char_time3);
-    VEXN.build_vec3(exhaust_vel1, exhaust_vel2, exhaust_vel3);
+    TAUN = arma::vec3({char_time1, char_time2, char_time3});
+    VEXN = arma::vec3({exhaust_vel1, exhaust_vel2, exhaust_vel3});
 
     // building array of burn-out time epochs of n-th stage, in 'time_ltg' clock
     // time - s
@@ -248,8 +248,7 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
                        RGRAV);  // throughput to '_rtgo(()'
 
     // calculating thrust command vector in inertial coordinates
-    Matrix TC =
-        ULAM + LAMD * (time_ltg - tlam);  // same as: TC=ULAM+LAMD*(-j_over_l)
+    arma::vec3 TC = ULAM + LAMD * (time_ltg - tlam);  // same as: TC=ULAM+LAMD*(-j_over_l)
 
     // calculating output thrust unit vector after skipping 10 'guid_step' delay
     // (settling of transients)
@@ -258,7 +257,7 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
         if (skip_flag == 10)
             skip_flag = 0;
     } else
-        UTIC = TC.univec3();
+        UTIC =  normalise(TC);
 
     // calling end-state predictor and corrector
     guidance_ltg_pdct(SPII, VPII, RGRAV, RBIAS  // output
@@ -305,21 +304,6 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
                   << " deg\n";
     }
     //-------------------------------------------------------------------------
-    // loading dignostic module-variables
-    // output to other modules
-    // saving variables
-    RBIAS.fill(rbias);
-    RGRAV.fill(rgrav);
-    RGO.fill(rgo);
-    VGO.fill(vgo);
-    SDII.fill(sdii);
-    UD.fill(ud);
-    UY.fill(uy);
-    UZ.fill(uz);
-    ULAM.fill(ulam);
-    LAMD.fill(_lamd);
-
-    // returning unit thrust vector command
     return UTIC;
 }
 
@@ -356,16 +340,16 @@ Matrix Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
 ///////////////////////////////////////////////////////////////////////////////
 
 void Guidance::guidance_ltg_tgo(double &tgop,
-                             Matrix &BURNTN,
-                             Matrix &L_IGRLN,
-                             Matrix &TGON,
+                             arma::mat &BURNTN,
+                             arma::mat &L_IGRLN,
+                             arma::mat &TGON,
                              double &l_igrl,
                              int &nstmax,
                              double &tgo,
                              int &nst,
-                             Matrix &TAUN,
-                             Matrix VEXN,
-                             Matrix BOTN,
+                             arma::mat &TAUN,
+                             arma::mat VEXN,
+                             arma::mat BOTN,
                              double delay_ignition,
                              double vgom,
                              double amag1,
@@ -507,11 +491,11 @@ void Guidance::guidance_ltg_igrl(double &s_igrl,
                               double &qprime,
                               int nst,
                               int nstmax,
-                              Matrix BURNTN,
-                              Matrix L_IGRLN,
-                              Matrix TGON,
-                              Matrix TAUN,
-                              Matrix VEXN,
+                              arma::mat BURNTN,
+                              arma::mat L_IGRLN,
+                              arma::mat TGON,
+                              arma::mat TAUN,
+                              arma::mat VEXN,
                               double l_igrl,
                               double time_ltg)
 {
@@ -619,11 +603,11 @@ void Guidance::guidance_ltg_igrl(double &s_igrl,
 // 040325 Converted from FORTRAN by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-void Guidance::guidance_ltg_trate(Matrix &ULAM,
-                               Matrix &LAMD,
-                               Matrix &RGO,
+void Guidance::guidance_ltg_trate(arma::mat &ULAM,
+                               arma::mat &LAMD,
+                               arma::mat &RGO,
                                int &ipas2_flag,
-                               Matrix VGO,
+                               arma::mat VGO,
                                double s_igrl,
                                double q_igrl,
                                double j_over_l,
@@ -632,14 +616,14 @@ void Guidance::guidance_ltg_trate(Matrix &ULAM,
                                double time_ltg,
                                double tgo,
                                double tgop,
-                               Matrix SDII,
-                               Matrix SBIIC,
-                               Matrix VBIIC,
-                               Matrix RBIAS,
-                               Matrix UD,
-                               Matrix UY,
-                               Matrix UZ,
-                               Matrix &RGRAV)
+                               arma::mat SDII,
+                               arma::mat SBIIC,
+                               arma::mat VBIIC,
+                               arma::mat RBIAS,
+                               arma::mat UD,
+                               arma::mat UY,
+                               arma::mat UZ,
+                               arma::mat &RGRAV)
 {
     //-------------------------------------------------------------------------
     // return if velocity-to-be-gained is zero
@@ -647,8 +631,8 @@ void Guidance::guidance_ltg_trate(Matrix &ULAM,
         return;
 
     // unit thrust vector in VGO direction
-    ULAM = VGO.univec3();
-    LAMD.zero();
+    ULAM =  normalise(VGO);
+    LAMD.zeros();
 
     // initializing RGO at first pass
     if (ipas2_flag) {
@@ -664,16 +648,16 @@ void Guidance::guidance_ltg_trate(Matrix &ULAM,
     if (denom != 0)
         LAMD = (RGO - ULAM * s_igrl) * (1 / denom);
     else
-        LAMD.zero();
+        LAMD.zeros();
 
     // setting limits on LAMD
-    lamd = LAMD.absolute();
+    lamd = norm(LAMD);
     if (lamd >= lamd_limit) {
-        Matrix ULMD = LAMD.univec3();
+        arma::mat ULMD =  normalise(LAMD);
         LAMD = ULMD * lamd_limit;
     }
     // diagnostics:
-    lamd = LAMD.absolute();
+    lamd = norm(LAMD);
     //-------------------------------------------------------------------------
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -702,32 +686,32 @@ void Guidance::guidance_ltg_trate(Matrix &ULAM,
 // 040326 Converted from FORTRAN by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-void Guidance::guidance_ltg_trate_rtgo(Matrix &RGO,
-                                    Matrix &RGRAV,
+void Guidance::guidance_ltg_trate_rtgo(arma::mat &RGO,
+                                    arma::mat &RGRAV,
                                     double tgo,
                                     double tgop,
-                                    Matrix SDII,
-                                    Matrix SBIIC,
-                                    Matrix VBIIC,
-                                    Matrix RBIAS,
-                                    Matrix ULAM,
-                                    Matrix UD,
-                                    Matrix UY,
-                                    Matrix UZ,
+                                    arma::mat SDII,
+                                    arma::mat SBIIC,
+                                    arma::mat VBIIC,
+                                    arma::mat RBIAS,
+                                    arma::mat ULAM,
+                                    arma::mat UD,
+                                    arma::mat UY,
+                                    arma::mat UZ,
                                     double s_igrl)
 {
     // correcting range-due-to-gravity
     RGRAV = RGRAV * (tgo / tgop) * (tgo / tgop);
-    Matrix RGO_LOCAL = SDII - (SBIIC + VBIIC * tgo + RGRAV) - RBIAS;
+    arma::mat RGO_LOCAL = SDII - (SBIIC + VBIIC * tgo + RGRAV) - RBIAS;
 
     // calculating range-to-go vector component in (UD,UY)-plane
-    double rgox = RGO_LOCAL ^ UD;
-    double rgoy = RGO_LOCAL ^ UY;
-    Matrix RGOXY = UD * rgox + UY * rgoy;
+    double rgox = dot(RGO_LOCAL, UD);
+    double rgoy = dot(RGO_LOCAL, UY);
+    arma::mat RGOXY = UD * rgox + UY * rgoy;
 
     // replacing down-range z-component
-    double num = RGOXY ^ ULAM;
-    double denom = ULAM ^ UZ;
+    double num = dot(RGOXY, ULAM);
+    double denom = dot(ULAM, UZ);
     if (denom == 0) {
         std::cerr
             << " *** Warning: divide by zero in 'guidance_ltg_trate_rtgo'; "
@@ -767,12 +751,12 @@ void Guidance::guidance_ltg_trate_rtgo(Matrix &RGO,
 // 040325 Converted from FORTRAN by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-void Guidance::guidance_ltg_pdct(Matrix &SPII,
-                              Matrix &VPII,
-                              Matrix &RGRAV,
-                              Matrix &RBIAS,
-                              Matrix LAMD,
-                              Matrix ULAM,
+void Guidance::guidance_ltg_pdct(arma::mat &SPII,
+                              arma::mat &VPII,
+                              arma::mat &RGRAV,
+                              arma::mat &RBIAS,
+                              arma::mat LAMD,
+                              arma::mat ULAM,
                               double l_igrl,
                               double s_igrl,
                               double j_igrl,
@@ -781,23 +765,23 @@ void Guidance::guidance_ltg_pdct(Matrix &SPII,
                               double p_igrl,
                               double j_over_l,
                               double qprime,
-                              Matrix SBIIC,
-                              Matrix VBIIC,
-                              Matrix RGO,
+                              arma::mat SBIIC,
+                              arma::mat VBIIC,
+                              arma::mat RGO,
                               double tgo)
 {
     // local variables
-    Matrix SBIIC2(3, 1);
-    Matrix VBIIC2(3, 1);
+    arma::vec3 SBIIC2;
+    arma::vec3 VBIIC2;
 
     // velocity gained due to thrust
-    double lmdsq = LAMD ^ LAMD;
-    Matrix VTHRUST =
+    double lmdsq = dot(LAMD, LAMD);
+    arma::mat VTHRUST =
         ULAM *
         (l_igrl - 0.5 * lmdsq * (h_igrl - j_igrl * j_over_l));  // Jackson, p.8
 
     // displacement gained due to thrust
-    Matrix RTHRUST =
+    arma::mat RTHRUST =
         ULAM *
             (s_igrl - 0.5 * lmdsq * (p_igrl - j_over_l * (q_igrl + qprime))) +
         LAMD * qprime;  // Jackson, p.8
@@ -806,13 +790,13 @@ void Guidance::guidance_ltg_pdct(Matrix &SPII,
     RBIAS = RGO - RTHRUST;
 
     // offsetting SBIIC, VBIIC to SBIIC1, VBIIC1 for gravity calculations
-    Matrix SBIIC1 =
+    arma::mat SBIIC1 =
         SBIIC - RTHRUST * 0.1 - VTHRUST * (tgo / 30);  // Jackson, p.23
-    Matrix VBIIC1 =
+    arma::mat VBIIC1 =
         VBIIC + RTHRUST * (1.2 / tgo) - VTHRUST * 0.1;  // Jackson, p.23
 
     // calling Kepler utility to project to end state (two options available)
-    int flag = cad_kepler(SBIIC2, VBIIC2, SBIIC1, VBIIC1, tgo);
+    int flag = cad::kepler(SBIIC2, VBIIC2, SBIIC1, VBIIC1, tgo);
     //    int flag=cad_kepler1(SBIIC2,VBIIC2,SBIIC1,VBIIC1,tgo);
     if (flag) {
         std::cerr
@@ -820,7 +804,7 @@ void Guidance::guidance_ltg_pdct(Matrix &SPII,
                "*** \n";
     }
     // gravity corrections
-    Matrix VGRAV = VBIIC2 - VBIIC1;
+    arma::mat VGRAV = VBIIC2 - VBIIC1;
     RGRAV = SBIIC2 - SBIIC1 - VBIIC1 * tgo;
 
     // predicted state with gravity and thrust corrections
@@ -853,28 +837,28 @@ void Guidance::guidance_ltg_pdct(Matrix &SPII,
 // 040325 Converted from FORTRAN by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-void Guidance::guidance_ltg_crct(Matrix &SDII,
-                              Matrix &UD,
-                              Matrix &UY,
-                              Matrix &UZ,
-                              Matrix &VMISS,
-                              Matrix &VGO,
+void Guidance::guidance_ltg_crct(arma::mat &SDII,
+                              arma::mat &UD,
+                              arma::mat &UY,
+                              arma::mat &UZ,
+                              arma::mat &VMISS,
+                              arma::mat &VGO,
                               double dbi_desired,
                               double dvbi_desired,
                               double thtvdx_desired,
-                              Matrix SPII,
-                              Matrix VPII,
-                              Matrix SBIIC,
-                              Matrix VBIIC)
+                              arma::mat SPII,
+                              arma::mat VPII,
+                              arma::mat SBIIC,
+                              arma::mat VBIIC)
 {
     // local variables
-    Matrix VDII(3, 1);
+    arma::vec3 VDII;
 
     // desired position
-    UD = SPII.univec3();
+    UD =  normalise(SPII);
     SDII = UD * dbi_desired;
 
-    // generating unit base vectors ('%' overloaded Matrix operator)
+    // generating unit base vectors ('%' overloaded arma::mat operator)
     UY = VBIIC % SBIIC;
     UZ = UD % UY;
 
@@ -886,19 +870,17 @@ void Guidance::guidance_ltg_crct(Matrix &SDII,
 
     // diagnostics:
     // displacement of P wrt D (both lie always on the UD vector)
-    double dpi = SPII.absolute();
-    double ddi = SDII.absolute();
+    double dpi = norm(SPII);
+    double ddi = norm(SDII);
     dpd = dpi - ddi;
     // displacement of vehicle B wrt the desired end-point D
-    double dbi = SBIIC.absolute();
+    double dbi = norm(SBIIC);
     dbd = dbi - ddi;
 
     //-------------------------------------------------------------------------
 }
 
-Matrix  Guidance::get_UTBC() {
-    Matrix UTBC(3, 1);
-    UTBC.build_vec3(utbc);
+arma::vec3  Guidance::get_UTBC() {
     return UTBC;
 }
 double  Guidance::get_alphacomx() { return alphacomx; }

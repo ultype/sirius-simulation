@@ -152,7 +152,7 @@ void RCS::set_mode(enum RCS::RCS_MODE in){
 ///////////////////////////////////////////////////////////////////////////////
 
 void RCS::actuate(){
-    arma::vec3 UTBC = arma::vec3(guidance->get_UTBC().get_pbody());
+    arma::vec3 UTBC = guidance->get_UTBC();
     double alphacomx = guidance->get_alphacomx();
     double betacomx  = guidance->get_betacomx();
 
