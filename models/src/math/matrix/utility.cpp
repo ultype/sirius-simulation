@@ -145,7 +145,7 @@ arma::mat33 build_psi_tht_phi_TM(const double &psi, const double &tht, const dou
 
 arma::vec4 Matrix2Quaternion(arma::mat33 Matrix_in)
 {
-    double q_square[4];
+    arma::vec4 q_square;
     double q_square_max;
     int i, j;
     arma::vec4 Quaternion;
@@ -155,16 +155,8 @@ arma::vec4 Matrix2Quaternion(arma::mat33 Matrix_in)
     q_square[2] = fabs(1.0 - Matrix_in(0,0) + Matrix_in(1,1) - Matrix_in(2,2));
     q_square[3] = fabs(1.0 - Matrix_in(0,0) - Matrix_in(1,1) + Matrix_in(2,2));
 
-    q_square_max = q_square[0];
-    j = 0;
-    for(i = 1;i < 4;i++)
-    {
-        if(q_square[i] > q_square_max)
-        {
-            q_square_max = q_square[i];
-            j = i;
-        }
-    }
+    q_square_max = q_square.max();
+    j = q_square.index_max();
     switch (j)
     {
         case 0:
