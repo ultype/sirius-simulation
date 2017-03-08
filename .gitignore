@@ -4,6 +4,8 @@
 *.sublime-workspace
 cscope.*
 tags
+.tags
+.tags-*
 compile_commands.json
 
 *.o
