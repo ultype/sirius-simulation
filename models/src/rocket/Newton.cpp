@@ -270,3 +270,5 @@ arma::vec3 Newton::get_SBII() { return SBII; }
 arma::vec3 Newton::get_FSPB() { return FSPB; }
 
 unsigned int Newton::get_liftoff() { return liftoff; }
+
+arma::mat Newton::get_TGI() { return TGI; }

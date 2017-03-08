@@ -168,8 +168,8 @@ class Datadeck
         ///////////////////////////////////////////////////////////////////////////////
         void alloc_mem(){
             table_ptr = std::vector<Table*>(capacity);
-            for(int i = 0; i < capacity; i++)
-                table_ptr[i] = new Table();
+            //for(int i = 0; i < capacity; i++)
+                //table_ptr[i] = new Table();
         }
 
         ///////////////////////////////////////////////////////////////////////////////

@@ -66,6 +66,7 @@ Datadeck::Datadeck(char *file_name)
         char dim_buff[2];
         int table_dim(0);
         strncpy(dim_buff,temp,1);
+        dim_buff[1] = '\0';
         //converting character to integer
         dim_check=sscanf(dim_buff,"%d",&table_dim);
         table->set_dim(table_dim);
