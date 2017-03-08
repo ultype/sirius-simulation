@@ -1,0 +1,33 @@
+global DR_GROUP_ID
+global drg
+try:
+    if DR_GROUP_ID >= 0:
+        DR_GROUP_ID += 1
+except NameError:
+    DR_GROUP_ID = 0
+    drg = []
+
+drg.append(trick.DRAscii("Wang"))
+drg[DR_GROUP_ID].set_freq(trick.DR_Always)
+drg[DR_GROUP_ID].set_cycle(0.01)
+drg[DR_GROUP_ID].set_single_prec_only(False)
+drg[DR_GROUP_ID].add_variable("rkt.newton._ABII[0]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._ABII[1]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._ABII[2]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._VBII[0]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._VBII[1]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._VBII[2]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._SBII[0]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._SBII[1]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._SBII[2]")
+drg[DR_GROUP_ID].add_variable("rkt.newton.propulsion[0].vmass")
+drg[DR_GROUP_ID].add_variable("rkt.env._GRAVG[0]")
+drg[DR_GROUP_ID].add_variable("rkt.env._GRAVG[1]")
+drg[DR_GROUP_ID].add_variable("rkt.env._GRAVG[2]")
+drg[DR_GROUP_ID].add_variable("rkt.env.gravg")
+drg[DR_GROUP_ID].add_variable("rkt.newton._thtvdx")
+drg[DR_GROUP_ID].add_variable("rkt.newton._psivdx")
+drg[DR_GROUP_ID].add_variable("rkt.newton._dvbi")
+drg[DR_GROUP_ID].add_variable("rkt.newton._dvbe")
+trick.add_data_record_group(drg[DR_GROUP_ID], trick.DR_Buffer)
+drg[DR_GROUP_ID].enable()

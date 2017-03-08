@@ -104,8 +104,8 @@ class Newton {
         arma::vec VBII;      /* *o  (m/s)    Vehicle inertia velocity */
         double _VBII[3];       /* *o  (m/s)    Vehicle inertia velocity */
 
-        arma::vec ABII;      /* **  (m/s2)   Vehicle inertia acceleration */
-        double _ABII[3];      /* **  (m/s2)   Vehicle inertia acceleration */
+        arma::vec ABII;      /* *o  (m/s2)   Vehicle inertia acceleration */
+        double _ABII[3];      /* *o  (m/s2)   Vehicle inertia acceleration */
 
         arma::mat TDI;      /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double _TDI[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
