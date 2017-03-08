@@ -74,6 +74,10 @@ class Propulsion{
                                 double moi_trans0, double moi_tran1,
                                 double spi, double fuel_flow_rate);
         void set_ltg_thrust();
+        void get_input_file_var(double xcg0, double xcg1,
+                                    double moi_roll0, double moi_roll1,
+                                    double moi_trans0, double moi_trans1,
+                                    double spi, double fuel_flow_rate);
 
         //XXX: get_thrust_state
         enum THRUST_TYPE get_thrust_state();

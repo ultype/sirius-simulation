@@ -20,6 +20,7 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Force.hh"
 ##include "rocket/Propulsion.hh"
 ##include "rocket/Aerodynamics.hh"
+##include "rocket/Time_management.hh"
 
 ##include "cad/utility.hh"
 ##include "cad/datadeck.hh"
@@ -83,6 +84,8 @@ class Rocket_SimObject : public Trick::SimObject {
         TVC tvc;
         RCS rcs;
 
+        time_management time;
+
         Rocket_SimObject() 
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
@@ -90,19 +93,20 @@ class Rocket_SimObject : public Trick::SimObject {
                 gpsr        ( newton     , euler        , *gps_sats    , ins )        ,
                 control     ( ins        , newton       , env          , propulsion   , aerodynamics) ,
                 guidance    ( ins        , newton       , propulsion)  ,
-                env         ( newton     , aerodynamics , kinematics ) ,
+                env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
                 ins         ( newton     , euler        , env          , kinematics   , gpsr )        ,
                 tvc         ( env        , kinematics   , control      , propulsion ) ,
                 rcs         ( ins        , guidance     , propulsion ) ,
-                forces      ( env        , propulsion   , rcs          , aerodynamics , tvc )
+                forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
+                time        ()
             {
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();
+            ("initialization") newton.initialize();
             ("initialization") env.initialize();
             ("initialization") aerodynamics.initialize();
-            ("initialization") newton.initialize();
             ("initialization") euler.initialize();
             ("initialization") gpsr.initialize(0.001);
             ("initialization") guidance.initialize();
@@ -113,7 +117,8 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
 
-            (0.001, "scheduled") gpsr.update_markov(0.001);
+            (0.001, "scheduled") time.dm_time();
+            //(0.001, "scheduled") gpsr.update_markov(0.001);
             (0.001, "scheduled") kinematics.propagate(0.001);
 	        (0.001, "scheduled") env.propagate(0.001);
             (0.001, "scheduled") propulsion.propagate(0.001);

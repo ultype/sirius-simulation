@@ -171,8 +171,8 @@ void TVC::actuate(double int_step){
             return;
             break;
         case NO_DYNAMIC_TVC:
-            eta = alphax * RAD;
-            zet = zetc;
+            eta = delecx * RAD;
+            zet = delrcx * RAD;
             break;
         case ONLINE_SECOND_ORDER_TVC:
             // variable nozzle reduction gain (low q, high gain)
@@ -290,6 +290,7 @@ void TVC::set_dtvclimx(double in) { dtvclimx = in; }
 void TVC::set_wntvc(double in) { wntvc = in; }
 void TVC::set_zettvc(double in) { zettvc = in; }
 void TVC::set_factgtvc(double in) { factgtvc = in; }
+void TVC::set_parm(double in) { parm = in; }
 
 double TVC::get_parm() { return parm; }
 

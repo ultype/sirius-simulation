@@ -109,6 +109,7 @@ class INS {
         double get_phibdcx();
         double get_thtbdcx();
         double get_psibdcx();
+        double get_thtvdcx();
 
         arma::vec3 get_SBIIC();
         arma::vec3 get_VBIIC();

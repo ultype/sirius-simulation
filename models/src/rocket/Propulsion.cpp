@@ -124,6 +124,21 @@ void Propulsion::set_input_thrust(double xcg0, double xcg1,
     this->spi            = spi;
 }
 
+void Propulsion::get_input_file_var(double xcg0, double xcg1,
+                                    double moi_roll0, double moi_roll1,
+                                    double moi_trans0, double moi_trans1,
+                                    double spi, double fuel_flow_rate)
+{
+    this->xcg_0          = xcg0;
+    this->xcg_1          = xcg1;
+    this->moi_roll_0     = moi_roll0;
+    this->moi_roll_1     = moi_roll1;
+    this->moi_trans_0    = moi_trans0;
+    this->moi_trans_1    = moi_trans1;
+    this->fuel_flow_rate = fuel_flow_rate;
+    this->spi            = spi;
+}
+
 void Propulsion::set_ltg_thrust(){
     this->thrust_state = LTG_THRUST;
 }
@@ -141,8 +156,9 @@ void Propulsion::propagate(double int_step)
         case NO_THRUST:
             fmassed = 0;
             thrust = 0;
-            fmasse = 0;
+            //fmasse = 0;
             //fmassr=0; //Somehow comment out in trick version
+            //this->IBBB = get_IBBB0();
 
             break;
         case INPUT_THRUST:
@@ -166,17 +182,15 @@ void Propulsion::propagate(double int_step)
                 this->thrust = 0;
             }
 
-            //interpolating cg as a function of fuel expended
-            this->xcg = calculate_xcg();
-
-            //interpolating moment of inertia tensor as a function of fuel expended
-            this->IBBB = calculate_IBBB();
-
             break;
     }
 
     //calculating vehicle mass, mass flow, and fuel mass remaining
     vmass = payload + vmass0 - fmasse;
+    //interpolating cg as a function of fuel expended
+    this->xcg = calculate_xcg();
+    //interpolating moment of inertia tensor as a function of fuel expended
+    this->IBBB = calculate_IBBB();
 }
 
 void Propulsion::propagate_thrust_delta_v(double int_step){

@@ -72,6 +72,11 @@ class Control {
         double control_normal_accel(double ancomx, double int_step);
         double control_yaw_accel(double alcomx, double int_step);
         double control_pitch_rate(double qqdx);
+        double control_gamma(double thtvdcomx);
+        void set_thtvdcomx(double in);
+        void set_maut(double in);
+        void set_delimx(double in);
+        void set_drlimx(double in);
 
         ///////////////////////////////////////////////////////////////////////////////
         // Definition of control module-variables
@@ -136,6 +141,10 @@ class Control {
         double  ancomx;         /* *io (--)     Pitch (normal) acceleration command */
         double  qqdx;           /* *io (--)     Desired pitch rate", "control */
         double  grate;          /* *io (--)     grate */
+        double gainff;          /* *io  (--)    gain */
+        double thtvdcomx;        /* *io (d)      Flight path angle command */
+        arma::mat GAINGAM;      /* *io  (--)    Gain */
+        double _GAINGAM[3][3];  /* 8io  (--)    Gain */
 };
 
 #endif  // __CONTROL_HH__

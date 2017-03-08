@@ -100,6 +100,7 @@ class TVC {
         void set_wntvc(double in);
         void set_zettvc(double in);
         void set_factgtvc(double in);
+        void set_parm(double in);
 
         double get_parm();
 

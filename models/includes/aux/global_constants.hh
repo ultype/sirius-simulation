@@ -65,4 +65,51 @@ int const NVAR = 50;     ///< max number of variables to be input at every event
 int const NMARKOV = 20;  ///< max number of Markov noise variables
 /**@}*/
 
+
+/** UTC Time/Julian Day/GPS Time **/
+const double DJ00 = 2451545.0;
+const double DJC = 36525.0;
+const double DAS2R = 4.848136811095359935899141e-6; /* Arcseconds to radians */
+const double D2PI = 6.283185307179586476925287; /* 2Pi */
+const double DMAS2R = 4.848136811095359935899141e-9; /* Milliarcseconds to radians */
+const double TURNAS = 1296000.0; /* Arcseconds in a full circle */
+const double JAN61980 = 44244.0;  /* MJD of GPS epoch : Jan. 6 1980 */
+const double JAN11901 = 15385.0;  /* MJD of Jan 1, 1901 */
+const double SEC_PER_DAY = 86400.0;
+const double SEC_PER_WEEK = 604800.0;
+const int TAI_GPS = 19;   /* Difference between TAI and GPS */
+const int UNIX_MJD = 40587; /* MJD of Unix epoch : 00:00:00 on January 1, 1970 */
+const double TT_TAI = 32.184;
+const double DM_sec2r    =  0.000072722052; /* second to radian */
+const double DM_arcsec2r =  4.848136811e-6; /* arcsecond to radian */
+/************************************************************************/
+/** GPS constellation **/
+const int  N_SBF = 5;
+const int  MAX_SAT = 32;
+const int  MAX_CHAR = 100;
+const int  N_DWRD_SBF = 10;
+const int  CA_SEQ_LEN = 1023;
+const int  N_DWRD = (N_SBF+1)*N_DWRD_SBF;
+const int  EPHEM_ARRAY_SIZE = 13;
+const int  TRUE = 1;
+const int  FALSE = 0;
+const int  SECONDS_IN_HOUR = 3600;
+const int  MAX_CHAN = 16;
+const int  SECONDS_IN_DAY = 86400;
+const double  SPEED_OF_LIGHT = 2.99792458e8;
+const double  LAMBDA_L1 = 0.190293672798365;
+const double POW2_M5 = 0.03125;
+const double POW2_M19 = 1.907348632812500e-6;
+const double POW2_M29 = 1.862645149230957e-9;
+const double POW2_M31 = 4.656612873077393e-10;
+const double POW2_M33 = 1.164153218269348e-10;
+const double POW2_M43 = 1.136868377216160e-13;
+const double POW2_M55 = 2.775557561562891e-17;
+const double POW2_M50 = 8.881784197001252e-016;
+const double POW2_M30 = 9.313225746154785e-010;
+const double POW2_M27 = 7.450580596923828e-009;
+const double POW2_M24 = 5.960464477539063e-008;
+const double WGS84_ECCENTRICITY = 0.0818191908426;
+/****************************************************************/
+
 #endif

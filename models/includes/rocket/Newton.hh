@@ -78,6 +78,8 @@ class Newton {
         arma::vec3 get_VBII();
         arma::vec3 get_VBED();
 
+        unsigned int get_liftoff();
+
         // XXX: Use getter and setters
         /* Interfacing Variabes */
 
@@ -150,6 +152,7 @@ class Newton {
         double _dvbe;          /* *o  (m/s)   [DIAG] Vehicle geographic speed */
         double _thtvdx;        /* *o  (d)     [DIAG] Vehicle's flight path angle */
         double _psivdx;        /* *o  (d)     [DIAG] Vehicle's heading angle */
+        unsigned int liftoff;        /* *io  (--)     To check wether the rocket liftoff or not: liftoff = 1, not liftoff = 0 */
 
         /* Orbital Logging */
         double _inclination;   /* **  (deg)   [DIAG] Orbital inclination is the minimun angle between reference plane and the orbital plane or direction of an object in orbit around another object */

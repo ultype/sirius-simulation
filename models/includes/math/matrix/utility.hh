@@ -28,4 +28,7 @@ arma::mat33 build_psivg_thtvg_TM(const double &psivg, const double &thtvg);
 /// @return the Euler T.M. of the psi->tht->phi sequence
 arma::mat33 build_psi_tht_phi_TM(const double &psi, const double &tht, const double &phi);
 
+arma::vec4 Matrix2Quaternion(arma::mat33 Matrix_in);
+arma::mat33 Quaternion2Matrix(arma::vec4 Quaternion_in);
+
 #endif  // __MATRIX_UTIL_HH__

@@ -6,7 +6,8 @@
 Control::Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDynamics& aero)
     :   ins(&i), propulsion(&plp), newton(&ntn), environment(&env), aerodynamics(&aero),
         VECTOR_INIT(GAINFP, 3),
-        VECTOR_INIT(GAINFY, 3)
+        VECTOR_INIT(GAINFY, 3),
+        MATRIX_INIT(GAINGAM, 3, 3)
 {
     this->default_data();
 }
@@ -14,7 +15,8 @@ Control::Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDyn
 Control::Control(const Control& other)
     :   ins(other.ins), propulsion(other.propulsion), newton(other.newton), environment(other.environment), aerodynamics(other.aerodynamics),
         VECTOR_INIT(GAINFP, 3),
-        VECTOR_INIT(GAINFY, 3)
+        VECTOR_INIT(GAINFY, 3),
+        MATRIX_INIT(GAINGAM, 3, 3)
 {
     this->default_data();
 }
@@ -93,6 +95,10 @@ void Control::control(double int_step){
     if (mautp == 4) {
         if (mprop)
             delecx = control_pitch_rate(qqdx);
+    }
+    if (mautp == 5){
+        if(mprop)
+            delecx = control_gamma(thtvdcomx);
     }
     // limiting control commands
     if (fabs(delecx) > delimx)
@@ -299,3 +305,123 @@ double Control::control_pitch_rate(double qqdx){
 
     return delecx;
 }
+
+
+double Control::control_gamma(double thtvdcomx)
+{
+    //local variables
+    arma::mat AA(3,3);
+    arma::vec BB(3);
+    arma::mat DP(3,3);
+    arma::vec DD(3);
+    arma::vec HH(3);
+
+    //local module-variables
+    // arma::mat GAINGAM(3,3);
+    // GAINGAM.zeros();
+    double gainff=0;
+
+    //localizing module-variables
+    //input data
+    double pgam = 3.0;
+    double wgam = 0.202;
+    double zgam = 1.0;
+    //input from other modules
+    double dvbe=newton->get_dvbe();
+    double dla=aerodynamics->get_dla();
+    double dlde=aerodynamics->get_dlde();
+    double dma=aerodynamics->get_dma();
+    double dmq=aerodynamics->get_dmq();
+    double dmde=aerodynamics->get_dmde();
+    double qqcx=ins->get_gyro().get_qqcx();
+    double dvbec=ins->get_dvbec();
+    double thtvdcx=ins->get_thtvdcx();
+    double thtbdcx=ins->get_thtbdcx();
+    //--------------------------------------------------------------------------
+
+    //prevent division by zero
+    if(dvbec==0)dvbec=dvbe;
+
+    //building fundamental matrices (body rate, acceleration, fin deflection)
+    AA(0,0) = dmq;
+    AA(0,1) = dma;
+    AA(0,2) = -dma;
+    AA(1,0) = 1.;
+    AA(1,1) = 0.0;
+    AA(1,2) = 0.0;
+    AA(2,0) = 0.0;
+    AA(2,1) = dla/dvbec;
+    AA(2,2) = -dla/dvbec;
+    //AA.build_mat33(dmq,dma,-dma,1.,0.,0.,0.,dla/dvbec,-dla/dvbec);
+    BB(0) = dmde;
+    BB(1) = 0.0;
+    BB(2) = dlde/dvbec;
+    //BB.build_vec3(dmde,0.,dlde/dvbec);
+
+    //feedback gains from closed-loop pole placement
+    double am=2.*zgam*wgam+pgam;
+    double bm=wgam*wgam+2.*zgam*wgam*pgam;
+    double cm=wgam*wgam*pgam;
+    // double v11=dmde;
+    // double v12=0.;
+    // double v13=dlde/dvbec;
+    // double v21=dmde*dla/dvbec-dlde*dma/dvbec;
+    // double v22=dmde;
+    // double v23=-dmq*dlde/dvbec;
+    // double v31=0.;
+    // double v32=v21;
+    // double v33=v21;
+
+    DP(0,0) = dmde;
+    DP(0,1) = 0.0;
+    DP(0,2) = dlde/dvbec;
+    DP(1,0) = dmde*dla/dvbec-dlde*dma/dvbec;
+    DP(1,1) = dmde;
+    DP(1,2) = -dmq*dlde/dvbec;
+    DP(2,0) = 0.0;
+    DP(2,1) = dmde*dla/dvbec-dlde*dma/dvbec;
+    DP(2,2) = dmde*dla/dvbec-dlde*dma/dvbec;
+    // DP.build_mat33(v11,v12,v13,v21,v22,v23,v31,v32,v33);
+
+    DD(0) = am+dmq-dla/dvbec;
+    DD(1) = bm+dma+dmq*dla/dvbec;
+    DD(2) = cm;
+    // DD.build_vec3(am+dmq-dla/dvbec,bm+dma+dmq*dla/dvbec,cm);
+    arma::mat DPI=inv(DP);
+    GAINGAM=DPI*DD;
+
+
+    //steady-state feed-forward gain to achieve unit gamma response
+    arma::mat DUM33=AA-BB*trans(GAINGAM);
+    arma::mat IDUM33=inv(DUM33);
+    arma::mat DUM3=IDUM33*BB;
+
+    HH(0) = 0.0;
+    HH(1) = 0.0;
+    HH(2) = 1.;
+    // HH.build_vec3(0.,0.,1.);
+    double denom=dot(HH,DUM3);
+    gainff=-1./denom;
+
+    //pitch control command
+    double thtc=gainff*thtvdcomx*RAD;
+    double qqf=GAINGAM(0,0)*qqcx*RAD;
+    double thtbgf=GAINGAM(1,0)*thtbdcx*RAD;
+    double thtugf=GAINGAM(2,0)*thtvdcx*RAD;
+    double delec=thtc-(qqf+thtbgf+thtugf);
+    double delecx=delec*DEG;
+
+    //--------------------------------------------------------------------------
+    //loading module-variables
+    //diagnostics
+    // hyper[566].gets_vec(GAINGAM);
+    // hyper[567].gets(gainff);
+
+    return delecx;
+}
+
+
+void Control::set_thtvdcomx(double in) { this->thtvdcomx = in; }
+void Control::set_maut(double in) { this->maut = in; }
+void Control::set_delimx(double in) { this->delimx = in; }
+void Control::set_drlimx(double in) { this->drlimx = in; }
