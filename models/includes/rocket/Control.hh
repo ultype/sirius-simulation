@@ -77,6 +77,9 @@ class Control {
         void set_maut(double in);
         void set_delimx(double in);
         void set_drlimx(double in);
+        void set_pgam(double in);
+        void set_wgam(double in);
+        void set_zgam(double in);
 
         ///////////////////////////////////////////////////////////////////////////////
         // Definition of control module-variables
@@ -144,7 +147,10 @@ class Control {
         double gainff;          /* *io  (--)    gain */
         double thtvdcomx;        /* *io (d)      Flight path angle command */
         arma::mat GAINGAM;      /* *io  (--)    Gain */
-        double _GAINGAM[3][3];  /* 8io  (--)    Gain */
+        double _GAINGAM[3][1];  /* *io  (--)    Gain */
+        double pgam;            /*  *io  (--)    Gain */
+        double wgam;            /*  *io  (--)    Gain */
+        double zgam;            /*  *io  (--)    Gain */
 };
 
 #endif  // __CONTROL_HH__

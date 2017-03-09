@@ -7,7 +7,7 @@ Control::Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDyn
     :   ins(&i), propulsion(&plp), newton(&ntn), environment(&env), aerodynamics(&aero),
         VECTOR_INIT(GAINFP, 3),
         VECTOR_INIT(GAINFY, 3),
-        MATRIX_INIT(GAINGAM, 3, 3)
+        MATRIX_INIT(GAINGAM, 3, 1)
 {
     this->default_data();
 }
@@ -16,7 +16,7 @@ Control::Control(const Control& other)
     :   ins(other.ins), propulsion(other.propulsion), newton(other.newton), environment(other.environment), aerodynamics(other.aerodynamics),
         VECTOR_INIT(GAINFP, 3),
         VECTOR_INIT(GAINFY, 3),
-        MATRIX_INIT(GAINGAM, 3, 3)
+        MATRIX_INIT(GAINGAM, 3, 1)
 {
     this->default_data();
 }
@@ -310,11 +310,11 @@ double Control::control_pitch_rate(double qqdx){
 double Control::control_gamma(double thtvdcomx)
 {
     //local variables
-    arma::mat AA(3,3);
-    arma::vec BB(3);
-    arma::mat DP(3,3);
-    arma::vec DD(3);
-    arma::vec HH(3);
+    arma::mat33 AA;
+    arma::vec3 BB;
+    arma::mat33 DP;
+    arma::vec3 DD;
+    arma::vec3 HH;
 
     //local module-variables
     // arma::mat GAINGAM(3,3);
@@ -323,9 +323,9 @@ double Control::control_gamma(double thtvdcomx)
 
     //localizing module-variables
     //input data
-    double pgam = 3.0;
-    double wgam = 0.202;
-    double zgam = 1.0;
+    double pgam = this->pgam;
+    double wgam = this->wgam;
+    double zgam = this->zgam;
     //input from other modules
     double dvbe=newton->get_dvbe();
     double dla=aerodynamics->get_dla();
@@ -387,14 +387,14 @@ double Control::control_gamma(double thtvdcomx)
     DD(1) = bm+dma+dmq*dla/dvbec;
     DD(2) = cm;
     // DD.build_vec3(am+dmq-dla/dvbec,bm+dma+dmq*dla/dvbec,cm);
-    arma::mat DPI=inv(DP);
+    arma::mat33 DPI=inv(DP);
     GAINGAM=DPI*DD;
 
 
     //steady-state feed-forward gain to achieve unit gamma response
-    arma::mat DUM33=AA-BB*trans(GAINGAM);
-    arma::mat IDUM33=inv(DUM33);
-    arma::mat DUM3=IDUM33*BB;
+    arma::mat33 DUM33=AA-BB*trans(GAINGAM);
+    arma::mat33 IDUM33=inv(DUM33);
+    arma::vec DUM3=IDUM33*BB;
 
     HH(0) = 0.0;
     HH(1) = 0.0;
@@ -425,3 +425,6 @@ void Control::set_thtvdcomx(double in) { this->thtvdcomx = in; }
 void Control::set_maut(double in) { this->maut = in; }
 void Control::set_delimx(double in) { this->delimx = in; }
 void Control::set_drlimx(double in) { this->drlimx = in; }
+void Control::set_pgam(double in) { this->pgam = in; }
+void Control::set_wgam(double in) { this->wgam = in; }
+void Control::set_zgam(double in) { this->zgam = in; }
