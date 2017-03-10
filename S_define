@@ -96,7 +96,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
-                ins         ( newton     , euler        , env          , kinematics   , gpsr )        ,
+                ins         ( newton     , kinematics   , gpsr )        ,
                 tvc         ( env        , kinematics   , control      , propulsion ) ,
                 rcs         ( ins        , guidance     , propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,

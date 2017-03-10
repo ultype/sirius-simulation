@@ -19,9 +19,8 @@
 
 #include <fstream>
 
-INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps)
-    :   newton(&ntn), euler(&elr), environment(&env), kinematics(&kins), gpsr(&gps),
-        MATRIX_INIT(WEII, 3, 3),
+INS::INS(Newton &newton, Kinematics &kinematics, GPS_Receiver &gpsr)
+    :   MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
@@ -37,11 +36,19 @@ INS::INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Rece
         VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
+
+    this->grab_SBII = LINK(newton, get_SBII);
+    this->grab_VBII = LINK(newton, get_VBII);
+    this->grab_dbi  = LINK(newton, get_dbi);
+    this->grab_TBI  = LINK(kinematics, get_TBI);
+    this->grab_SXH  = LINK(gpsr, get_SXH);
+    this->grab_VXH  = LINK(gpsr, get_VXH);
+    this->grab_gps_update  = LINK(gpsr, get_gps_update);
+    this->clear_gps_flag  = LINK(gpsr, clear_gps_flag);
 }
 
 INS::INS(const INS& other)
-    :   newton(other.newton), euler(other.euler), environment(other.environment), kinematics(other.kinematics), gpsr(other.gpsr),
-        MATRIX_INIT(WEII, 3, 3),
+    :   MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
         VECTOR_INIT(RICI, 3),
@@ -57,6 +64,15 @@ INS::INS(const INS& other)
         VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
+
+    this->grab_SBII = other.grab_SBII;
+    this->grab_VBII = other.grab_VBII;
+    this->grab_dbi  = other.grab_dbi;
+    this->grab_TBI  = other.grab_TBI;
+    this->grab_SXH = other.grab_SXH;
+    this->grab_VXH = other.grab_VXH;
+    this->grab_gps_update = other.grab_gps_update;
+    this->clear_gps_flag = other.clear_gps_flag;
 
     this->gyro = new sensor::Gyro(*other.gyro);
     this->accel = new sensor::Accelerometer(*other.accel);
@@ -104,11 +120,14 @@ INS& INS::operator=(const INS& other){
     if(&other == this)
         return *this;
 
-    this->newton      = other.newton;
-    this->euler       = other.euler;
-    this->environment = other.environment;
-    this->kinematics  = other.kinematics;
-    this->gpsr        = other.gpsr;
+    this->grab_SBII = other.grab_SBII;
+    this->grab_VBII = other.grab_VBII;
+    this->grab_dbi  = other.grab_dbi;
+    this->grab_TBI  = other.grab_TBI;
+    this->grab_SXH = other.grab_SXH;
+    this->grab_VXH = other.grab_VXH;
+    this->grab_gps_update = other.grab_gps_update;
+    this->clear_gps_flag = other.clear_gps_flag;
 
     this->gyro = new sensor::Gyro(*other.gyro);
     this->accel = new sensor::Accelerometer(*other.accel);
@@ -258,10 +277,10 @@ double INS::calculate_INS_derived_dvbe(){
 
 bool INS::GPS_update(){
     // GPS update
-    if (gpsr->gps_update) {
+    if (grab_gps_update()) {
         // GPS Measurement
-        arma::vec3 SXH = gpsr->get_SXH();
-        arma::vec3 VXH = gpsr->get_VXH();
+        arma::vec3 SXH = grab_SXH();
+        arma::vec3 VXH = grab_VXH();
 
         // updating INS navigation output
         SBIIC = SBIIC - SXH;
@@ -270,7 +289,7 @@ bool INS::GPS_update(){
         ESBI = ESBI - SXH;
         EVBI = EVBI - VXH;
         // returning flag to GPS that update was completed
-        gpsr->gps_update--;
+        clear_gps_flag();
 
         return true;
     }
@@ -388,9 +407,9 @@ void INS::update(double int_step){
 
     // input from other modules
     double time      = get_rettime();
-    arma::vec3 SBII  = newton->get_SBII();
-    arma::vec3 VBII  = newton->get_VBII();
-    arma::mat33 TBI  = kinematics->get_TBI();
+    arma::vec3 SBII  = grab_SBII();
+    arma::vec3 VBII  = grab_VBII();
+    arma::mat33 TBI  = grab_TBI();
 
     int mroll = 0; // Ambiguous
 
@@ -412,7 +431,7 @@ void INS::update(double int_step){
     this->TBIC = calculate_INS_derived_TBI(TBI);
 
     // calculate gravitational error
-    this->EGRAVI = calculate_gravity_error(newton->get_dbi());
+    this->EGRAVI = calculate_gravity_error(grab_dbi());
 
     // integrating velocity error equation
     // XXX: How come INS integrates the Errorous Velocity based on EFSPB?

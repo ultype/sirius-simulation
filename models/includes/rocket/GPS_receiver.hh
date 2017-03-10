@@ -130,7 +130,8 @@ class GPS_Receiver {
         void filter_extrapolation(double);
         void measure();
 
-        int gps_update;       /* *o (--)       GPS update? > 0 updated */
+        int get_gps_update() { return gps_update; };
+        void clear_gps_flag() { gps_update--; };
 
         arma::vec3 get_SXH();
         arma::vec3 get_VXH();
@@ -174,6 +175,8 @@ class GPS_Receiver {
         _Euler_        * euler;
         GPS_Satellites * gps_sats;
         INS            * ins;
+
+        int gps_update;       /* *o (--)       GPS update? > 0 updated */
 
         /* Internal variables */
         bool gps_acq;               /* ** (--)      GPS Signal Acquired? */

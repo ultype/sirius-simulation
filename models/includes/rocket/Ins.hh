@@ -6,6 +6,8 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/rocket/Ins.cpp))
 *******************************************************************************/
+#include <functional>
+
 #include "Newton.hh"
 #include "Euler.hh"
 #include "Environment.hh"
@@ -48,12 +50,6 @@ class INS {
             ar & gyro;
             ar & accel;
 
-            ar & newton;
-            ar & euler;
-            ar & environment;
-            ar & kinematics;
-            ar & gpsr;
-
             ar & _EVBI;
             ar & _EVBID;
             ar & _ESBI;
@@ -83,7 +79,7 @@ class INS {
             ar & psibdcx;
         }
 
-        INS(Newton &ntn, _Euler_ &elr, Environment &env, Kinematics &kins, GPS_Receiver &gps);
+        INS(Newton &newton, Kinematics &kinematics, GPS_Receiver &gpsr);
         INS(const INS& other);
 
         INS& operator=(const INS& other);
@@ -102,6 +98,15 @@ class INS {
         void set_non_ideal(double frax_algnmnt);
 
         /* Input File */
+
+        std::function<arma::vec3()>   grab_SBII;
+        std::function<arma::vec3()>   grab_VBII;
+        std::function<double()>       grab_dbi;
+        std::function<arma::mat33()>  grab_TBI;
+        std::function<int()>          grab_gps_update;
+        std::function<arma::vec3()>   grab_SXH;
+        std::function<arma::vec3()>   grab_VXH;
+        std::function<void()>         clear_gps_flag;
 
         double get_dvbec();
         double get_alphacx();
@@ -147,13 +152,6 @@ class INS {
         double calculate_INS_derived_euler_angles(arma::mat33 TBD);
 
         /* Internal Calculators */
-
-        /* Routing references */
-        Newton       * newton;
-        _Euler_      * euler;
-        Environment  * environment;
-        Kinematics   * kinematics;
-        GPS_Receiver * gpsr;
 
         /* Sensors */
         sensor::Gyro * gyro;
