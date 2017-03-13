@@ -29,7 +29,7 @@ INCLUDE_R_DIR = ../models/includes
 CPPFLAGS += -isystem $(GTEST_DIR)/include -std=c++11
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -I$(INCLUDE_R_DIR)
+CXXFLAGS += -g -Wall -Wextra -pthread -I$(INCLUDE_R_DIR) -I ./
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
