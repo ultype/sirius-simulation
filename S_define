@@ -86,6 +86,35 @@ class Rocket_SimObject : public Trick::SimObject {
 
         time_management time;
 
+        void link_control_input(){
+            control.grab_mprop = LINK(propulsion, get_mprop);
+
+            control.grab_dvbe  = LINK(newton, get_dvbe);
+
+            control.grab_gymax = LINK(aerodynamics, get_gymax);
+            control.grab_dyb   = LINK(aerodynamics, get_dyb);
+            control.grab_dnb   = LINK(aerodynamics, get_dnb);
+            control.grab_dnr   = LINK(aerodynamics, get_dnr);
+            control.grab_dndr  = LINK(aerodynamics, get_dndr);
+            control.grab_dla   = LINK(aerodynamics, get_dla);
+            control.grab_dma   = LINK(aerodynamics, get_dma);
+            control.grab_dmq   = LINK(aerodynamics, get_dmq);
+            control.grab_dmde  = LINK(aerodynamics, get_dmde);
+            control.grab_dnd   = LINK(aerodynamics, get_dnd);
+            control.grab_dlde  = LINK(aerodynamics, get_dlde);
+
+            control.grab_pdynmc = LINK(env, get_pdynmc);
+
+            control.grab_dvbec = LINK(ins, get_dvbec);
+            control.grab_thtvdcx = LINK(ins, get_thtvdcx);
+            control.grab_thtbdcx = LINK(ins, get_thtbdcx);
+
+            control.grab_qqcx = LINK(ins.get_gyro(), get_qqcx);
+            control.grab_rrcx = LINK(ins.get_gyro(), get_rrcx);
+
+            control.grab_FSPCB = LINK(ins.get_accelerometer(), get_computed_FSPB);
+        };
+
         void link_ins_input(){
             ins.grab_SBII       = LINK(newton     , get_SBII);
             ins.grab_VBII       = LINK(newton     , get_VBII);
@@ -102,7 +131,6 @@ class Rocket_SimObject : public Trick::SimObject {
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
                 gpsr        ( newton     , euler        , *gps_sats    , ins )        ,
-                control     ( ins        , newton       , env          , propulsion   , aerodynamics) ,
                 guidance    ( ins        , newton       , propulsion)  ,
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
@@ -113,7 +141,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 time        ()
             {
             ("default_data") link_ins_input();
-            
+            ("default_data") link_control_input();
 
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();

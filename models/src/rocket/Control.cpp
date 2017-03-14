@@ -3,9 +3,8 @@
 #include "math/integrate.hh"
 #include "math/utility.hh"
 
-Control::Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDynamics& aero)
-    :   ins(&i), propulsion(&plp), newton(&ntn), environment(&env), aerodynamics(&aero),
-        VECTOR_INIT(GAINFP, 3),
+Control::Control()
+    :   VECTOR_INIT(GAINFP, 3),
         VECTOR_INIT(GAINFY, 3),
         MATRIX_INIT(GAINGAM, 3, 1)
 {
@@ -13,8 +12,7 @@ Control::Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDyn
 }
 
 Control::Control(const Control& other)
-    :   ins(other.ins), propulsion(other.propulsion), newton(other.newton), environment(other.environment), aerodynamics(other.aerodynamics),
-        VECTOR_INIT(GAINFP, 3),
+    :   VECTOR_INIT(GAINFP, 3),
         VECTOR_INIT(GAINFY, 3),
         MATRIX_INIT(GAINGAM, 3, 1)
 {
@@ -24,12 +22,6 @@ Control::Control(const Control& other)
 Control& Control::operator=(const Control& other){
     if(&other == this)
         return *this;
-
-    this->ins = other.ins;
-    this->environment = other.environment;
-    this->newton = other.newton;
-    this->propulsion = other.propulsion;
-    this->aerodynamics = other.aerodynamics;
 
     return *this;
 }
@@ -62,8 +54,8 @@ void Control::initialize(){
 void Control::control(double int_step){
     // localizing module-variables
     // input from other modules
-    int mprop = propulsion->get_mprop();
-    double gymax = aerodynamics->get_gymax();
+    int mprop = grab_mprop();
+    double gymax = grab_gymax();
     //-------------------------------------------------------------------------
     // decoding control flag
     // std::cout<<"Called : Control"<<'\n';
@@ -140,20 +132,20 @@ double Control::control_normal_accel(double ancomx, double int_step){
     double gainfb2(0);
     double gainfb3(0);
 
-    double dyb = aerodynamics->get_dyb();
-    double dnb = aerodynamics->get_dnb();
-    double dnr = aerodynamics->get_dnr();
-    double dndr = aerodynamics->get_dndr();
+    double dyb = grab_dyb();
+    double dnb = grab_dnb();
+    double dnr = grab_dnr();
+    double dndr = grab_dndr();
 
     // input from other modules
-    double pdynmc = environment->get_pdynmc();
-    double dla = aerodynamics->get_dla();
-    double dma = aerodynamics->get_dma();
-    double dmq = aerodynamics->get_dmq();
-    double dmde = aerodynamics->get_dmde();
-    double dvbec = ins->get_dvbec();
-    double qqcx = ins->get_gyro().get_qqcx();
-    arma::vec3 FSPCB = ins->get_accelerometer().get_computed_FSPB();
+    double pdynmc = grab_pdynmc();
+    double dla = grab_dla();
+    double dma = grab_dma();
+    double dmq = grab_dmq();
+    double dmde = grab_dmde();
+    double dvbec = grab_dvbec();
+    double qqcx = grab_qqcx();
+    arma::vec3 FSPCB = grab_FSPCB();
     //-------------------------------------------------------------------------
     // calculating online close loop poles
     waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
@@ -214,14 +206,14 @@ double Control::control_normal_accel(double ancomx, double int_step){
 
 double Control::control_yaw_accel(double alcomx, double int_step){
     // input from other modules
-    double pdynmc = environment->get_pdynmc();
-    double dyb = aerodynamics->get_dyb();
-    double dnb = aerodynamics->get_dnb();
-    double dnr = aerodynamics->get_dnr();
-    double dndr = aerodynamics->get_dndr();
-    double dvbe = newton->get_dvbe();
-    double rrcx = ins->get_gyro().get_rrcx();
-    arma::vec3 FSPCB = ins->get_accelerometer().get_computed_FSPB();
+    double pdynmc = grab_pdynmc();
+    double dyb = grab_dyb();
+    double dnb = grab_dnb();
+    double dnr = grab_dnr();
+    double dndr = grab_dndr();
+    double dvbe = grab_dvbe();
+    double rrcx = grab_rrcx();
+    arma::vec3 FSPCB = grab_FSPCB();
 
     //-------------------------------------------------------------------------
     // calculating close loop poles
@@ -268,14 +260,14 @@ double Control::control_pitch_rate(double qqdx){
     double dqcx(0);
 
     // input from aerodynamic
-    double pdynmc = environment->get_pdynmc();
-    double dla = aerodynamics->get_dla();
-    double dma = aerodynamics->get_dma();
-    double dmq = aerodynamics->get_dmq();
-    double dmde = aerodynamics->get_dmde();
-    double dvbec = ins->get_dvbec();
-    double dnd = aerodynamics->get_dnd();
-    double qqcx = ins->get_gyro().get_qqcx();
+    double pdynmc = grab_pdynmc();
+    double dla = grab_dla();
+    double dma = grab_dma();
+    double dmq = grab_dmq();
+    double dmde = grab_dmde();
+    double dvbec = grab_dvbec();
+    double dnd = grab_dnd();
+    double qqcx = grab_qqcx();
 
     //-------------------------------------------------------------------------
     // parameters of open loop angular rate transfer function
@@ -327,16 +319,16 @@ double Control::control_gamma(double thtvdcomx)
     double wgam = this->wgam;
     double zgam = this->zgam;
     //input from other modules
-    double dvbe=newton->get_dvbe();
-    double dla=aerodynamics->get_dla();
-    double dlde=aerodynamics->get_dlde();
-    double dma=aerodynamics->get_dma();
-    double dmq=aerodynamics->get_dmq();
-    double dmde=aerodynamics->get_dmde();
-    double qqcx=ins->get_gyro().get_qqcx();
-    double dvbec=ins->get_dvbec();
-    double thtvdcx=ins->get_thtvdcx();
-    double thtbdcx=ins->get_thtbdcx();
+    double dvbe = grab_dvbe();
+    double dla = grab_dla();
+    double dlde = grab_dlde();
+    double dma = grab_dma();
+    double dmq = grab_dmq();
+    double dmde = grab_dmde();
+    double qqcx = grab_qqcx();
+    double dvbec = grab_dvbec();
+    double thtvdcx = grab_thtvdcx();
+    double thtbdcx = grab_thtbdcx();
     //--------------------------------------------------------------------------
 
     //prevent division by zero

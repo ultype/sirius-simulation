@@ -61,7 +61,7 @@ class Control {
             ar & grate;
         }
 
-        Control(INS& i, Newton& ntn, Environment& env, Propulsion& plp, AeroDynamics& aero);
+        Control();
         Control(const Control& other);
 
         Control& operator=(const Control& other);
@@ -97,17 +97,39 @@ class Control {
         // 030520 Created by Peter H Zipfel
         // 091214 Modified for ROCKET6, PZi
         ///////////////////////////////////////////////////////////////////////////////
+
+        std::function<int()>    grab_mprop;
+
+        std::function<double()> grab_dvbe;
+
+        std::function<double()> grab_gymax;
+        std::function<double()> grab_dyb;
+        std::function<double()> grab_dnb;
+        std::function<double()> grab_dnr;
+        std::function<double()> grab_dndr;
+        std::function<double()> grab_dla;
+        std::function<double()> grab_dma;
+        std::function<double()> grab_dmq;
+        std::function<double()> grab_dmde;
+        std::function<double()> grab_dnd;
+        std::function<double()> grab_dlde;
+
+        std::function<double()> grab_pdynmc;
+
+        std::function<double()> grab_dvbec;
+        std::function<double()> grab_thtvdcx;
+        std::function<double()> grab_thtbdcx;
+
+        std::function<double()> grab_qqcx;
+        std::function<double()> grab_rrcx;
+
+        std::function<arma::vec3()> grab_FSPCB;
+
         double  get_delecx();
         double  get_delrcx();
 
     private:
         void default_data();
-
-        Environment  * environment;
-        AeroDynamics * aerodynamics;
-        INS          * ins;
-        Newton       * newton;
-        Propulsion   * propulsion;
 
         double  delecx;         /* *io (d)      Pitch command deflection */ // n
         double  delrcx;         /* *io (d)      Yaw command deflection */   // n
