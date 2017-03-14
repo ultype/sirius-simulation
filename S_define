@@ -86,6 +86,17 @@ class Rocket_SimObject : public Trick::SimObject {
 
         time_management time;
 
+        void link_ins_input(){
+            ins.grab_SBII       = LINK(newton     , get_SBII);
+            ins.grab_VBII       = LINK(newton     , get_VBII);
+            ins.grab_dbi        = LINK(newton     , get_dbi);
+            ins.grab_TBI        = LINK(kinematics , get_TBI);
+            ins.grab_SXH        = LINK(gpsr       , get_SXH);
+            ins.grab_VXH        = LINK(gpsr       , get_VXH);
+            ins.grab_gps_update = LINK(gpsr       , get_gps_update);
+            ins.clear_gps_flag  = LINK(gpsr       , clear_gps_flag);
+        };
+
         Rocket_SimObject() 
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
@@ -96,12 +107,14 @@ class Rocket_SimObject : public Trick::SimObject {
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
-                ins         ( newton     , kinematics   , gpsr )        ,
                 tvc         ( env        , kinematics   , control      , propulsion ) ,
                 rcs         ( ins        , guidance     , propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        ()
             {
+            ("default_data") link_ins_input();
+            
+
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();
             ("initialization") newton.initialize();

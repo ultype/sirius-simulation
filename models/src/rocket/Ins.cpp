@@ -19,7 +19,7 @@
 
 #include <fstream>
 
-INS::INS(Newton &newton, Kinematics &kinematics, GPS_Receiver &gpsr)
+INS::INS()
     :   MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
@@ -36,15 +36,6 @@ INS::INS(Newton &newton, Kinematics &kinematics, GPS_Receiver &gpsr)
         VECTOR_INIT(WBICI, 3)
 {
     this->default_data();
-
-    this->grab_SBII = LINK(newton, get_SBII);
-    this->grab_VBII = LINK(newton, get_VBII);
-    this->grab_dbi  = LINK(newton, get_dbi);
-    this->grab_TBI  = LINK(kinematics, get_TBI);
-    this->grab_SXH  = LINK(gpsr, get_SXH);
-    this->grab_VXH  = LINK(gpsr, get_VXH);
-    this->grab_gps_update  = LINK(gpsr, get_gps_update);
-    this->clear_gps_flag  = LINK(gpsr, clear_gps_flag);
 }
 
 INS::INS(const INS& other)

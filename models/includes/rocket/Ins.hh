@@ -79,7 +79,7 @@ class INS {
             ar & psibdcx;
         }
 
-        INS(Newton &newton, Kinematics &kinematics, GPS_Receiver &gpsr);
+        INS();
         INS(const INS& other);
 
         INS& operator=(const INS& other);
