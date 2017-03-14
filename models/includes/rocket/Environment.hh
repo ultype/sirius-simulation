@@ -125,6 +125,8 @@ class Environment{
         double vmach;       /* *o (--)         Mach number */
         double pdynmc;      /* *o (pa)         Dynamic pressure */
         double dvba;        /* *o (m/s)        Vehicle speed wrt air */
+        arma::vec GRAVGB;   /* *o (m/s2)    Gravity acc in body coordinate */
+        double _GRAVGB[3];     /* *o (m/s2)    Gravity acc in body coordinate */
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */

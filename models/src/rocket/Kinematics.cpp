@@ -15,7 +15,8 @@ Kinematics::Kinematics(Newton &newt, Environment &env, _Euler_ &eul)
         MATRIX_INIT(TBI, 3, 3),
         MATRIX_INIT(TBID, 3, 3),
         VECTOR_INIT(TBI_Q, 4),
-        VECTOR_INIT(TBID_Q, 4)
+        VECTOR_INIT(TBID_Q, 4),
+        VECTOR_INIT(TBDQ, 4)
 {
     this->default_data();
 }
@@ -26,7 +27,8 @@ Kinematics::Kinematics(const Kinematics& other)
         MATRIX_INIT(TBI, 3, 3),
         MATRIX_INIT(TBID, 3, 3),
         VECTOR_INIT(TBI_Q, 4),
-        VECTOR_INIT(TBID_Q, 4)
+        VECTOR_INIT(TBID_Q, 4),
+        VECTOR_INIT(TBDQ, 4)
 {
     this->default_data();
 
@@ -36,6 +38,7 @@ Kinematics::Kinematics(const Kinematics& other)
     this->TBID = other.TBID;
     this->TBI_Q = other.TBI_Q;
     this->TBID_Q = other.TBID_Q;
+    this->TBDQ = other.TBDQ;
 
     this->alphax = other.alphax;
     this->betax = other.betax;
@@ -133,6 +136,8 @@ void Kinematics::propagate(double int_step){
     arma::vec3 VBIB = TBI * VBII;
     this->alphaix = calculate_alphaix(VBIB);
     this->betaix  = calculate_betaix(VBIB);
+
+    this->TBDQ = Matrix2Quaternion(this->TBD);
 }
 
 
@@ -258,6 +263,7 @@ double Kinematics::get_psibdx() {
         cpsi = 1 * sign(cpsi);
     }
     psibd = acos(cpsi) * sign(TBD(0, 1));
+    // psibd = atan2( 2. * (TBDQ(1) * TBDQ(2) + TBDQ(0) * TBDQ(3) ), (1. - 2. * (TBDQ(2) * TBDQ(2) + TBDQ(3) * TBDQ(3))) ); 
 
     return DEG * psibd;
 }
@@ -281,6 +287,7 @@ double Kinematics::get_thtbdx(double &cthtbd) {
         thtbd = PI / 2 * sign(-TBD(0, 2));
         cthtbd = arma::datum::eps;
     }
+    // thtbd = asin(  2 * (TBDQ(0) * TBDQ(2) - TBDQ(1) * TBDQ(3)));
 
     return DEG * thtbd;
 }
@@ -296,6 +303,8 @@ double Kinematics::get_phibdx() {
         cphi = 1 * sign(cphi);
     }
     phibd = acos(cphi) * sign(TBD(1, 2));
+    //phibd = atan2( 2. * (TBDQ(2) * TBDQ(3) + TBDQ(0) * TBDQ(1) ), (1. - 2. * (TBDQ(2) * TBDQ(2) + TBDQ(1) * TBDQ(1))));
+
 
     return DEG * phibd;
 }

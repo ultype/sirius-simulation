@@ -143,7 +143,8 @@ double CS_JGM3[N_JGM3+1][N_JGM3+1] =
 Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine, time_management &Time)
     :   newton(&newt), aerodynamics(&aero), kinematics(&kine), time(&Time),
         VECTOR_INIT(GRAVG, 3),
-        MATRIX_INIT(TEI, 3, 3)
+        MATRIX_INIT(TEI, 3, 3),
+        VECTOR_INIT(GRAVGB, 3)
 {
     this->default_data();
 
@@ -155,7 +156,8 @@ Environment::Environment(const Environment& other)
     :   newton(other.newton), aerodynamics(other.aerodynamics), kinematics(other.kinematics),
         time(other.time),
         VECTOR_INIT(GRAVG, 3),
-        MATRIX_INIT(TEI, 3, 3)
+        MATRIX_INIT(TEI, 3, 3),
+        VECTOR_INIT(GRAVGB, 3)
 {
     this->default_data();
 
@@ -171,6 +173,7 @@ Environment::Environment(const Environment& other)
     this->vmach = other.vmach;
     this->pdynmc = other.pdynmc;
     this->dvba = other.dvba;
+    this->GRAVGB = other.GRAVGB;
 }
 
 Environment& Environment::operator=(const Environment& other) {
@@ -245,15 +248,19 @@ void Environment::propagate(double int_step) {
     arma::vec3 VBED = newton->get_VBED();
     arma::vec3 SBII = newton->get_SBII();
     double alt = newton->get_alt();
+    arma::mat33 TGI = newton->get_TGI();
+    arma::mat33  TBI = kinematics->get_TBI();
 
     arma::mat TBD = kinematics->get_TBD();
     double alppx = kinematics->get_alppx();
     double phipx = kinematics->get_phipx();
 
+
     dm_RNP();//Calculate Rotation-Nutation-Precession (ECI to ECEF) Matrix
 
     //this->GRAVG = cad::grav84(SBII, get_rettime());
      this->GRAVG = AccelHarmonic(SBII, CS_JGM3, 20, 20);
+     this->GRAVGB = TBI * trans(TGI) * GRAVG;
     // this->GRAVG2 = arma_cad_grav84(SBII, get_rettime());
     //
     atmosphere->set_altitude(alt);

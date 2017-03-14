@@ -113,6 +113,8 @@ class Kinematics{
 
         arma::mat TBD;      /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
         double _TBD[3][3];  /* *io (--)    Transformation Matrix of body coord wrt geodetic coord */
+        arma::vec TBDQ;     /* *o  (--)     TBDQ */
+        double _TBDQ[4];    /* *o  (--)     TBDQ */
 
         double alphax;      /* *io (d)     Angle of attack */
         double betax;       /* *io (d)     Sideslip angle */

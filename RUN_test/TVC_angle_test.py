@@ -34,8 +34,8 @@ alt        = 100        # Vehicle altitude  - m  module newton
 rkt.newton.load_location(lonx, latx, alt)
 
 phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
-thtbdx = 90 # Pitching angle of veh wrt geod coord - deg  module kinematics
-psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 89 # Pitching angle of veh wrt geod coord - deg  module kinematics
+psibdx = 89     # Yawing   angle of veh wrt geod coord - deg  module kinematics
 rkt.kinematics.load_angle(psibdx, phibdx, thtbdx)
 
 alpha0x    = 0    #Initial angle-of-attack   - deg  module newton
@@ -192,7 +192,7 @@ rkt.guidance.set_degree(alphacomx, betacomx)
 
 #Control
 maut = 55 
-thtvdcomx = 89.0
+thtvdcomx = 88.0
 delmix = 7.0
 drlmix = 7.0
 pgam = 0.15
