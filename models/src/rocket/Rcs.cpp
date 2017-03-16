@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-RCS::RCS(INS &i, Guidance &guia, Propulsion &plp)
-    :   ins(&i), guidance(&guia), propulsion(&plp),
+RCS::RCS(INS &i, Propulsion &plp)
+    :   ins(&i), propulsion(&plp),
         roll_schi(0, 0),
         pitch_schi(0, 0),
         yaw_schi(0, 0),
@@ -14,7 +14,7 @@ RCS::RCS(INS &i, Guidance &guia, Propulsion &plp)
 }
 
 RCS::RCS(const RCS& other)
-    :   ins(other.ins), guidance(other.guidance), propulsion(other.propulsion),
+    :   ins(other.ins), propulsion(other.propulsion),
         roll_schi(other.roll_schi),
         pitch_schi(other.pitch_schi),
         yaw_schi(other.yaw_schi),
@@ -63,7 +63,6 @@ RCS& RCS::operator=(const RCS& other){
         return *this;
 
     this->ins = other.ins;
-    this->guidance = other.guidance;
     this->propulsion = other.propulsion;
 
     this->roll_schi = other.roll_schi;
@@ -151,9 +150,9 @@ void RCS::set_mode(enum RCS::RCS_MODE in){
 ///////////////////////////////////////////////////////////////////////////////
 
 void RCS::actuate(){
-    arma::vec3 UTBC = guidance->get_UTBC();
-    double alphacomx = guidance->get_alphacomx();
-    double betacomx  = guidance->get_betacomx();
+    arma::vec3 UTBC = grab_UTBC();
+    double alphacomx = grab_alphacomx();
+    double betacomx  = grab_betacomx();
 
     double qqcx = ins->get_gyro().get_qqcx();
     double ppcx = ins->get_gyro().get_ppcx();

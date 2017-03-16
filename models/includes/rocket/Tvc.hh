@@ -30,7 +30,6 @@ class TVC {
         void serialize(Archive & ar, const unsigned int version){
             ar & environment;
             ar & kinematics;
-            ar & control;
             ar & propulsion;
 
             ar & mtvc;
@@ -73,7 +72,7 @@ class TVC {
             ar & zetcx;
         }
 
-        TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp);
+        TVC(Environment &env, Kinematics &kins, Propulsion &plp);
         TVC(const TVC& other);
 
         TVC& operator=(const TVC& other);
@@ -103,6 +102,9 @@ class TVC {
         void set_parm(double in);
 
         double get_parm();
+
+        std::function<double()>   grab_delrcx;
+        std::function<double()>   grab_delecx;
 
         arma::vec3 get_FPB();
         arma::vec3 get_FMPB();

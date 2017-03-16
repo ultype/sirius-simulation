@@ -4,8 +4,8 @@
 #include "rocket/Tvc.hh"
 #include "sim_services/include/simtime.h"
 
-TVC::TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp)
-    :   environment(&env), kinematics(&kins), control(&con), propulsion(&plp),
+TVC::TVC(Environment &env, Kinematics &kins, Propulsion &plp)
+    :   environment(&env), kinematics(&kins), propulsion(&plp),
         VECTOR_INIT(FPB, 3),
         VECTOR_INIT(FMPB, 3)
 {
@@ -13,7 +13,7 @@ TVC::TVC(Environment &env, Kinematics &kins, Control &con, Propulsion &plp)
 }
 
 TVC::TVC(const TVC& other)
-    :   environment(other.environment), kinematics(other.kinematics), control(other.control), propulsion(other.propulsion),
+    :   environment(other.environment), kinematics(other.kinematics), propulsion(other.propulsion),
         VECTOR_INIT(FPB, 3),
         VECTOR_INIT(FMPB, 3)
 {
@@ -65,7 +65,6 @@ TVC& TVC::operator=(const TVC& other){
 
     this->environment = other.environment;
     this->kinematics = other.kinematics;
-    this->control = other.control;
     this->propulsion = other.propulsion;
 
     this->mtvc = other.mtvc;
@@ -161,8 +160,8 @@ void TVC::actuate(double int_step){
     double pdynmc = environment->get_pdynmc();
     double xcg    = propulsion->get_xcg();
     double thrust = propulsion->get_thrust();
-    double delecx = control->get_delecx();
-    double delrcx = control->get_delrcx();
+    double delecx = grab_delecx();
+    double delrcx = grab_delrcx();
     double alphax = kinematics->get_alphax();
 
     switch(mtvc){

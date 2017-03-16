@@ -126,6 +126,17 @@ class Rocket_SimObject : public Trick::SimObject {
             ins.clear_gps_flag  = LINK(gpsr       , clear_gps_flag);
         };
 
+        void link_tvc_input(){
+            tvc.grab_delrcx = LINK(control, get_delrcx);
+            tvc.grab_delecx = LINK(control, get_delecx);
+        };
+
+        void link_rcs_input(){
+            rcs.grab_UTBC = LINK(guidance, get_UTBC);
+            rcs.grab_alphacomx = LINK(guidance, get_alphacomx);
+            rcs.grab_betacomx  = LINK(guidance, get_betacomx);
+        };
+
         Rocket_SimObject() 
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
@@ -135,13 +146,15 @@ class Rocket_SimObject : public Trick::SimObject {
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
-                tvc         ( env        , kinematics   , control      , propulsion ) ,
-                rcs         ( ins        , guidance     , propulsion ) ,
+                tvc         ( env        , kinematics   , propulsion ) ,
+                rcs         ( ins        , propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        ()
             {
             ("default_data") link_ins_input();
             ("default_data") link_control_input();
+            ("default_data") link_tvc_input();
+            ("default_data") link_rcs_input();
 
             ("default_data") guidance.default_data();
             ("initialization") kinematics.initialize();

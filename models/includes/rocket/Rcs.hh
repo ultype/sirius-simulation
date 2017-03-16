@@ -22,7 +22,6 @@ class RCS {
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version){
             ar & ins;
-            ar & guidance;
             ar & propulsion;
 
             ar & roll_schi;
@@ -60,7 +59,7 @@ class RCS {
             ar & yaw_count;
         }
 
-        RCS(INS &i, Guidance &guia, Propulsion &plp);
+        RCS(INS &i, Propulsion &plp);
         RCS(const RCS& other);
 
         RCS& operator=(const RCS& other);
@@ -92,6 +91,10 @@ class RCS {
 
         void set_mode(enum RCS_MODE);
         enum RCS_MODE get_rcs_mode();
+
+        std::function<arma::vec3()>   grab_UTBC;
+        std::function<double()>       grab_alphacomx;
+        std::function<double()>       grab_betacomx;
 
         arma::vec3 get_FMRCS();
         arma::vec3 get_FARCS();
