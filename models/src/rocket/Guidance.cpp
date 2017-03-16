@@ -4,9 +4,8 @@
 
 #include "sim_services/include/simtime.h"
 
-Guidance::Guidance(INS& i, Newton& ntn, Propulsion& plp)
-    :   ins(&i), newton(&ntn), propulsion(&plp),
-        VECTOR_INIT(UTBC, 3),
+Guidance::Guidance()
+    :   VECTOR_INIT(UTBC, 3),
         VECTOR_INIT(UTIC, 3),
         VECTOR_INIT(RBIAS, 3),
         VECTOR_INIT(RGRAV, 3),
@@ -23,8 +22,7 @@ Guidance::Guidance(INS& i, Newton& ntn, Propulsion& plp)
 }
 
 Guidance::Guidance(const Guidance& other)
-   :    ins(other.ins), newton(other.newton), propulsion(other.propulsion),
-        VECTOR_INIT(UTBC, 3),
+    :   VECTOR_INIT(UTBC, 3),
         VECTOR_INIT(UTIC, 3),
         VECTOR_INIT(RBIAS, 3),
         VECTOR_INIT(RGRAV, 3),
@@ -45,10 +43,6 @@ Guidance::Guidance(const Guidance& other)
 Guidance& Guidance::operator= (const Guidance& other) {
     if (&other == this)
         return *this;
-
-    this->ins = other.ins;
-    this->newton = other.newton;
-    this->propulsion = other.propulsion;
 
     this->mguide = other.mguide;
 }
@@ -84,8 +78,8 @@ void Guidance::guidance(double int_step)
 {
     // local module variable
 
-    int mprop = propulsion->get_mprop();
-    arma::mat33 TBIC = ins->get_TBIC();
+    int mprop = grab_mprop();
+    arma::mat33 TBIC = grab_TBIC();
     //-------------------------------------------------------------------------
     // zeroing UTBC,if no guidance
     if (mguide == 0)
@@ -111,10 +105,10 @@ void Guidance::guidance(double int_step)
     //-------------------------------------------------------------------------
     switch(mprop){
         case 0:
-            propulsion->set_no_thrust();
+            set_no_thrust();
             break;
         case 4:
-            propulsion->set_ltg_thrust();
+            set_ltg_thrust();
             break;
     }
 }
@@ -182,16 +176,16 @@ arma::vec3 Guidance::guidance_ltg(int &mprop, double int_step, double time_ltg)
 
     // input from other modules
     double time = get_rettime();
-    double dbi = newton->get_dbi();
-    double dvbi = newton->get_dvbi();
-    double thtvdx = newton->get_thtvdx();
-    double fmassr = propulsion->get_fmassr();
-    arma::vec3 VBIIC = ins->get_VBIIC();
-    arma::vec3 SBIIC = ins->get_SBIIC();
+    double dbi = grab_dbi();
+    double dvbi = grab_dvbi();
+    double thtvdx = grab_thtvdx();
+    double fmassr = grab_fmassr();
+    arma::vec3 VBIIC = grab_VBIIC();
+    arma::vec3 SBIIC = grab_SBIIC();
 
-    arma::mat33 TBIC = ins->get_TBIC();
+    arma::mat33 TBIC = grab_TBIC();
 
-    arma::vec3 FSPCB = ins->get_accelerometer().get_computed_FSPB();
+    arma::vec3 FSPCB = grab_FSPCB();
     //-------------------------------------------------------------------------
     // preparing necessary variables
     arma::vec3 ABII = trans(TBIC) * FSPCB;

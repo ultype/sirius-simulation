@@ -126,6 +126,22 @@ class Rocket_SimObject : public Trick::SimObject {
             ins.clear_gps_flag  = LINK(gpsr       , clear_gps_flag);
         };
 
+        void link_guidance_input(){
+            guidance.grab_mprop  = LINK(propulsion, get_mprop);
+            guidance.grab_TBIC   = LINK(ins, get_TBIC);
+
+            guidance.grab_dbi    = LINK(newton, get_dbi);
+            guidance.grab_dvbi   = LINK(newton, get_dvbi);
+            guidance.grab_thtvdx = LINK(newton, get_thtvdx);
+            guidance.grab_fmassr = LINK(propulsion, get_fmassr);
+            guidance.grab_VBIIC  = LINK(ins, get_VBIIC);
+            guidance.grab_SBIIC  = LINK(ins, get_SBIIC);
+            guidance.grab_FSPCB  = LINK(ins.get_accelerometer(), get_computed_FSPB);
+
+            guidance.set_no_thrust  = LINK(propulsion, set_no_thrust);
+            guidance.set_ltg_thrust = LINK(propulsion, set_ltg_thrust);
+        };
+
         void link_tvc_input(){
             tvc.grab_delrcx = LINK(control, get_delrcx);
             tvc.grab_delecx = LINK(control, get_delecx);
@@ -142,7 +158,6 @@ class Rocket_SimObject : public Trick::SimObject {
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
                 gpsr        ( newton     , euler        , *gps_sats    , ins )        ,
-                guidance    ( ins        , newton       , propulsion)  ,
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
@@ -152,6 +167,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 time        ()
             {
             ("default_data") link_ins_input();
+            ("default_data") link_guidance_input();
             ("default_data") link_control_input();
             ("default_data") link_tvc_input();
             ("default_data") link_rcs_input();

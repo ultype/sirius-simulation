@@ -85,7 +85,7 @@ class Guidance {
             ar & thtvddbx;
         }
 
-    Guidance(INS& i, Newton& ntn, Propulsion& plp);
+        Guidance();
         Guidance(const Guidance& other);
 
         Guidance& operator= (const Guidance& other);
@@ -196,9 +196,19 @@ class Guidance {
                                       arma::mat SBIIC,
                                       arma::mat VBIIC);
 
-        INS* ins;
-        Newton *newton;
-        Propulsion *propulsion;
+        std::function<int()>            grab_mprop;
+
+        std::function<double()>         grab_dbi;
+        std::function<double()>         grab_dvbi;
+        std::function<double()>         grab_thtvdx;
+        std::function<double()>         grab_fmassr;
+        std::function<arma::vec3()>     grab_VBIIC;
+        std::function<arma::vec3()>     grab_SBIIC;
+        std::function<arma::mat33()>    grab_TBIC;
+        std::function<arma::vec3()>     grab_FSPCB;
+
+        std::function<void()>           set_no_thrust;
+        std::function<void()>           set_ltg_thrust;
 
         ///////////////////////////////////////////////////////////////////////////////
         // Definition of guidance module-variables
