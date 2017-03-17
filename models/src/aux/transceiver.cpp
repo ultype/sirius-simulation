@@ -29,46 +29,27 @@ void Transceiver::initialize_connection(char* name){
     }
 }
 
-void Transceiver::transmit(INS& ins){
-    std::string serial_str;
-    boost::iostreams::back_insert_device<std::string> inserter(serial_str);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-    boost::archive::binary_oarchive oa(s);
-
-    oa << ins;
-
-    s.flush();
-
-    uint32_t len = serial_str.length();
+void Transceiver::transmit(void* ptr, uint32_t size){
     if (tc_isValid(&dev)) {
-        tc_write(&dev, (char*)&len, sizeof(uint32_t));
+        tc_write(&dev, (char*)&size, sizeof(uint32_t));
     }
 
     if (tc_isValid(&dev)) {
-        tc_write(&dev, (char*)serial_str.data(), serial_str.length());
+        tc_write(&dev, (char*)ptr, size);
     }
 }
 
-void Transceiver::receive(INS& ins){
-    uint32_t len;
+uint32_t Transceiver::receive_size(){
+    uint32_t size;
     if (tc_isValid(&dev)) {
-        tc_read(&dev, (char*)&len, sizeof(uint32_t));
+        tc_read(&dev, (char*)&size, sizeof(uint32_t));
     }
 
-    char* buf = (char*)malloc(len + 1);
-    if(!buf){
-        perror("allocating receive buffer\n");
-        exit(255);
-    }
+    return size;
+}
 
+void Transceiver::receive_data(void* ptr, uint32_t size){
     if (tc_isValid(&dev)) {
-        tc_read(&dev, buf, len);
+        tc_read(&dev, (char*)ptr, size);
     }
-
-    boost::iostreams::basic_array_source<char> device(buf, len);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(device);
-    boost::archive::binary_iarchive ia(s);
-    ia >> ins;
-
-    free(buf);
 }

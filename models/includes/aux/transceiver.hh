@@ -16,8 +16,9 @@ class Transceiver {
         Transceiver() {};
 
         void initialize_connection(char* name);
-        void transmit(INS& ins);
-        void receive(INS& ins);
+        void transmit(void* ptr, uint32_t size);
+        uint32_t receive_size();
+        void receive_data(void* ptr, uint32_t size);
 
     private:
         TCDevice dev;
