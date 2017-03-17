@@ -1,0 +1,37 @@
+global DR_GROUP_ID
+global drg
+try:
+    if DR_GROUP_ID >= 0:
+        DR_GROUP_ID += 1
+except NameError:
+    DR_GROUP_ID = 0
+    drg = []
+
+drg.append(trick.DRAscii("rocket_csv"))
+drg[DR_GROUP_ID].set_freq(trick.DR_Always)
+drg[DR_GROUP_ID].set_cycle(0.1)
+drg[DR_GROUP_ID].set_single_prec_only(False)
+drg[DR_GROUP_ID].add_variable("rkt.newton.lonx")
+drg[DR_GROUP_ID].add_variable("rkt.newton.latx")
+drg[DR_GROUP_ID].add_variable("rkt.newton.alt")
+drg[DR_GROUP_ID].add_variable("rkt.newton._psivdx")
+drg[DR_GROUP_ID].add_variable("rkt.newton._thtvdx")
+drg[DR_GROUP_ID].add_variable("rkt.kinematics.alphax")
+drg[DR_GROUP_ID].add_variable("rkt.kinematics.betax")
+drg[DR_GROUP_ID].add_variable("rkt.kinematics.psibdx")
+drg[DR_GROUP_ID].add_variable("rkt.kinematics.thtbdx")
+drg[DR_GROUP_ID].add_variable("rkt.kinematics.phibdx")
+drg[DR_GROUP_ID].add_variable("rkt.env.DM_sidereal_time")
+drg[DR_GROUP_ID].add_variable("rkt.control.delecx")
+drg[DR_GROUP_ID].add_variable("rkt.tvc.etax")
+drg[DR_GROUP_ID].add_variable("rkt.euler.qqx")
+drg[DR_GROUP_ID].add_variable("rkt.control.delimx")
+drg[DR_GROUP_ID].add_variable("rkt.control.delrcx")
+drg[DR_GROUP_ID].add_variable("rkt.env.pdynmc")
+drg[DR_GROUP_ID].add_variable("rkt.env.atmosphere[0].density")
+drg[DR_GROUP_ID].add_variable("rkt.propulsion.spi")
+drg[DR_GROUP_ID].add_variable("rkt.env._GRAVG[0]")
+drg[DR_GROUP_ID].add_variable("rkt.env._GRAVG[1]")
+drg[DR_GROUP_ID].add_variable("rkt.env._GRAVG[2]")
+trick.add_data_record_group(drg[DR_GROUP_ID], trick.DR_Buffer)
+drg[DR_GROUP_ID].enable()
