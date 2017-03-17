@@ -14,7 +14,7 @@ The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
 # Type of Simulation
 These simulation as different S_defines resides in exe/ directory.
  - single-node
- - SIL : software in the loop
+ - SIL : Software in the loop
  - PIL : Processor in the loop
 
 # Building
@@ -29,7 +29,7 @@ Execute in shell at repo root
 ```
     ./S_main_<platform>.exe RUN_test/golden/golden-<date>.py
 ```
-The input file will have data prefix, only the latest is guarantee to execute.
+The input file will have date prefix, only the latest is guarantee to execute.
 
 Result will be stored in RUN_test/golden Directory
 
