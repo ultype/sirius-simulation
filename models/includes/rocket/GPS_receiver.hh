@@ -11,10 +11,8 @@ PROGRAMMERS:
 
 #include "Newton.hh"
 #include "Euler.hh"
-#include "Ins.hh"
 #include "GPS_satellites.hh"
 
-class INS;
 class Newton;
 class _Euler_;
 
@@ -104,7 +102,7 @@ class GPS_Receiver {
             ar & state_vel;
         }
 
-        GPS_Receiver(Newton&, _Euler_&, GPS_Satellites&, INS&);
+        GPS_Receiver(Newton&, _Euler_&, GPS_Satellites&);
         GPS_Receiver(const GPS_Receiver& other);
 
         GPS_Receiver& operator=(const GPS_Receiver& other);
@@ -132,6 +130,10 @@ class GPS_Receiver {
 
         int get_gps_update() { return gps_update; };
         void clear_gps_flag() { gps_update--; };
+
+        std::function<arma::vec3()> grab_SBIIC;
+        std::function<arma::vec3()> grab_VBIIC;
+        std::function<arma::vec3()> grab_WBICI;
 
         arma::vec3 get_SXH();
         arma::vec3 get_VXH();
@@ -174,7 +176,6 @@ class GPS_Receiver {
         Newton         * newton;
         _Euler_        * euler;
         GPS_Satellites * gps_sats;
-        INS            * ins;
 
         int gps_update;       /* *o (--)       GPS update? > 0 updated */
 

@@ -11,6 +11,7 @@ PROGRAMMERS:
 #include "aux/global_constants.hh"
 #include "Environment.hh"
 #include "Rcs.hh"
+#include "RcsFc.hh"
 #include "Tvc.hh"
 #include "Kinematics.hh"
 #include "Newton.hh"
@@ -19,6 +20,7 @@ PROGRAMMERS:
 class Propulsion;
 class AeroDynamics;
 class RCS;
+class RCS_FC;
 class TVC;
 class Environment;
 
@@ -49,6 +51,9 @@ class Forces {
         void initialize();
 
         void collect_forces_and_propagate();
+
+        std::function<bool()> grab_rcs_isEnabled;
+        std::function<int()> grab_rcs_mode;
 
         arma::vec get_FAPB();
         arma::vec get_FAP();

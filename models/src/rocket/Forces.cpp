@@ -55,8 +55,8 @@ void Forces::collect_forces_and_propagate(){
     enum Propulsion::THRUST_TYPE thrust_type = propulsion->get_thrust_state();
     double thrust                            = propulsion->get_thrust();
 
-    bool rcs_enabled            = rcs->isEnabled();
-    enum RCS::RCS_MODE rcs_mode = rcs->get_rcs_mode();
+    bool rcs_enabled            = grab_rcs_isEnabled();
+    enum RCS_FC::RCS_MODE rcs_mode = (enum RCS_FC::RCS_MODE)grab_rcs_mode();
     arma::vec3 FMRCS            = rcs->get_FMRCS();
     arma::vec3 FARCS            = rcs->get_FARCS();
 
@@ -96,7 +96,7 @@ void Forces::collect_forces_and_propagate(){
         //FAPB=FAPB+FARCS;
 
     //adding moment components from RCS
-    if(rcs_enabled && rcs_mode != RCS::GEODETIC_YAW_ANGLE_CONTROL){
+    if(rcs_enabled && rcs_mode != RCS_FC::GEODETIC_YAW_ANGLE_CONTROL){
         FMB += FMRCS;
     }
 }

@@ -19,8 +19,8 @@
 #include "rocket/Earth.hh"
 #include "rocket/Ins.hh"
 
-GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS &i)
-    :   newton(&ntn), euler(&elr), gps_sats(&sats), ins(&i),
+GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats)
+    :   newton(&ntn), euler(&elr), gps_sats(&sats),
         MATRIX_INIT(PP, 8, 8),
         MATRIX_INIT(FF, 8, 8),
         MATRIX_INIT(PHI, 8, 8),
@@ -32,7 +32,7 @@ GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats, INS 
 }
 
 GPS_Receiver::GPS_Receiver(const GPS_Receiver& other)
-    :   newton(other.newton), euler(other.euler), gps_sats(other.gps_sats), ins(other.ins),
+    :   newton(other.newton), euler(other.euler), gps_sats(other.gps_sats),
         MATRIX_INIT(PP, 8, 8),
         MATRIX_INIT(FF, 8, 8),
         MATRIX_INIT(PHI, 8, 8),
@@ -129,7 +129,6 @@ GPS_Receiver& GPS_Receiver::operator=(const GPS_Receiver& other){
     this->newton   = other.newton;
     this->euler    = other.euler;
     this->gps_sats = other.gps_sats;
-    this->ins      = other.ins;
 
     /* Input File */
     memcpy(this->slot, other.slot, sizeof(this->slot));
@@ -557,9 +556,9 @@ void GPS_Receiver::measure(){
         arma::vec3 VBII = newton->get_VBII();
         arma::vec3 WBII = euler->get_WBII();
 
-        arma::vec3 SBIIC = ins->get_SBIIC();
-        arma::vec3 VBIIC = ins->get_VBIIC();
-        arma::vec3 WBICI = ins->get_WBICI();
+        arma::vec3 SBIIC = grab_SBIIC();
+        arma::vec3 VBIIC = grab_VBIIC();
+        arma::vec3 WBICI = grab_WBICI();
 
         // calculating true range to SV
         arma::vec3 SSBI;
