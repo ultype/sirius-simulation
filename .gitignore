@@ -40,4 +40,4 @@ MONTE_RUN_golden/run_summary
 
 MONTE_RUN_monte
 
-!RUN_golden/golden*.csv
+!golden*.csv
