@@ -2,15 +2,23 @@ Sirius is a Simulation of rocket
 From version 0.1.0, it is ported form Rocket Simulation in 6DOF.
 The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
 
-# Dependencies 3
- - NASA Trick 17
-   - Github NASA/trick
-   - Internal mirror: rTRICK repo
+# Dependencies
+ - NASA Trick 17.0.5
+   - Github [NASA/trick](https://github.com/nasa/trick)
+   - Internal mirror: rTRICK repo (Deprecated)
  - GCC 5.4
  - Python 2.7
+ - [Armadillo Matrix Library](http://arma.sourceforge.net/)
+ - Boost Serialization
 
-# Installation
-Execute in shell at repo root
+# Type of Simulation
+These simulation as different S_defines resides in exe/ directory.
+ - single-node
+ - SIL : software in the loop
+ - PIL : Processor in the loop
+
+# Building
+Execute in shell at root of simulation you want to run
 ```
     trick-CP
 ```
@@ -19,8 +27,10 @@ Execute in shell at repo root
 ## Golden Model
 Execute in shell at repo root
 ```
-    ./S_main_<platform>.exe RUN_test/golden/golden.py
+    ./S_main_<platform>.exe RUN_test/golden/golden-<date>.py
 ```
+The input file will have data prefix, only the latest is guarantee to execute.
+
 Result will be stored in RUN_test/golden Directory
 
 ## Monte Carol
@@ -34,20 +44,20 @@ Result will be stored in RUN_test/monte Directory
 
 ## Automative testing
 A auto-testing is preset and should be run every time change is applied.
-To run, issue:
+To run, at simulation root, issue:
 ```
-    ./tools/run_test.sh
+    ./test.sh
 ```
 which will build, execute and compare against golden data.
 Result will be displayed on screen.
 
-The testing is based on average result relative error against golden data < 1E-6
+The testing is based on average result relative error against golden data < 1E-5
 
-## Golden Model (Not runnable for master branch due to refactor)
+## Golden Model
 Build and Run Golden Model
 Use the comparison tool to compare the result
 ```
-    python2.7 tool/generate_error.py RUN_test/golden.csv RUN_test/test.csv
+    python2.7 tool/generate_error.py RUN_test/golden-<data>.csv RUN_test/test.csv
 ```
 Examine the resulting file result.csv, which contains the % error between each data points. It should display all zeros.
 
@@ -68,3 +78,5 @@ dot topology.dot -Tpng > topology.png
 ```
 Then you can use a typical image viewer to view it.
 
+# Detailed documentation
+See: (https://tainan.tispace.com/folder/Simulator/SIRIUS/SIRIUS)
