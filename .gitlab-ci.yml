@@ -1,8 +1,9 @@
-test:
+single-node:
     script:
-        - ./tools/run_test.sh
-        - python ./tools/ci_test.py result.csv 1e-6 > test_result
+        - cd exe/single-node
+        - ./test.sh
+        - python ../../tools/ci_test.py result.csv 1e-5 > test_result
     artifacts:
         paths:
-            - result.csv
-            - test_result
+            - exe/single-node/result.csv
+            - exe/single-node/test_result
