@@ -7,3 +7,13 @@ single-node:
         paths:
             - exe/single-node/result.csv
             - exe/single-node/test_result
+
+SIL:
+    script:
+        - cd exe/SIL
+        - ./test.sh
+        - python ../../tools/ci_test.py result.csv 1e-5 > test_result
+    artifacts:
+        paths:
+            - exe/SIL/result.csv
+            - exe/SIL/test_result
