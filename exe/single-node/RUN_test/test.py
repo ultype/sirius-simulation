@@ -51,7 +51,7 @@ rkt.env.atmosphere_use_public()
 rkt.env.set_no_wind()
 rkt.env.set_no_wind_turbulunce()
 #aerodynamics
-rkt.aerodynamics.load_aerotable("auxiliary/aero_table_slv3.txt")
+rkt.aerodynamics.load_aerotable("../../auxiliary/aero_table_slv3.txt")
 rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m
 rkt.aerodynamics.set_refa(2.36)       #Reference area for aero coefficients - m^2
 rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - m
@@ -171,16 +171,16 @@ rkt.gpsr.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
 rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 #RCS thruster
-rkt.rcs.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
+rkt.rcs_fc.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
 rkt.rcs.set_roll_mom_max(100)      #RCS rolling moment max value - Nm  module rcs
 rkt.rcs.set_pitch_mom_max(200000)  #RCS pitching moment max value - Nm  module rcs
 rkt.rcs.set_yaw_mom_max(200000)    #RCS yawing moment max value - Nm  module rcs
 dead_zone = 0.1                #Dead zone of Schmitt trigger - deg  module rcs
 hysteresis = 0.1               #Hysteresis of Schmitt trigger - deg  module rcs
 rkt.rcs.setup_rcs_schmitt_trigger(dead_zone, hysteresis);
-rkt.rcs.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
-rkt.rcs.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
-rkt.rcs.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs
+rkt.rcs_fc.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
+rkt.rcs_fc.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
+rkt.rcs_fc.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs
 rkt.rcs.set_rcs_thrust(100)        #rcs thrust - N  module rcs
 rkt.rcs.set_rcs_pos(1.66507)       #rcs thruster's postion from nose - m  module rcs
 rkt.rcs.set_rocket_r(0.68)         #rocket's radius - m  module rcs
@@ -200,7 +200,7 @@ start.activate()
 rcs_on = trick.new_event("rcs_on")
 rcs_on.set_cycle(0.001)
 rcs_on.condition(0, "trick.exec_get_sim_time() == 185.001")
-rcs_on.action(0, "rkt.rcs.enable_rcs()")
+rcs_on.action(0, "rkt.rcs_fc.enable_rcs()")
 trick.add_event(rcs_on)
 rcs_on.activate()
 #Event1:Stage 2 ignition
@@ -224,10 +224,10 @@ speration_1.action(11, "spi            = 290   " )
 speration_1.action(12, "fuel_flow_rate = 29.63 " )
 speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
 
-speration_1.action(14, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+speration_1.action(14, "rkt.rcs_fc.set_mode(rkt.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 speration_1.action(15, "trick.add_event(speration_2)")
 speration_1.action(16, "speration_2.activate()")
-speration_1.action(17, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv2.txt')")
+speration_1.action(17, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv2.txt')")
 trick.add_event(speration_1)
 speration_1.activate()
 ###############################################################
@@ -264,8 +264,8 @@ speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0
 
 speration_3.action(16, "trick.add_event(speration_4)")
 speration_3.action(17, "speration_4.activate()")
-speration_3.action(18, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv1.txt')")
-speration_3.action(19, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+speration_3.action(18, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv1.txt')")
+speration_3.action(19, "rkt.rcs_fc.set_mode(rkt.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 #############################################################
 #Event4:MECO
 speration_4=trick.new_event("speration_4")

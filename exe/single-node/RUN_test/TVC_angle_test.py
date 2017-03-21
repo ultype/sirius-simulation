@@ -51,7 +51,7 @@ rkt.env.atmosphere_use_public()
 rkt.env.set_no_wind()
 rkt.env.set_no_wind_turbulunce()
 #aerodynamics
-rkt.aerodynamics.load_aerotable("auxiliary/aero_table_slv3.txt")
+rkt.aerodynamics.load_aerotable("../../auxiliary/aero_table_slv3.txt")
 rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m
 rkt.aerodynamics.set_refa(2.36)       #Reference area for aero coefficients - m^2
 rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - m
@@ -172,16 +172,16 @@ rkt.gpsr.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
 rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
 rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 #RCS thruster
-rkt.rcs.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
+rkt.rcs_fc.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
 rkt.rcs.set_roll_mom_max(100)      #RCS rolling moment max value - Nm  module rcs
 rkt.rcs.set_pitch_mom_max(200000)  #RCS pitching moment max value - Nm  module rcs
 rkt.rcs.set_yaw_mom_max(200000)    #RCS yawing moment max value - Nm  module rcs
 dead_zone = 0.1                #Dead zone of Schmitt trigger - deg  module rcs
 hysteresis = 0.1               #Hysteresis of Schmitt trigger - deg  module rcs
 rkt.rcs.setup_rcs_schmitt_trigger(dead_zone, hysteresis);
-rkt.rcs.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
-rkt.rcs.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
-rkt.rcs.set_psibdcomx(90)         #Yaw angle command - deg  module rcs
+rkt.rcs_fc.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
+rkt.rcs_fc.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
+rkt.rcs_fc.set_psibdcomx(90)         #Yaw angle command - deg  module rcs
 rkt.rcs.set_rcs_thrust(100)        #rcs thrust - N  module rcs
 rkt.rcs.set_rcs_pos(1.66507)       #rcs thruster's postion from nose - m  module rcs
 rkt.rcs.set_rocket_r(0.68)         #rocket's radius - m  module rcs
@@ -192,7 +192,7 @@ rkt.guidance.set_degree(alphacomx, betacomx)
 
 #Control
 maut = 55 
-thtvdcomx = 88.0
+thtvdcomx = 87.0
 delmix = 7.0
 drlmix = 7.0
 pgam = 0.15
@@ -234,7 +234,7 @@ rkt.tvc.set_gtvc(gtvc)
 control_on = trick.new_event("control_on")
 control_on.set_cycle(0.001)
 control_on.condition(0, "trick.exec_get_sim_time() == 5.001")
-# control_on.action(0, "rkt.rcs.enable_rcs()")
+control_on.action(0, "rkt.rcs_fc.enable_rcs()")
 control_on.action(0, "rkt.control.set_maut(maut)")
 trick.add_event(control_on)
 control_on.activate()
