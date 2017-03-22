@@ -26,4 +26,7 @@ ICG: (No)
 #define LINK(model, func) \
         std::bind(&std::remove_reference<decltype(model)>::type::func, &model)
 
+#define LINKARG(model, func, arg) \
+        std::bind(&std::remove_reference<decltype(model)>::type::func, &model, arg)
+
 #endif// utility_header__HPP
