@@ -28,28 +28,11 @@ class Kinematics;
 class _Euler_;
 class Environment;
 
-namespace sensor{
-    class GyroIdeal;
-    class GyroRocket6G;
-
-    class AccelerometerIdeal;
-    class AccelerometerRocket6G;
-}
-
 class INS {
     TRICK_INTERFACE(INS);
     public:
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version){
-            ar.template register_type<sensor::GyroIdeal>();
-            ar.template register_type<sensor::GyroRocket6G>();
-
-            ar.template register_type<sensor::AccelerometerIdeal>();
-            ar.template register_type<sensor::AccelerometerRocket6G>();
-
-            ar & gyro;
-            ar & accel;
-
             ar & _EVBI;
             ar & _EVBID;
             ar & _ESBI;
@@ -88,16 +71,16 @@ class INS {
 
         void update(double int_step);
 
-        void set_gyro(sensor::Gyro &gyro);
-        void set_accelerometer(sensor::Accelerometer &accel);
-
-        sensor::Gyro& get_gyro();
-        sensor::Accelerometer& get_accelerometer();
-
         void set_ideal();
         void set_non_ideal(double frax_algnmnt);
 
         /* Input File */
+
+        std::function<arma::vec3()> grab_computed_WBIB;
+        std::function<arma::vec3()> grab_error_of_computed_WBIB;
+
+        std::function<arma::vec3()> grab_computed_FSPB;
+        std::function<arma::vec3()> grab_error_of_computed_FSPB;
 
         std::function<arma::vec3()>   grab_SBII;
         std::function<arma::vec3()>   grab_VBII;
@@ -154,8 +137,6 @@ class INS {
         /* Internal Calculators */
 
         /* Sensors */
-        sensor::Gyro * gyro;
-        sensor::Accelerometer * accel;
 
         /* Constants */
         arma::mat WEII;        /* *o  (r/s)    Earth's angular velocity (skew-sym) */

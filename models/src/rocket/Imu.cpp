@@ -65,6 +65,9 @@ INS::INS(const INS& other)
     this->grab_gps_update = other.grab_gps_update;
     this->clear_gps_flag = other.clear_gps_flag;
 
+    this->gyro = new sensor::Gyro(*other.gyro);
+    this->accel = new sensor::Accelerometer(*other.accel);
+
     /* Propagative Stats */
     this->EVBI = other.EVBI;
     this->EVBID = other.EVBID;
@@ -116,6 +119,9 @@ INS& INS::operator=(const INS& other){
     this->grab_VXH = other.grab_VXH;
     this->grab_gps_update = other.grab_gps_update;
     this->clear_gps_flag = other.clear_gps_flag;
+
+    this->gyro = new sensor::Gyro(*other.gyro);
+    this->accel = new sensor::Accelerometer(*other.accel);
 
     /* Propagative Stats */
     this->EVBI = other.EVBI;
@@ -174,6 +180,12 @@ void INS::default_data(){
 
 void INS::initialize(){
 }
+
+void INS::set_gyro(sensor::Gyro &gyro) { this->gyro = &gyro; }
+void INS::set_accelerometer(sensor::Accelerometer &accel) { this->accel = &accel; }
+
+sensor::Gyro& INS::get_gyro() { return *gyro; }
+sensor::Accelerometer& INS::get_accelerometer() { return *accel; }
 
 void INS::set_ideal(){
 
@@ -375,6 +387,9 @@ double INS::calculate_INS_derived_euler_angles(arma::mat33 TBD){
 }
 
 void INS::update(double int_step){
+    assert(gyro && "INS module must be given a gyro model");
+    assert(accel && "INS module must be given a accelerometer model");
+
     // local variables
     double lonc(0), latc(0);
     double psivdc(0), thtvdc(0);
@@ -390,12 +405,12 @@ void INS::update(double int_step){
     int mroll = 0; // Ambiguous
 
     // Gyro Measurement
-    arma::vec3 WBICB = grab_computed_WBIB();
-    arma::vec3 EWBIB = grab_error_of_computed_WBIB();
+    arma::vec3 WBICB = gyro->get_computed_WBIB();
+    arma::vec3 EWBIB = gyro->get_error_of_computed_WBIB();
 
     // Accelerometer Measurement
-    arma::vec3 FSPCB = grab_computed_FSPB();
-    arma::vec3 EFSPB = grab_error_of_computed_FSPB();
+    arma::vec3 FSPCB = accel->get_computed_FSPB();
+    arma::vec3 EFSPB = accel->get_error_of_computed_FSPB();
 
     this->SBIIC = calculate_INS_derived_postion(SBII); //  wrt center of Earth I
     //dbic = norm(SBIIC);
