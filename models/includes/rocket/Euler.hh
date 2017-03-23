@@ -53,6 +53,7 @@ class _Euler_ {
         double get_rrx();
         arma::vec3 get_WBII();
         arma::vec3 get_WBIB();
+        arma::vec3 get_WEII();
 
         void load_angular_velocity(double ppx, double qqx, double rrx);
 

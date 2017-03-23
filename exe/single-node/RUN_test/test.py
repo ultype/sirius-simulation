@@ -1,6 +1,7 @@
 #execfile("Modified_data/realtime.py")
 #execfile("Modified_data/rocket.dr")
-execfile("Modified_data/test.dr")
+#execfile("Modified_data/test.dr")
+execfile("Modified_data/chang.dr")
 # execfile("Modified_data/wangwang.dr")
 # trick.exec_set_enable_freeze(True)
 # trick.exec_set_freeze_command(True)
@@ -20,9 +21,9 @@ execfile("Modified_data/test.dr")
 ##############################################################
 #Set simulation start time
 Year = 2017
-DOY = 61
-Hour = 18
-Min = 30
+DOY = 81
+Hour = 2
+Min = 00
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
 
@@ -189,7 +190,9 @@ alphacomx = 0   #Alpha command - deg  module guidance
 betacomx = 0    #Beta command - deg  module guidance
 rkt.guidance.set_degree(alphacomx, betacomx)
 ######################################################################################################
-
+#GPS_constellation
+rkt.gps_con.readfile("../../auxiliary/brdc0810.17n")
+######################################################################################################
 start = trick.new_event("start")
 start.set_cycle(0.001)
 start.condition(0,"trick.exec_get_sim_time() == 180.001")
