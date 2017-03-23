@@ -78,6 +78,8 @@ class Rocket_SimObject : public Trick::SimObject {
         Propulsion propulsion;
 
         GPS_Receiver gpsr;
+        sensor::Gyro *gyro;
+        sensor::Accelerometer *accelerometer;
 
         TVC tvc;
         RCS rcs;
@@ -118,6 +120,8 @@ class Rocket_SimObject : public Trick::SimObject {
             // P1 (0.1, "scheduled") gpsr.get_quadriga();
             // P1 (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // P1 (0.1, "scheduled") gpsr.measure();
+            P1 (0.05, "scheduled") gyro->propagate_error(0.05);
+            P1 (0.05, "scheduled") accelerometer->propagate_error(0.05);
 
             P3 (0.001, "scheduled") tvc.actuate(0.001);
             P3 (0.001, "scheduled") rcs.rcs_schmitt_thrust();
@@ -170,12 +174,16 @@ class FlightComputer_SimObject : public Trick::SimObject {
             control.grab_thtvdcx = LINK(ins, get_thtvdcx);
             control.grab_thtbdcx = LINK(ins, get_thtbdcx);
 
-            control.grab_qqcx = LINK(ins.get_gyro(), get_qqcx);
-            control.grab_rrcx = LINK(ins.get_gyro(), get_rrcx);
+            control.grab_qqcx = LINK(*rkt->gyro, get_qqcx);
+            control.grab_rrcx = LINK(*rkt->gyro, get_rrcx);
 
-            control.grab_FSPCB = LINK(ins.get_accelerometer(), get_computed_FSPB);
+            control.grab_FSPCB = LINK(*rkt->accelerometer, get_computed_FSPB);
 
 
+            ins.grab_computed_WBIB          = LINK(*rkt->gyro, get_computed_WBIB);
+            ins.grab_error_of_computed_WBIB = LINK(*rkt->gyro, get_error_of_computed_WBIB);
+            ins.grab_computed_FSPB          = LINK(*rkt->accelerometer, get_computed_FSPB);
+            ins.grab_error_of_computed_FSPB = LINK(*rkt->accelerometer, get_error_of_computed_FSPB);
             ins.grab_SBII       = LINK(rkt->newton     , get_SBII);
             ins.grab_VBII       = LINK(rkt->newton     , get_VBII);
             ins.grab_dbi        = LINK(rkt->newton     , get_dbi);
@@ -195,7 +203,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             guidance.grab_fmassr = LINK(rkt->propulsion, get_fmassr);
             guidance.grab_VBIIC  = LINK(ins, get_VBIIC);
             guidance.grab_SBIIC  = LINK(ins, get_SBIIC);
-            guidance.grab_FSPCB  = LINK(ins.get_accelerometer(), get_computed_FSPB);
+            guidance.grab_FSPCB  = LINK(*rkt->accelerometer, get_computed_FSPB);
 
             guidance.set_no_thrust  = LINK(rkt->propulsion, set_no_thrust);
             guidance.set_ltg_thrust = LINK(rkt->propulsion, set_ltg_thrust);
@@ -204,9 +212,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             rkt->tvc.grab_delrcx = LINK(control, get_delrcx);
             rkt->tvc.grab_delecx = LINK(control, get_delecx);
 
-            rcs_fc.grab_qqcx = LINK(ins.get_gyro(), get_qqcx);
-            rcs_fc.grab_ppcx = LINK(ins.get_gyro(), get_ppcx);
-            rcs_fc.grab_rrcx = LINK(ins.get_gyro(), get_rrcx);
+            rcs_fc.grab_qqcx = LINK(*rkt->gyro, get_qqcx);
+            rcs_fc.grab_ppcx = LINK(*rkt->gyro, get_ppcx);
+            rcs_fc.grab_rrcx = LINK(*rkt->gyro, get_rrcx);
 
             rcs_fc.grab_alphacx = LINK(ins, get_alphacx);
             rcs_fc.grab_betacx = LINK(ins, get_betacx);
@@ -244,8 +252,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             ("initialization") link();
 
-            P2 (0.05, "scheduled") ins.get_gyro().propagate_error(0.05);
-            P2 (0.05, "scheduled") ins.get_accelerometer().propagate_error(0.05);
             P2 (0.05, "scheduled") ins.update(0.05);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);
             P2 (0.05, "scheduled") control.control(0.05);

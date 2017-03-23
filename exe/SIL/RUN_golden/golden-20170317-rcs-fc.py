@@ -86,11 +86,10 @@ fc.ins.set_ideal()
 EMISA  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALA = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASA = [0, 0, 0]      #gauss(0, 1.e-6)
-accel = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
+rkt.accelerometer = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
 """
 # Create a Ideal Accelerometer
-accel = trick.AccelerometerIdeal(rkt.newton);
-fc.ins.set_accelerometer(accel);
+rkt.accelerometer = trick.AccelerometerIdeal(rkt.newton);
 
 #ins gyro
 # Create a Errorous Gyro
@@ -98,11 +97,10 @@ fc.ins.set_accelerometer(accel);
 EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
-gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+rkt.gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
 """
 # Create a Ideal Gyro
-gyro = trick.GyroIdeal(rkt.euler);
-fc.ins.set_gyro(gyro);
+rkt.gyro = trick.GyroIdeal(rkt.euler);
 
 #GPS
 gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps

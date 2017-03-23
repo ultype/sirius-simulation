@@ -1,0 +1,224 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (Lists out the other object files that are not included from C++ headers)
+LIBRARY DEPENDENCIES:
+(
+)
+*************************************************************/
+
+#include "sim_objects/default_trick_sys.sm"
+##include "rocket/Earth.hh"
+##include "rocket/GPS_satellites.hh"
+##include "rocket/GPS_receiver.hh"
+##include "rocket/Newton.hh"
+##include "rocket/Euler.hh"
+##include "rocket/Ins.hh"
+##include "rocket/Tvc.hh"
+##include "rocket/Rcs.hh"
+##include "rocket/RcsFc.hh"
+##include "rocket/Control.hh"
+##include "rocket/Guidance.hh"
+##include "rocket/Force.hh"
+##include "rocket/Propulsion.hh"
+##include "rocket/Aerodynamics.hh"
+##include "rocket/Time_management.hh"
+
+##include "cad/utility.hh"
+##include "cad/datadeck.hh"
+##include "cad/schmitt_trigger.hh"
+
+##include "cad/env/atmosphere.hh"
+##include "cad/env/atmosphere_nasa2002.hh"
+##include "cad/env/atmosphere76.hh"
+##include "cad/env/atmosphere_weatherdeck.hh"
+
+##include "cad/env/wind.hh"
+##include "cad/env/wind_no.hh"
+##include "cad/env/wind_tabular.hh"
+##include "cad/env/wind_constant.hh"
+
+##include "sensor/gyro/gyro.hh"
+##include "sensor/gyro/gyro_ideal.hh"
+##include "sensor/gyro/gyro_rocket6g.hh"
+
+##include "sensor/accel/accelerometer.hh"
+##include "sensor/accel/accelerometer_ideal.hh"
+##include "sensor/accel/accelerometer_rocket6g.hh"
+
+##include "math/utility.hh"
+##include "math/integrate.hh"
+##include "math/stochastic.hh"
+##include "math/matrix/utility.hh"
+
+##include "aux/transceiver.hh"
+
+class FlightComputer_SimObject : public Trick::SimObject {
+    public:
+
+        double ltg_thrust, no_thrust, clear_gps;
+
+        INS ins;
+
+        Control control;
+        Guidance guidance;
+
+        RCS_FC rcs_fc;
+
+        Transceiver transceiver;
+
+        void transmit(){
+            transceiver.begin_transmit();
+
+            transceiver.register_for_transmit_double(LINK(control, get_delrcx));
+            transceiver.register_for_transmit_double(LINK(control, get_delecx));
+            transceiver.register_for_transmit_double(LINK(rcs_fc, isEnabled));
+            transceiver.register_for_transmit_double(LINK(rcs_fc, get_rcs_mode));
+            transceiver.register_for_transmit_double(LINK(rcs_fc, get_e_roll));
+            transceiver.register_for_transmit_double(LINK(rcs_fc, get_e_pitch));
+            transceiver.register_for_transmit_double(LINK(rcs_fc, get_e_yaw));
+            transceiver.register_for_transmit_vec3(LINK(ins, get_SBIIC));
+            transceiver.register_for_transmit_vec3(LINK(ins, get_VBIIC));
+            transceiver.register_for_transmit_vec3(LINK(ins, get_WBICI));
+
+            transceiver.register_for_transmit_double([this](){ return this->clear_gps; });
+            transceiver.register_for_transmit_double([this](){ return this->no_thrust; });
+            transceiver.register_for_transmit_double([this](){ return this->ltg_thrust; });
+
+            transceiver.transmit();
+        };
+
+        void receive(){
+            transceiver.begin_receive();
+            transceiver.register_to_receive_double("mprop");
+            transceiver.register_to_receive_double("fmassr");
+            transceiver.register_to_receive_double("gymax");
+            transceiver.register_to_receive_double("dyb");
+            transceiver.register_to_receive_double("dnb");
+            transceiver.register_to_receive_double("dnr");
+            transceiver.register_to_receive_double("dndr");
+            transceiver.register_to_receive_double("dla");
+            transceiver.register_to_receive_double("dma");
+            transceiver.register_to_receive_double("dmq");
+            transceiver.register_to_receive_double("dmde");
+            transceiver.register_to_receive_double("dnd");
+            transceiver.register_to_receive_double("dlde");
+            transceiver.register_to_receive_double("pdynmc");
+
+            transceiver.register_to_receive_vec3("SBII");
+            transceiver.register_to_receive_vec3("VBII");
+            transceiver.register_to_receive_double("dbi");
+            transceiver.register_to_receive_double("dvbe");
+            transceiver.register_to_receive_double("dvbi");
+            transceiver.register_to_receive_double("thtvdx");
+            transceiver.register_to_receive_mat33("TBI");
+            transceiver.register_to_receive_vec3("SXH");
+            transceiver.register_to_receive_vec3("VXH");
+            transceiver.register_to_receive_double("gps_update");
+            transceiver.register_to_receive_vec3("computed_WBIB");
+            transceiver.register_to_receive_vec3("error_of_computed_WBIB");
+            transceiver.register_to_receive_vec3("computed_FSPB");
+            transceiver.register_to_receive_vec3("error_of_computed_FSPB");
+            transceiver.register_to_receive_double("qqcx");
+            transceiver.register_to_receive_double("ppcx");
+            transceiver.register_to_receive_double("rrcx");
+        };
+
+        void link(){
+            control.grab_dvbec = LINK(ins, get_dvbec);
+            control.grab_thtvdcx = LINK(ins, get_thtvdcx);
+            control.grab_thtbdcx = LINK(ins, get_thtbdcx);
+
+            guidance.grab_TBIC   = LINK(ins, get_TBIC);
+
+            guidance.grab_VBIIC  = LINK(ins, get_VBIIC);
+            guidance.grab_SBIIC  = LINK(ins, get_SBIIC);
+
+            rcs_fc.grab_alphacx = LINK(ins, get_alphacx);
+            rcs_fc.grab_betacx = LINK(ins, get_betacx);
+
+            rcs_fc.grab_thtbdcx = LINK(ins, get_thtbdcx);
+            rcs_fc.grab_psibdcx = LINK(ins, get_psibdcx);
+            rcs_fc.grab_phibdcx = LINK(ins, get_phibdcx);
+
+            rcs_fc.grab_UTBC = LINK(guidance, get_UTBC);
+            rcs_fc.grab_alphacomx = LINK(guidance, get_alphacomx);
+            rcs_fc.grab_betacomx  = LINK(guidance, get_betacomx);
+
+            /* remote */
+            control.grab_mprop = LINKARG(transceiver, get_double, "mprop");
+            control.grab_dvbe  = LINKARG(transceiver, get_double, "dvbe");
+            control.grab_gymax = LINKARG(transceiver, get_double, "gymax");
+            control.grab_dyb   = LINKARG(transceiver, get_double, "dyb");
+            control.grab_dnb   = LINKARG(transceiver, get_double, "dnb");
+            control.grab_dnr   = LINKARG(transceiver, get_double, "dnr");
+            control.grab_dndr  = LINKARG(transceiver, get_double, "dndr");
+            control.grab_dla   = LINKARG(transceiver, get_double, "dla");
+            control.grab_dma   = LINKARG(transceiver, get_double, "dma");
+            control.grab_dmq   = LINKARG(transceiver, get_double, "dmq");
+            control.grab_dmde  = LINKARG(transceiver, get_double, "dmde");
+            control.grab_dnd   = LINKARG(transceiver, get_double, "dnd");
+            control.grab_dlde  = LINKARG(transceiver, get_double, "dlde");
+            control.grab_pdynmc = LINKARG(transceiver, get_double, "pdynmc");
+            control.grab_qqcx = LINKARG(transceiver, get_double, "qqcx");
+            control.grab_rrcx = LINKARG(transceiver, get_double, "rrcx");
+            control.grab_FSPCB = LINKARG(transceiver, get_vec3, "computed_FSPB");
+            ins.grab_computed_WBIB          = LINKARG(transceiver, get_vec3, "computed_WBIB");
+            ins.grab_error_of_computed_WBIB = LINKARG(transceiver, get_vec3, "error_of_computed_WBIB");
+            ins.grab_computed_FSPB          = LINKARG(transceiver, get_vec3, "computed_FSPB");
+            ins.grab_error_of_computed_FSPB = LINKARG(transceiver, get_vec3, "error_of_computed_FSPB");
+            ins.grab_SBII       = LINKARG(transceiver, get_vec3, "SBII");
+            ins.grab_VBII       = LINKARG(transceiver, get_vec3, "VBII");
+            ins.grab_dbi        = LINKARG(transceiver, get_double, "dbi");
+            ins.grab_TBI        = LINKARG(transceiver, get_mat33, "TBI");
+            ins.grab_SXH        = LINKARG(transceiver, get_vec3, "SXH");
+            ins.grab_VXH        = LINKARG(transceiver, get_vec3, "VXH");
+            ins.grab_gps_update = LINKARG(transceiver, get_double, "gps_update");
+            guidance.grab_mprop  = LINKARG(transceiver, get_double, "mprop");
+            guidance.grab_dbi    = LINKARG(transceiver, get_double, "dbi");
+            guidance.grab_dvbi   = LINKARG(transceiver, get_double, "dvbi");
+            guidance.grab_thtvdx = LINKARG(transceiver, get_double, "thtvdx");
+            guidance.grab_fmassr = LINKARG(transceiver, get_double, "fmassr");
+            guidance.grab_FSPCB  = LINKARG(transceiver, get_vec3, "computed_FSPB");
+            rcs_fc.grab_qqcx = LINKARG(transceiver, get_double, "qqcx");
+            rcs_fc.grab_ppcx = LINKARG(transceiver, get_double, "ppcx");
+            rcs_fc.grab_rrcx = LINKARG(transceiver, get_double, "rrcx");
+
+            /* XXX */
+            ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
+            guidance.set_no_thrust  = [this](){ this->no_thrust = 1; };
+            guidance.set_ltg_thrust = [this](){ this->ltg_thrust = 1; };
+        };
+
+        void clear_flag(){
+            this->clear_gps = 0;
+            this->no_thrust = 0;
+            this->ltg_thrust = 0;
+        }
+
+        FlightComputer_SimObject(){
+
+            ("default_data") clear_flag();
+            ("default_data") guidance.default_data();
+
+            ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
+            ("initialization") link();
+            ("initialization") guidance.initialize();
+            ("initialization") control.initialize();
+            ("initialization") ins.initialize();
+            ("initialization") rcs_fc.initialize();
+
+
+            P2 (0.05, "scheduled") receive();
+
+            P2 (0.05, "scheduled") clear_flag();
+
+            P2 (0.05, "scheduled") ins.update(0.05);
+            // P2 (0.001, "scheduled") guidance.guidance(0.001);
+            P2 (0.05, "scheduled") control.control(0.05);
+            P2 (0.05, "scheduled") rcs_fc.actuate();
+
+            P2 (0.05, "scheduled") transmit();
+        }
+};
+
+FlightComputer_SimObject fc;
