@@ -91,6 +91,7 @@ class Environment{
 
         arma::vec3 get_GRAVG();
         arma::vec3 get_VAED();
+        arma::mat33 get_TEI();
 
     private:
 
@@ -135,6 +136,9 @@ class Environment{
         double DM_sidereal_time; /* *io  (r)  temps_sideral */
         double DM_Julian_century; /* *io  (--)  Julian_century */
         double DM_w_precessing; /* *io  (--)  w_precessing */
+
+        arma::mat M_nut_n_pre; /* *o (--)   Nutation-Precession Matrix */
+        double _M_nut_n_pre[3][3];    /* *o (--)   Nutation-Precession Matrix */
 };
 
 #endif  // __environment_HH__

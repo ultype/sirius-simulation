@@ -67,6 +67,9 @@ void _Euler_::initialize()
 
 void _Euler_::default_data(){
     this->WEII.zeros();
+    //Due to RNP so that earth rate have 3 axis components
+    this->WEII(0) = WEII1;
+    this->WEII(1) = WEII2;
     this->WEII(2) = WEII3;
 }
 
@@ -113,3 +116,4 @@ double _Euler_::get_rrx() { return this->WBEB(2) * DEG; }
 
 arma::vec3 _Euler_::get_WBII() { return this->WBII; }
 arma::vec3 _Euler_::get_WBIB() { return this->WBIB; }
+arma::vec3 _Euler_::get_WEII() { return this->WEII; }

@@ -22,6 +22,7 @@ LIBRARY DEPENDENCIES:
 ##include "rocket/Propulsion.hh"
 ##include "rocket/Aerodynamics.hh"
 ##include "rocket/Time_management.hh"
+##include "rocket/GPS_constellation.hh"
 
 ##include "cad/utility.hh"
 ##include "cad/datadeck.hh"
@@ -91,6 +92,8 @@ class Rocket_SimObject : public Trick::SimObject {
         Guidance guidance;
 
         RCS_FC rcs_fc;
+
+        GPS_constellation gps_con;
 
         void link(){
             control.grab_mprop = LINK(propulsion, get_mprop);
@@ -193,7 +196,8 @@ class Rocket_SimObject : public Trick::SimObject {
                 tvc         ( env        , kinematics   , propulsion ) ,
                 rcs         ( propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
-                time        ()
+                time        () ,
+                gps_con     ( time       , newton       , env )
             {
 
             ("default_data") guidance.default_data();
@@ -213,6 +217,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") control.initialize();
             ("initialization") ins.initialize();
             ("initialization") rcs_fc.initialize();
+            ("initialization") gps_con.initialize();
 
             ("initialization") link();
 
@@ -225,8 +230,9 @@ class Rocket_SimObject : public Trick::SimObject {
             // (0.1, "scheduled") gpsr.get_quadriga();
             // (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
             // (0.1, "scheduled") gpsr.measure();
-            (0.05, "scheduled") gyro->propagate_error(0.05);
-            (0.05, "scheduled") accelerometer->propagate_error(0.05);
+            (0.001, "scheduled") gps_con.compute();
+            // (0.05, "scheduled") gyro->propagate_error(0.05);
+            // (0.05, "scheduled") accelerometer->propagate_error(0.05);
             (0.05, "scheduled") ins.update(0.05);
             // (0.001, "scheduled") guidance.guidance(0.001);
             (0.05, "scheduled") control.control(0.05);
@@ -241,6 +247,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "logging") env.update_diagnostic_attributes(0.001);
             (0.001, "logging") newton.update_diagnostic_attributes(0.001);
             (0.001, "logging") euler.update_diagnostic_attributes(0.001);
+            (10.0, "scheduled") gps_con.show();
 
         }
 };

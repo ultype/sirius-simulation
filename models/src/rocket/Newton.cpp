@@ -16,7 +16,10 @@ Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &pro
         VECTOR_INIT(SBII, 3),
         VECTOR_INIT(VBII, 3),
         VECTOR_INIT(ABII, 3),
-        VECTOR_INIT(FSPB, 3)
+        VECTOR_INIT(FSPB, 3),
+        VECTOR_INIT(ABIB, 3),
+        VECTOR_INIT(SBEE, 3),
+        VECTOR_INIT(VBEE, 3)
 {
     this->default_data();
 }
@@ -29,7 +32,10 @@ Newton::Newton(const Newton& other)
         VECTOR_INIT(SBII, 3),
         VECTOR_INIT(VBII, 3),
         VECTOR_INIT(ABII, 3),
-        VECTOR_INIT(FSPB, 3)
+        VECTOR_INIT(FSPB, 3),
+        VECTOR_INIT(ABIB, 3),
+        VECTOR_INIT(SBEE, 3),
+        VECTOR_INIT(VBEE, 3)
 {
     this->default_data();
 
@@ -40,6 +46,7 @@ Newton::Newton(const Newton& other)
     this->SBII = other.SBII;
     this->VBII = other.VBII;
     this->ABII = other.ABII;
+    this->ABIB = other.ABIB;
 
     this->TGI = other.TGI;
     this->TDI = other.TDI;
@@ -66,6 +73,7 @@ Newton& Newton::operator=(const Newton& other){
     this->SBII = other.SBII;
     this->VBII = other.VBII;
     this->ABII = other.ABII;
+    this->ABIB = other.ABIB;
 
     this->TGI = other.TGI;
     this->TDI = other.TDI;
@@ -176,6 +184,10 @@ void Newton::propagate_position_speed_acceleration(double int_step){
 
     arma::vec3 GRAVG = environment->get_GRAVG();
 
+    arma::mat33 TEI = environment->get_TEI();//cad::tei(get_rettime());
+
+    arma::vec3 WEII = euler->get_WEII();
+
     /* Prograte S, V, A status */
     arma::mat NEXT_ACC = trans(TBI) * FSPB + trans(TGI) * GRAVG;
     /* To check wether the rocket liftoff */
@@ -192,6 +204,10 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     SBII = integrate(NEXT_VEL, VBII, SBII, int_step);
     ABII = NEXT_ACC;
     VBII = NEXT_VEL;
+    ABIB = TBI * ABII;
+
+    SBEE = TEI * SBII; //Calculate position in ECEF
+    VBEE = TEI * VBII - cross(WEII, SBEE); //Calculate velocity in ECEF 
 
     //Calculate lon lat alt
     cad::geo84_in(lon, lat, al, SBII, get_rettime());
@@ -268,6 +284,7 @@ arma::vec3 Newton::get_VBII() { return VBII; }
 arma::vec3 Newton::get_SBII() { return SBII; }
 /* Use stored Value due to coherence with other models */
 arma::vec3 Newton::get_FSPB() { return FSPB; }
+arma::vec3 Newton::get_SBEE() { return SBEE; }
 
 unsigned int Newton::get_liftoff() { return liftoff; }
 

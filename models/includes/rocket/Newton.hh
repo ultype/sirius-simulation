@@ -42,6 +42,7 @@ class Newton {
             ar & _SBII;
             ar & _VBII;
             ar & _ABII;
+            ar & _ABIB;
 
             ar & _TGI;
             ar & _TDI;
@@ -76,6 +77,7 @@ class Newton {
 
         arma::vec3 get_SBII();
         arma::vec3 get_VBII();
+        arma::vec3 get_SBEE();
         arma::vec3 get_VBED();
         arma::mat get_TGI();
 
@@ -125,6 +127,15 @@ class Newton {
 
         arma::vec ABII;      /* *o  (m/s2)   Vehicle inertia acceleration */
         double _ABII[3];      /* *o  (m/s2)   Vehicle inertia acceleration */
+
+        arma::vec ABIB;        /* *o  (m/s2)   Vehicle inertia acceleration on body coordinate */
+        double _ABIB[3];       /* *o  (m/s2)   Vehicle inertia acceleration on body coordinate */
+
+        arma::vec SBEE;        /* *o  (m)     Vehicle position in earth coord  */
+        double _SBEE[3];           /* *o  (m)     Vehicle position in earth coord  */
+
+        arma::vec VBEE;         /* *o  (m/s)     Vehicle speed in earth coord  */
+        double _VBEE[3];           /* *o  (m/s)     Vehicle speed in earth coord  */
 
         arma::mat TDI;      /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double _TDI[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */

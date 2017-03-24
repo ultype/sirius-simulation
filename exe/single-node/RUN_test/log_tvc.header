@@ -1,6 +1,0 @@
-log_tvc is in ASCII
-log_tvc	double	     s	sys.exec.out.time
-log_tvc	double	     m	rkt.newton.alt
-log_tvc	double	degree	rkt.newton._thtvdx
-log_tvc	double	degree	rkt.tvc.zetx
-log_tvc	double	degree	rkt.tvc.etax

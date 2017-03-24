@@ -144,7 +144,8 @@ Environment::Environment(Newton &newt, AeroDynamics &aero, Kinematics &kine, tim
     :   newton(&newt), aerodynamics(&aero), kinematics(&kine), time(&Time),
         VECTOR_INIT(GRAVG, 3),
         MATRIX_INIT(TEI, 3, 3),
-        VECTOR_INIT(GRAVGB, 3)
+        VECTOR_INIT(GRAVGB, 3),
+        MATRIX_INIT(M_nut_n_pre, 3, 3)
 {
     this->default_data();
 
@@ -157,7 +158,8 @@ Environment::Environment(const Environment& other)
         time(other.time),
         VECTOR_INIT(GRAVG, 3),
         MATRIX_INIT(TEI, 3, 3),
-        VECTOR_INIT(GRAVGB, 3)
+        VECTOR_INIT(GRAVGB, 3),
+        MATRIX_INIT(M_nut_n_pre, 3, 3)
 {
     this->default_data();
 
@@ -297,6 +299,7 @@ double Environment::get_grav() { return norm(GRAVG); }
 
 arma::vec3 Environment::get_GRAVG() { return GRAVG; }
 arma::vec3 Environment::get_VAED() { return wind->get_VAED(); }
+arma::mat33 Environment::get_TEI() { return TEI; }
 
 /* Rotation-Nutation-Precession transfor Matrix (ECI to ECEF) */
 void Environment::dm_RNP()
@@ -310,7 +313,7 @@ void Environment::dm_RNP()
     arma::mat33 M_rotation;
     arma::mat33 M_nutation;
     arma::mat33 M_precession;
-    arma::mat33 M_nut_n_pre;
+    //arma::mat33 M_nut_n_pre;
     double t, t2, t3, thetaA, zetaA, zA;
     double epsilonA, epsilonAP, F,D,omega;
     double temps_sideral(0);
@@ -451,10 +454,11 @@ void Environment::dm_RNP()
     /*------------------------------------------------------------- */
     /* GPS time converted from GPS format to YYYY/MM/DD/MM/SS */
     /* Correction for time difference btwn GPS & UTC is applied implicitly */
-
-    // tmp_gps.Week  = time->gpstime.Week;
-    // tmp_gps.SOW  = time->gpstime.SOW;
-    time->gps_to_utc(&(time->gpstime), &utc_caldate);   /* leap second is considered */
+    /***to prevent change origin gpstime data****/
+    tmp_gps.Week  = time->gpstime.Week;
+    tmp_gps.SOW  = time->gpstime.SOW;
+    /*********************************************/
+    time->gps_to_utc(&tmp_gps, &utc_caldate);   /* leap second is considered */
 
     UTC = utc_caldate.Hour * 3600.0 + utc_caldate.Min * 60.0 + utc_caldate.Sec;
 

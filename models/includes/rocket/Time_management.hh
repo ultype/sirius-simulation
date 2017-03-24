@@ -42,11 +42,12 @@ struct CUC		/* CCSDS Unsegmented time Code */
 	unsigned char F2;
 } ;
 
-
+// #include "GPS_constellation.hh"
 class time_management{
 
 	TRICK_INTERFACE(time_management);
 	friend class Environment;
+	friend class GPS_constellation;
 
 	public:
 		time_management();
@@ -54,7 +55,7 @@ class time_management{
 		~time_management(){};
 		void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
 		void dm_time();/* convert simulation time to gps time */
-
+		
 	private:
 
 		GPS gpstime;
@@ -98,6 +99,8 @@ class time_management{
 		time_t gps_to_unix(GPS *gpsptr);
 
 		float cuc_diff(CUC *cucptr1, CUC *cucptr2);
+
+		void utctime2gpstime(const GPS *utcptr, GPS *gpsptr);
 };
 
 
