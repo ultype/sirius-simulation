@@ -16,37 +16,73 @@ LIBRARY DEPENDENCY:
 #include <set>
 #include <list>
 
+class Transceiver;
+class TransceiverProxy;
+
 class Transceiver {
     public:
         Transceiver() {};
 
         void initialize_connection(char* name);
 
-        void begin_transmit();
-        void register_for_transmit_double(std::function<double()> in);
-        void register_for_transmit_vec3(std::function<arma::vec3()> in);
-        void register_for_transmit_mat33(std::function<arma::mat33()> in);
+        void register_for_transmit(std::string cid, std::string id, std::function<double()> in);
+        void register_for_transmit(std::string cid, std::string id, std::function<arma::mat()> in);
+
         void transmit();
+        void receive();
 
-        uint32_t begin_receive();
-        std::function<double()> register_to_receive_double(std::string name);
-        std::function<arma::vec3()> register_to_receive_vec3(std::string name);
-        std::function<arma::mat33()> register_to_receive_mat33(std::string name);
+        TransceiverProxy operator ()(std::string cid, std::string id);
 
-        double get_double(std::string id);
-        arma::vec3 get_vec3(std::string id);
-        arma::mat33 get_mat33(std::string id);
+        std::function<double()> get_double(std::string cid, std::string id);
+        std::function<arma::mat()> get_mat(std::string cid, std::string id);
 
     private:
         TCDevice dev;
         TrickErrorHndlr   err_hndlr;
 
-        std::list<double> data_out;
+        std::map<std::string, std::function<double()>> data_double_out;
+        std::map<std::string, std::function<arma::mat()>> data_mat_out;
 
-        std::set<std::string> data_in_tag;
-        std::map<std::string, double> data_in_double;
-        std::map<std::string, arma::vec3> data_in_vec3;
-        std::map<std::string, arma::mat33> data_in_mat33;
+        std::map<std::string, double> data_double_in;
+        std::map<std::string, arma::mat> data_mat_in;
+};
+
+class TransceiverProxy{
+    Transceiver *transceiver;
+    std::string cid;
+    std::string id;
+public:
+    TransceiverProxy(Transceiver *trans , std::string cid, std::string id)
+        :   transceiver(trans), cid(cid), id(id)
+    {
+    }
+#ifndef TRICK_ICG
+#ifndef SWIG
+    operator std::function<double()> () {
+        return transceiver->get_double(cid, id);
+    }
+
+    operator std::function<bool()> () {
+        return transceiver->get_double(cid, id);
+    }
+
+    operator std::function<int()> () {
+        return transceiver->get_double(cid, id);
+    }
+
+    operator std::function<arma::mat()> () {
+        return transceiver->get_mat(cid, id);
+    }
+
+    operator std::function<arma::vec3()> () {
+        return transceiver->get_mat(cid, id);
+    }
+
+    operator std::function<arma::mat33()> () {
+        return transceiver->get_mat(cid, id);
+    }
+#endif
+#endif
 };
 
 #endif  // __TRANSCEIVER_HH__

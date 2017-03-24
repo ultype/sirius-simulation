@@ -88,89 +88,69 @@ class Rocket_SimObject : public Trick::SimObject {
 
         Transceiver transceiver;
 
-        void transmit(){
-            transceiver.begin_transmit();
+        void setup_export(){
+            transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));
+            transceiver.register_for_transmit(EXPORT( propulsion    , get_fmassr));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_gymax));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dyb));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dnb));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dnr));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dndr));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dla));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dma));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dmq));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dmde));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dnd));
+            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dlde));
+            transceiver.register_for_transmit(EXPORT( env           , get_pdynmc));
 
-            transceiver.register_for_transmit_double( LINK( propulsion   , get_mprop));
-            transceiver.register_for_transmit_double( LINK( propulsion   , get_fmassr));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_gymax));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dyb));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dnb));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dnr));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dndr));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dla));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dma));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dmq));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dmde));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dnd));
-            transceiver.register_for_transmit_double( LINK( aerodynamics , get_dlde));
-            transceiver.register_for_transmit_double( LINK( env          , get_pdynmc));
+            transceiver.register_for_transmit(EXPORT( newton        , get_SBII));
+            transceiver.register_for_transmit(EXPORT( newton        , get_VBII));
+            transceiver.register_for_transmit(EXPORT( newton        , get_dbi));
+            transceiver.register_for_transmit(EXPORT( newton        , get_dvbe));
+            transceiver.register_for_transmit(EXPORT( newton        , get_dvbi));
+            transceiver.register_for_transmit(EXPORT( newton        , get_thtvdx));
+            transceiver.register_for_transmit(EXPORT( kinematics    , get_TBI));
+            transceiver.register_for_transmit(EXPORT( gpsr          , get_SXH));
+            transceiver.register_for_transmit(EXPORT( gpsr          , get_VXH));
+            transceiver.register_for_transmit(EXPORT( gpsr          , get_gps_update));
+            transceiver.register_for_transmit(EXPORT(*gyro          , get_computed_WBIB));
+            transceiver.register_for_transmit(EXPORT(*gyro          , get_error_of_computed_WBIB));
+            transceiver.register_for_transmit(EXPORT(*accelerometer , get_computed_FSPB));
+            transceiver.register_for_transmit(EXPORT(*accelerometer , get_error_of_computed_FSPB));
+            transceiver.register_for_transmit(EXPORT(*gyro          , get_qqcx));
+            transceiver.register_for_transmit(EXPORT(*gyro          , get_ppcx));
+            transceiver.register_for_transmit(EXPORT(*gyro          , get_rrcx));
 
-            transceiver.register_for_transmit_vec3(   LINK( newton       , get_SBII));
-            transceiver.register_for_transmit_vec3(   LINK( newton       , get_VBII));
-            transceiver.register_for_transmit_double( LINK( newton       , get_dbi));
-            transceiver.register_for_transmit_double( LINK( newton       , get_dvbe));
-            transceiver.register_for_transmit_double( LINK( newton       , get_dvbi));
-            transceiver.register_for_transmit_double( LINK( newton       , get_thtvdx));
-            transceiver.register_for_transmit_mat33(  LINK( kinematics   , get_TBI));
-            transceiver.register_for_transmit_vec3(   LINK( gpsr         , get_SXH));
-            transceiver.register_for_transmit_vec3(   LINK( gpsr         , get_VXH));
-            transceiver.register_for_transmit_double( LINK( gpsr         , get_gps_update));
-            transceiver.register_for_transmit_vec3(LINK(*gyro, get_computed_WBIB));
-            transceiver.register_for_transmit_vec3(LINK(*gyro, get_error_of_computed_WBIB));
-            transceiver.register_for_transmit_vec3(LINK(*accelerometer, get_computed_FSPB));
-            transceiver.register_for_transmit_vec3(LINK(*accelerometer, get_error_of_computed_FSPB));
-            transceiver.register_for_transmit_double(LINK(*gyro, get_qqcx));
-            transceiver.register_for_transmit_double(LINK(*gyro, get_ppcx));
-            transceiver.register_for_transmit_double(LINK(*gyro, get_rrcx));
-
-            transceiver.transmit();
         };
 
-        void receive(){
-            transceiver.begin_receive();
-
-            transceiver.register_to_receive_double("delrcx");
-            transceiver.register_to_receive_double("delecx");
-
-            transceiver.register_to_receive_double("rcs_isEnabled");
-            transceiver.register_to_receive_double("rcs_mode");
-            transceiver.register_to_receive_double("e_roll");
-            transceiver.register_to_receive_double("e_pitch");
-            transceiver.register_to_receive_double("e_yaw");
-
-            transceiver.register_to_receive_vec3("SBIIC");
-            transceiver.register_to_receive_vec3("VBIIC");
-            transceiver.register_to_receive_vec3("WBICI");
-            
+        void exec_receive(){
             /* XXX */
-            if(transceiver.register_to_receive_double("clear_gps_flag")()){
+            if(((std::function<double()>)transceiver(IMPORT(ins, clear_gps_flag)))()){
                 gpsr.clear_gps_flag();
             }
-            if(transceiver.register_to_receive_double("no_thrust")()){
+            if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
                 propulsion.set_no_thrust();
             }
-            if(transceiver.register_to_receive_double("ltg_thrust")()){
+            if(((std::function<double()>)transceiver(IMPORT(guidance, ltg_thrust)))()){
                 propulsion.set_ltg_thrust();
             }
         };
 
         void link(){
-            tvc.grab_delrcx = LINKARG(transceiver, get_double, "delrcx");
-            tvc.grab_delecx = LINKARG(transceiver, get_double, "delecx");
+            tvc.grab_delrcx           = transceiver(IMPORT(control , get_delrcx));
+            tvc.grab_delecx           = transceiver(IMPORT(control , get_delecx));
 
-            forces.grab_rcs_isEnabled = LINKARG(transceiver, get_double, "rcs_isEnabled");
-            forces.grab_rcs_mode = LINKARG(transceiver, get_double, "rcs_mode");
+            forces.grab_rcs_isEnabled = transceiver(IMPORT(rcs_fc  , isEnabled));
+            forces.grab_rcs_mode      = transceiver(IMPORT(rcs_fc  , get_rcs_mode));
 
+            rcs.grab_e_roll           = transceiver(IMPORT(rcs_fc  , get_e_roll));
+            rcs.grab_e_pitch          = transceiver(IMPORT(rcs_fc  , get_e_pitch));
+            rcs.grab_e_yaw            = transceiver(IMPORT(rcs_fc  , get_e_yaw));
 
-            rcs.grab_e_roll  = LINKARG(transceiver, get_double, "e_roll");
-            rcs.grab_e_pitch = LINKARG(transceiver, get_double, "e_pitch");
-            rcs.grab_e_yaw   = LINKARG(transceiver, get_double, "e_yaw");
-
-
-            gpsr.grab_SBIIC = LINKARG(transceiver, get_vec3, "SBIIC");
-            gpsr.grab_VBIIC = LINKARG(transceiver, get_vec3, "VBIIC");
-            gpsr.grab_WBICI = LINKARG(transceiver, get_vec3, "WBICI");
+            gpsr.grab_SBIIC           = transceiver(IMPORT(ins     , get_SBIIC));
+            gpsr.grab_VBIIC           = transceiver(IMPORT(ins     , get_VBIIC));
+            gpsr.grab_WBICI           = transceiver(IMPORT(ins     , get_WBICI));
         };
 
         Rocket_SimObject() 
@@ -188,6 +168,7 @@ class Rocket_SimObject : public Trick::SimObject {
             {
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
+            ("initialization") setup_export();
 
             ("initialization") kinematics.initialize();
             ("initialization") newton.initialize();
@@ -212,8 +193,10 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.05, "scheduled") gyro->propagate_error(0.05);
             P1 (0.05, "scheduled") accelerometer->propagate_error(0.05);
 
-            P2 (0.05, "scheduled") transmit();
-            P2 (0.05, "scheduled") receive();
+            P2 (0.05, "scheduled") transceiver.transmit();
+;
+            P2 (0.05, "scheduled") transceiver.receive();
+            P2 (0.05, "scheduled") exec_receive();
 
             P3 (0.001, "scheduled") tvc.actuate(0.001);
             P3 (0.001, "scheduled") rcs.rcs_schmitt_thrust();

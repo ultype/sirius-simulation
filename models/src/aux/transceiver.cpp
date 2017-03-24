@@ -6,15 +6,23 @@
 #include "trick_utils/comm/include/tc_proto.h"
 
 #include <iostream>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/stream_buffer.hpp>
-#include <boost/iostreams/device/back_inserter.hpp>
 
 #define TR_BUFFER_SIZE 102400
+
+enum packet_type{
+    DOUBLE,
+    MAT
+};
+
+struct __attribute__ ((__packed__)) generic_header{
+    unsigned int type : 1;
+    unsigned int name_length : 7;
+};
+
+struct __attribute__ ((__packed__)) mat_header{
+    long long unsigned int x : 4;
+    long long unsigned int y : 4;
+};
 
 void Transceiver::initialize_connection(char* name){
     memset((void *)&err_hndlr,'\0',sizeof(TrickErrorHndlr));
@@ -29,125 +37,103 @@ void Transceiver::initialize_connection(char* name){
     }
 }
 
-void Transceiver::begin_transmit(){
-    data_out.clear();
+void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<double()> in){
+    std::string tid = cid + "." + id;
+    if(tid.length() > 127) throw std::out_of_range("ID too long");
+    data_double_out[tid] = in;
 }
 
-void Transceiver::register_for_transmit_double(std::function<double()> in){
-    data_out.push_back(in());
-}
-
-void Transceiver::register_for_transmit_vec3(std::function<arma::vec3()> in){
-    arma::vec3 data = in();
-    for(int i = 0; i < 3; i++){
-        data_out.push_back(data(i));
-    }
-}
-
-void Transceiver::register_for_transmit_mat33(std::function<arma::mat33()> in){
-    arma::mat33 data = in();
-    for(int i = 0; i < 3; i++){
-        for(int j = 0; j < 3; j++){
-            data_out.push_back(data(i, j));
-        }
-    }
+void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<arma::mat()> in){
+    std::string tid = cid + "." + id;
+    if(tid.length() > 127) throw std::out_of_range("ID too long");
+    data_mat_out[tid] = in;
 }
 
 void Transceiver::transmit(){
-    uint32_t size = sizeof(double) * data_out.size();
+    uint32_t size = data_double_out.size() + data_mat_out.size();
     if (tc_isValid(&dev)) {
         tc_write(&dev, (char*)&size, sizeof(uint32_t));
     }
 
-    if (tc_isValid(&dev)) {
-        auto out = [this](const double& n) { tc_write(&dev, (char*)&n, sizeof(double)); };
-        std::for_each(data_out.begin(), data_out.end(), out);
+    for (auto it = data_double_out.begin(); it != data_double_out.end(); ++it) {
+        struct generic_header gh = { .type = DOUBLE, .name_length = (unsigned int)it->first.length() };
+        double tmp;
+        tc_write(&dev, (char*)&gh, sizeof(gh));
+        tc_write(&dev, (char*)it->first.c_str(), gh.name_length);
+        tmp = it->second();
+        tc_write(&dev, (char*)&tmp, sizeof(double));
+    }
+
+    for (auto it = data_mat_out.begin(); it != data_mat_out.end(); ++it) {
+        struct generic_header gh = { .type = MAT, .name_length = (unsigned int)it->first.length() };
+        struct mat_header mh = { .x = it->second().n_rows, .y = it->second().n_cols };
+        tc_write(&dev, (char*)&gh, sizeof(gh));
+        tc_write(&dev, (char*)&mh, sizeof(mh));
+        tc_write(&dev, (char*)it->first.c_str(), gh.name_length);
+
+        auto out_fn = [this](double& val) { tc_write(&dev, (char*)&val, sizeof(double)); };
+        it->second().for_each(out_fn);
     }
 }
 
-uint32_t Transceiver::begin_receive(){
+void Transceiver::receive(){
     uint32_t size;
     if (tc_isValid(&dev)) {
         tc_read(&dev, (char*)&size, sizeof(uint32_t));
     }
 
-    data_in_tag.clear();
-    data_in_double.clear();
-    data_in_vec3.clear();
-    data_in_mat33.clear();
+    for(int i = 0; i < size; i++){
+        char *buf;
+        struct generic_header gh;
+        struct mat_header mh;
+        tc_read(&dev, (char*)&gh, sizeof(gh));
+        switch(gh.type){
+            case DOUBLE:
+                {
+                    buf = new char[gh.name_length + 1];
+                    tc_read(&dev, buf, gh.name_length);
+                    buf[gh.name_length] = '\0';
+                    std::string name(buf);
+                    delete[] buf;
 
-    return size;
-}
-
-std::function<double()> Transceiver::register_to_receive_double(std::string name){
-    double in;
-    if (tc_isValid(&dev)) {
-        if(data_in_tag.find(name) == data_in_tag.end()){
-            tc_read(&dev, (char*)&in, sizeof(double));
-            data_in_double[name] = in;
-            data_in_tag.insert(name);
-        }
-    }
-
-    return std::bind(&Transceiver::get_double, this, name);
-}
-
-std::function<arma::vec3()> Transceiver::register_to_receive_vec3(std::string name){
-    arma::vec3 in;
-    if (tc_isValid(&dev)) {
-        if(data_in_tag.find(name) == data_in_tag.end()){
-            for(int i = 0; i < 3; i++){
-                tc_read(&dev, (char*)&(in(i)), sizeof(double));
-            }
-            data_in_vec3[name] = in;
-            data_in_tag.insert(name);
-        }
-    }
-
-    return std::bind(&Transceiver::get_vec3, this, name);
-}
-
-std::function<arma::mat33()> Transceiver::register_to_receive_mat33(std::string name){
-    arma::mat33 in;
-    if (tc_isValid(&dev)) {
-        if(data_in_tag.find(name) == data_in_tag.end()){
-            for(int i = 0; i < 3; i++){
-                for(int j = 0; j < 3; j++){
-                    tc_read(&dev, (char*)&(in(i, j)), sizeof(double));
+                    double in;
+                    tc_read(&dev, (char*)&in, sizeof(double));
+                    data_double_in[name] = in;
                 }
-            }
-            data_in_mat33[name] = in;
-            data_in_tag.insert(name);
+                break;
+            case MAT:
+                {
+                    tc_read(&dev, (char*)&mh, sizeof(mh));
+                    buf = new char[gh.name_length + 1];
+                    tc_read(&dev, buf, gh.name_length);
+                    buf[gh.name_length] = '\0';
+                    std::string name(buf);
+                    delete[] buf;
+
+                    arma::mat in(mh.x, mh.y);
+                    auto in_fn = [this](double& val) { tc_read(&dev, (char*)&val, sizeof(double)); };
+                    in.for_each(in_fn);
+                    data_mat_in.insert(std::make_pair(name, in));
+                }
+                break;
+            default:
+                throw std::runtime_error("Received Data Corrupted");
+                break;
         }
     }
 
-    return std::bind(&Transceiver::get_mat33, this, name);
+    return;
 }
 
-double Transceiver::get_double(std::string id){
-    if(data_in_tag.find(id) != data_in_tag.end()){
-        return data_in_double[id];
-    }else{
-        throw std::invalid_argument(id);
-    }
-    return 0;
+TransceiverProxy Transceiver::operator ()(std::string cid, std::string id){
+    return TransceiverProxy(this, cid, id);
 }
 
-arma::vec3 Transceiver::get_vec3(std::string id){
-    if(data_in_tag.find(id) != data_in_tag.end()){
-        return data_in_vec3[id];
-    }else{
-        throw std::invalid_argument(id);
-    }
-    return arma::vec3(arma::fill::zeros);
+std::function<double()> Transceiver::get_double(std::string cid, std::string id){
+    return [this, cid, id](){ return data_double_in[cid + "." + id]; };
+
 }
 
-arma::mat33 Transceiver::get_mat33(std::string id){
-    if(data_in_tag.find(id) != data_in_tag.end()){
-        return data_in_mat33[id];
-    }else{
-        throw std::invalid_argument(id);
-    }
-    return arma::mat33(arma::fill::zeros);
+std::function<arma::mat()> Transceiver::get_mat(std::string cid, std::string id){
+    return [this, cid, id](){ return data_mat_in[cid + "." + id]; };
 }
-

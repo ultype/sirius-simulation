@@ -29,4 +29,10 @@ ICG: (No)
 #define LINKARG(model, func, arg) \
         std::bind(&std::remove_reference<decltype(model)>::type::func, &model, arg)
 
+#define EXPORT(model, func) \
+        #model, #func, std::bind(&std::remove_reference<decltype(model)>::type::func, &model)
+
+#define IMPORT(model, func) \
+        #model, #func
+
 #endif// utility_header__HPP
