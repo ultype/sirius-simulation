@@ -26,6 +26,7 @@ trick
 DP_Product/
 
 *.csv
+*.header
 
 */S_job_execution
 */S_run_summary
