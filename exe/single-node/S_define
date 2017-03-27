@@ -197,7 +197,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 rcs         ( propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        () ,
-                gps_con     ( time       , newton       , env )
+                gps_con     ( time       , newton       , env          , kinematics)
             {
 
             ("default_data") guidance.default_data();

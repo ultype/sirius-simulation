@@ -1,14 +1,16 @@
 #include "rocket/GPS_constellation.hh"
 
-GPS_constellation::GPS_constellation(time_management &time_ma, Newton &newt, Environment &env)
+GPS_constellation::GPS_constellation(time_management &time_ma, Newton &newt, Environment &env, Kinematics &kine)
 :	time(&time_ma),
 	newton(&newt),
-	environment(&env)
+	environment(&env),
+	kinematics(&kine)
 {}
 GPS_constellation::GPS_constellation(const GPS_constellation& other)
 :	time(other.time),
 	newton(other.newton),
-	environment(other.environment)
+	environment(other.environment),
+	kinematics(other.kinematics)
 {	
 	this->neph = other.neph;
 	this->ieph = other.ieph;
@@ -20,6 +22,7 @@ GPS_constellation& GPS_constellation::operator= (const GPS_constellation& other)
 	this->time = other.time;
 	this->newton = other.newton;
 	this->environment = other.environment;
+	this->kinematics = other.kinematics;
 	this->neph = other.neph;
 	this->ieph = other.ieph;
 	this->nsat = other.nsat;	
@@ -475,7 +478,6 @@ int GPS_constellation::allocateChannel(channel_t *chan, ephem_t *eph, ionoutc_t 
 						chan[i].prn = sv+1;
 						chan[i].azel(0) = azel(0);
 						chan[i].azel(1) = azel(1);
-
 						// // C/A code generation
 						// codegen(chan[i].ca, chan[i].prn);
 
@@ -530,6 +532,7 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	arma::vec2 clk;
 	arma::vec3 los;
 	arma::mat33 tmat;
+	arma::mat33 TBD = kinematics->get_TBD();
 
 	if (eph.vflg != 1)
 		return (-1); // Invalid
@@ -539,7 +542,7 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 
 	satpos(eph, g, pos, vel, clk);
 	los = pos - xyz;
-	neu = tmat * los;
+	neu = TBD * tmat * los;
 	neu2azel(azel, neu);
 	if (azel(1)*DEG > elvMask)
 		return (1); // Visible
@@ -566,6 +569,7 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 	arma::vec3 llh;
 	arma::vec3 neu;
 	arma::mat33 tmat;
+	arma::mat33 TBD = kinematics->get_TBD();
 	
 	// SV position at time of the pseudorange observation.
 	satpos(eph, g, pos, vel, clk);
@@ -605,7 +609,7 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 	// Azimuth and elevation angles.
 	xyz2llh(xyz, llh);
 	tmat = ltcmat(llh);
-	neu = tmat * los;
+	neu = TBD * tmat * los;
 	// ecef2neu(los, tmat, neu);
 	neu2azel(rho->azel, neu);
 

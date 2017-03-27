@@ -102,7 +102,7 @@ class GPS_constellation{
 	TRICK_INTERFACE(GPS_constellation);
 	public:
 		
-		GPS_constellation(time_management &time_ma, Newton &newt, Environment &env);
+		GPS_constellation(time_management &time_ma, Newton &newt, Environment &env, Kinematics &kine);
 		GPS_constellation(const GPS_constellation& other);
 		GPS_constellation& operator= (const GPS_constellation& other);
 
@@ -140,7 +140,8 @@ class GPS_constellation{
 		time_management *time;
 		Newton *newton;
 		Environment *environment;
-
+		Kinematics *kinematics;
+		
 		int neph;   /* *io  (--)	number of ephemeris */
 		int ieph;   /* *io  (--)	which ephemeris been select */
 		
