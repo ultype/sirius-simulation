@@ -29,7 +29,7 @@ void Transceiver::initialize_connection(char* name){
     trick_error_init(&err_hndlr, (TrickErrorFuncPtr)NULL,
                      (TrickErrorDataPtr)NULL, TRICK_ERROR_TRIVIAL);
 
-    int status = tc_multiconnect(&dev , name , "SIRIUS" , &err_hndlr);
+    int status = tc_multiconnect(&dev , name , (char*)"SIRIUS" , &err_hndlr);
     tc_blockio(&dev, TC_COMM_BLOCKIO);
     if (status != TC_SUCCESS) {
         perror("Error from tc_multiconnect\n");

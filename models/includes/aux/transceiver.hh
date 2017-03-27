@@ -6,10 +6,10 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../../src/aux/transceiver.cpp))
 *******************************************************************************/
-#include "rocket/Ins.hh"
-
 #include "trick_utils/comm/include/tc.h"
 #include "trick_utils/comm/include/tc_proto.h"
+
+#include <armadillo>
 
 #include <functional>
 #include <map>
