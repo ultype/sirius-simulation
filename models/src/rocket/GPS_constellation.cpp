@@ -544,8 +544,33 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	los = pos - xyz;
 	neu = TBD * tmat * los;
 	neu2azel(azel, neu);
-	if (azel(1)*DEG > elvMask)
-		return (1); // Visible
+	double epsilon = acos(REARTH/norm(pos));
+	double delta = acos(dot(xyz, pos)/(norm(xyz) * norm(pos)));
+	if(delta < epsilon){
+		if(azel(1)*DEG > elvMask){
+			return (1);
+		}	
+	}else{
+		double rmin = (REARTH + 500000.0)/cos(delta - epsilon);
+		if(norm(xyz) > rmin){
+			if(azel(1)*DEG > elvMask){
+			return (1);
+			}
+		}
+	}
+	// if (azel(1)*DEG > elvMask){
+	// 	double epsilon = acos(REARTH/norm(pos));
+	// 	double delta = acos(dot(xyz, pos)/(norm(xyz) * norm(pos)));
+	// 	if(delta < epsilon){
+	// 		return (1);
+	// 	}else{
+	// 		double rmin = (REARTH + 500000.0)/cos(delta - epsilon);
+	// 		if(norm(xyz) > rmin){
+	// 			return (1);
+	// 		}
+	// 	}
+	// }
+		// return (1); // Visible
 	// else
 	return (0); // Invisible
 }
