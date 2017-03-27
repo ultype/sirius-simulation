@@ -580,7 +580,7 @@ void time_management::dm_time()/* convert simulation time to gps time */
 	/* Convert UTC time to MJD & JD time */
 	Julian_Date = gps_to_mjd(&utctime) + 2400000.5;	/* DM_Julian_Date : Julian Date */
     gps_to_caldate(&utctime, &caldate); //Convert UTC(GPS form) time to calendar Date
-    //gps_to_utc(&gpstime, &caldate);
+    // gps_to_utc(&gpstime, &caldate);
     //cout<<setprecision(10)<<"gps week: "<<gpstime.Week<<'\t'<<"gps sow :"<<gpstime.SOW<<'\t'<<"utc week:"<<utctime.Week<<'\t'<<"utc sow :"<<utctime.SOW<<endl;
     // cout<<setprecision(10)<<"Year: "<<caldate.Year<<'\t'<<"Month: "<<caldate.Month<<'\t'<<"Day: "<<caldate.Day<<'\t'<<"Min: "<<caldate.Min<<'\t'<<"Sec: "<<caldate.Sec<<endl;
     //cout<<setprecision(20)<<"Julian_Date: "<<Julian_Date<<endl;
