@@ -136,6 +136,7 @@ class GPS_constellation{
 		double ionosphericDelay(const ionoutc_t *ionoutc, GPS g, arma::vec3 llh, arma::vec2 azel);
 		double subGpsTime(GPS g1, GPS g0);
 		arma::mat33 ltcmat(const arma::vec3 llh);
+		arma::mat33 enu2ecef(arma::vec3 llh);
 
 		time_management *time;
 		Newton *newton;

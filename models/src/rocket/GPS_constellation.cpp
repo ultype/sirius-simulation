@@ -532,17 +532,20 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	arma::vec2 clk;
 	arma::vec3 los;
 	arma::mat33 tmat;
-	arma::mat33 TBD = kinematics->get_TBD();
+	arma::mat33 TBI = kinematics->get_TBI();
+	arma::mat33 TEI = environment->get_TEI();
 
 	if (eph.vflg != 1)
 		return (-1); // Invalid
 
 	xyz2llh(xyz,llh);
 	tmat = ltcmat(llh);
+	arma::mat33 TEENU = enu2ecef(llh);
 
 	satpos(eph, g, pos, vel, clk);
 	los = pos - xyz;
-	neu = TBD * tmat * los;
+	neu = TBI * trans(TEI) * TEENU * tmat * los;
+
 	neu2azel(azel, neu);
 	double epsilon = acos(REARTH/norm(pos));
 	double delta = acos(dot(xyz, pos)/(norm(xyz) * norm(pos)));
@@ -551,7 +554,7 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 			return (1);
 		}	
 	}else{
-		double rmin = (REARTH + 500000.0)/cos(delta - epsilon);
+		double rmin = (REARTH)/cos(delta - epsilon);
 		if(norm(xyz) > rmin){
 			if(azel(1)*DEG > elvMask){
 			return (1);
@@ -594,7 +597,8 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 	arma::vec3 llh;
 	arma::vec3 neu;
 	arma::mat33 tmat;
-	arma::mat33 TBD = kinematics->get_TBD();
+	arma::mat33 TBI = kinematics->get_TBI();
+	arma::mat33 TEI = environment->get_TEI();
 	
 	// SV position at time of the pseudorange observation.
 	satpos(eph, g, pos, vel, clk);
@@ -633,8 +637,9 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 
 	// Azimuth and elevation angles.
 	xyz2llh(xyz, llh);
+	arma::mat33 TEENU = enu2ecef(llh);
 	tmat = ltcmat(llh);
-	neu = TBD * tmat * los;
+	neu = TBI * trans(TEI) * TEENU * tmat * los;
 	// ecef2neu(los, tmat, neu);
 	neu2azel(rho->azel, neu);
 
@@ -998,8 +1003,22 @@ double GPS_constellation::subGpsTime(GPS g1, GPS g0)
 
 	return(dt);
 }
+//Build enu2ecef transform matrix
+arma::mat33 GPS_constellation::enu2ecef(arma::vec3 llh)
+{
+	arma::mat33 TEENU;
+	TEENU(0,0) = -sin(llh(0));
+	TEENU(0,1) = -cos(llh(0)) * sin(llh(1));
+	TEENU(0,2) = cos(llh(0)) * cos(llh(1));
+	TEENU(1,0) = cos(llh(0));
+	TEENU(1,1) = -sin(llh(0)) * sin(llh(1));
+	TEENU(1,2) = sin(llh(0)) * cos(llh(1));
+	TEENU(2,0) = 0.0;
+	TEENU(2,1) = cos(llh(1));
+	TEENU(2,2) = sin(llh(1));
 
-
+	return TEENU;
+}
 
 // void gps_con::codegen(int *ca, int prn)
 // {
