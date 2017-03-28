@@ -536,22 +536,24 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	arma::vec2 clk;
 	arma::vec3 los;
 	arma::mat33 tmat;
-	arma::mat33 TBI = kinematics->get_TBI();
 	arma::mat33 TEI = environment->get_TEI();
+	double phi = kinematics->get_phibdx();
+	double tht = kinematics->get_thtbdx();
+	double psi = kinematics->get_psibdx();
+	arma::mat33 TAENU = enu2atenna(phi * RAD, (tht - 20.0) * RAD, psi * RAD);
 
 	if (eph.vflg != 1)
 		return (-1); // Invalid
 
 	xyz2llh(xyz,llh);
 	tmat = ltcmat(llh);
-	arma::mat33 TEENU = enu2ecef(llh);
 
 	satpos(eph, g, pos, vel, clk);
 	los = pos - xyz;
-	neu = TBI * trans(TEI) * TEENU * tmat * los;
+	neu = TAENU * tmat  * los;
 
 	neu2azel(azel, neu);
-	double epsilon = acos(REARTH/norm(pos));
+	double epsilon = acos((REARTH)/norm(pos));
 	double delta = acos(dot(xyz, pos)/(norm(xyz) * norm(pos)));
 	if(delta < epsilon){
 		if(azel(1)*DEG > elvMask){
@@ -560,25 +562,10 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	}else{
 		double rmin = (REARTH)/cos(delta - epsilon);
 		if(norm(xyz) > rmin){
-			if(azel(1)*DEG > elvMask){
 			return (1);
-			}
 		}
 	}
-	// if (azel(1)*DEG > elvMask){
-	// 	double epsilon = acos(REARTH/norm(pos));
-	// 	double delta = acos(dot(xyz, pos)/(norm(xyz) * norm(pos)));
-	// 	if(delta < epsilon){
-	// 		return (1);
-	// 	}else{
-	// 		double rmin = (REARTH + 500000.0)/cos(delta - epsilon);
-	// 		if(norm(xyz) > rmin){
-	// 			return (1);
-	// 		}
-	// 	}
-	// }
-		// return (1); // Visible
-	// else
+
 	return (0); // Invisible
 }
 
@@ -641,9 +628,9 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 
 	// Azimuth and elevation angles.
 	xyz2llh(xyz, llh);
-	arma::mat33 TEENU = enu2ecef(llh);
+	//arma::mat33 TEENU = enu2ecef(llh);
 	tmat = ltcmat(llh);
-	neu = TBI * trans(TEI) * TEENU * tmat * los;
+	neu = tmat * los;
 	// ecef2neu(los, tmat, neu);
 	neu2azel(rho->azel, neu);
 
@@ -1022,6 +1009,23 @@ arma::mat33 GPS_constellation::enu2ecef(arma::vec3 llh)
 	TEENU(2,2) = sin(llh(1));
 
 	return TEENU;
+}
+//Build ENU to Antenna T.M. 
+arma::mat33 GPS_constellation::enu2atenna(double phi, double tht, double psi)
+{
+	arma::mat33 TAENU;
+
+	TAENU(0,0) = cos(psi) * cos(tht);
+	TAENU(0,1) = sin(psi) * cos(tht);
+	TAENU(0,2) = -sin(tht);
+	TAENU(1,0) = cos(psi) * sin(tht) * sin(phi) - sin(psi) * cos(phi);
+	TAENU(1,1) = sin(psi) * sin(tht) * sin(phi) + cos(psi) * cos(phi);
+	TAENU(1,2) = cos(tht) * sin(phi);
+	TAENU(2,0) = cos(psi) * sin(tht) * cos(phi) + sin(psi) * sin(phi);
+	TAENU(2,1) = sin(psi) * sin(tht) * cos(phi) - cos(psi) * sin(phi);
+	TAENU(2,2) = cos(tht) * cos(phi);
+
+	return TAENU;
 }
 
 // void gps_con::codegen(int *ca, int prn)
