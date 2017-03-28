@@ -35,6 +35,10 @@ GPS_constellation& GPS_constellation::operator= (const GPS_constellation& other)
 void GPS_constellation::readfile(const char *fname)
 {
 	neph = readRinexNavAll(eph, &ionoutc, fname);
+	if(neph <= 0){
+		cout<<"Error : Can not find the RINEX Navigation file !!"<<endl;
+		exit(1);
+	}
 }
 
 void GPS_constellation::initialize()
