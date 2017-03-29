@@ -26,6 +26,7 @@ struct range_t
 	double d;
 	arma::vec2 azel;
 	double iono_delay;
+	arma::vec3 pos;
 };
 
 struct ephem_t
@@ -138,6 +139,7 @@ class GPS_constellation{
 		arma::mat33 ltcmat(const arma::vec3 llh);
 		arma::mat33 enu2ecef(arma::vec3 llh);
 		arma::mat33 enu2atenna(double phi, double tht, double psi);
+		void GDOP(channel_t *chan, arma::vec3 xyz);
 
 		time_management *time;
 		Newton *newton;
@@ -153,6 +155,8 @@ class GPS_constellation{
 		ephem_t eph[EPHEM_ARRAY_SIZE][MAX_SAT];	
 
 		int allocatedSat[MAX_SAT]; /* *o (--)						*/
+
+		double gdop; /* *io  (--)  Geometric Dilution of Precsision */
 
 		// arma::vec azel;
 		// double _azel[2];

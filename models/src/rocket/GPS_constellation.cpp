@@ -78,7 +78,12 @@ void GPS_constellation::compute()
 	range_t rho;
 	arma::vec3 SBEE = newton->get_SBEE();
 	nsat = allocateChannel(chan, eph[ieph], ionoutc, time->gpstime, SBEE, 10.0);
-                for(int i = 0;i<MAX_CHAN;i++){
+	//Check number of Satellite if smaller than 4  stop calculate gdop
+	if(nsat < 4){
+		return;
+	}
+
+    for(int i = 0;i<MAX_CHAN;i++){
                     if(chan[i].prn>0){
                         sv = chan[i].prn-1;
                         computeRange(&rho, eph[ieph][sv], &ionoutc, time->gpstime, SBEE);
@@ -86,12 +91,43 @@ void GPS_constellation::compute()
                         chan[i].azel(0)=rho.azel(0);
                         chan[i].azel(1)=rho.azel(1);
                     }
-                }
+    }
+    GDOP(chan, SBEE);
+}
+
+void GPS_constellation::GDOP(channel_t *chan, arma::vec3 xyz)
+{
+	//Check number of Satellite if smaller than 4  stop calculate gdop
+	if(nsat < 4){
+		return;
+	}
+
+	arma::mat H(nsat, 4, arma::fill::ones);
+	int ii(0);
+	// for(int i = 0;i < nsat;i++){	
+	// 		H(i,3) = 1.0;
+	// }
+	// arma::mat tmp(nsat, 3);
+	arma::vec3 tmpvec;
+	//make H matrix
+	for(int i = 0;i < MAX_CHAN;i++){
+		if(chan[i].prn > 0){
+			tmpvec = xyz - chan[i].rho0.pos;
+			double normtmpvec = norm(tmpvec);
+			H(ii,0) = tmpvec(0)/normtmpvec;
+			H(ii,1) = tmpvec(1)/normtmpvec;
+			H(ii,2) = tmpvec(2)/normtmpvec;
+			ii++;
+		}
+	}
+	arma::mat dm(4,4);
+	dm = inv(trans(H) * H);
+	gdop = sqrt(trace(dm));
 }
 
 void GPS_constellation::show()
 {
-	cout<<"Lock number ="<<nsat<<'\t'<<"GPS SOW ="<<time->gpstime.SOW<<endl;
+	cout<<"Lock number ="<<nsat<<'\t'<<"GPS SOW ="<<time->gpstime.SOW<<'\t'<<"GDOP = "<<gdop<<endl;
                 cout<<"/*****************************************************************************/"<<endl;
                 for(int i = 0;i<MAX_CHAN;i++){
                     if(chan[i].prn>0){
@@ -540,7 +576,7 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	double phi = kinematics->get_phibdx();
 	double tht = kinematics->get_thtbdx();
 	double psi = kinematics->get_psibdx();
-	arma::mat33 TAENU = enu2atenna(phi * RAD, (tht - 20.0) * RAD, psi * RAD);
+	arma::mat33 TAENU = enu2atenna(phi * RAD, (tht - 20) * RAD, psi * RAD);
 
 	if (eph.vflg != 1)
 		return (-1); // Invalid
@@ -613,7 +649,8 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 	los =  pos - xyz;
 	range = norm(los);
 	rho->d = range;
-
+	//Save the Sv's pos vector
+	rho->pos = pos;
 	// Pseudorange.
 	rho->range = range - SPEED_OF_LIGHT*clk(0);
 
