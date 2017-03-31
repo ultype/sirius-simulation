@@ -3,7 +3,7 @@
 
 /********************************* TRICK HEADER *******************************
 PURPOSE:
-      (Describe the newton Module Variables and Algorithm)
+      (Describe the GPS Receiver model)
 LIBRARY DEPENDENCY:
       ((../src/rocket/GPS_constellation.cpp))
 PROGRAMMERS:
@@ -101,6 +101,7 @@ struct channel_t
 class GPS_constellation{
 	
 	TRICK_INTERFACE(GPS_constellation);
+	friend class GPS;
 	public:
 		
 		GPS_constellation(time_management &time_ma, Newton &newt, Environment &env, Kinematics &kine);
@@ -111,6 +112,7 @@ class GPS_constellation{
 		void initialize();
 		void compute();
 		void show();
+		channel_t* get_channel();
 
 		template<class Archive>
 	    void serialize(Archive & ar, const unsigned int version){

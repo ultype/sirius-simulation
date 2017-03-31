@@ -1065,6 +1065,11 @@ arma::mat33 GPS_constellation::enu2atenna(double phi, double tht, double psi)
 	return TAENU;
 }
 
+channel_t *GPS_constellation::get_channel()
+{
+	return this->chan;
+}
+
 // void gps_con::codegen(int *ca, int prn)
 // {
 // 	int delay[] = {

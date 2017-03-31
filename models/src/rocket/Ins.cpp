@@ -161,8 +161,12 @@ INS& INS::operator=(const INS& other){
 arma::mat INS::build_WEII(){
     arma::mat33 WEII;
     WEII.zeros();
-    WEII(0, 1) = -WEII3;
-    WEII(1, 0) =  WEII3;
+    WEII(0,2) = WEII2;
+    WEII(2,0) = -WEII2;
+    WEII(0,1) = -WEII3;
+    WEII(1,0) =  WEII3;
+    WEII(1,2) = -WEII1;
+    WEII(2,1) = WEII1;
     return WEII;
 }
 
