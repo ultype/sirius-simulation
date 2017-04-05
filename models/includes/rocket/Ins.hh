@@ -13,6 +13,7 @@ LIBRARY DEPENDENCY:
 #include "Environment.hh"
 #include "Kinematics.hh"
 #include "GPS_receiver.hh"
+#include "Time_management.hh"
 
 #include "sensor/gyro/gyro.hh"
 #include "sensor/gyro/gyro_ideal.hh"
@@ -27,6 +28,7 @@ class Newton;
 class Kinematics;
 class _Euler_;
 class Environment;
+class time_management;
 
 class INS {
     TRICK_INTERFACE(INS);
@@ -40,8 +42,11 @@ class INS {
             ar & _RICI;
             ar & _RICID;
             ar & _TBIC;
+            ar & _TEIC;
             ar & _SBIIC;
             ar & _VBIIC;
+            ar & _SBEEC;
+            ar & _VBEEC;
             ar & _WBICI;
             ar & _EGRAVI;
             ar & loncx;
@@ -62,7 +67,7 @@ class INS {
             ar & psibdcx;
         }
 
-        INS();
+        INS(time_management &tim);
         INS(const INS& other);
 
         INS& operator=(const INS& other);
@@ -104,8 +109,13 @@ class INS {
         arma::vec3 get_WBICI();
         arma::vec3 get_EGRAVI();
         arma::mat33 get_TBIC();
+        arma::vec3 get_SBEEC();
+        arma::vec3 get_VBEEC();
+        arma::mat33 get_TEIC();
 
     private:
+
+        time_management *time;
         /* Internal Getter */
         arma::mat build_WEII();
 
@@ -120,6 +130,7 @@ class INS {
         arma::vec3 calculate_INS_derived_bodyrate(arma::mat33 TBIC, arma::vec3 WBICB);
 
         arma::mat33 calculate_INS_derived_TBI(arma::mat33 TBI);
+        arma::mat33 calculate_INS_derived_TEI();
         arma::vec3 calculate_gravity_error(double dbi);
         double calculate_INS_derived_dvbe();
 
@@ -133,6 +144,8 @@ class INS {
         double calculate_INS_derived_thtvd(arma::vec3 VBECD);
 
         double calculate_INS_derived_euler_angles(arma::mat33 TBD);
+
+
 
         /* Internal Calculators */
 
@@ -162,14 +175,20 @@ class INS {
         double   _RICID[3];    /* *o  (r)     INS tilt error derivative */
 
         /* Generating Outputs */
-        arma::mat TBIC;        /* *o  (--)    Computed T.M. of body wrt earth coordinate */
-        double _TBIC[3][3];    /* *o  (--)    Computed T.M. of body wrt earth coordinate */
+        arma::mat TBIC;        /* *o  (--)    Computed T.M. of body wrt inertia coordinate */
+        double _TBIC[3][3];    /* *o  (--)    Computed T.M. of body wrt inertia coordinate */
 
-        arma::vec SBIIC;       /* *o  (m)     Computed pos of body wrt earth reference point*/
-        double   _SBIIC[3];    /* *o  (m)     Computed pos of body wrt earth reference point*/
+        arma::vec SBIIC;       /* *o  (m)     Computed pos of body wrt inertia reference point*/
+        double   _SBIIC[3];    /* *o  (m)     Computed pos of body wrt inertia reference point*/
 
-        arma::vec VBIIC;       /* *o  (m/s)   Computed body vel in earth coor */
-        double   _VBIIC[3];    /* *o  (m/s)   Computed body vel in earth coor */
+        arma::vec VBIIC;       /* *o  (m/s)   Computed body vel in inertia coor */
+        double   _VBIIC[3];    /* *o  (m/s)   Computed body vel in inertia coor */
+
+        arma::vec SBEEC;       /* *o   (m)    Computed body position in ECEF */
+        double _SBEEC[3];      /* *o   (m)    Computed body position in ECEF */
+
+        arma::vec VBEEC;       /* *o   (m)    Computed body velocity in ECEF */
+        double _VBEEC[3];      /* *o   (m)    Computed body velocity in ECEF */
 
         arma::vec WBICI;       /* *o  (r/s)   Computed inertial body rate in inert coordinate */
         double   _WBICI[3];    /* *o  (r/s)   Computed inertial body rate in inert coordinate */
@@ -186,6 +205,9 @@ class INS {
 
         arma::mat TDCI;        /* *o  (--)    Comp T.M. of geodetic wrt inertial */
         double   _TDCI[3][3];  /* *o  (--)    Comp T.M. of geodetic wrt inertial */
+
+        arma::mat TEIC;         /* *o  (--)   T.M. of inertia to ECEF */
+        double _TEIC[3][3];     /* *o  (--)   T.M. of inertia to ECEF */
 
         double dbic;        /* *io  (m)     INS computed vehicle distance from Earth center */
         double dvbec;       /* *io  (m/s)   Computed body speed wrt earth */

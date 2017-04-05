@@ -8,8 +8,7 @@ LIBRARY DEPENDENCIES:
 
 #include "sim_objects/default_trick_sys.sm"
 ##include "rocket/Earth.hh"
-##include "rocket/GPS_satellites.hh"
-##include "rocket/GPS_receiver.hh"
+##include "rocket/GPS.hh"
 ##include "rocket/Newton.hh"
 ##include "rocket/Euler.hh"
 ##include "rocket/Ins.hh"
@@ -53,20 +52,19 @@ LIBRARY DEPENDENCIES:
 
 ##include "aux/transceiver.hh"
 
-class GPS_SAT_SimObject : public Trick::SimObject {
-    public:
-        GPS_Satellites sats;
+// class GPS_SAT_SimObject : public Trick::SimObject {
+//     public:
+//         GPS_Satellites sats;
 
-        GPS_SAT_SimObject() {
-            ("default_data") sats.default_data();
-            ("initialization") sats.initialize();
-            (0.001, "scheduled") sats.propagate_sv();
-        }
-};
+//         GPS_SAT_SimObject() {
+//             ("default_data") sats.default_data();
+//             ("initialization") sats.initialize();
+//             (0.001, "scheduled") sats.propagate_sv();
+//         }
+// };
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
-        GPS_Satellites* gps_sats;
 
         Environment env;
         Newton newton;
@@ -78,7 +76,7 @@ class Rocket_SimObject : public Trick::SimObject {
         AeroDynamics aerodynamics;
         Propulsion propulsion;
 
-        GPS_Receiver gpsr;
+        GPS_FSW gps;
         sensor::Gyro *gyro;
         sensor::Accelerometer *accelerometer;
 
@@ -92,7 +90,6 @@ class Rocket_SimObject : public Trick::SimObject {
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
-                gpsr        ( newton     , euler        , *gps_sats )        ,
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
@@ -100,7 +97,8 @@ class Rocket_SimObject : public Trick::SimObject {
                 rcs         ( propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        (),
-                gps_con     ( time       , newton       , env          , kinematics)
+                gps_con     ( time       , newton       , env          , kinematics),
+                gps         (time        , gps_con      , newton       , euler)
             {
 
             ("initialization") kinematics.initialize();
@@ -108,7 +106,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") env.initialize();
             ("initialization") aerodynamics.initialize();
             ("initialization") euler.initialize();
-            ("initialization") gpsr.initialize(0.001);
+            ("initialization") gps.initialize(0.001);
             ("initialization") tvc.initialize();
             ("initialization") rcs.initialize();
             ("initialization") propulsion.initialize();
@@ -122,8 +120,8 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.001, "scheduled") propulsion.propagate(0.001);
             P1 (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
             //P1 (0.1, "scheduled") gpsr.get_quadriga();
-            //P1 (0.1, "scheduled") gpsr.filter_extrapolation(0.1);
-            //P1 (0.1, "scheduled") gpsr.measure();
+           // P1 (0.1, "scheduled") gps.filter_extrapolation(0.1);
+           // P1 (0.1, "scheduled") gps.measure(0.1);
             P1 (0.001, "scheduled") gps_con.compute();
             P1 (0.05, "scheduled") gyro->propagate_error(0.05);
             P1 (0.05, "scheduled") accelerometer->propagate_error(0.05);
@@ -144,7 +142,6 @@ class Rocket_SimObject : public Trick::SimObject {
         }
 };
 
-GPS_SAT_SimObject gps_sats;
 Rocket_SimObject rkt;
 
 class FlightComputer_SimObject : public Trick::SimObject {
@@ -195,10 +192,10 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ins.grab_VBII       = LINK(rkt->newton     , get_VBII);
             ins.grab_dbi        = LINK(rkt->newton     , get_dbi);
             ins.grab_TBI        = LINK(rkt->kinematics , get_TBI);
-            ins.grab_SXH        = LINK(rkt->gpsr       , get_SXH);
-            ins.grab_VXH        = LINK(rkt->gpsr       , get_VXH);
-            ins.grab_gps_update = LINK(rkt->gpsr       , get_gps_update);
-            ins.clear_gps_flag  = LINK(rkt->gpsr       , clear_gps_flag);
+            ins.grab_SXH        = LINK(rkt->gps       , get_SXH);
+            ins.grab_VXH        = LINK(rkt->gps       , get_VXH);
+            ins.grab_gps_update = LINK(rkt->gps       , get_gps_update);
+            ins.clear_gps_flag  = LINK(rkt->gps       , clear_gps_flag);
 
 
             guidance.grab_mprop  = LINK(rkt->propulsion, get_mprop);
@@ -244,12 +241,16 @@ class FlightComputer_SimObject : public Trick::SimObject {
             rkt->rcs.grab_e_yaw   = LINK(rcs_fc, get_e_yaw);
 
 
-            rkt->gpsr.grab_SBIIC = LINK(ins, get_SBIIC);
-            rkt->gpsr.grab_VBIIC = LINK(ins, get_VBIIC);
-            rkt->gpsr.grab_WBICI = LINK(ins, get_WBICI);
+            rkt->gps.grab_SBIIC = LINK(ins, get_SBIIC);
+            rkt->gps.grab_VBIIC = LINK(ins, get_VBIIC);
+            rkt->gps.grab_WBICI = LINK(ins, get_WBICI);
+            rkt->gps.grab_SBEEC = LINK(ins, get_SBEEC);
+            rkt->gps.grab_VBEEC = LINK(ins, get_VBEEC);
+            rkt->gps.grab_TEIC = LINK(ins, get_TEIC);
         };
-
-        FlightComputer_SimObject(){
+        FlightComputer_SimObject()
+        :   ins         (rkt->time )
+        {
             ("default_data") guidance.default_data();
 
             ("initialization") guidance.initialize();
@@ -269,8 +270,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
 FlightComputer_SimObject fc;
 
 void create_connections() {
-    rkt.gps_sats = &gps_sats.sats;
-
+    // rkt.gps_sats = &gps_sats.sats;
     fc.rkt = &rkt;
 }
 

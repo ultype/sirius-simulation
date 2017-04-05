@@ -27,6 +27,7 @@ struct range_t
 	arma::vec2 azel;
 	double iono_delay;
 	arma::vec3 pos;
+	arma::vec3 vel;
 };
 
 struct ephem_t
@@ -101,7 +102,7 @@ struct channel_t
 class GPS_constellation{
 	
 	TRICK_INTERFACE(GPS_constellation);
-	friend class GPS;
+	friend class GPS_FSW;
 	public:
 		
 		GPS_constellation(time_management &time_ma, Newton &newt, Environment &env, Kinematics &kine);

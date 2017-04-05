@@ -651,6 +651,8 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 	rho->d = range;
 	//Save the Sv's pos vector
 	rho->pos = pos;
+	//Save the Sv's vel vector
+	rho->vel = vel;
 	// Pseudorange.
 	rho->range = range - SPEED_OF_LIGHT*clk(0);
 
