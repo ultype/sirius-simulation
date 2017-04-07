@@ -639,7 +639,7 @@ void GPS_Receiver::measure(){
         RR(i + 4, i + 4) = pow(rvel * (1 + factr), 2);
     }
     // Kalman gain
-    KK = arma::inv(PP * arma::trans(HH) * (HH * PP * arma::trans(HH) + RR));
+    KK = inv(PP * trans(HH) * (HH * PP * trans(HH) + RR));
     // state correction
     XH = KK * ZZ;
     // covariance correction for next cycle

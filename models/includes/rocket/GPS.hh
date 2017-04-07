@@ -16,7 +16,7 @@ class GPS_FSW{
 
 	TRICK_INTERFACE(GPS_FSW);
     public:
-    	GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &newt, _Euler_ &eul);
+    	GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &newt, _Euler_ &eul, Environment &env);
     	GPS_FSW(const GPS_FSW &other);
     	GPS_FSW & operator= (const GPS_FSW &other);
 
@@ -78,13 +78,13 @@ class GPS_FSW{
         double rpos;            /* *i (m)       1sig pos value of meas cov matrix */
         double rvel;            /* *i (m/s)     1sig vel value of meas cov matrix */
         double factr;           /* *i (--)      Factor to modifiy the R-matrix R(1+factr) */
-        
+
     private:
         time_management * time;
     	GPS_constellation * gps_con;
     	Newton *newton;
     	_Euler_ *euler;
-
+    	Environment *environment;
 
         
 

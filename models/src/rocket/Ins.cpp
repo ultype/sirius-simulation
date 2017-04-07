@@ -186,6 +186,16 @@ void INS::default_data(){
 }
 
 void INS::initialize(){
+    arma::vec3 SBII  = grab_SBII();
+    arma::vec3 VBII  = grab_VBII();
+
+    SBIIC = SBII;
+    VBIIC = VBII;
+
+    TEIC = calculate_INS_derived_TEI();
+
+    SBEEC = TEIC * SBIIC;
+    VBEEC = TEIC * VBIIC - WEII * SBEEC;
 }
 
 void INS::set_ideal(){
@@ -566,7 +576,7 @@ void INS::update(double int_step){
     // calculating position error
     INTEGRATE_MAT(ESBI, EVBI);
 
-    GPS_update();
+    // GPS_update();
 
     this->SBIIC = calculate_INS_derived_postion(SBII);
     this->VBIIC = calculate_INS_derived_velocity(VBII);
@@ -577,7 +587,7 @@ void INS::update(double int_step){
     //ins_vel_err  = norm(EVBI);
     //ins_tilt_err = norm(RICI);
 
-    arma::mat33 TEIC = calculate_INS_derived_TEI();
+    TEIC = calculate_INS_derived_TEI();
 
     SBEEC = TEIC * SBIIC;
     VBEEC = TEIC * VBIIC - WEII * SBEEC;

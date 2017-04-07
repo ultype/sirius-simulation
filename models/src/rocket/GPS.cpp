@@ -16,11 +16,12 @@
 #include "rocket/Euler.hh"
 #include "rocket/Ins.hh"
 #include "rocket/GPS.hh"
-GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &newt, _Euler_ &eul)
+GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &newt, _Euler_ &eul, Environment &env)
 :   time(&time_ma),
     gps_con(&gps_cons),
     newton(&newt),
     euler(&eul),
+    environment(&env),
     MATRIX_INIT(PP, 8, 8),
     MATRIX_INIT(FF, 8, 8),
     MATRIX_INIT(PHI, 8, 8),
@@ -34,6 +35,7 @@ GPS_FSW::GPS_FSW(const GPS_FSW &other)
     gps_con(other.gps_con),
     newton(other.newton),
     euler(other.euler),
+    environment(other.environment),
     MATRIX_INIT(PP, 8, 8),
     MATRIX_INIT(FF, 8, 8),
     MATRIX_INIT(PHI, 8, 8),
@@ -160,6 +162,7 @@ void GPS_FSW::measure(double int_step){
     // arma::vec4 pesudo_range_rate(arma::fill::zeros);
     arma::vec4 channel_id(arma::fill::zeros);
     arma::mat33 TEIC = grab_TEIC();
+    arma::mat33 TEI = environment->get_TEI();
     int ii(0);
   // Pseudo-range and range-rate measurements
     for(int i = 0; i < MAX_CHAN; i++){
@@ -179,7 +182,7 @@ void GPS_FSW::measure(double int_step){
 
     arma::vec3 SBII = newton->get_SBII();
     arma::vec3 VBII = newton->get_VBII();
-    arma::vec3 WBII = euler->get_WBII();
+    arma::vec3 WEII = euler->get_WEII();
 
     arma::vec3 SBIIC = grab_SBIIC();
     arma::vec3 VBIIC = grab_VBIIC();
@@ -192,56 +195,53 @@ void GPS_FSW::measure(double int_step){
         // unpacking i-th SV information
         int id(channel_id(i));
 
-        // // calculating true range to SV
-        // arma::vec3 SSBI;
 
-        // SSBI = SSII - SBII;
-        // double dsb = norm(SSBI);
-        double dsb = gps_con->chan[id].rho0.range;
-        // measured pseudo-range
-        double dsb_meas = dsb + PR_BIAS[i] + PR_NOISE[i] + ucbias_error;
+        // double dsb = gps_con->chan[id].rho0.range;
+        // // measured pseudo-range
+        // double dsb_meas = dsb ;//+ PR_BIAS[i] + PR_NOISE[i];// + ucbias_error;
 
-        // unpacking i-th SV inertial velocity
-        // arma::vec3 VSII;
-        // for (int j = 0; j < 3; j++) {
-        //     VSII[j] = *(vsii_quad + 3 * i + j);
-        // }
-        // // velocity of SV wrt user
-        // arma::vec3 VSBI;
-        // VSBI = VSII - VBII - skew_sym(WBII) * SSBI;
-
-        // // calculating true range-rate to SV
-        // arma::vec3 USSBI;
-        // USSBI = SSBI * (1 / dsb);
-        // double dvsb = dot(VSBI, USSBI);
-        double dvsb = gps_con->chan[id].rho0.rate;
-        // measured delta-range rate
-        double dvsb_meas = dvsb + DR_NOISE[i] + ucfreq_error;
+     
+        // double dvsb = gps_con->chan[id].rho0.rate;
+        // // measured delta-range rate
+        // double dvsb_meas = dvsb ;//+ DR_NOISE[i] ;//+ ucfreq_error;
 
         
 
-        // INS derived range measurements
+        // // INS derived range measurements
+        // arma::vec3 SSBIC;
+        // // SSBIC = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC)- SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+        // SSBIC = (gps_con->chan[id].rho0.pos - SBEEC);
+        // double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+
+        // arma::vec3 USSBI;
+        // USSBI = SSBIC/norm(SSBIC);
+
+        // // double dvsbc = dot(trans(TEIC) * (gps_con->chan[i].rho0.vel + cross(WEII, gps_con->chan[id].rho0.pos)), (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC))/dsbc;
+        // double dvsbc = dot(gps_con->chan[i].rho0.vel , SSBIC)/dsbc;
+        
+        // Pesudo-range on ECI/////////////////////////////////////////////////////////////////////////
+        // arma::vec3 SSBI;
+        // SSBI = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC);
+
         arma::vec3 SSBIC;
-        SSBIC = trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC;
-        double dsbc = norm(SSBIC);
+        SSBIC = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC);
+
+        double dsb_meas = gps_con->chan[id].rho0.range;//norm(SSBI) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+
+        arma::vec3 velECI;
+        velECI = trans(TEIC) * (gps_con->chan[id].rho0.vel + cross(WEII, gps_con->chan[id].rho0.pos));
+
+        double dvsb_meas = dot(velECI, SSBIC)/dsb_meas;
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+
+        double dvsbc = dot(velECI, SSBIC)/dsbc;
 
         arma::vec3 USSBI;
-        USSBI = SSBIC/dsbc;
-        // // INS derived range-rate measurements
+        USSBI = SSBIC/norm(SSBIC);
 
-        double dvsbc = dot(gps_con->chan[i].rho0.vel, SSBIC)/dsbc;
 
-        // // velocity of SV wrt user
-        // arma::vec3 VSBIC;
-        // VSBIC = VSII - VBIIC - skew_sym(WBICI) * SSBIC;
-        // // calculating range-rate to SV
-        // arma::vec3 USSBIC;
-        // USSBIC = SSBIC * (1 / dsb);
-        // double dvsbc = dot(VSBIC, USSBIC);
-
-        // loading measurement residuals into measurement vector
-        // ZZ[0->3] range meas resid of SV's;
-        // ZZ[4->7] range-rate meas resid of SV's
         ZZ[i] = dsb_meas - dsbc;
         ZZ[i + 4] = dvsb_meas - dvsbc;
 
@@ -271,18 +271,18 @@ void GPS_FSW::measure(double int_step){
     //*** filter correction and update (to INS: 'SXH' and 'VXH') ***
     // filter gain
     arma::mat88 KK(arma::fill::zeros);
-
+    arma::mat88 E(arma::fill::eye);
     // measurement noise covariance matrix
     for (int i = 0; i < 4; i++) {
         RR(i, i) = pow(rpos * (1 + factr), 2);
         RR(i + 4, i + 4) = pow(rvel * (1 + factr), 2);
     }
     // Kalman gain
-    KK = arma::inv(PP * arma::trans(HH) * (HH * PP * arma::trans(HH) + RR));
+    KK = PP * trans(HH) * inv(HH * PP * trans(HH) + RR);
     // state correction
     XH = KK * ZZ;
     // covariance correction for next cycle
-    PP = (arma::mat88(arma::fill::eye) - KK * HH) * PP;
+    PP = (E - KK * HH) * PP;
 
     // clock error bias update
     ucbias_error = ucbias_error - XH(6, 0);

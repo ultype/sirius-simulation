@@ -277,4 +277,4 @@ speration_4.action(0, "rkt.propulsion.set_no_thrust()")
 #speration_4.action(1, "rkt.propulsion.set_vmass0(0)")
 ######################################################################################################
 
-trick.stop(880)
+trick.stop(500)

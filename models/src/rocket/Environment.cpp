@@ -206,6 +206,7 @@ Environment::~Environment() {
 
 void Environment::initialize() {
     dvba = newton->get_dvbe();
+    dm_RNP();
 }
 
 void Environment::default_data() {

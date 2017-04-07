@@ -98,7 +98,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        (),
                 gps_con     ( time       , newton       , env          , kinematics),
-                gps         (time        , gps_con      , newton       , euler)
+                gps         (time        , gps_con      , newton       , euler        , env)
             {
 
             ("initialization") kinematics.initialize();

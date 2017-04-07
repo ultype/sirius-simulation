@@ -28,6 +28,7 @@ struct range_t
 	double iono_delay;
 	arma::vec3 pos;
 	arma::vec3 vel;
+	arma::vec2 clk;
 };
 
 struct ephem_t

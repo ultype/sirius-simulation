@@ -113,14 +113,16 @@ class INS {
         arma::vec3 get_VBEEC();
         arma::mat33 get_TEIC();
 
+        /* Internal Initializers */
+        void default_data();
+
     private:
 
         time_management *time;
         /* Internal Getter */
         arma::mat build_WEII();
 
-        /* Internal Initializers */
-        void default_data();
+
 
         /* Internal Propagator / Calculators */
         bool GPS_update();
