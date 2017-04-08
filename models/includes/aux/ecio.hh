@@ -27,7 +27,7 @@ class Ecio {
         void wait_ready();
         void receive_fc_data();
 
-        std::function<double()> grab_mprop;
+        std::function<int()> grab_mprop;
         std::function<double()> grab_dvbe;
         std::function<double()> grab_gymax;
         std::function<double()> grab_dyb;
@@ -50,7 +50,7 @@ class Ecio {
         std::function<arma::mat33()> grab_TBI;
         std::function<arma::vec3()> grab_SXH;
         std::function<arma::vec3()> grab_VXH;
-        std::function<double()> grab_gps_update;
+        std::function<int()> grab_gps_update;
         std::function<double()> grab_dbi;
         std::function<double()> grab_dvbi;
         std::function<double()> grab_thtvdx;

@@ -106,7 +106,7 @@ void Ecio::prepare_ethercat_packet(){
     vec3_to_array(grab_SBII(), data.newton_SBII);
     vec3_to_array(grab_VBII(), data.newton_VBII);
     mat33_to_array(grab_TDI(), data.newton_TDI);
-    data.propulsion_thrust_state = grab_mprop();
+    data.propulsion_thrust_state = (enum Propulsion::THRUST_TYPE)grab_thrust_state();
     data.propulsion_fmassr = grab_fmassr();
     data.newton_dvbe = grab_dvbe();
     data.newton_dbi = grab_dbi();
@@ -144,54 +144,54 @@ void Ecio::receive_fc_data(){
     }
 }
 
-void ecio::vec3_to_array(arma::vec3 in, double array[3]){
-    for(int i = 0; i < 3 i++)
+void Ecio::vec3_to_array(arma::vec3 in, double array[3]){
+    for(int i = 0; i < 3; i++)
         array[i] = in(i);
 }
 
-void ecio::mat33_to_array(arma::mat33 in, double array[3][3]){
-    for(int i = 0; i < 3 i++)
-        for(jnt j = 0; j < 3 j++)
+void Ecio::mat33_to_array(arma::mat33 in, double array[3][3]){
+    for(int i = 0; i < 3; i++)
+        for(int j = 0; j < 3; j++)
             array[i][j] = in(i)(j);
 }
 
-double get_delrcx(){
+double Ecio::get_delrcx(){
     return data_in.control_delrcx;
 }
 
-double get_delecx(){
+double Ecio::get_delecx(){
     return data_in.control_delecx;
 }
 
-bool isEnabled(){
-    return (bool)data.rcs_isEnable;
+bool Ecio::isEnabled(){
+    return (bool)data_in.rcs_isEnable;
 }
 
-enum RCS_FC::RCS_MODE get_rcs_mode(){
-    return data.rcsfc_rcs_mode;
+enum RCS_FC::RCS_MODE Ecio::get_rcs_mode(){
+    return data_in.rcsfc_rcs_mode;
 }
 
-double get_e_roll(){
-    return data.rcsfc_e_roll;
+double Ecio::get_e_roll(){
+    return data_in.rcsfc_e_roll;
 }
 
-double get_e_pitch(){
-    return data.rcsfc_e_pitch;
+double Ecio::get_e_pitch(){
+    return data_in.rcsfc_e_pitch;
 }
 
-double get_e_yaw(){
-    return data.rcsfc_e_yaw;
+double Ecio::get_e_yaw(){
+    return data_in.rcsfc_e_yaw;
 }
 
-arma::vec3 get_SBIIC(){
-    return arma::vec3(data.ins_SBIIC);
+arma::vec3 Ecio::get_SBIIC(){
+    return arma::vec3(data_in.ins_SBIIC);
 }
 
-arma::vec3 get_VBIIC(){
-    return arma::vec3(data.ins_VBIIC);
+arma::vec3 Ecio::get_VBIIC(){
+    return arma::vec3(data_in.ins_VBIIC);
 }
 
-arma::vec3 get_WBICI(){
-    return arma::vec3(data.ins_WBICI);
+arma::vec3 Ecio::get_WBICI(){
+    return arma::vec3(data_in.ins_WBICI);
 }
 
