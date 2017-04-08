@@ -84,7 +84,6 @@ class Ecio {
             double kinematics_TBI[3][3];
             double newton_SBII[3];
             double newton_VBII[3];
-            double newton_TDI[3][3];
             enum Propulsion::THRUST_TYPE propulsion_thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
             double propulsion_fmassr;              /* *o (kg)     Remaining fuel mass*/
             double newton_dvbe;

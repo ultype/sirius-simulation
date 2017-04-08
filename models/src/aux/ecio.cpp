@@ -70,7 +70,7 @@ void Ecio::socket_bind_connection(){
         fprintf(stderr,"ERROR, no such host\n");
         exit(0);
     }
-    memset(&serv_addr, 0, serv_addr_len);
+    memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     bcopy((char *)server->h_addr,
             (char *)&serv_addr.sin_addr.s_addr,
@@ -105,12 +105,11 @@ void Ecio::prepare_ethercat_packet(){
     mat33_to_array(grab_TBI(), data.kinematics_TBI);
     vec3_to_array(grab_SBII(), data.newton_SBII);
     vec3_to_array(grab_VBII(), data.newton_VBII);
-    mat33_to_array(grab_TDI(), data.newton_TDI);
-    data.propulsion_thrust_state = (enum Propulsion::THRUST_TYPE)grab_thrust_state();
+    data.propulsion_thrust_state = (enum Propulsion::THRUST_TYPE)grab_mprop();
     data.propulsion_fmassr = grab_fmassr();
     data.newton_dvbe = grab_dvbe();
     data.newton_dbi = grab_dbi();
-    data.newton_dvbi = grab_dvbi;
+    data.newton_dvbi = grab_dvbi();
     data.newton_thtvdx = grab_thtvdx();
     data.gyro_qqcx = grab_qqcx();
     data.gyro_ppcx = grab_ppcx();
@@ -152,7 +151,7 @@ void Ecio::vec3_to_array(arma::vec3 in, double array[3]){
 void Ecio::mat33_to_array(arma::mat33 in, double array[3][3]){
     for(int i = 0; i < 3; i++)
         for(int j = 0; j < 3; j++)
-            array[i][j] = in(i)(j);
+            array[i][j] = in(i, j);
 }
 
 double Ecio::get_delrcx(){
