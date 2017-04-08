@@ -113,7 +113,11 @@ void Transceiver::receive(){
                     arma::mat in(mh.x, mh.y);
                     auto in_fn = [this](double& val) { tc_read(&dev, (char*)&val, sizeof(double)); };
                     in.for_each(in_fn);
-                    data_mat_in.insert(std::make_pair(name, in));
+                    if(!data_mat_in.count(name)){
+                        data_mat_in.insert(std::make_pair(name, in));
+                    }else{
+                        data_mat_in[name] = in;
+                    }
                 }
                 break;
             default:
