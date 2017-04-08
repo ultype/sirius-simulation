@@ -17,3 +17,15 @@ SIL:
         paths:
             - exe/SIL/result.csv
             - exe/SIL/test_result
+
+PIL:
+    script:
+        - cd exe/PIL/slave
+        - trick-CP
+        - cd ../master
+        - ./test.sh
+        - python ../../../tools/ci_test.py result.csv 1e-5 > test_result
+    artifacts:
+        paths:
+            - exe/PIL/master/result.csv
+            - exe/PIL/master/test_result
