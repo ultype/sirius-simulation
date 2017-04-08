@@ -76,7 +76,7 @@ void Ecio::socket_bind_connection(){
             (char *)&serv_addr.sin_addr.s_addr,
             server->h_length);
     serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(struct sockaddr *)&serv_addr, serv_addr_len) < 0)
+    if (connect(sockfd,(struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
         puts("ERROR connecting");
 }
 
