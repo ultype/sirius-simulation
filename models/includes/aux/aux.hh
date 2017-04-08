@@ -32,6 +32,9 @@ ICG: (No)
 #define EXPORT(model, func) \
         #model, #func, std::bind(&std::remove_reference<decltype(model)>::type::func, &model)
 
+#define ECIO_EXPORT(model, func) \
+        #model, #func, std::bind(&Ecio::func, &ecio)
+
 #define IMPORT(model, func) \
         #model, #func
 
