@@ -1,24 +1,7 @@
-#execfile("Modified_data/realtime.py")
-#execfile("Modified_data/rocket.dr")
-execfile("Modified_data/test.dr")
-# execfile("Modified_data/wangwang.dr")
-# trick.exec_set_enable_freeze(True)
-# trick.exec_set_freeze_command(True)
-# trick.sim_control_panel_set_enabled(True)
 ##########################################################
 new_connection = trick.MSSocket()
 trick_master_slave.slave.set_connection_type(new_connection)
 trick_master_slave.slave.sync_error_terminate = 1
-
-#############################################################
-#Realtime setting
-# trick.exec_set_thread_cpu_affinity(0,0)
-# trick.exec_set_thread_priority(0,1)
-# trick.frame_log_on()
-# trick.real_time_enable()
-# trick.exec_set_software_frame(0.01)
-# trick.itimer_enable()
-##############################################################
 
 #INS
 """
