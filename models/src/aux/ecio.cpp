@@ -41,6 +41,8 @@ Ecio::Ecio(){
         exit(-1);
     }
 
+    socket_bind_connection();
+
     //config PPS output
     gpio_config_input(PPS_GPIO);  //must set before output
     gpio_config_output(PPS_GPIO);
