@@ -1,4 +1,4 @@
-# execfile("../../../public/Modified_data/realtime.py")
+execfile("../../../public/Modified_data/realtime.py")
 # execfile("../../../public/Modified_data/realtime.dr")
 # execfile("../../../public/Modified_data/ui.py")
 execfile("../../../public/Modified_data/golden.dr")
@@ -6,10 +6,10 @@ execfile("../../../public/Modified_data/golden.dr")
 new_connection = trick.MSSocket()
 new_slave = trick.SlaveInfo()
 new_slave.set_connection_type(new_connection)
-new_slave.sim_path = "/home/sonicyang/gitRepo/sirius-simulation/exe/PIL/slave"
-new_slave.S_main_name = "./S_main_Linux_5.4_x86_64.exe"
+new_slave.sim_path = "/home/ubuntu/sirius-simulation/exe/PIL/cfs-relay"
+new_slave.S_main_name = "./S_main_Linux_5.4.exe"
 new_slave.run_input_file = "RUN_golden/golden.py"
-new_slave.machine_name = "sonicyang@10.0.0.53"
+new_slave.machine_name = "root@10.0.0.66"
 new_slave.sync_error_terminate = 1
 trick_master_slave.master.add_slave(new_slave)
 trick_master_slave.master.enable()
@@ -177,6 +177,7 @@ start = trick.new_event("start")
 start.set_cycle(0.001)
 start.condition(0,"trick.exec_get_sim_time() == 180.001")
 start.action(0,"rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
+start.action(1,"print 'start'")
 trick.add_event(start)
 start.activate()
 #Event1:Stage 2 ignition
