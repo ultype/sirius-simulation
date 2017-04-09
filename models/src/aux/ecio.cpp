@@ -121,6 +121,7 @@ void Ecio::prepare_ethercat_packet(){
 void Ecio::send_pps(){
     //PPS pulse
     gpio_set(PPS_GPIO);
+    usleep(50);
     gpio_clr(PPS_GPIO);
 }
 
