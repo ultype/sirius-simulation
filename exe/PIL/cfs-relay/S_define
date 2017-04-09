@@ -71,7 +71,7 @@ class Relay_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(ECIO_EXPORT(ins, get_WBICI));
 
             /* XXX */
-            transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->ecio.get_clear_gps(); });
+            transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->ecio.get_clear_gps_flag(); });
             transceiver.register_for_transmit("guidance", "no_thrust", [this](){ return this->ecio.get_no_thrust_flag(); });
             transceiver.register_for_transmit("guidance", "ltg_thrust", [this](){ return this->ecio.get_ltg_thrust_flag(); });
         };
