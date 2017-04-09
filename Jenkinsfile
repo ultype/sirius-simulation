@@ -1,0 +1,40 @@
+node {
+
+    def workspace = pwd()
+
+    stage('Checkout Source Code') {
+        checkout scm
+    }
+
+    stage ('Test Single Node') {
+        sh '''
+            cd exe/single-node
+            ./test.sh
+            python ../../tools/ci_test.py result.csv 1e-5 > test_result
+        '''
+         archiveArtifacts artifacts: 'exe/single-node/result.csv, exe/single-node/test_result',
+                 fingerprint: true
+    }
+
+    stage ('Test SIL') {
+        sh '''
+            cd exe/SIL
+            ./test.sh
+            python ../../tools/ci_test.py result.csv 1e-5 > test_result
+        '''
+         archiveArtifacts artifacts: 'exe/SIL/result.csv, exe/SIL/test_result',
+                 fingerprint: true
+    }
+
+    stage ('Test PIL') {
+        sh '''
+            cd exe/PIL/slave
+            trick-CP
+            cd ../master
+            ./test.sh
+            python ../../../tools/ci_test.py result.csv 1e-5 > test_result
+        '''
+         archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
+                 fingerprint: true
+    }
+}
