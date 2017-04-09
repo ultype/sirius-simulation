@@ -194,3 +194,14 @@ arma::vec3 Ecio::get_WBICI(){
     return arma::vec3(data_in.ins_WBICI);
 }
 
+int Ecio::get_clear_gps_flag(){
+    return data_in.gpsr_flag_for_clear_flag;
+}
+
+int Ecio::get_no_thrust_flag(){
+    return data_in.propulsion_flag_for_set_no_thrust;
+}
+
+int Ecio::get_ltg_thrust_flag(){
+    return data_in.propulsion_flag_for_set_ltg_thrust;
+}

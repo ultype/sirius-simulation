@@ -55,18 +55,8 @@ LIBRARY DEPENDENCIES:
 
 class Relay_SimObject : public Trick::SimObject {
     public:
-        double ltg_thrust, no_thrust, clear_gps;
-
-        INS ins;
-
-        Control control;
-        Guidance guidance;
-
-        RCS_FC rcs_fc;
-
         Transceiver transceiver;
         Ecio ecio;
-
 
         void setup_export(){
             transceiver.register_for_transmit(ECIO_EXPORT(control, get_delrcx));
@@ -81,9 +71,9 @@ class Relay_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(ECIO_EXPORT(ins, get_WBICI));
 
             /* XXX */
-            transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });
-            transceiver.register_for_transmit("guidance", "no_thrust", [this](){ return this->no_thrust; });
-            transceiver.register_for_transmit("guidance", "ltg_thrust", [this](){ return this->ltg_thrust; });
+            transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->ecio.get_clear_gps(); });
+            transceiver.register_for_transmit("guidance", "no_thrust", [this](){ return this->ecio.get_no_thrust_flag(); });
+            transceiver.register_for_transmit("guidance", "ltg_thrust", [this](){ return this->ecio.get_ltg_thrust_flag(); });
         };
 
         void link(){
@@ -119,30 +109,15 @@ class Relay_SimObject : public Trick::SimObject {
             ecio.grab_qqcx                   = transceiver(IMPORT(*gyro          , get_qqcx));
             ecio.grab_ppcx                   = transceiver(IMPORT(*gyro          , get_ppcx));
             ecio.grab_rrcx                   = transceiver(IMPORT(*gyro          , get_rrcx));
-
-            /* XXX */
-            ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
-            guidance.set_no_thrust  = [this](){ this->no_thrust = 1; };
-            guidance.set_ltg_thrust = [this](){ this->ltg_thrust = 1; };
         };
 
-        void clear_flag(){
-            this->clear_gps = 0;
-            this->no_thrust = 0;
-            this->ltg_thrust = 0;
-        }
-
         Relay_SimObject(){
-
-            ("default_data") clear_flag();
 
             ("initialization") transceiver.initialize_connection("RELAY");
             ("initialization") setup_export();
             ("initialization") link();
 
-
             P2 (0.05, "scheduled") transceiver.receive();
-            P2 (0.05, "scheduled") clear_flag();
             
             P2 (0.05, "scheduled") ecio.prepare_ethercat_packet();
             P2 (0.05, "scheduled") ecio.send_pps();

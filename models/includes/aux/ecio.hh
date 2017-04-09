@@ -70,6 +70,10 @@ class Ecio {
         arma::vec3 get_VBIIC();
         arma::vec3 get_WBICI();
 
+        int get_clear_gps_flag();
+        int get_no_thrust_flag();
+        int get_ltg_thrust_flag();
+
     private:
         typedef struct {
             double accel_FSPCB[3];
@@ -79,12 +83,16 @@ class Ecio {
             double gyro_WBICB[3];
             double gyro_EWBIB[3];
             int gpsr_gps_update;
+            int gpsr_flag_for_clear_flag;
             double gpsr_SXH[3];
             double gpsr_VXH[3];
             double kinematics_TBI[3][3];
             double newton_SBII[3];
             double newton_VBII[3];
-            enum Propulsion::THRUST_TYPE propulsion_thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
+            double newton_TDI[3][3];
+            int propulsion_thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
+            int propulsion_flag_for_set_no_thrust;
+            int propulsion_flag_for_set_ltg_thrust;
             double propulsion_fmassr;              /* *o (kg)     Remaining fuel mass*/
             double newton_dvbe;
             double newton_dbi;
@@ -97,7 +105,7 @@ class Ecio {
             double control_delrcx;
             double control_delecx;
             int rcs_isEnable;
-            enum RCS_FC::RCS_MODE rcsfc_rcs_mode;  /* *o  (--)   Attitude control, see RCS_MODE */
+            int rcsfc_rcs_mode;  /* *o  (--)   Attitude control, see RCS_MODE */
             double  rcsfc_e_roll;          /* *o  (--)   Roll error signal */
             double  rcsfc_e_pitch;         /* *o  (--)   Pitch error signal */
             double  rcsfc_e_yaw;           /* *o  (--)   Yaw error signal */
