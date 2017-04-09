@@ -52,6 +52,7 @@ Ecio::Ecio(){
     //set to input mode with pulldown
     bcm2835_gpio_fsel(SYNC_GPIO,BCM2835_GPIO_FSEL_INPT);
     bcm2835_gpio_set_pud(SYNC_GPIO, BCM2835_GPIO_PUD_DOWN);
+    bcm2835_gpio_set_eds(SYNC_GPIO);
 }
 
 Ecio::~Ecio(){
@@ -67,7 +68,7 @@ void Ecio::socket_bind_connection(){
     portno = LOCAL_PORT;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)  puts("ERROR opening socket");
-    server = gethostbyname("192.168.1.1");
+    server = gethostbyname("10.0.0.168");
     if (server == NULL) {
         fprintf(stderr,"ERROR, no such host\n");
         exit(0);
@@ -123,7 +124,7 @@ void Ecio::prepare_ethercat_packet(){
 void Ecio::send_pps(){
     //PPS pulse
     gpio_set(PPS_GPIO);
-    usleep(50);
+    usleep(10000);
     gpio_clr(PPS_GPIO);
 }
 
@@ -140,10 +141,12 @@ void Ecio::receive_fc_data(){
     int total = 0;
     uint8_t *buffer = (uint8_t *)&data_in;
 
+
     while( total != sizeof(net_data_t) && (read_size = recv(sockfd , buffer, sizeof(net_data_t), 0)) > 0 ){
         buffer += read_size;
         total += read_size;
     }
+
 }
 
 void Ecio::vec3_to_array(arma::vec3 in, double array[3]){

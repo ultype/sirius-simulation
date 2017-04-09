@@ -116,12 +116,13 @@ class Relay_SimObject : public Trick::SimObject {
             ("initialization") transceiver.initialize_connection("RELAY");
             ("initialization") setup_export();
             ("initialization") link();
+            ("initialization") ecio.send_pps();
 
             P2 (0.05, "scheduled") transceiver.receive();
             
-            P2 (0.05, "scheduled") ecio.prepare_ethercat_packet();
             P2 (0.05, "scheduled") ecio.send_pps();
-            P2 (0.05, "scheduled") ecio.wait_ready();
+            P2 (0.05, "scheduled") ecio.prepare_ethercat_packet();
+            //P2 (0.05, "scheduled") ecio.wait_ready();
             P2 (0.05, "scheduled") ecio.receive_fc_data();
 
             P2 (0.05, "scheduled") transceiver.transmit();
