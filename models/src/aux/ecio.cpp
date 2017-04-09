@@ -168,7 +168,7 @@ bool Ecio::isEnabled(){
 }
 
 enum RCS_FC::RCS_MODE Ecio::get_rcs_mode(){
-    return data_in.rcsfc_rcs_mode;
+    return (enum RCS_FC::RCS_MODE)data_in.rcsfc_rcs_mode;
 }
 
 double Ecio::get_e_roll(){
