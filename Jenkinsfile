@@ -5,7 +5,7 @@ builds['single-node'] = {
     node{
         def workspace = pwd()
 
-        stage('Checkout Source Code') {
+        stage('Single-Node Checkout Source Code') {
             checkout scm
         }
 
@@ -25,7 +25,7 @@ builds['SIL'] = {
     node{
         def workspace = pwd()
 
-        stage('Checkout Source Code') {
+        stage('SIL Checkout Source Code') {
             checkout scm
         }
 
@@ -45,7 +45,7 @@ builds['PIL'] = {
     node{
         def workspace = pwd()
 
-        stage('Checkout Source Code') {
+        stage('PIL Checkout Source Code') {
             checkout scm
         }
 
