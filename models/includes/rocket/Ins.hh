@@ -72,7 +72,7 @@ class INS {
 
         INS& operator=(const INS& other);
 
-        void initialize();
+        void initialize(time_management &ti);
 
         void update(double int_step);
 

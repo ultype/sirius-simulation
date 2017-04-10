@@ -120,8 +120,8 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.001, "scheduled") propulsion.propagate(0.001);
             P1 (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
             //P1 (0.1, "scheduled") gpsr.get_quadriga();
-           // P1 (0.1, "scheduled") gps.filter_extrapolation(0.1);
-           // P1 (0.1, "scheduled") gps.measure(0.1);
+           P1 (0.1, "scheduled") gps.filter_extrapolation(0.1);
+           P1 (0.1, "scheduled") gps.measure(0.1);
             P1 (0.001, "scheduled") gps_con.compute();
             P1 (0.05, "scheduled") gyro->propagate_error(0.05);
             P1 (0.05, "scheduled") accelerometer->propagate_error(0.05);
@@ -253,12 +253,14 @@ class FlightComputer_SimObject : public Trick::SimObject {
         {
             ("default_data") guidance.default_data();
 
+            ("initialization") link();
+            
             ("initialization") guidance.initialize();
             ("initialization") control.initialize();
-            ("initialization") ins.initialize();
+            ("initialization") ins.initialize(rkt->time);
             ("initialization") rcs_fc.initialize();
 
-            ("initialization") link();
+            
 
             P2 (0.05, "scheduled") ins.update(0.05);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);

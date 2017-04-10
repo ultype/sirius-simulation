@@ -185,7 +185,9 @@ void INS::default_data(){
     this->EGRAVI.zeros();
 }
 
-void INS::initialize(){
+void INS::initialize(time_management &ti){
+    time = &ti;
+
     arma::vec3 SBII  = grab_SBII();
     arma::vec3 VBII  = grab_VBII();
 
