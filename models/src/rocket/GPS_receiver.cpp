@@ -19,8 +19,8 @@
 #include "rocket/Earth.hh"
 #include "rocket/Ins.hh"
 
-GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr, GPS_Satellites &sats)
-    :   newton(&ntn), euler(&elr), gps_sats(&sats),
+GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr)
+    :   newton(&ntn), euler(&elr),
         MATRIX_INIT(PP, 8, 8),
         MATRIX_INIT(FF, 8, 8),
         MATRIX_INIT(PHI, 8, 8),
@@ -251,7 +251,9 @@ void GPS_Receiver::setup_fundamental_dynamic_matrix(double uctime_cor){
     return;
 }
 
-void GPS_Receiver::initialize(double int_step){
+void GPS_Receiver::initialize(GPS_Satellites *sats, double int_step){
+    gps_sats = sats;
+
     // state transition matrix - constant throughout
     PHI = arma::mat88(arma::fill::eye) + FF * int_step + FF * FF * (int_step * int_step / 2);
 
