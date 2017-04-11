@@ -117,6 +117,9 @@ class GPS_FSW{
         arma::vec CXH;      /* *o (--)       CLock state */
         double   _CXH[3];   /* *o (--)       CLock state */
 
+        arma::vec ZZ;       /* *o  (--)      */
+        double _ZZ[8];      /* *o  (--)      */
+
         /* GPS Outputs */
 
         double gps_step;		/* *o  (s)      gps time step */

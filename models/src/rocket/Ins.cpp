@@ -578,18 +578,22 @@ void INS::update(double int_step){
     // calculating position error
     INTEGRATE_MAT(ESBI, EVBI);
 
-    // GPS_update();
-
+    if(gpsupdate == 1){
+        GPS_update();
+    }
+    
     this->SBIIC = calculate_INS_derived_postion(SBII);
     this->VBIIC = calculate_INS_derived_velocity(VBII);
     this->WBICI = calculate_INS_derived_bodyrate(TBIC, WBICB);
 
     // diagnostics
-    //ins_pos_err  = norm(ESBI);
-    //ins_vel_err  = norm(EVBI);
-    //ins_tilt_err = norm(RICI);
+    ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
+    ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);
+    ins_tilt_err = norm(RICI);
 
     TEIC = calculate_INS_derived_TEI();
+    // arma::mat33 TEI;
+    // TEI = grab_TEI();
 
     SBEEC = TEIC * SBIIC;
     VBEEC = TEIC * VBIIC - WEII * SBEEC;
@@ -645,3 +649,5 @@ arma::vec3 INS::get_WBICI() { return WBICI; }
 arma::vec3 INS::get_EGRAVI() { return EGRAVI; }
 arma::mat33 INS::get_TBIC() { return TBIC; }
 arma::mat33 INS::get_TEIC() { return TEIC; }
+
+void INS::set_gps_correction(unsigned int index){ gpsupdate = index; }

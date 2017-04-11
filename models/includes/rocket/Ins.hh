@@ -78,6 +78,7 @@ class INS {
 
         void set_ideal();
         void set_non_ideal(double frax_algnmnt);
+        void set_gps_correction(unsigned int index);
 
         /* Input File */
 
@@ -95,6 +96,7 @@ class INS {
         std::function<arma::vec3()>   grab_SXH;
         std::function<arma::vec3()>   grab_VXH;
         std::function<void()>         clear_gps_flag;
+        std::function<arma::mat33()>  grab_TEI;  //Only for testing
 
         double get_dvbec();
         double get_alphacx();
@@ -233,6 +235,8 @@ class INS {
         double ins_pos_err; /* *io  (m)     INS absolute postion error */
         double ins_vel_err; /* *io  (m/s)   INS absolute velocity error */
         double ins_tilt_err; /* *o  (r)     INS absolute tilt error */
+
+        unsigned int gpsupdate; /* *o (--)   Set wether use gps correction or not */
 };
 
 #endif  // __INS_HH__

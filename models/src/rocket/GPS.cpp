@@ -27,7 +27,8 @@ GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &
     MATRIX_INIT(PHI, 8, 8),
     VECTOR_INIT(SXH, 3),
     VECTOR_INIT(VXH, 3),
-    VECTOR_INIT(CXH, 3)
+    VECTOR_INIT(CXH, 3),
+    VECTOR_INIT(ZZ, 8)
 {}
 
 GPS_FSW::GPS_FSW(const GPS_FSW &other)
@@ -41,7 +42,8 @@ GPS_FSW::GPS_FSW(const GPS_FSW &other)
     MATRIX_INIT(PHI, 8, 8),
     VECTOR_INIT(SXH, 3),
     VECTOR_INIT(VXH, 3),
-    VECTOR_INIT(CXH, 3)
+    VECTOR_INIT(CXH, 3),
+    VECTOR_INIT(ZZ, 8)
 {}
 
 GPS_FSW & GPS_FSW::operator= (const GPS_FSW &other){
@@ -92,7 +94,7 @@ void GPS_FSW::initialize(double int_step){
     PHI = arma::mat88(arma::fill::eye) + FF * int_step + FF * FF * (int_step * int_step / 2);
 
     // initializing update clock
-    gps_epoch = get_rettime();
+    // gps_epoch = get_rettime();
 }
 
 
@@ -153,7 +155,7 @@ void GPS_FSW::measure(double int_step){
     // /* GPS Update and Measurement */
     // double slotm(0);
 
-    arma::vec8 ZZ(arma::fill::zeros);
+    //arma::vec8 ZZ(arma::fill::zeros);
     arma::vec8 XH(arma::fill::zeros);           // local
     arma::mat88 RR(arma::fill::zeros);          // local
     arma::mat88 HH(arma::fill::zeros);          // local
@@ -162,7 +164,7 @@ void GPS_FSW::measure(double int_step){
     // arma::vec4 pesudo_range_rate(arma::fill::zeros);
     arma::vec4 channel_id(arma::fill::zeros);
     arma::mat33 TEIC = grab_TEIC();
-    arma::mat33 TEI = environment->get_TEI();
+    // arma::mat33 TEI = environment->get_TEI();
     int ii(0);
   // Pseudo-range and range-rate measurements
     for(int i = 0; i < MAX_CHAN; i++){
@@ -180,8 +182,8 @@ void GPS_FSW::measure(double int_step){
 
     }
 
-    arma::vec3 SBII = newton->get_SBII();
-    arma::vec3 VBII = newton->get_VBII();
+    // arma::vec3 SBII = newton->get_SBII();
+    // arma::vec3 VBII = newton->get_VBII();
     arma::vec3 WEII = euler->get_WEII();
 
     arma::vec3 SBIIC = grab_SBIIC();

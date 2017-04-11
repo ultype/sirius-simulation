@@ -136,6 +136,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ins.grab_VXH        = LINK(gps       , get_VXH);
             ins.grab_gps_update = LINK(gps       , get_gps_update);
             ins.clear_gps_flag  = LINK(gps       , clear_gps_flag);
+            ins.grab_TEI        = LINK(env       , get_TEI);
 
 
             guidance.grab_mprop  = LINK(propulsion, get_mprop);

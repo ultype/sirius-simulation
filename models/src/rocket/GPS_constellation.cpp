@@ -559,7 +559,10 @@ int GPS_constellation::allocateChannel(channel_t *chan, ephem_t *eph, ionoutc_t 
 			allocatedSat[sv] = -1;
 		}
 	}
-
+	
+	if(nsat > MAX_CHAN){
+		nsat = MAX_CHAN;
+	}
 	return(nsat);
 }
 
