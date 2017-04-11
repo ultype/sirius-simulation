@@ -76,6 +76,13 @@ rkt.propulsion.set_aexit(0.258242843) #nozzle exhaust area
 rkt.propulsion.set_payload(98) #payload mass
 
 #INS
+
+rkt.ins.loncx = lonx
+rkt.ins.latcx = latx
+rkt.ins.altc = alt
+rkt.ins.phibdcx = phibdx
+rkt.ins.thtbdcx = thtbdx
+rkt.ins.psibdcx = psibdx
 """
 frax_algnmnt = 0
 rkt.ins.set_non_ideal(frax_algnmnt)

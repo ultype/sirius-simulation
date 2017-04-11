@@ -118,6 +118,14 @@ class INS {
         /* Internal Initializers */
         void default_data();
 
+
+        double loncx;       /* *io  (d)     INS derived longitude */
+        double latcx;       /* *io  (d)     INS derived latitude */
+        double altc;        /* *io  (m)     INS derived altitude */
+        double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
+        double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
+        double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
+
     private:
 
         time_management *time;
@@ -148,6 +156,9 @@ class INS {
         double calculate_INS_derived_thtvd(arma::vec3 VBECD);
 
         double calculate_INS_derived_euler_angles(arma::mat33 TBD);
+
+        void load_angle();
+        void propagate_TBI_Q(double int_step, arma::vec3 WBICB);
 
 
 
@@ -182,6 +193,12 @@ class INS {
         arma::mat TBIC;        /* *o  (--)    Computed T.M. of body wrt inertia coordinate */
         double _TBIC[3][3];    /* *o  (--)    Computed T.M. of body wrt inertia coordinate */
 
+        arma::vec TBIC_Q;      /* *o  (--)    Computed T.M of body wrt inertia coordinate quaterion */
+        double _TBIC_Q[4];     /* *o  (--)    Computed T.M of body wrt inertia coordinate quaterion */
+
+        arma::vec TBIDC_Q;   /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative (Quaternion) */
+        double _TBIDC_Q[4];  /* *io (--)    Transformation Matrix of body coord wrt inertia coord derivative (Quaternion) */
+
         arma::vec SBIIC;       /* *o  (m)     Computed pos of body wrt inertia reference point*/
         double   _SBIIC[3];    /* *o  (m)     Computed pos of body wrt inertia reference point*/
 
@@ -200,9 +217,6 @@ class INS {
         arma::vec EGRAVI;      /* *o  (--)    error by gravity */
         double   _EGRAVI[3];   /* *o  (--)    error by gravity */
 
-        double loncx;       /* *io  (d)     INS derived longitude */
-        double latcx;       /* *io  (d)     INS derived latitude */
-        double altc;        /* *io  (m)     INS derived altitude */
 
         arma::vec VBECD;       /* *o  (m/s)   Geodetic velocity */
         double   _VBECD[3];    /* *o  (m/s)   Geodetic velocity */
@@ -225,9 +239,6 @@ class INS {
         double alppcx;      /* *io  (d)     INS computed total angle of attack */
         double phipcx;      /* *io  (d)     INS computed aero roll angle */
 
-        double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
-        double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
-        double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */

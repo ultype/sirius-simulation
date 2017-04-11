@@ -5,6 +5,10 @@
 
 #include "sensor/gyro/gyro_rocket6g.hh"
 
+#include "math/stochastic.hh"
+
+#include <ctime>
+
 sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine)
     :   newton(&newt), euler(&eul), kinematics(&kine),
         VECTOR_INIT(EUG    , 3),
@@ -21,10 +25,17 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
     EWG.zeros();
     EWALKG.zeros();
     EUNBG.zeros();
-
-    EMISG  = arma::vec3(emisg);
-    ESCALG = arma::vec3(escalg);
-    EBIASG = arma::vec3(ebiasg);
+    srand( (unsigned)time(NULL) );
+    for(int i = 0;i < 3;i++){
+    
+        EMISG(i)  = gauss(0, 1.1e-4);
+        ESCALG(i) = gauss(0, 2.e-5);
+        EBIASG(i) = gauss(0, 1.e-6);
+   
+    }
+    // EMISG  = arma::vec3(emisg);
+    // ESCALG = arma::vec3(escalg);
+    // EBIASG = arma::vec3(ebiasg);
 }
 
 void sensor::GyroRocket6G::propagate_error(double int_step){
