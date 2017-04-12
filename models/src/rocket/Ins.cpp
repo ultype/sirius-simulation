@@ -192,21 +192,57 @@ void INS::default_data(){
 void INS::initialize(time_management &ti){
     time = &ti;
 
-    load_angle();
-
-    arma::vec3 SBII  = grab_SBII();
-    arma::vec3 VBII  = grab_VBII();
-
-    SBIIC = SBII;
-    VBIIC = VBII;
-
     TEIC = calculate_INS_derived_TEI();
 
     SBEEC = TEIC * SBIIC;
     VBEEC = TEIC * VBIIC - WEII * SBEEC;
+}
 
+void INS::load_location(double lonx, double latx, double alt){
+    this->loncx = lonx;
+    this->latcx = latx;
+    this->altc = alt;
 
+    //converting geodetic lonx, latx, alt to SBII
+    SBIIC = cad::in_geo84(loncx * RAD, latcx * RAD, altc, get_rettime());
+}
 
+void INS::load_angle(double yaw, double roll, double pitch) {
+    this->psibdcx = yaw;
+    this->phibdcx = roll;
+    this->thtbdcx = pitch;
+
+    arma::mat33 TBD;
+
+    TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
+
+    arma::mat33 current_TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, get_rettime());
+    TBIC = TBD * current_TDI;
+
+    this->TBIC_Q = Matrix2Quaternion(this->TBIC);  //Convert Direct Cosine Matrix to Quaternion
+}
+
+void INS::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
+    //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
+    arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
+    arma::mat33 TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
+    arma::mat33 TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, get_rettime());
+    //Geodetic velocity
+    arma::mat VBED = trans(TBD) * VBEB;
+
+    VBIIC = trans(TDI) * VBED + WEII * SBIIC;
+}
+
+arma::vec INS::build_VBEB(double _alpha0x, double _beta0x, double _dvbe){
+    double salp = sin(_alpha0x * RAD);
+    double calp = cos(_alpha0x * RAD);
+    double sbet = sin(_beta0x * RAD);
+    double cbet = cos(_beta0x * RAD);
+    double vbeb1 = calp * cbet * _dvbe;
+    double vbeb2 = sbet * _dvbe;
+    double vbeb3 = salp * cbet * _dvbe;
+    arma::vec3 VBEB= {vbeb1, vbeb2, vbeb3};
+    return VBEB;
 }
 
 void INS::set_ideal(){
@@ -294,16 +330,16 @@ arma::mat33 INS::calculate_INS_derived_TEI(){
     double s_thetaA, c_thetaA, s_zetaA, c_zetaA, s_zA, c_zA;
     double s_delta_psi, c_delta_psi, s_epsilonA, c_epsilonA, s_epsilonAP, c_epsilonAP;
     double s2_half_delta_psi, s_delta_epsilon, c_delta_epsilon;
-    double DM_sidereal_time; 
-    double DM_Julian_century; 
-    double DM_w_precessing; 
+    double DM_sidereal_time;
+    double DM_Julian_century;
+    double DM_w_precessing;
     double mjd;/*double GC_swtwopi;*/
 
     int index;
 
 
 
- 
+
 
     /*------------------------------------------------------------------ */
     /* --------------- Interface to Global Variable ------------*/
@@ -335,7 +371,7 @@ arma::mat33 INS::calculate_INS_derived_TEI(){
 
     UT1 = UTC + dUT1;
 
- 
+
 
     /*----------------------------------------------------------- */
     /*-------------- Precession Matrix  ------------------- */
@@ -368,7 +404,7 @@ arma::mat33 INS::calculate_INS_derived_TEI(){
     M_precession(2,1) = -s_zetaA  * s_thetaA;
     M_precession(2,2) =  c_thetaA;
 
-    
+
     M_nut_n_pre = M_nutation * M_precession;
 
     /*----------------------------------------------------------- */
@@ -383,7 +419,7 @@ arma::mat33 INS::calculate_INS_derived_TEI(){
 
     temps_sideral = UT1 +  (24110.54841 + 8640184.812866 * t + 0.093104 * t2 - 0.0000062 * t3);
 
-   
+
     temps_sideral = temps_sideral * DM_sec2r + delta_psi * cos(epsilonA) * DM_arcsec2r; /* unit: radian */
 
 
@@ -406,7 +442,7 @@ arma::mat33 INS::calculate_INS_derived_TEI(){
 
     return TEIC;
 
-}  
+}
 
 
 arma::vec3 INS::calculate_gravity_error(double dbi){
@@ -593,7 +629,7 @@ void INS::update(double int_step){
     if(gpsupdate == 1){
         GPS_update();
     }
-    
+
     this->SBIIC = calculate_INS_derived_postion(SBII);
     this->VBIIC = calculate_INS_derived_velocity(VBII);
     this->WBICI = calculate_INS_derived_bodyrate(TBIC, WBICB);
@@ -689,16 +725,4 @@ void INS::propagate_TBI_Q(double int_step, arma::vec3 WBICB){
     // double e2 = UBI(1,1) - 1.;
     // double e3 = UBI(2,2) - 1.;
     // this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
-}
-
-void INS::load_angle() {
-
-    arma::mat33 TBD;
-
-    TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
-
-    arma::mat33 current_TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, get_rettime());
-    TBIC = TBD * current_TDI;
-
-    this->TBIC_Q = Matrix2Quaternion(this->TBIC);  //Convert Direct Cosine Matrix to Quaternion
 }

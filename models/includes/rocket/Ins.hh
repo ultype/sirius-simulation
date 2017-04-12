@@ -74,6 +74,10 @@ class INS {
 
         void initialize(time_management &ti);
 
+        void load_location(double lonx, double latx, double alt);
+        void load_angle(double yaw, double roll, double pitch);
+        void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
+
         void update(double int_step);
 
         void set_ideal();
@@ -118,15 +122,8 @@ class INS {
         /* Internal Initializers */
         void default_data();
 
-
-        double loncx;       /* *io  (d)     INS derived longitude */
-        double latcx;       /* *io  (d)     INS derived latitude */
-        double altc;        /* *io  (m)     INS derived altitude */
-        double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
-        double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
-        double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
-
     private:
+        arma::vec build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
 
         time_management *time;
         /* Internal Getter */
@@ -238,6 +235,14 @@ class INS {
 
         double alppcx;      /* *io  (d)     INS computed total angle of attack */
         double phipcx;      /* *io  (d)     INS computed aero roll angle */
+
+        double loncx;       /* *io  (d)     INS derived longitude */
+        double latcx;       /* *io  (d)     INS derived latitude */
+        double altc;        /* *io  (m)     INS derived altitude */
+
+        double phibdcx;     /* *io  (d)     INS computed geodetic Euler roll angle */
+        double thtbdcx;     /* *io  (d)     INS computed geodetic Euler pitch angle */
+        double psibdcx;     /* *io  (d)     INS computed geodetic Euler yaw angle */
 
 
         /* Non-propagating Diagnostic Variables */
