@@ -48,6 +48,7 @@ class time_management{
 	TRICK_INTERFACE(time_management);
 	friend class Environment;
 	friend class GPS_constellation;
+	friend class INS;
 
 	public:
 		time_management();

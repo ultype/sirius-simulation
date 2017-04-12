@@ -20,9 +20,9 @@ execfile("Modified_data/test.dr")
 ##############################################################
 #Set simulation start time
 Year = 2017
-DOY = 61
-Hour = 18
-Min = 30
+DOY = 81
+Hour = 2
+Min = 0
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
 
@@ -51,7 +51,7 @@ rkt.env.atmosphere_use_public()
 rkt.env.set_no_wind()
 rkt.env.set_no_wind_turbulunce()
 #aerodynamics
-rkt.aerodynamics.load_aerotable("auxiliary/aero_table_slv3.txt")
+rkt.aerodynamics.load_aerotable("../../auxiliary/aero_table_slv3.txt")
 rkt.aerodynamics.set_xcg_ref(9.632)   #Reference cg location from nose - m
 rkt.aerodynamics.set_refa(2.36)       #Reference area for aero coefficients - m^2
 rkt.aerodynamics.set_refd(1.7334)     #Reference length for aero coefficients - m
@@ -77,118 +77,118 @@ rkt.propulsion.set_payload(98) #payload mass
 #INS
 """
 frax_algnmnt = 0
-rkt.ins.set_non_ideal(frax_algnmnt)
+fc.ins.set_non_ideal(frax_algnmnt)
 """
-rkt.ins.set_ideal()
+fc.ins.set_ideal()
 #INS Accel
 # Create a Errorous Accelerometer
 """
 EMISA  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALA = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASA = [0, 0, 0]      #gauss(0, 1.e-6)
-accel = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
+rkt.accelerometer = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
 """
 # Create a Ideal Accelerometer
-# accel = trick.AccelerometerIdeal(rkt.newton);
-# rkt.ins.set_accelerometer(accel);
+rkt.accelerometer = trick.AccelerometerIdeal(rkt.newton);
 
-# #ins gyro
-# # Create a Errorous Gyro
-# """
-# EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
-# ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
-# EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
-# gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
-# """
-# # Create a Ideal Gyro
-# gyro = trick.GyroIdeal(rkt.euler);
-# rkt.ins.set_gyro(gyro);
+#ins gyro
+# Create a Errorous Gyro
+"""
+EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
+ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
+EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
+rkt.gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+"""
+# Create a Ideal Gyro
+rkt.gyro = trick.GyroIdeal(rkt.euler);
 
 #GPS
-gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps
-gps_sats.sats.sv_data = [
-        [5.63, -1.600],  # A-plane, slot #1
-        [5.63, 2.115],   #              #2
-        [5.63, -2.309],  #              #3
-        [5.63, 0.319],   #              #4
+# gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps
+# gps_sats.sats.sv_data = [
+#         [5.63, -1.600],  # A-plane, slot #1
+#         [5.63, 2.115],   #              #2
+#         [5.63, -2.309],  #              #3
+#         [5.63, 0.319],   #              #4
 
-        [0.40, 1.063],   # B-plane, slot #5
-        [0.40, -1.342],  #              #6
-        [0.40, 0.543],   #              #7
-        [0.40, 2.874],   #              #8
+#         [0.40, 1.063],   # B-plane, slot #5
+#         [0.40, -1.342],  #              #6
+#         [0.40, 0.543],   #              #7
+#         [0.40, 2.874],   #              #8
 
-        [1.45, 1.705],   # C-plane, slot #9
-        [1.45, -2.841],  #              #10
-        [1.45, -2.321],  #              #11
-        [1.45, -0.640],  #              #12
+#         [1.45, 1.705],   # C-plane, slot #9
+#         [1.45, -2.841],  #              #10
+#         [1.45, -2.321],  #              #11
+#         [1.45, -0.640],  #              #12
 
-        [2.45, 1.941],   # D-plane, slot #13
-        [2.45, -0.147],  #              #14
-        [2.45, 1.690],   #              #15
-        [2.45, 0.409],   #              #16
+#         [2.45, 1.941],   # D-plane, slot #13
+#         [2.45, -0.147],  #              #14
+#         [2.45, 1.690],   #              #15
+#         [2.45, 0.409],   #              #16
 
-        [3.48, -0.571],  # E-plane, slot #17
-        [3.48, -2.988],  #              #18
-        [3.48, 0.858],   #              #19
-        [3.48, 2.705],   #              #20
+#         [3.48, -0.571],  # E-plane, slot #17
+#         [3.48, -2.988],  #              #18
+#         [3.48, 0.858],   #              #19
+#         [3.48, 2.705],   #              #20
 
-        [4.59, -0.7180],  # F-plane,slot #21
-        [4.59, 2.666],    #             #22
-        [4.59, -2.977],   #             #23
-        [4.59, -0.2090]   #             #24
-    ]
-rkt.gpsr.slot = [0, 0, 0, 0];  #/< SV slot#  of quadriga
+#         [4.59, -0.7180],  # F-plane,slot #21
+#         [4.59, 2.666],    #             #22
+#         [4.59, -2.977],   #             #23
+#         [4.59, -0.2090]   #             #24
+#     ]
+# rkt.gpsr.slot = [0, 0, 0, 0];  #/< SV slot#  of quadriga
 
-rkt.gpsr.del_rearth        = 2317000    #Delta to Earth's radius for GPS clear LOS signal reception - m  module gps
-rkt.gpsr.gps_acqtime       = 10    #Acquisition time for GPS signal - s  module gps
-rkt.gpsr.gps_step          = 0.1    #GPS update interval - s  module gps
+# rkt.gpsr.del_rearth        = 2317000    #Delta to Earth's radius for GPS clear LOS signal reception - m  module gps
+# rkt.gpsr.gps_acqtime       = 10    #Acquisition time for GPS signal - s  module gps
+# rkt.gpsr.gps_step          = 0.1    #GPS update interval - s  module gps
 
-rkt.gpsr.ucfreq_noise      = 0.1 #User clock frequency error - m/s MARKOV  module gps
-rkt.gpsr.ucbias_error      = 0 #User clock bias error - m GAUSS  module gps
+rkt.gps.ucfreq_noise      = 0.1 #User clock frequency error - m/s MARKOV  module gps
+rkt.gps.ucbias_error      = 0 #User clock bias error - m GAUSS  module gps
 
-rkt.gpsr.PR_BIAS           = [0, 0, 0, 0] #Pseudo-range bias - m GAUSS  module gps
-rkt.gpsr.PR_NOISE          = [0.25, 0.25, 0.25, 0.25] #Pseudo-range noise - m MARKOV  module gps
-rkt.gpsr.DR_NOISE          = [0.03, 0.03, 0.03, 0.03] #Delta-range noise - m/s MARKOV  module gps
+rkt.gps.PR_BIAS           = [0, 0, 0, 0] #Pseudo-range bias - m GAUSS  module gps
+rkt.gps.PR_NOISE          = [0.25, 0.25, 0.25, 0.25] #Pseudo-range noise - m MARKOV  module gps
+rkt.gps.DR_NOISE          = [0.03, 0.03, 0.03, 0.03] #Delta-range noise - m/s MARKOV  module gps
 
 gpsr_factp       = 0   #Factor to modifiy initial P-matrix P(1+factp)=module gps
 gpsr_pclockb     = 3   #Init 1sig clock bias error of state cov matrix - m=module gps
 gpsr_pclockf     = 1   #Init 1sig clock freq error of state cov matrix - m/s=module gps
-rkt.gpsr.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf)
+rkt.gps.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf)
 
 gpsr_factq       = 0   #Factor to modifiy the Q-matrix Q(1+factq)=module gps
 gpsr_qclockb     = 0.5 #1sig clock bias error of process cov matrix - m=module gps
 gpsr_qclockf     = 0.1 #1sig clock freq error of process cov matrix - m/s=module gps
-rkt.gpsr.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf)
+rkt.gps.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf)
 
 gpsr_uctime_cor = 100  #User clock correlation time constant - s=module gps
-rkt.gpsr.setup_fundamental_dynamic_matrix(gpsr_uctime_cor)
+rkt.gps.setup_fundamental_dynamic_matrix(gpsr_uctime_cor)
 
-rkt.gpsr.ppos        = 5  #Init 1sig pos values of state cov matrix - m=module gps
-rkt.gpsr.pvel        = 0.2  #Init 1sig vel values of state cov matrix - m/s=module gps
-rkt.gpsr.qpos        = 0.1  #1sig pos values of process cov matrix - m=module gps
-rkt.gpsr.qvel        = 0.01  #1sig vel values of process cov matrix - m/s=module gps
-rkt.gpsr.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
-rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
-rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
+rkt.gps.ppos        = 5  #Init 1sig pos values of state cov matrix - m=module gps
+rkt.gps.pvel        = 0.2  #Init 1sig vel values of state cov matrix - m/s=module gps
+rkt.gps.qpos        = 0.1  #1sig pos values of process cov matrix - m=module gps
+rkt.gps.qvel        = 0.01  #1sig vel values of process cov matrix - m/s=module gps
+rkt.gps.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
+rkt.gps.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
+rkt.gps.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 #RCS thruster
-rkt.rcs.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
+fc.rcs_fc.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
 rkt.rcs.set_roll_mom_max(100)      #RCS rolling moment max value - Nm  module rcs
 rkt.rcs.set_pitch_mom_max(200000)  #RCS pitching moment max value - Nm  module rcs
 rkt.rcs.set_yaw_mom_max(200000)    #RCS yawing moment max value - Nm  module rcs
 dead_zone = 0.1                #Dead zone of Schmitt trigger - deg  module rcs
 hysteresis = 0.1               #Hysteresis of Schmitt trigger - deg  module rcs
 rkt.rcs.setup_rcs_schmitt_trigger(dead_zone, hysteresis);
-rkt.rcs.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
-rkt.rcs.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
-rkt.rcs.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs
+fc.rcs_fc.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
+fc.rcs_fc.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
+fc.rcs_fc.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs
 rkt.rcs.set_rcs_thrust(100)        #rcs thrust - N  module rcs
 rkt.rcs.set_rcs_pos(1.66507)       #rcs thruster's postion from nose - m  module rcs
 rkt.rcs.set_rocket_r(0.68)         #rocket's radius - m  module rcs
 #Guidance
 alphacomx = 0   #Alpha command - deg  module guidance
 betacomx = 0    #Beta command - deg  module guidance
-rkt.guidance.set_degree(alphacomx, betacomx)
+fc.guidance.set_degree(alphacomx, betacomx)
 ######################################################################################################
+
+rkt.gps_con.readfile("../../auxiliary/brdc0810.17n")
 
 start = trick.new_event("start")
 start.set_cycle(0.001)
@@ -200,7 +200,7 @@ start.activate()
 rcs_on = trick.new_event("rcs_on")
 rcs_on.set_cycle(0.001)
 rcs_on.condition(0, "trick.exec_get_sim_time() == 185.001")
-rcs_on.action(0, "rkt.rcs.enable_rcs()")
+rcs_on.action(0, "fc.rcs_fc.enable_rcs()")
 trick.add_event(rcs_on)
 rcs_on.activate()
 #Event1:Stage 2 ignition
@@ -224,10 +224,10 @@ speration_1.action(11, "spi            = 290   " )
 speration_1.action(12, "fuel_flow_rate = 29.63 " )
 speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
 
-speration_1.action(14, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+speration_1.action(14, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 speration_1.action(15, "trick.add_event(speration_2)")
 speration_1.action(16, "speration_2.activate()")
-speration_1.action(17, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv2.txt')")
+speration_1.action(17, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv2.txt')")
 trick.add_event(speration_1)
 speration_1.activate()
 ###############################################################
@@ -264,8 +264,8 @@ speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0
 
 speration_3.action(16, "trick.add_event(speration_4)")
 speration_3.action(17, "speration_4.activate()")
-speration_3.action(18, "rkt.aerodynamics.load_aerotable('auxiliary/aero_table_slv1.txt')")
-speration_3.action(19, "rkt.rcs.set_mode(rkt.rcs.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+speration_3.action(18, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv1.txt')")
+speration_3.action(19, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 #############################################################
 #Event4:MECO
 speration_4=trick.new_event("speration_4")

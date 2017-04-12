@@ -19,10 +19,12 @@
 
 #include <fstream>
 
-INS::INS()
-    :   MATRIX_INIT(WEII, 3, 3),
+INS::INS(time_management &tim)
+    :   time(&tim),
+        MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
+        MATRIX_INIT(TEIC, 3, 3),
         VECTOR_INIT(RICI, 3),
         VECTOR_INIT(RICID, 3),
         VECTOR_INIT(ESBI, 3),
@@ -33,15 +35,21 @@ INS::INS()
         VECTOR_INIT(VBECD, 3),
         VECTOR_INIT(SBIIC, 3),
         VECTOR_INIT(VBIIC, 3),
-        VECTOR_INIT(WBICI, 3)
+        VECTOR_INIT(SBEEC, 3),
+        VECTOR_INIT(VBEEC, 3),
+        VECTOR_INIT(WBICI, 3),
+        VECTOR_INIT(TBIC_Q, 4),
+        VECTOR_INIT(TBIDC_Q, 4)
 {
     this->default_data();
 }
 
 INS::INS(const INS& other)
-    :   MATRIX_INIT(WEII, 3, 3),
+    :   time(other.time),
+        MATRIX_INIT(WEII, 3, 3),
         MATRIX_INIT(TDCI, 3, 3),
         MATRIX_INIT(TBIC, 3, 3),
+        MATRIX_INIT(TEIC, 3, 3),
         VECTOR_INIT(RICI, 3),
         VECTOR_INIT(RICID, 3),
         VECTOR_INIT(ESBI, 3),
@@ -52,7 +60,11 @@ INS::INS(const INS& other)
         VECTOR_INIT(VBECD, 3),
         VECTOR_INIT(SBIIC, 3),
         VECTOR_INIT(VBIIC, 3),
-        VECTOR_INIT(WBICI, 3)
+        VECTOR_INIT(SBEEC, 3),
+        VECTOR_INIT(VBEEC, 3),
+        VECTOR_INIT(WBICI, 3),
+        VECTOR_INIT(TBIC_Q, 4),
+        VECTOR_INIT(TBIDC_Q ,4)
 {
     this->default_data();
 
@@ -108,6 +120,7 @@ INS& INS::operator=(const INS& other){
     if(&other == this)
         return *this;
 
+    this->time = other.time;
     this->grab_SBII = other.grab_SBII;
     this->grab_VBII = other.grab_VBII;
     this->grab_dbi  = other.grab_dbi;
@@ -176,7 +189,24 @@ void INS::default_data(){
     this->EGRAVI.zeros();
 }
 
-void INS::initialize(){
+void INS::initialize(time_management &ti){
+    time = &ti;
+
+    load_angle();
+
+    arma::vec3 SBII  = grab_SBII();
+    arma::vec3 VBII  = grab_VBII();
+
+    SBIIC = SBII;
+    VBIIC = VBII;
+
+    TEIC = calculate_INS_derived_TEI();
+
+    SBEEC = TEIC * SBIIC;
+    VBEEC = TEIC * VBIIC - WEII * SBEEC;
+
+
+
 }
 
 void INS::set_ideal(){
@@ -242,6 +272,142 @@ arma::mat33 INS::calculate_INS_derived_TBI(arma::mat33 TBI){
     arma::mat33 TIIC = UNI - skew_sym(RICI);
     return TBI * TIIC;
 }
+
+arma::mat33 INS::calculate_INS_derived_TEI(){
+
+    arma::mat33 TEIC;
+    /* double We = 7.2921151467E-5; */
+    //GPSR gpsr;/* call gpsr function */
+    CALDATE utc_caldate;
+    GPS tmp_gps;
+    unsigned char  i;
+    double UTC, UT1;
+    arma::mat33 M_rotation;
+    arma::mat33 M_nutation; M_nutation.eye();
+    arma::mat33 M_precession;
+    arma::mat33 M_nut_n_pre;
+    double t, t2, t3, thetaA, zetaA, zA;
+    double epsilonA, epsilonAP, F,D,omega;
+    double temps_sideral(0);
+    double L, La, gamma, delta_psi, delta_epsilon;
+    double dUT1;
+    double s_thetaA, c_thetaA, s_zetaA, c_zetaA, s_zA, c_zA;
+    double s_delta_psi, c_delta_psi, s_epsilonA, c_epsilonA, s_epsilonAP, c_epsilonAP;
+    double s2_half_delta_psi, s_delta_epsilon, c_delta_epsilon;
+    double DM_sidereal_time; 
+    double DM_Julian_century; 
+    double DM_w_precessing; 
+    double mjd;/*double GC_swtwopi;*/
+
+    int index;
+
+
+
+ 
+
+    /*------------------------------------------------------------------ */
+    /* --------------- Interface to Global Variable ------------*/
+    /*------------------------------------------------------------------ */
+
+    /*------------------------------------------------------------- */
+    /*--------------- Calculate the UTC time -------------*/
+    /*------------------------------------------------------------- */
+    /* GPS time converted from GPS format to YYYY/MM/DD/MM/SS */
+    /* Correction for time difference btwn GPS & UTC is applied implicitly */
+    /***to prevent change origin gpstime data****/
+    tmp_gps.Week  = time->gpstime.Week;
+    tmp_gps.SOW  = time->gpstime.SOW;
+    /*********************************************/
+    time->gps_to_utc(&tmp_gps, &utc_caldate);   /* leap second is considered */
+
+    UTC = utc_caldate.Hour * 3600.0 + utc_caldate.Min * 60.0 + utc_caldate.Sec;
+
+
+    index = (int) (time->Julian_Date - 2400000.5 - 55197.00);   /* get dUT1 = Ut1 - UT from table*/
+    if ((index >= 0) && (index < Max_DM_UT1_UT_Index))      /*MJD = 55197.00 (1-1-2010)~ 56150.00(8-11-2012) */
+    {
+        dUT1 = DM_UT1_UT[index];
+    }
+    else
+    {
+        dUT1 = -0.008853655954360;  /* mean value during 19760519~20120811, FSW: dUT1 = 0.4; */
+    }
+
+    UT1 = UTC + dUT1;
+
+ 
+
+    /*----------------------------------------------------------- */
+    /*-------------- Precession Matrix  ------------------- */
+    /*----------------------------------------------------------- */
+    t = (time->Julian_Date - 2451545.0) / 36525.0;  /* J2000.5 : Julian Day is 2451545, unit in day */
+
+    DM_Julian_century = t;  /* elapsed century since J2000.5 */
+
+    t2 = t * t;
+    t3 = t * t * t;
+
+    thetaA = 2004.3109 * t - 0.42665 * t2 - 0.041833 * t3; /* unit : arcsec */
+    zetaA  = 2306.2181 * t + 0.30188 * t2 + 0.017998 * t3; /* unit : arcsec */
+    zA     = 2306.2181 * t + 1.09468 * t2 + 0.018203 * t3; /* unit : arcsec */
+
+    s_thetaA = sin(thetaA * DM_arcsec2r);
+    c_thetaA = cos(thetaA * DM_arcsec2r);
+    s_zetaA  = sin(zetaA  * DM_arcsec2r);
+    c_zetaA  = cos(zetaA  * DM_arcsec2r);
+    s_zA     = sin(zA * DM_arcsec2r);
+    c_zA     = cos(zA * DM_arcsec2r);
+
+    M_precession(0,0) = -s_zA * s_zetaA + c_zA * c_thetaA * c_zetaA;
+    M_precession(0,1) = -s_zA * c_zetaA - c_zA * c_thetaA * s_zetaA;
+    M_precession(0,2) = -c_zA * s_thetaA;
+    M_precession(1,0) =  c_zA * s_zetaA + s_zA * c_thetaA * c_zetaA;
+    M_precession(1,1) =  c_zA * c_zetaA - s_zA * c_thetaA * s_zetaA;
+    M_precession(1,2) = -s_zA * s_thetaA;
+    M_precession(2,0) =  s_thetaA * c_zetaA;
+    M_precession(2,1) = -s_zetaA  * s_thetaA;
+    M_precession(2,2) =  c_thetaA;
+
+    
+    M_nut_n_pre = M_nutation * M_precession;
+
+    /*----------------------------------------------------------- */
+    /*------------------- Rotation Matrix --------------------*/
+    /*----------------------------------------------------------- */
+
+
+
+    DM_w_precessing = 7.2921158553e-5 + 4.3e-15 * t; /* refer to Vallado */
+
+
+
+    temps_sideral = UT1 +  (24110.54841 + 8640184.812866 * t + 0.093104 * t2 - 0.0000062 * t3);
+
+   
+    temps_sideral = temps_sideral * DM_sec2r + delta_psi * cos(epsilonA) * DM_arcsec2r; /* unit: radian */
+
+
+    DM_sidereal_time = temps_sideral;
+
+
+
+    M_rotation(0,0) = cos(temps_sideral);
+    M_rotation(0,1) = sin(temps_sideral);
+    M_rotation(0,2) = 0.0;
+    M_rotation(1,0) = -sin(temps_sideral);
+    M_rotation(1,1) = cos(temps_sideral);
+    M_rotation(1,2) = 0.0;
+    M_rotation(2,0) = 0.0;
+    M_rotation(2,1) = 0.0;
+    M_rotation(2,2) = 1.0;
+
+
+    TEIC = M_rotation * M_nut_n_pre;
+
+    return TEIC;
+
+}  
+
 
 arma::vec3 INS::calculate_gravity_error(double dbi){
     double dbic = norm(SBIIC);
@@ -408,7 +574,10 @@ void INS::update(double int_step){
     INTEGRATE_MAT(RICI, TBI * EWBIB);
 
     // computed transformation matrix
-    this->TBIC = calculate_INS_derived_TBI(TBI);
+    // this->TBIC = calculate_INS_derived_TBI(TBI);
+    propagate_TBI_Q(int_step, WBICB);
+
+
 
     // calculate gravitational error
     this->EGRAVI = calculate_gravity_error(grab_dbi());
@@ -421,16 +590,25 @@ void INS::update(double int_step){
     // calculating position error
     INTEGRATE_MAT(ESBI, EVBI);
 
-    GPS_update();
-
+    if(gpsupdate == 1){
+        GPS_update();
+    }
+    
     this->SBIIC = calculate_INS_derived_postion(SBII);
     this->VBIIC = calculate_INS_derived_velocity(VBII);
     this->WBICI = calculate_INS_derived_bodyrate(TBIC, WBICB);
 
     // diagnostics
-    //ins_pos_err  = norm(ESBI);
-    //ins_vel_err  = norm(EVBI);
-    //ins_tilt_err = norm(RICI);
+    ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
+    ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);
+    ins_tilt_err = norm(RICI);
+
+    TEIC = calculate_INS_derived_TEI();
+    // arma::mat33 TEI;
+    // TEI = grab_TEI();
+
+    SBEEC = TEIC * SBIIC;
+    VBEEC = TEIC * VBIIC - WEII * SBEEC;
 
     // computing geographic velocity in body coordinates from INS
     arma::vec3 VEIC = WEII * SBIIC;
@@ -477,6 +655,50 @@ double INS::get_thtvdcx() { return thtvdcx; }
 
 arma::vec3 INS::get_SBIIC() { return SBIIC; }
 arma::vec3 INS::get_VBIIC() { return VBIIC; }
+arma::vec3 INS::get_SBEEC() { return SBEEC; }
+arma::vec3 INS::get_VBEEC() { return VBEEC; }
 arma::vec3 INS::get_WBICI() { return WBICI; }
 arma::vec3 INS::get_EGRAVI() { return EGRAVI; }
 arma::mat33 INS::get_TBIC() { return TBIC; }
+arma::mat33 INS::get_TEIC() { return TEIC; }
+
+void INS::set_gps_correction(unsigned int index){ gpsupdate = index; }
+
+void INS::propagate_TBI_Q(double int_step, arma::vec3 WBICB){
+    arma::vec TBIDC_Q_NEW(4);
+    /* Prepare for orthonormalization */
+    double quat_metric = TBIC_Q(0) * TBIC_Q(0) + TBIC_Q(1) * TBIC_Q(1) + TBIC_Q(2) * TBIC_Q(2) + TBIC_Q(3) * TBIC_Q(3);
+    double erq = 1. - quat_metric;
+
+    /* Calculate Previous states */
+    TBIDC_Q_NEW(0) = 0.5 * (-WBICB(0) * TBIC_Q(1) - WBICB(1) * TBIC_Q(2) - WBICB(2) * TBIC_Q(3)) + 50. * erq * TBIC_Q(0);
+    TBIDC_Q_NEW(1) = 0.5 * (WBICB(0) * TBIC_Q(0) + WBICB(2) * TBIC_Q(2) - WBICB(1) * TBIC_Q(3)) + 50. * erq * TBIC_Q(1);
+    TBIDC_Q_NEW(2) = 0.5 * (WBICB(1) * TBIC_Q(0) - WBICB(2) * TBIC_Q(1) + WBICB(0) * TBIC_Q(3)) + 50. * erq * TBIC_Q(2);
+    TBIDC_Q_NEW(3) = 0.5 * (WBICB(2) * TBIC_Q(0) + WBICB(1) * TBIC_Q(1) - WBICB(0) * TBIC_Q(2)) + 50. * erq * TBIC_Q(3);
+
+    this->TBIC_Q = integrate(TBIDC_Q_NEW, this->TBIDC_Q, this->TBIC_Q, int_step);
+
+    this->TBIDC_Q = TBIDC_Q_NEW;
+
+    this->TBIC = Quaternion2Matrix(this->TBIC_Q);  //Convert Quaternion to Matrix
+
+    //TBI orthogonality check
+    // arma::mat TIBC = trans(TBIC);
+    // arma::mat UBI = TIBC * TBIC;
+    // double e1 = UBI(0,0) - 1.;
+    // double e2 = UBI(1,1) - 1.;
+    // double e3 = UBI(2,2) - 1.;
+    // this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
+}
+
+void INS::load_angle() {
+
+    arma::mat33 TBD;
+
+    TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
+
+    arma::mat33 current_TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, get_rettime());
+    TBIC = TBD * current_TDI;
+
+    this->TBIC_Q = Matrix2Quaternion(this->TBIC);  //Convert Direct Cosine Matrix to Quaternion
+}

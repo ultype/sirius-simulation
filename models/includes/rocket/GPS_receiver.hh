@@ -102,7 +102,7 @@ class GPS_Receiver {
             ar & state_vel;
         }
 
-        GPS_Receiver(Newton&, _Euler_&, GPS_Satellites&);
+        GPS_Receiver(Newton&, _Euler_&);
         GPS_Receiver(const GPS_Receiver& other);
 
         GPS_Receiver& operator=(const GPS_Receiver& other);
@@ -120,7 +120,7 @@ class GPS_Receiver {
         /* uctime_cor (s)       User clock correlation time constant */
         void setup_fundamental_dynamic_matrix(double uctime_cor);
 
-        void initialize(double int_step);
+        void initialize(GPS_Satellites*, double int_step);
         void update_markov(double);
 
         void get_quadriga();

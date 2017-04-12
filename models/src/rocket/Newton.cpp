@@ -109,6 +109,8 @@ void Newton::default_data(){
 
 void Newton::initialize(){
     this->ABII = this->WEII * (this->WEII * this->SBII);
+    arma::mat33 TEI = environment->get_TEI();//cad::tei(get_rettime());
+    SBEE = TEI * SBII; //Calculate position in ECEF
     liftoff = 0;
 }
 

@@ -69,7 +69,7 @@ void GPS_constellation::initialize()
 	for (sv=0; sv<MAX_SAT; sv++)
 		allocatedSat[sv] = -1;
 
-	ionoutc.enable = TRUE;
+	ionoutc.enable = FALSE;
 }
 
 void GPS_constellation::compute()
@@ -559,7 +559,10 @@ int GPS_constellation::allocateChannel(channel_t *chan, ephem_t *eph, ionoutc_t 
 			allocatedSat[sv] = -1;
 		}
 	}
-
+	
+	if(nsat > MAX_CHAN){
+		nsat = MAX_CHAN;
+	}
 	return(nsat);
 }
 
@@ -651,6 +654,10 @@ void GPS_constellation::computeRange(range_t *rho, ephem_t eph, ionoutc_t *ionou
 	rho->d = range;
 	//Save the Sv's pos vector
 	rho->pos = pos;
+	//Save the Sv's vel vector
+	rho->vel = vel;
+	//Save the Sv's clock vector
+	rho->clk = clk;
 	// Pseudorange.
 	rho->range = range - SPEED_OF_LIGHT*clk(0);
 
