@@ -32,6 +32,7 @@ DP_Product/
 */*.trk
 */*.csv
 */*.header
+*.header
 
 MONTE_RUN_golden/RUN_*
 MONTE_RUN_golden/monte_header
