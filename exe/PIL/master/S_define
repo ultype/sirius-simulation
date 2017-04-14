@@ -159,7 +159,7 @@ class Rocket_SimObject : public Trick::SimObject {
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
-                gpsr        ( newton     , euler        , *gps_sats )        ,
+                gpsr        ( newton     , euler )        ,
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
@@ -178,7 +178,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") env.initialize();
             ("initialization") aerodynamics.initialize();
             ("initialization") euler.initialize();
-            ("initialization") gpsr.initialize(0.001);
+            ("initialization") gpsr.initialize(gps_sats, 0.001);
             ("initialization") tvc.initialize();
             ("initialization") rcs.initialize();
             ("initialization") propulsion.initialize();
