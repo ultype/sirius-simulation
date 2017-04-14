@@ -1,9 +1,33 @@
+execfile("Modified_data/test.dr")
+
 ##########################################################
 new_connection = trick.MSSocket()
 trick_master_slave.slave.set_connection_type(new_connection)
 trick_master_slave.slave.sync_error_terminate = 1
 
+Year = 2017
+DOY = 81
+Hour = 2
+Min = 0
+Sec = 0
+fc.time.load_start_time(Year, DOY, Hour, Min, Sec)
+
 #INS
+lonx       = 120.893501 # Vehicle longitude - deg  module newton
+latx       = 22.138917  # Vehicle latitude  - deg  module newton
+alt        = 100        # Vehicle altitude  - m  module newton
+fc.ins.load_location(lonx, latx, alt)
+
+phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
+psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
+fc.ins.load_angle(psibdx, phibdx, thtbdx)
+
+alpha0x    = 0    #Initial angle-of-attack   - deg  module newton
+beta0x     = 0    #Initial sideslip angle    - deg  module newton
+dvbe       = 0    #Vehicle geographic speed  - m/s  module newton
+fc.ins.load_geodetic_velocity(alpha0x, beta0x, dvbe)
+
 """
 frax_algnmnt = 0
 fc.ins.set_non_ideal(frax_algnmnt)

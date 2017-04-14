@@ -64,6 +64,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
         RCS_FC rcs_fc;
 
+        time_management time;
+
         Transceiver transceiver;
 
         void setup_export(){
@@ -156,7 +158,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             this->ltg_thrust = 0;
         }
 
-        FlightComputer_SimObject(){
+        FlightComputer_SimObject() : ins(time){
 
             ("default_data") clear_flag();
             ("default_data") guidance.default_data();
@@ -166,15 +168,16 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("initialization") link();
             ("initialization") guidance.initialize();
             ("initialization") control.initialize();
-            ("initialization") ins.initialize();
+            ("initialization") ins.initialize(time);
             ("initialization") rcs_fc.initialize();
 
+            P1 (0.001, "scheduled") time.dm_time();
 
             P2 (0.05, "scheduled") transceiver.receive();
 
             P2 (0.05, "scheduled") clear_flag();
 
-            P2 (0.05, "scheduled") ins.update(0.05);
+            P2 (0.005, "scheduled") ins.update(0.005);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);
             P2 (0.05, "scheduled") control.control(0.05);
             P2 (0.05, "scheduled") rcs_fc.actuate();
