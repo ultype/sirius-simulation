@@ -11,7 +11,7 @@ Hour = 2
 Min = 0
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
-
+fc.time.load_start_time(Year, DOY, Hour, Min, Sec)
 
 #SLV
 lonx       = 120.893501 # Vehicle longitude - deg  module newton
@@ -247,9 +247,8 @@ speration_1.action(12, "fuel_flow_rate = 29.63 " )
 speration_1.action(13, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
 
 speration_1.action(14, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
-speration_1.action(15, "trick.add_event(speration_2)")
-speration_1.action(16, "speration_2.activate()")
-speration_1.action(17, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv2.txt')")
+speration_1.action(15, "speration_2.activate()")
+speration_1.action(16, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv2.txt')")
 trick.add_event(speration_1)
 speration_1.activate()
 ###############################################################
@@ -258,8 +257,8 @@ speration_2=trick.new_event("speration_2")
 speration_2.set_cycle(0.001)
 speration_2.condition(0, "trick.exec_get_sim_time() == 350.001")
 speration_2.action(0, "rkt.propulsion.set_vmass0(3863)")
-speration_2.action(1, "trick.add_event(speration_3)")
-speration_2.action(2, "speration_3.activate()")
+speration_2.action(1, "speration_3.activate()")
+trick.add_event(speration_2)
 ##############################################################
 #Event3:Stage 3 ignition
 speration_3=trick.new_event("speration_3")
@@ -284,10 +283,10 @@ speration_3.action(13, "spi            = 300  " )
 speration_3.action(14, "fuel_flow_rate = 3.33 " )
 speration_3.action(15, "rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate)")
 
-speration_3.action(16, "trick.add_event(speration_4)")
-speration_3.action(17, "speration_4.activate()")
-speration_3.action(18, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv1.txt')")
-speration_3.action(19, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+speration_3.action(16, "speration_4.activate()")
+speration_3.action(17, "rkt.aerodynamics.load_aerotable('../../auxiliary/aero_table_slv1.txt')")
+speration_3.action(18, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+trick.add_event(speration_3)
 #############################################################
 #Event4:MECO
 speration_4=trick.new_event("speration_4")
@@ -295,6 +294,7 @@ speration_4.set_cycle(0.05)
 speration_4.condition(0, "rkt.newton.get_dvbi() > 7613.5")
 speration_4.action(0, "rkt.propulsion.set_no_thrust()")
 #speration_4.action(1, "rkt.propulsion.set_vmass0(0)")
+trick.add_event(speration_4)
 ######################################################################################################
 
 trick.stop(880)
