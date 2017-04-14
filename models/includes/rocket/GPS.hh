@@ -16,7 +16,7 @@ class GPS_FSW{
 
 	TRICK_INTERFACE(GPS_FSW);
     public:
-    	GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &newt, _Euler_ &eul, Environment &env);
+    	GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons);
     	GPS_FSW(const GPS_FSW &other);
     	GPS_FSW & operator= (const GPS_FSW &other);
 
@@ -31,7 +31,7 @@ class GPS_FSW{
 
         int get_gps_update() { return gps_update; };
         void clear_gps_flag() { gps_update--; };
-        void initialize(double int_step);
+        void initialize(double int_step, time_management &time_ma, GPS_constellation &gps_cons);
 
         arma::vec3 get_SXH();
 		arma::vec3 get_VXH();
@@ -82,12 +82,7 @@ class GPS_FSW{
     private:
         time_management * time;
     	GPS_constellation * gps_con;
-    	Newton *newton;
-    	_Euler_ *euler;
-    	Environment *environment;
-
         
-
         int gps_update;       /* *o (--)       GPS update? > 0 updated */
 
         /* Internal variables */
@@ -120,9 +115,12 @@ class GPS_FSW{
         arma::vec ZZ;       /* *o  (--)      */
         double _ZZ[8];      /* *o  (--)      */
 
+        arma::vec WEII;     /* *o  (r/s)      Earth rate (Vector) */
+        double _WEII[3];     /* *o  (r/s)      Earth rate (Vector) */   
         /* GPS Outputs */
 
         double gps_step;		/* *o  (s)      gps time step */
+
 
 };
 

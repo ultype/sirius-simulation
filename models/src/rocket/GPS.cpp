@@ -16,34 +16,30 @@
 #include "rocket/Euler.hh"
 #include "rocket/Ins.hh"
 #include "rocket/GPS.hh"
-GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons, Newton &newt, _Euler_ &eul, Environment &env)
+GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons)
 :   time(&time_ma),
     gps_con(&gps_cons),
-    newton(&newt),
-    euler(&eul),
-    environment(&env),
     MATRIX_INIT(PP, 8, 8),
     MATRIX_INIT(FF, 8, 8),
     MATRIX_INIT(PHI, 8, 8),
     VECTOR_INIT(SXH, 3),
     VECTOR_INIT(VXH, 3),
     VECTOR_INIT(CXH, 3),
-    VECTOR_INIT(ZZ, 8)
+    VECTOR_INIT(ZZ, 8),
+    VECTOR_INIT(WEII, 3)
 {}
 
 GPS_FSW::GPS_FSW(const GPS_FSW &other)
 :   time(other.time),
     gps_con(other.gps_con),
-    newton(other.newton),
-    euler(other.euler),
-    environment(other.environment),
     MATRIX_INIT(PP, 8, 8),
     MATRIX_INIT(FF, 8, 8),
     MATRIX_INIT(PHI, 8, 8),
     VECTOR_INIT(SXH, 3),
     VECTOR_INIT(VXH, 3),
     VECTOR_INIT(CXH, 3),
-    VECTOR_INIT(ZZ, 8)
+    VECTOR_INIT(ZZ, 8),
+    VECTOR_INIT(WEII, 3)
 {}
 
 GPS_FSW & GPS_FSW::operator= (const GPS_FSW &other){
@@ -89,10 +85,16 @@ void GPS_FSW::setup_fundamental_dynamic_matrix(double uctime_cor){
 }
 
 
-void GPS_FSW::initialize(double int_step){
+void GPS_FSW::initialize(double int_step, time_management &time_ma, GPS_constellation &gps_cons){
+    time = &time_ma;
+    gps_con = &gps_cons;
     // state transition matrix - constant throughout
     PHI = arma::mat88(arma::fill::eye) + FF * int_step + FF * FF * (int_step * int_step / 2);
-
+    this->WEII.zeros();
+    //Due to RNP so that earth rate have 3 axis components
+    this->WEII(0) = WEII1;
+    this->WEII(1) = WEII2;
+    this->WEII(2) = WEII3;
     // initializing update clock
     // gps_epoch = get_rettime();
 }
@@ -184,7 +186,7 @@ void GPS_FSW::measure(double int_step){
 
     // arma::vec3 SBII = newton->get_SBII();
     // arma::vec3 VBII = newton->get_VBII();
-    arma::vec3 WEII = euler->get_WEII();
+    // arma::vec3 WEII = euler->get_WEII();
 
     arma::vec3 SBIIC = grab_SBIIC();
     arma::vec3 VBIIC = grab_VBIIC();

@@ -203,7 +203,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        () ,
                 gps_con     ( time       , newton       , env          , kinematics) ,
-                gps         (time        , gps_con      , newton       , euler       , env) ,
+                gps         (time        , gps_con) ,
                 ins         (time )
             {
 
@@ -216,7 +216,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") aerodynamics.initialize();
             ("initialization") euler.initialize();
             //("initialization") gpsr.initialize(gps_sats, 0.001);
-            ("initialization") gps.initialize(0.001);
+            ("initialization") gps.initialize(0.001, time, gps_con);
             ("initialization") tvc.initialize();
             ("initialization") rcs.initialize();
             ("initialization") propulsion.initialize();
