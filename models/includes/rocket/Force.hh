@@ -11,16 +11,14 @@ PROGRAMMERS:
 #include "aux/global_constants.hh"
 #include "Environment.hh"
 #include "Rcs.hh"
-#include "RcsFc.hh"
 #include "Tvc.hh"
 #include "Kinematics.hh"
 #include "Newton.hh"
-#include "Control.hh"
 #include "Propulsion.hh"
+
 class Propulsion;
 class AeroDynamics;
 class RCS;
-class RCS_FC;
 class TVC;
 class Environment;
 

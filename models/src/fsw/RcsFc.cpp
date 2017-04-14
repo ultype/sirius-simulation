@@ -1,4 +1,5 @@
-#include "rocket/RcsFc.hh"
+#include "fsw/RcsFc.hh"
+#include "aux/global_constants.hh"
 
 RCS_FC::RCS_FC(){
     this->default_data();

@@ -1,4 +1,4 @@
-execfile("Modified_data/test.dr")
+# execfile("Modified_data/test.dr")
 
 ##########################################################
 new_connection = trick.MSSocket()

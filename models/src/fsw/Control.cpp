@@ -1,7 +1,8 @@
-#include "rocket/Control.hh"
+#include "fsw/Control.hh"
 
 #include "math/integrate.hh"
 #include "math/utility.hh"
+#include "aux/global_constants.hh"
 
 Control::Control()
     :   VECTOR_INIT(GAINFP, 3),

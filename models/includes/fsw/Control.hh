@@ -4,21 +4,12 @@
 PURPOSE:
       (Describe the CONTROL Module On Board)
 LIBRARY DEPENDENCY:
-      ((../src/rocket/Control.cpp))
+      ((../src/fsw/Control.cpp))
 PROGRAMMERS:
       (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
-
-#include "Newton.hh"
-#include "Environment.hh"
-#include "Ins.hh"
-#include "Propulsion.hh"
-#include "Aerodynamics.hh"
-
-class Newton;
-class Environment;
-class Propulsion;
-class AeroDynamics;
+#include <armadillo>
+#include "aux/aux.hh"
 
 class Control {
     TRICK_INTERFACE(Control);

@@ -1,5 +1,4 @@
 #include "aux/transceiver.hh"
-#include "rocket/Ins.hh"
 #include "sim_services/include/simtime.h"
 
 #include "trick_utils/comm/include/tc.h"

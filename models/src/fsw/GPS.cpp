@@ -12,10 +12,8 @@
 
 #include <armadillo>
 
-#include "rocket/Newton.hh"
-#include "rocket/Euler.hh"
-#include "rocket/Ins.hh"
-#include "rocket/GPS.hh"
+#include "fsw/Ins.hh"
+#include "fsw/GPS.hh"
 GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons)
 :   time(&time_ma),
     gps_con(&gps_cons),
@@ -170,8 +168,8 @@ void GPS_FSW::measure(double int_step){
     int ii(0);
   // Pseudo-range and range-rate measurements
     for(int i = 0; i < MAX_CHAN; i++){
-        
-        
+
+
         if(gps_con->chan[i].prn > 0){
             // pesudo_range(ii) = gps_con->chan[i].rho0.range;
             // pesudo_range_rate(ii) = gps_con->chan[i].rho0.rate;
@@ -204,12 +202,12 @@ void GPS_FSW::measure(double int_step){
         // // measured pseudo-range
         // double dsb_meas = dsb ;//+ PR_BIAS[i] + PR_NOISE[i];// + ucbias_error;
 
-     
+
         // double dvsb = gps_con->chan[id].rho0.rate;
         // // measured delta-range rate
         // double dvsb_meas = dvsb ;//+ DR_NOISE[i] ;//+ ucfreq_error;
 
-        
+
 
         // // INS derived range measurements
         // arma::vec3 SSBIC;
@@ -222,7 +220,7 @@ void GPS_FSW::measure(double int_step){
 
         // // double dvsbc = dot(trans(TEIC) * (gps_con->chan[i].rho0.vel + cross(WEII, gps_con->chan[id].rho0.pos)), (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC))/dsbc;
         // double dvsbc = dot(gps_con->chan[i].rho0.vel , SSBIC)/dsbc;
-        
+
         // Pesudo-range on ECI/////////////////////////////////////////////////////////////////////////
         // arma::vec3 SSBI;
         // SSBI = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC);
@@ -237,7 +235,7 @@ void GPS_FSW::measure(double int_step){
 
         double dvsb_meas = dot(velECI, SSBIC)/dsb_meas;
         /////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
 
         double dvsbc = dot(velECI, SSBIC)/dsbc;

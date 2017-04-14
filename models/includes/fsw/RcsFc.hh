@@ -4,15 +4,10 @@
 PURPOSE:
       (Describe the RCS Module On Board)
 LIBRARY DEPENDENCY:
-      ((../src/rocket/RcsFc.cpp))
+      ((../src/fsw/RcsFc.cpp))
 *******************************************************************************/
-
-#include "Newton.hh"
-#include "Ins.hh"
-#include "Tvc.hh"
-#include "Guidance.hh"
-
-class Guidance;
+#include <armadillo>
+#include "aux/aux.hh"
 
 class RCS_FC {
     TRICK_INTERFACE(RCS_FC);

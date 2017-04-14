@@ -1,4 +1,5 @@
 #include "rocket/Force.hh"
+#include "fsw/RcsFc.hh"
 #include "sim_services/include/simtime.h"
 
 #include "aux/aux.hh"

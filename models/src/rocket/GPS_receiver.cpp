@@ -17,7 +17,7 @@
 #include "rocket/Newton.hh"
 #include "rocket/Euler.hh"
 #include "rocket/Earth.hh"
-#include "rocket/Ins.hh"
+#include "fsw/Ins.hh"
 
 GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr)
     :   newton(&ntn), euler(&elr),

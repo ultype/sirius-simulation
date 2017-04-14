@@ -4,16 +4,12 @@
 PURPOSE:
       (Describe the GUIDANCE Module On Board)
 LIBRARY DEPENDENCY:
-      ((../src/rocket/Guidance.cpp))
+      ((../src/fsw/Guidance.cpp))
 PROGRAMMERS:
       (((Chung-Fan Yang) () () () ))
 *******************************************************************************/
 #include <armadillo>
-
-#include "Newton.hh"
-#include "Ins.hh"
-#include "Propulsion.hh"
-class Propulsion;
+#include "aux/aux.hh"
 
 class Guidance {
     TRICK_INTERFACE(Guidance);

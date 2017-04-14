@@ -1,6 +1,7 @@
-#include "rocket/Guidance.hh"
+#include "fsw/Guidance.hh"
 
 #include "cad/utility.hh"
+#include "aux/global_constants.hh"
 
 #include "sim_services/include/simtime.h"
 

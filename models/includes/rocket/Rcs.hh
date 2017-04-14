@@ -6,15 +6,11 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/rocket/Rcs.cpp))
 *******************************************************************************/
-
+#include "Propulsion.hh"
 #include "Newton.hh"
-#include "Ins.hh"
 #include "Tvc.hh"
-#include "Guidance.hh"
 
 #include "cad/schmitt_trigger.hh"
-
-class Guidance;
 
 class RCS {
     TRICK_INTERFACE(RCS);

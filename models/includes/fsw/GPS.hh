@@ -4,13 +4,12 @@
 PURPOSE:
       (Describe the GPS compute unit On Board)
 LIBRARY DEPENDENCY:
-      ((../src/rocket/GPS.cpp) (../src/aux/utility_functions.cpp))
+      ((../src/fsw/GPS.cpp))
 PROGRAMMERS:
       (((Lai Chun Hsu) () () () ))
 *******************************************************************************/
-#include "Ins.hh"
-#include "GPS_constellation.hh"
-#include "Time_management.hh"
+#include "rocket/Time_management.hh"
+#include "rocket/GPS_constellation.hh"
 
 class GPS_FSW{
 
@@ -82,7 +81,7 @@ class GPS_FSW{
     private:
         time_management * time;
     	GPS_constellation * gps_con;
-        
+
         int gps_update;       /* *o (--)       GPS update? > 0 updated */
 
         /* Internal variables */
@@ -116,7 +115,7 @@ class GPS_FSW{
         double _ZZ[8];      /* *o  (--)      */
 
         arma::vec WEII;     /* *o  (r/s)      Earth rate (Vector) */
-        double _WEII[3];     /* *o  (r/s)      Earth rate (Vector) */   
+        double _WEII[3];     /* *o  (r/s)      Earth rate (Vector) */
         /* GPS Outputs */
 
         double gps_step;		/* *o  (s)      gps time step */

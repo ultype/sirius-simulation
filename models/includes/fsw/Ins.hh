@@ -4,16 +4,11 @@
 PURPOSE:
       (Describe the INS Module On Board, Error equations based on Zipfel, Figure 10.27, space stabilized INS with GPS updates)
 LIBRARY DEPENDENCY:
-      ((../src/rocket/Ins.cpp))
+      ((../src/fsw/Ins.cpp))
 *******************************************************************************/
 #include <functional>
 
-#include "Newton.hh"
-#include "Euler.hh"
-#include "Environment.hh"
-#include "Kinematics.hh"
-#include "GPS_receiver.hh"
-#include "Time_management.hh"
+#include "rocket/Time_management.hh"
 
 #include "sensor/gyro/gyro.hh"
 #include "sensor/gyro/gyro_ideal.hh"
@@ -23,11 +18,6 @@ LIBRARY DEPENDENCY:
 #include "sensor/accel/accelerometer_ideal.hh"
 #include "sensor/accel/accelerometer_rocket6g.hh"
 
-class GPS_Receiver;
-class Newton;
-class Kinematics;
-class _Euler_;
-class Environment;
 class time_management;
 
 class INS {

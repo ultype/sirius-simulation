@@ -15,11 +15,9 @@ LIBRARY DEPENDENCY:
 #include "Environment.hh"
 #include "Kinematics.hh"
 #include "GPS_receiver.hh"
-#include "Control.hh"
 
 class Propulsion;
 class Kinematics;
-class Control;
 class Environment;
 
 class TVC {
@@ -127,7 +125,6 @@ class TVC {
         /* Routing references */
         Environment * environment;
         Kinematics  * kinematics;
-        Control     * control;
         Propulsion  * propulsion;
 
         /* State */

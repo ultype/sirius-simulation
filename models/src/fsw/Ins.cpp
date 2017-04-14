@@ -6,7 +6,7 @@
 #include "math/integrate.hh"
 #include "math/matrix/utility.hh"
 
-#include "rocket/Ins.hh"
+#include "fsw/Ins.hh"
 #include "sim_services/include/simtime.h"
 
 #include "sensor/gyro/gyro.hh"
