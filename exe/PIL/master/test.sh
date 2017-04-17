@@ -1,5 +1,11 @@
 #!/bin/bash
 set -e
+if env | grep -q ^WORKSPACE=
+then
+    echo finding slave from $WORKSPACE
+else
+    export WORKSPACE=`pwd`/../../../
+fi
 
 trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
