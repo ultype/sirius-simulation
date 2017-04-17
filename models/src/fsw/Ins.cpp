@@ -644,12 +644,7 @@ void INS::update(double int_step){
     SBEEC = TEIC * SBIIC;
     VBEEC = TEIC * VBIIC - WEII * SBEEC;
 
-    // diagnostics
-    ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
-    ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);    
-    ins_pose_err  = norm(SBEE - SBEEC);//norm(ESBI);
-    ins_vele_err  = norm(VBEE - VBEEC);//norm(EVBI);
-    ins_tilt_err = norm(RICI);    
+      
 
     // computing geographic velocity in body coordinates from INS
     arma::vec3 VEIC = WEII * SBIIC;
@@ -684,6 +679,8 @@ void INS::update(double int_step){
     // computing Euler angles from INS
     arma::mat33 TBD = TBIC * trans(TDCI);
     calculate_INS_derived_euler_angles(TBD);
+
+    error_diagnostics();
 }
 
 double INS::get_dvbec() { return dvbec; }
@@ -730,4 +727,17 @@ void INS::propagate_TBI_Q(double int_step, arma::vec3 WBICB){
     // double e2 = UBI(1,1) - 1.;
     // double e3 = UBI(2,2) - 1.;
     // this->ortho_error = sqrt(e1 * e1 + e2 * e2 + e3 * e3);
+}
+
+void INS::error_diagnostics(){
+    arma::vec3 SBII  = grab_SBII();
+    arma::vec3 VBII  = grab_VBII();
+    arma::vec3 SBEE = grab_SBEE();
+    arma::vec3 VBEE = grab_VBEE();
+    // diagnostics
+    ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
+    ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);    
+    ins_pose_err  = norm(SBEE - SBEEC);//norm(ESBI);
+    ins_vele_err  = norm(VBEE - VBEEC);//norm(EVBI);
+    ins_tilt_err = norm(RICI);  
 }

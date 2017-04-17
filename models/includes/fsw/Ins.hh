@@ -149,6 +149,8 @@ class INS {
         void load_angle();
         void propagate_TBI_Q(double int_step, arma::vec3 WBICB);
 
+        void error_diagnostics();
+
 
 
         /* Internal Calculators */
