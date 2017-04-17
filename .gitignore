@@ -34,6 +34,9 @@ DP_Product/
 */*.header
 *.header
 
+*.header
+*.trk
+
 MONTE_RUN_golden/RUN_*
 MONTE_RUN_golden/monte_header
 MONTE_RUN_golden/monte_runs
