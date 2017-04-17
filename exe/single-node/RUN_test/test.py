@@ -80,11 +80,11 @@ rkt.propulsion.set_payload(98) #payload mass
 rkt.ins.load_location(lonx, latx, alt)
 rkt.ins.load_angle(psibdx, phibdx, thtbdx)
 rkt.ins.load_geodetic_velocity(alpha0x, beta0x, dvbe)
-
+"""
 frax_algnmnt = 0
 rkt.ins.set_non_ideal(frax_algnmnt)
-
-# rkt.ins.set_ideal()
+"""
+rkt.ins.set_ideal()
 #INS Accel
 # Create a Errorous Accelerometer
 """
@@ -98,16 +98,16 @@ rkt.accelerometer = trick.AccelerometerIdeal(rkt.newton);
 
 #ins gyro
 # Create a Errorous Gyro
-
+"""
 EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
 rkt.gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
-
+"""
 # Create a Ideal Gyro
-# rkt.gyro = trick.GyroIdeal(rkt.euler);
+rkt.gyro = trick.GyroIdeal(rkt.euler);
 
-gpsupdate  = 1
+gpsupdate  = 0
 rkt.ins.set_gps_correction(gpsupdate);
 
 #GPS

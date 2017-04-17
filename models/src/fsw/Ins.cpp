@@ -634,17 +634,22 @@ void INS::update(double int_step){
     this->VBIIC = calculate_INS_derived_velocity(VBII);
     this->WBICI = calculate_INS_derived_bodyrate(TBIC, WBICB);
 
-    // diagnostics
-    ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
-    ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);
-    ins_tilt_err = norm(RICI);
-
     TEIC = calculate_INS_derived_TEI();
     // arma::mat33 TEI;
     // TEI = grab_TEI();
 
+    arma::vec3 SBEE = grab_SBEE();
+    arma::vec3 VBEE = grab_VBEE();
+
     SBEEC = TEIC * SBIIC;
     VBEEC = TEIC * VBIIC - WEII * SBEEC;
+
+    // diagnostics
+    ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
+    ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);    
+    ins_pose_err  = norm(SBEE - SBEEC);//norm(ESBI);
+    ins_vele_err  = norm(VBEE - VBEEC);//norm(EVBI);
+    ins_tilt_err = norm(RICI);    
 
     // computing geographic velocity in body coordinates from INS
     arma::vec3 VEIC = WEII * SBIIC;

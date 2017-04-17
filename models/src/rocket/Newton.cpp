@@ -291,3 +291,4 @@ arma::vec3 Newton::get_SBEE() { return SBEE; }
 unsigned int Newton::get_liftoff() { return liftoff; }
 
 arma::mat Newton::get_TGI() { return TGI; }
+arma::vec3 Newton::get_VBEE() { return VBEE; }

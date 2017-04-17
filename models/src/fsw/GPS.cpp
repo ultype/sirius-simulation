@@ -309,3 +309,4 @@ void GPS_FSW::measure(double int_step){
 arma::vec3 GPS_FSW::get_SXH() { return SXH; };
 arma::vec3 GPS_FSW::get_VXH() { return VXH; };
 arma::vec3 GPS_FSW::get_CXH() { return CXH; };
+

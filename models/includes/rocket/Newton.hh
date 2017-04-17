@@ -80,6 +80,7 @@ class Newton {
         arma::vec3 get_SBEE();
         arma::vec3 get_VBED();
         arma::mat get_TGI();
+        arma::vec3 get_VBEE();
 
         unsigned int get_liftoff();
 
