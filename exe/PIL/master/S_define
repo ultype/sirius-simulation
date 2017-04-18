@@ -108,6 +108,8 @@ class Rocket_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT( newton        , get_dvbe));
             transceiver.register_for_transmit(EXPORT( newton        , get_dvbi));
             transceiver.register_for_transmit(EXPORT( newton        , get_thtvdx));
+            transceiver.register_for_transmit(EXPORT( newton        , get_SBEE));
+            transceiver.register_for_transmit(EXPORT( newton        , get_VBEE));
             transceiver.register_for_transmit(EXPORT( kinematics    , get_TBI));
             transceiver.register_for_transmit(EXPORT( gpsr          , get_SXH));
             transceiver.register_for_transmit(EXPORT( gpsr          , get_VXH));
