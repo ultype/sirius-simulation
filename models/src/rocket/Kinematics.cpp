@@ -252,10 +252,10 @@ double Kinematics::get_alphax() { return alphax; }
 double Kinematics::get_betax() { return betax; }
 
 double Kinematics::get_psibdx() {
-    double psibd = 0;
+    
     double cthtbd = 0;
 
-    get_thtbdx(cthtbd);
+    get_thtbdx_in(cthtbd);
 
     //yaw angle: 'psibd'
     double cpsi = TBD(0, 0) / cthtbd;
@@ -270,11 +270,11 @@ double Kinematics::get_psibdx() {
 
 double Kinematics::get_thtbdx() {
     double cthtbd = 0;
-    return get_thtbdx(cthtbd);
+    return get_thtbdx_in(cthtbd);
 }
 
-double Kinematics::get_thtbdx(double &cthtbd) {
-    double thtbd = 0;
+double Kinematics::get_thtbdx_in(double &cthtbd) {
+    
 
     //*geodetic _Euler_ angles
     //pitch angle: 'thtbd'
@@ -292,10 +292,10 @@ double Kinematics::get_thtbdx(double &cthtbd) {
     return DEG * thtbd;
 }
 double Kinematics::get_phibdx() {
-    double phibd = 0;
+    
     double cthtbd = 0;
 
-    get_thtbdx(cthtbd);
+    get_thtbdx_in(cthtbd);
 
     //roll angle: 'phibdc'
     double cphi = TBD(2, 2) / cthtbd;

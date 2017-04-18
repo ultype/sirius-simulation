@@ -19,7 +19,10 @@ Newton::Newton(Kinematics &kine, _Euler_ &elr, Environment &env, Propulsion &pro
         VECTOR_INIT(FSPB, 3),
         VECTOR_INIT(ABIB, 3),
         VECTOR_INIT(SBEE, 3),
-        VECTOR_INIT(VBEE, 3)
+        VECTOR_INIT(VBEE, 3),
+        VECTOR_INIT(ABEE, 3),
+        VECTOR_INIT(JBII, 3),
+        VECTOR_INIT(JBEE, 3)
 {
     this->default_data();
 }
@@ -35,7 +38,10 @@ Newton::Newton(const Newton& other)
         VECTOR_INIT(FSPB, 3),
         VECTOR_INIT(ABIB, 3),
         VECTOR_INIT(SBEE, 3),
-        VECTOR_INIT(VBEE, 3)
+        VECTOR_INIT(VBEE, 3),
+        VECTOR_INIT(ABEE, 3),
+        VECTOR_INIT(JBII, 3),
+        VECTOR_INIT(JBEE, 3)
 {
     this->default_data();
 
@@ -204,13 +210,16 @@ void Newton::propagate_position_speed_acceleration(double int_step){
 
     arma::mat NEXT_VEL = integrate(NEXT_ACC, ABII, VBII, int_step);
     SBII = integrate(NEXT_VEL, VBII, SBII, int_step);
+    JBII = (NEXT_ACC - ABII)/int_step;//Calculate Jerk in ECI
     ABII = NEXT_ACC;
     VBII = NEXT_VEL;
     ABIB = TBI * ABII;
 
     SBEE = TEI * SBII; //Calculate position in ECEF
     VBEE = TEI * VBII - cross(WEII, SBEE); //Calculate velocity in ECEF 
-
+    ABEE = TEI * ABII - cross(WEII, VBEE) - cross(WEII, VBEE) - cross(WEII, cross(WEII, SBEE));
+    JBEE = TEI * JBII - cross(WEII, cross(WEII, cross(WEII, SBEE))) - cross(WEII, cross(WEII, VBEE)) - cross(WEII, ABEE);
+    
     //Calculate lon lat alt
     cad::geo84_in(lon, lat, al, SBII, get_rettime());
     this->lonx = lon * DEG;

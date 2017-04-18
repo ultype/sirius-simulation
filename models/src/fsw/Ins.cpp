@@ -730,14 +730,23 @@ void INS::propagate_TBI_Q(double int_step, arma::vec3 WBICB){
 }
 
 void INS::error_diagnostics(){
+
     arma::vec3 SBII  = grab_SBII();
     arma::vec3 VBII  = grab_VBII();
     arma::vec3 SBEE = grab_SBEE();
     arma::vec3 VBEE = grab_VBEE();
+    
+    double phibdx = grab_phibdx();
+    double thtbdx = grab_thtbdx();
+    double psibdx = grab_psibdx();
+    
     // diagnostics
     ins_pos_err  = norm(SBII - SBIIC);//norm(ESBI);
     ins_vel_err  = norm(VBII - VBIIC);//norm(EVBI);    
     ins_pose_err  = norm(SBEE - SBEEC);//norm(ESBI);
     ins_vele_err  = norm(VBEE - VBEEC);//norm(EVBI);
-    ins_tilt_err = norm(RICI);  
+    ins_tilt_err = norm(RICI);
+    ins_phi_err = phibdx - phibdcx;
+    ins_tht_err = thtbdx - thtbdcx;
+    ins_psi_err = psibdx - psibdcx;  
 }

@@ -93,6 +93,7 @@ void GPS_constellation::compute()
                     }
     }
     GDOP(chan, SBEE);
+    gps_update = 1;
 }
 
 void GPS_constellation::GDOP(channel_t *chan, arma::vec3 xyz)

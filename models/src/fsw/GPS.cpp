@@ -24,7 +24,8 @@ GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons)
     VECTOR_INIT(VXH, 3),
     VECTOR_INIT(CXH, 3),
     VECTOR_INIT(ZZ, 8),
-    VECTOR_INIT(WEII, 3)
+    VECTOR_INIT(WEII, 3),
+    MATRIX_INIT(PP0, 8, 8)
 {}
 
 GPS_FSW::GPS_FSW(const GPS_FSW &other)
@@ -37,7 +38,8 @@ GPS_FSW::GPS_FSW(const GPS_FSW &other)
     VECTOR_INIT(VXH, 3),
     VECTOR_INIT(CXH, 3),
     VECTOR_INIT(ZZ, 8),
-    VECTOR_INIT(WEII, 3)
+    VECTOR_INIT(WEII, 3),
+    MATRIX_INIT(PP0, 8, 8)
 {}
 
 GPS_FSW & GPS_FSW::operator= (const GPS_FSW &other){
@@ -146,8 +148,8 @@ void GPS_FSW::measure(double int_step){
     //     return;
     // }
     gps_step = int_step;
-    gps_acq = true;
-    gps_update++;
+    // gps_acq = true;
+    // gps_update = 1;
     // // resetting update clock
     // time_gps = 0;
     // gps_epoch = get_rettime();

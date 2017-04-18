@@ -138,6 +138,15 @@ class Newton {
         arma::vec VBEE;         /* *o  (m/s)     Vehicle speed in earth coord  */
         double _VBEE[3];           /* *o  (m/s)     Vehicle speed in earth coord  */
 
+        arma::vec ABEE;         /* *o  (m/s2)   Vehicle acceleration in ECEF */
+        double _ABEE[3];        /* *o  (m/s2)   Vehicle acceleration in ECEF */
+
+        arma::vec JBII;         /* *o (m/s3)    Vehicle Jerk in ECI*/
+        double _JBII[3];        /* *o (m/s3)    Vehicle Jerk in ECI*/
+
+        arma::vec JBEE;         /* *o (m/s3)    Vehicle Jerk in ECEF */
+        double _JBEE[3];        /* *o (m/s3)    Vehicle Jerk in ECEF */
+
         arma::mat TDI;      /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
         double _TDI[3][3];     /* **  (--)     Transformation Matrix of geodetic wrt inertial  coordinates */
 

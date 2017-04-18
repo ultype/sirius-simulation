@@ -28,8 +28,8 @@ class GPS_FSW{
         std::function<arma::vec3()> grab_WBICI;
 
 
-        int get_gps_update() { return gps_update; };
-        void clear_gps_flag() { gps_update--; };
+        // int get_gps_update() { return gps_update; };
+        // void clear_gps_flag() { gps_update = 0; };
         void initialize(double int_step, time_management &time_ma, GPS_constellation &gps_cons);
 
         arma::vec3 get_SXH();
@@ -82,7 +82,7 @@ class GPS_FSW{
         time_management * time;
     	GPS_constellation * gps_con;
 
-        int gps_update;       /* *o (--)       GPS update? > 0 updated */
+ 
 
         /* Internal variables */
         bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
@@ -97,6 +97,9 @@ class GPS_FSW{
 
         arma::mat PP;               /* *o (--)      Covariance Matrix */
         double _PP[8][8];           /* *o (--)      Covariance Matrix */
+
+        arma::mat PP0;
+        double _PP0[8][8];
 
         double factq;               /* *o (--)      Factor to modifiy the Q-matrix Q(1+factq) */
         double qclockb;             /* *o (m)       1sig clock bias error of process cov matrix */

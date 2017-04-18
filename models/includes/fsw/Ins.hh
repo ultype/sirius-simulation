@@ -93,6 +93,9 @@ class INS {
         std::function<arma::mat33()>  grab_TEI;  //Only for testing
         std::function<arma::vec3()>   grab_SBEE;
         std::function<arma::vec3()>   grab_VBEE;
+        std::function<double()>   grab_phibdx;
+        std::function<double()>   grab_thtbdx;
+        std::function<double()>   grab_psibdx;
 
         double get_dvbec();
         double get_alphacx();
@@ -247,6 +250,9 @@ class INS {
         double ins_tilt_err; /* *o  (r)     INS absolute tilt error */
         double ins_pose_err; /* *io  (m)     INS absolute postion error */
         double ins_vele_err; /* *io  (m/s)   INS absolute velocity error */
+        double ins_phi_err;  /* *o (d)      INS absolute phi angle error */
+        double ins_tht_err;   /* *o (d)     INS absolute tht angle error */
+        double ins_psi_err;  /* *o  (d)     INS absolute psi angle error */
 
 
         unsigned int gpsupdate; /* *o (--)   Set wether use gps correction or not */

@@ -115,6 +115,8 @@ class GPS_constellation{
 		void compute();
 		void show();
 		channel_t* get_channel();
+		unsigned int get_gps_update() { return gps_update; }
+		void clear_gps_flag() { gps_update = 0; };
 
 		template<class Archive>
 	    void serialize(Archive & ar, const unsigned int version){
@@ -161,7 +163,7 @@ class GPS_constellation{
 		int allocatedSat[MAX_SAT]; /* *o (--)						*/
 
 		double gdop; /* *io  (--)  Geometric Dilution of Precsision */
-
+		unsigned int gps_update;       /* *o (--)       GPS update? > 0 updated */
 		// arma::vec azel;
 		// double _azel[2];
 

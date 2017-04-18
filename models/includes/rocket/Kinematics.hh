@@ -69,7 +69,7 @@ class Kinematics{
         void default_data();
 
         /* Internal Getter */
-        double get_thtbdx(double &cthtbd);
+        double get_thtbdx_in(double &cthtbd);
 
         /* Internal Initializers */
 
@@ -126,9 +126,13 @@ class Kinematics{
 
         /* Non-propagating Diagnostic Variables */
         /* These can be deleted, but keep to remain trackable in trick simulator */
-        double psibdx;      /* *io (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
-        double thtbdx;      /* *io (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
-        double phibdx;      /* *io (d)     Roll angle of Vehicle wrt geodetic coord - deg */
+        double psibdx;      /* *o (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
+        double thtbdx;      /* *o (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
+        double phibdx;      /* *o (d)     Roll angle of Vehicle wrt geodetic coord - deg */
+        double psibd;      /* *o (r)     Yaw angle of Vehicle wrt geodetic coord - rad */
+        double thtbd;      /* *o (r)     Pitch angle of Vehicle wrt geodetic coord - rad */
+        double phibd;      /* *o (r)     Roll angle of Vehicle wrt geodetic coord - rad */
+
 };
 
 
