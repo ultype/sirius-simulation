@@ -132,6 +132,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ins.grab_gps_update             = transceiver(IMPORT(gpsr           , get_gps_update));
             ins.grab_SBEE                   = transceiver(IMPORT(newton         , get_SBEE));
             ins.grab_VBEE                   = transceiver(IMPORT(newton         , get_VBEE));
+            ins.grab_phibdx                 = transceiver(IMPORT(kinematics     , get_phibdx));
+            ins.grab_thtbdx                 = transceiver(IMPORT(kinematics     , get_thtbdx));
+            ins.grab_psibdx                 = transceiver(IMPORT(kinematics     , get_psibdx));
             guidance.grab_mprop             = transceiver(IMPORT(propulsion     , get_mprop));
             guidance.grab_dbi               = transceiver(IMPORT(newton         , get_dbi));
             guidance.grab_dvbi              = transceiver(IMPORT(newton         , get_dvbi));
