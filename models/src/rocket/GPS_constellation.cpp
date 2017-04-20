@@ -132,7 +132,7 @@ void GPS_constellation::show()
                 cout<<"/*****************************************************************************/"<<endl;
                 for(int i = 0;i<MAX_CHAN;i++){
                     if(chan[i].prn>0){
-                        cout<<chan[i].prn<<'\t'<<(chan[i].azel(0))*DEG<<'\t'<<(chan[i].azel(1))*DEG<<'\t'<<chan[i].rho0.d
+                        cout<<chan[i].prn<<'\t'<<(chan[i].azel(1))*DEG<<'\t'<<(chan[i].azel(0))*DEG<<'\t'<<chan[i].rho0.d
                         <<'\t'<<chan[i].rho0.iono_delay<<'\t'<<chan[i].rho0.range<<'\t'<<chan[i].rho0.rate<<endl;
                     }
                 }
@@ -580,7 +580,7 @@ int GPS_constellation::checkSatVisibility(ephem_t eph, GPS g, arma::vec3 xyz, do
 	double phi = kinematics->get_phibdx();
 	double tht = kinematics->get_thtbdx();
 	double psi = kinematics->get_psibdx();
-	arma::mat33 TAENU = enu2atenna(phi * RAD, (tht - 20) * RAD, psi * RAD);
+	arma::mat33 TAENU = enu2atenna(phi * RAD, (tht - 20) * RAD, (psi * RAD));
 
 	if (eph.vflg != 1)
 		return (-1); // Invalid

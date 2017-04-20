@@ -15,3 +15,6 @@ log_gps	double	   m/s	rkt.ins.ins_vele_err
 log_gps	double	degree	rkt.ins.ins_phi_err
 log_gps	double	degree	rkt.ins.ins_tht_err
 log_gps	double	degree	rkt.ins.ins_psi_err
+log_gps	double	     m	rkt.newton._SBII[0]
+log_gps	double	     m	rkt.newton._SBII[1]
+log_gps	double	     m	rkt.newton._SBII[2]
