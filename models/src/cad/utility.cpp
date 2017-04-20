@@ -918,7 +918,7 @@ arma::mat33 cad::tgi84(const double &lon,
                   const double &time)
 {
     arma::mat33 TDI = tdi84(lon, lat, alt, time);
-    arma::mat33 TGD;
+    arma::mat33 TGD(arma::fill::zeros);
 
     // deflection of the normal, dd, and length of earth's radius to ellipse
     // surface, R0
