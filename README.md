@@ -11,6 +11,9 @@ The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
  - [Armadillo Matrix Library](http://arma.sourceforge.net/)
  - Boost Serialization
 
+# Models
+You will need to init and update the submodules for the model codes
+
 # Type of Simulation
 These simulation as different S_defines resides in exe/ directory.
  - single-node
