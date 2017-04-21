@@ -19,10 +19,13 @@ PROGRAMMERS:
 #include "Propulsion.hh"
 #include "Force.hh"
 #include "Euler.hh"
+#include "Time_management.hh"
 
 class Kinematics;
 
 class Propulsion;
+
+class time_management;
 
 class Newton {
     TRICK_INTERFACE(Newton);

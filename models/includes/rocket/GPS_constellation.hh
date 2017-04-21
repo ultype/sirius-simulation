@@ -117,7 +117,7 @@ class GPS_constellation{
 		channel_t* get_channel();
 		unsigned int get_gps_update() { return gps_update; }
 		void clear_gps_flag() { gps_update = 0; };
-
+		
 		template<class Archive>
 	    void serialize(Archive & ar, const unsigned int version){
 	        ar & neph;

@@ -21,7 +21,7 @@ Hour = 2
 Min = 0
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
-
+rkt.env.dm_RNP()
 
 #SLV
 lonx       = 120.893501 # Vehicle longitude - deg  module newton
@@ -93,71 +93,71 @@ rkt.propulsion.set_aexit(0.258242843) #nozzle exhaust area
 rkt.propulsion.set_payload(98) #payload mass
 
 #GPS
-gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps
-gps_sats.sats.sv_data = [
-        [5.63, -1.600],  # A-plane, slot #1
-        [5.63, 2.115],   #              #2
-        [5.63, -2.309],  #              #3
-        [5.63, 0.319],   #              #4
+# gps_sats.sats.almanac_time = 80000    #Time since almanac epoch at sim start - sec  module gps
+# gps_sats.sats.sv_data = [
+#         [5.63, -1.600],  # A-plane, slot #1
+#         [5.63, 2.115],   #              #2
+#         [5.63, -2.309],  #              #3
+#         [5.63, 0.319],   #              #4
 
-        [0.40, 1.063],   # B-plane, slot #5
-        [0.40, -1.342],  #              #6
-        [0.40, 0.543],   #              #7
-        [0.40, 2.874],   #              #8
+#         [0.40, 1.063],   # B-plane, slot #5
+#         [0.40, -1.342],  #              #6
+#         [0.40, 0.543],   #              #7
+#         [0.40, 2.874],   #              #8
 
-        [1.45, 1.705],   # C-plane, slot #9
-        [1.45, -2.841],  #              #10
-        [1.45, -2.321],  #              #11
-        [1.45, -0.640],  #              #12
+#         [1.45, 1.705],   # C-plane, slot #9
+#         [1.45, -2.841],  #              #10
+#         [1.45, -2.321],  #              #11
+#         [1.45, -0.640],  #              #12
 
-        [2.45, 1.941],   # D-plane, slot #13
-        [2.45, -0.147],  #              #14
-        [2.45, 1.690],   #              #15
-        [2.45, 0.409],   #              #16
+#         [2.45, 1.941],   # D-plane, slot #13
+#         [2.45, -0.147],  #              #14
+#         [2.45, 1.690],   #              #15
+#         [2.45, 0.409],   #              #16
 
-        [3.48, -0.571],  # E-plane, slot #17
-        [3.48, -2.988],  #              #18
-        [3.48, 0.858],   #              #19
-        [3.48, 2.705],   #              #20
+#         [3.48, -0.571],  # E-plane, slot #17
+#         [3.48, -2.988],  #              #18
+#         [3.48, 0.858],   #              #19
+#         [3.48, 2.705],   #              #20
 
-        [4.59, -0.7180],  # F-plane,slot #21
-        [4.59, 2.666],    #             #22
-        [4.59, -2.977],   #             #23
-        [4.59, -0.2090]   #             #24
-    ]
-rkt.gpsr.slot = [0, 0, 0, 0];  #/< SV slot#  of quadriga
+#         [4.59, -0.7180],  # F-plane,slot #21
+#         [4.59, 2.666],    #             #22
+#         [4.59, -2.977],   #             #23
+#         [4.59, -0.2090]   #             #24
+#     ]
+# rkt.gpsr.slot = [0, 0, 0, 0];  #/< SV slot#  of quadriga
 
-rkt.gpsr.del_rearth        = 2317000    #Delta to Earth's radius for GPS clear LOS signal reception - m  module gps
-rkt.gpsr.gps_acqtime       = 10    #Acquisition time for GPS signal - s  module gps
-rkt.gpsr.gps_step          = 0.1    #GPS update interval - s  module gps
+# rkt.gpsr.del_rearth        = 2317000    #Delta to Earth's radius for GPS clear LOS signal reception - m  module gps
+# rkt.gpsr.gps_acqtime       = 10    #Acquisition time for GPS signal - s  module gps
+# rkt.gpsr.gps_step          = 0.1    #GPS update interval - s  module gps
 
-rkt.gpsr.ucfreq_noise      = 0.1 #User clock frequency error - m/s MARKOV  module gps
-rkt.gpsr.ucbias_error      = 0 #User clock bias error - m GAUSS  module gps
+# rkt.gpsr.ucfreq_noise      = 0.1 #User clock frequency error - m/s MARKOV  module gps
+# rkt.gpsr.ucbias_error      = 0 #User clock bias error - m GAUSS  module gps
 
-rkt.gpsr.PR_BIAS           = [0, 0, 0, 0] #Pseudo-range bias - m GAUSS  module gps
-rkt.gpsr.PR_NOISE          = [0.25, 0.25, 0.25, 0.25] #Pseudo-range noise - m MARKOV  module gps
-rkt.gpsr.DR_NOISE          = [0.03, 0.03, 0.03, 0.03] #Delta-range noise - m/s MARKOV  module gps
+# rkt.gpsr.PR_BIAS           = [0, 0, 0, 0] #Pseudo-range bias - m GAUSS  module gps
+# rkt.gpsr.PR_NOISE          = [0.25, 0.25, 0.25, 0.25] #Pseudo-range noise - m MARKOV  module gps
+# rkt.gpsr.DR_NOISE          = [0.03, 0.03, 0.03, 0.03] #Delta-range noise - m/s MARKOV  module gps
 
-gpsr_factp       = 0   #Factor to modifiy initial P-matrix P(1+factp)=module gps
-gpsr_pclockb     = 3   #Init 1sig clock bias error of state cov matrix - m=module gps
-gpsr_pclockf     = 1   #Init 1sig clock freq error of state cov matrix - m/s=module gps
-rkt.gpsr.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf)
+# gpsr_factp       = 0   #Factor to modifiy initial P-matrix P(1+factp)=module gps
+# gpsr_pclockb     = 3   #Init 1sig clock bias error of state cov matrix - m=module gps
+# gpsr_pclockf     = 1   #Init 1sig clock freq error of state cov matrix - m/s=module gps
+# rkt.gpsr.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf)
 
-gpsr_factq       = 0   #Factor to modifiy the Q-matrix Q(1+factq)=module gps
-gpsr_qclockb     = 0.5 #1sig clock bias error of process cov matrix - m=module gps
-gpsr_qclockf     = 0.1 #1sig clock freq error of process cov matrix - m/s=module gps
-rkt.gpsr.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf)
+# gpsr_factq       = 0   #Factor to modifiy the Q-matrix Q(1+factq)=module gps
+# gpsr_qclockb     = 0.5 #1sig clock bias error of process cov matrix - m=module gps
+# gpsr_qclockf     = 0.1 #1sig clock freq error of process cov matrix - m/s=module gps
+# rkt.gpsr.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf)
 
-gpsr_uctime_cor = 100  #User clock correlation time constant - s=module gps
-rkt.gpsr.setup_fundamental_dynamic_matrix(gpsr_uctime_cor)
+# gpsr_uctime_cor = 100  #User clock correlation time constant - s=module gps
+# rkt.gpsr.setup_fundamental_dynamic_matrix(gpsr_uctime_cor)
 
-rkt.gpsr.ppos        = 5  #Init 1sig pos values of state cov matrix - m=module gps
-rkt.gpsr.pvel        = 0.2  #Init 1sig vel values of state cov matrix - m/s=module gps
-rkt.gpsr.qpos        = 0.1  #1sig pos values of process cov matrix - m=module gps
-rkt.gpsr.qvel        = 0.01  #1sig vel values of process cov matrix - m/s=module gps
-rkt.gpsr.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
-rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
-rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
+# rkt.gpsr.ppos        = 5  #Init 1sig pos values of state cov matrix - m=module gps
+# rkt.gpsr.pvel        = 0.2  #Init 1sig vel values of state cov matrix - m/s=module gps
+# rkt.gpsr.qpos        = 0.1  #1sig pos values of process cov matrix - m=module gps
+# rkt.gpsr.qvel        = 0.01  #1sig vel values of process cov matrix - m/s=module gps
+# rkt.gpsr.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
+# rkt.gpsr.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
+# rkt.gpsr.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 #RCS thruster
 rkt.rcs.set_roll_mom_max(100)      #RCS rolling moment max value - Nm  module rcs
 rkt.rcs.set_pitch_mom_max(200000)  #RCS pitching moment max value - Nm  module rcs

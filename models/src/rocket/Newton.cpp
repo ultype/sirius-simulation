@@ -145,13 +145,13 @@ void Newton::load_location(double lonx, double latx, double alt){
     this->lonx = lonx;
     this->latx = latx;
     this->alt = alt;
-
+    arma::mat33 TEI = environment->get_TEI();
     //converting geodetic lonx, latx, alt to SBII
-    SBII = cad::in_geo84(lonx * RAD, latx * RAD, alt, get_rettime());
+    SBII = cad::in_geo84(lonx * RAD, latx * RAD, alt, TEI);
 
     //building inertial velocity
-    TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
-    TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
+    TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, TEI);
 }
 
 void Newton::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
@@ -221,13 +221,13 @@ void Newton::propagate_position_speed_acceleration(double int_step){
     JBEE = TEI * JBII - cross(WEII, cross(WEII, cross(WEII, SBEE))) - cross(WEII, cross(WEII, VBEE)) - cross(WEII, ABEE);
     
     //Calculate lon lat alt
-    cad::geo84_in(lon, lat, al, SBII, get_rettime());
+    cad::geo84_in(lon, lat, al, SBII, TEI);
     this->lonx = lon * DEG;
     this->latx = lat * DEG;
     this->alt  = al;
 
-    TDI = cad::tdi84(lon, lat, al, get_rettime());
-    TGI = cad::tgi84(lon, lat, al, get_rettime());
+    TDI = cad::tdi84(lon, lat, al, TEI);
+    TGI = cad::tgi84(lon, lat, al, TEI);
 }
 
 void Newton::propagate_aeroloss(double int_step){

@@ -19,6 +19,7 @@ class TVC;
 class _Euler_;
 class Propulsion;
 class Kinematics;
+class Newton;
 
 class AeroDynamics{
     TRICK_INTERFACE(AeroDynamics);

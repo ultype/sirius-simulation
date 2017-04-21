@@ -88,10 +88,11 @@ void Kinematics::load_angle(double yaw, double roll, double pitch) {
     double lonx = newton->get_lonx();
     double latx = newton->get_latx();
     double alt  = newton->get_alt();
+    arma::mat33 TEI = environment->get_TEI();
 
     TBD = build_psi_tht_phi_TM(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
 
-    arma::mat current_TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    arma::mat current_TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
     TBI = TBD * current_TDI;
 
     this->TBI_Q = Matrix2Quaternion(this->TBI);  //Convert Direct Cosine Matrix to Quaternion
@@ -193,7 +194,9 @@ void Kinematics::propagate_TBI_Q(double int_step, arma::vec3 WBIB)
 
 arma::mat Kinematics::calculate_TBD(double lonx, double latx, double alt) {
     //_Euler_ angles
-    arma::mat TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, get_rettime());
+    arma::mat33 TEI = environment->get_TEI();
+
+    arma::mat TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
     return this->TBI * trans(TDI);
 }
 

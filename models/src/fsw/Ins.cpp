@@ -42,6 +42,7 @@ INS::INS(time_management &tim)
         VECTOR_INIT(TBIDC_Q, 4)
 {
     this->default_data();
+    
 }
 
 INS::INS(const INS& other)
@@ -114,6 +115,8 @@ INS::INS(const INS& other)
     this->phibdcx = other.phibdcx;
     this->thtbdcx = other.thtbdcx;
     this->psibdcx = other.psibdcx;
+
+
 }
 
 INS& INS::operator=(const INS& other){
@@ -185,7 +188,7 @@ arma::mat INS::build_WEII(){
 
 void INS::default_data(){
     this->WEII = build_WEII();
-
+    // this->TEIC = calculate_INS_derived_TEI();
     this->EGRAVI.zeros();
 }
 
@@ -204,7 +207,7 @@ void INS::load_location(double lonx, double latx, double alt){
     this->altc = alt;
 
     //converting geodetic lonx, latx, alt to SBII
-    SBIIC = cad::in_geo84(loncx * RAD, latcx * RAD, altc, get_rettime());
+    SBIIC = cad::in_geo84(loncx * RAD, latcx * RAD, altc, TEIC);
 }
 
 void INS::load_angle(double yaw, double roll, double pitch) {
@@ -212,11 +215,13 @@ void INS::load_angle(double yaw, double roll, double pitch) {
     this->phibdcx = roll;
     this->thtbdcx = pitch;
 
+    this->TEIC = calculate_INS_derived_TEI();
+
     arma::mat33 TBD;
 
     TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
 
-    arma::mat33 current_TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, get_rettime());
+    arma::mat33 current_TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, TEIC);
     TBIC = TBD * current_TDI;
 
     this->TBIC_Q = Matrix2Quaternion(this->TBIC);  //Convert Direct Cosine Matrix to Quaternion
@@ -226,7 +231,7 @@ void INS::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe){
     //building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
     arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
     arma::mat33 TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
-    arma::mat33 TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, get_rettime());
+    arma::mat33 TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, TEIC);
     //Geodetic velocity
     arma::mat VBED = trans(TBD) * VBEB;
 
@@ -662,12 +667,12 @@ void INS::update(double int_step){
     this->phipcx = calculate_INS_derived_phip(VBECB) * DEG;
 
     // getting long,lat,alt from INS
-    cad::geo84_in(lonc, latc, altc, SBIIC, time);
+    cad::geo84_in(lonc, latc, altc, SBIIC, TEIC);
     loncx = lonc * DEG;
     latcx = latc * DEG;
 
     // getting T.M. of geodetic wrt inertial coord
-    this->TDCI = cad::tdi84(lonc, latc, altc, time);
+    this->TDCI = cad::tdi84(lonc, latc, altc, TEIC);
 
     // computing geodetic velocity from INS
     arma::vec3 VBECD = TDCI * VBEIC;

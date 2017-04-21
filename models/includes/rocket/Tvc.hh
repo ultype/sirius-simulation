@@ -14,7 +14,7 @@ LIBRARY DEPENDENCY:
 #include "Euler.hh"
 #include "Environment.hh"
 #include "Kinematics.hh"
-#include "GPS_receiver.hh"
+
 
 class Propulsion;
 class Kinematics;

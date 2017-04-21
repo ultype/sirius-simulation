@@ -14,9 +14,8 @@
 
 #include "fsw/Ins.hh"
 #include "fsw/GPS.hh"
-GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons)
+GPS_FSW::GPS_FSW(time_management &time_ma)
 :   time(&time_ma),
-    gps_con(&gps_cons),
     MATRIX_INIT(PP, 8, 8),
     MATRIX_INIT(FF, 8, 8),
     MATRIX_INIT(PHI, 8, 8),
@@ -30,7 +29,6 @@ GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons)
 
 GPS_FSW::GPS_FSW(const GPS_FSW &other)
 :   time(other.time),
-    gps_con(other.gps_con),
     MATRIX_INIT(PP, 8, 8),
     MATRIX_INIT(FF, 8, 8),
     MATRIX_INIT(PHI, 8, 8),
@@ -46,7 +44,7 @@ GPS_FSW & GPS_FSW::operator= (const GPS_FSW &other){
     if(&other == this)
     return *this;
     this->time = other.time;
-    this->gps_con = other.gps_con;
+;
 
     return *this;
 }
@@ -85,9 +83,8 @@ void GPS_FSW::setup_fundamental_dynamic_matrix(double uctime_cor){
 }
 
 
-void GPS_FSW::initialize(double int_step, time_management &time_ma, GPS_constellation &gps_cons){
+void GPS_FSW::initialize(double int_step, time_management &time_ma){
     time = &time_ma;
-    gps_con = &gps_cons;
     // state transition matrix - constant throughout
     PHI = arma::mat88(arma::fill::eye) + FF * int_step + FF * FF * (int_step * int_step / 2);
     this->WEII.zeros();
@@ -166,13 +163,14 @@ void GPS_FSW::measure(double int_step){
     // arma::vec4 pesudo_range_rate(arma::fill::zeros);
     arma::vec4 channel_id(arma::fill::zeros);
     arma::mat33 TEIC = grab_TEIC();
+    channel_t* chan = grab_channel();
     // arma::mat33 TEI = environment->get_TEI();
     int ii(0);
   // Pseudo-range and range-rate measurements
     for(int i = 0; i < MAX_CHAN; i++){
 
 
-        if(gps_con->chan[i].prn > 0){
+        if(chan[i].prn > 0){
             // pesudo_range(ii) = gps_con->chan[i].rho0.range;
             // pesudo_range_rate(ii) = gps_con->chan[i].rho0.rate;
             channel_id(ii) = i;
@@ -228,17 +226,17 @@ void GPS_FSW::measure(double int_step){
         // SSBI = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC);
 
         arma::vec3 SSBIC;
-        SSBIC = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC);
+        SSBIC = (trans(TEIC) * chan[id].rho0.pos - SBIIC);
 
-        double dsb_meas = gps_con->chan[id].rho0.range;//norm(SSBI) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+        double dsb_meas = chan[id].rho0.range;//norm(SSBI) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
 
         arma::vec3 velECI;
-        velECI = trans(TEIC) * (gps_con->chan[id].rho0.vel + cross(WEII, gps_con->chan[id].rho0.pos));
+        velECI = trans(TEIC) * (chan[id].rho0.vel + cross(WEII, chan[id].rho0.pos));
 
         double dvsb_meas = dot(velECI, SSBIC)/dsb_meas;
         /////////////////////////////////////////////////////////////////////////////////////////////////
 
-        double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+        double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * chan[id].rho0.clk(0);
 
         double dvsbc = dot(velECI, SSBIC)/dsbc;
 

@@ -27,7 +27,7 @@ Hour = 2
 Min = 0
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
-
+rkt.env.dm_RNP()
 
 #SLV
 lonx       = 120.893501 # Vehicle longitude - deg  module newton
@@ -36,7 +36,7 @@ alt        = 100        # Vehicle altitude  - m  module newton
 rkt.newton.load_location(lonx, latx, alt)
 
 phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
-thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 86.635# Pitching angle of veh wrt geod coord - deg  module kinematics 86.635
 psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
 rkt.kinematics.load_angle(psibdx, phibdx, thtbdx)
 

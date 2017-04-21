@@ -27,6 +27,7 @@ PROGRAMMERS:
 #include "rocket/dm_delta_ut.hh"
 
 class time_management;
+class Newton;
 
 class Environment{
     TRICK_INTERFACE(Environment);

@@ -48,7 +48,7 @@ namespace cad {
                   double &lat,
                   double &alt,
                   arma::vec3 SBII,
-                  const double &time);
+                  arma::mat33 TEI);
 
     //////////////////////////////////////////////////////////////////////////////
     // Returns geodetic velocity vector information from inertial postion and
@@ -72,7 +72,7 @@ namespace cad {
                      double &thtvdx,
                      arma::vec3 SBII,
                      arma::vec3 VBII,
-                     const double &time);
+                     arma::mat33 TEI);
 
     ////////////////////////////////////////////////////////////////////////////////
     // Returns geocentric lon, lat, alt from inertial displacement vector
@@ -146,7 +146,7 @@ namespace cad {
     arma::vec3 in_geo84(const double lon,
                         const double lat,
                         const double alt,
-                        const double &time);
+                        arma::mat33 TEI);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Returns the inertial displacement vector from geocentric longitude, latitude
@@ -312,7 +312,7 @@ namespace cad {
     arma::mat33 tdi84(const double &lon,
                                const double &lat,
                                const double &alt,
-                               const double &time);
+                               arma::mat33 TEI);
 
     ////////////////////////////////////////////////////////////////////////////////
     // Returns the T.M. of earth wrt inertial coordinates
@@ -358,7 +358,7 @@ namespace cad {
     arma::mat33 tgi84(const double &lon,
                       const double &lat,
                       const double &alt,
-                      const double &time);
+                      arma::mat33 TEI);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Returns the transformation matrix of inertial wrt perifocal coordinates

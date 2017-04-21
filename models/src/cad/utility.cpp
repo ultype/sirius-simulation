@@ -61,15 +61,16 @@ void cad::geo84_in(double &lon,
               double &lat,
               double &alt,
               arma::vec3 SBII,
-              const double &time)
+              arma::mat33 TEI)
 {
     int count(0);
     double lat0(0);
     double alamda(0);
-
+    arma::vec3 SBEE;
+    SBEE = TEI * SBII;
     // initializing geodetic latitude using geocentric latitude
-    double dbi = norm(SBII);
-    double latg = asin(SBII(2, 0) / dbi);
+    double dbi = norm(SBEE);
+    double latg = asin(SBEE(2, 0) / dbi);
     lat = latg;
 
     // iterating to calculate geodetic latitude and altitude
@@ -91,19 +92,19 @@ void cad::geo84_in(double &lon,
     } while (fabs(lat - lat0) > SMALL);
 
     // longitude
-    double sbii1 = SBII(0, 0);
-    double sbii2 = SBII(1, 0);
-    double dum4 = asin(sbii2 / sqrt(sbii1 * sbii1 + sbii2 * sbii2));
+    double sbee1 = SBEE(0, 0);
+    double sbee2 = SBEE(1, 0);
+    double dum4 = asin(sbee2 / sqrt(sbee1 * sbee1 + sbee2 * sbee2));
     // Resolving the multi-valued arcsin function
-    if ((sbii1 >= 0.0) && (sbii2 >= 0.0))
+    if ((sbee1 >= 0.0) && (sbee2 >= 0.0))
         alamda = dum4;  // quadrant I
-    if ((sbii1 < 0.0) && (sbii2 >= 0.0))
+    if ((sbee1 < 0.0) && (sbee2 >= 0.0))
         alamda = (180. * RAD) - dum4;  // quadrant II
-    if ((sbii1 < 0.0) && (sbii2 < 0.0))
+    if ((sbee1 < 0.0) && (sbee2 < 0.0))
         alamda = (180. * RAD) - dum4;  // quadrant III
-    if ((sbii1 > 0.0) && (sbii2 < 0.0))
+    if ((sbee1 > 0.0) && (sbee2 < 0.0))
         alamda = (360. * RAD) + dum4;  // quadrant IV
-    lon = alamda - WEII3 * time - GW_CLONG;
+    lon = alamda;// - WEII3 * time - GW_CLONG;
     if ((lon) > (180. * RAD))
         lon = -((360. * RAD) - lon);  // east positive, west negative
 }
@@ -130,14 +131,14 @@ void cad::geo84vel_in(double &dvbe,
                  double &thtvdx,
                  arma::vec3 SBII,
                  arma::vec3 VBII,
-                 const double &time)
+                 arma::mat33 TEI)
 {
     double lon(0);
     double lat(0);
     double alt(0);
     // geodetic longitude, latitude and altitude
-    geo84_in(lon, lat, alt, SBII, time);
-    arma::mat33 TDI = tdi84(lon, lat, alt, time);
+    geo84_in(lon, lat, alt, SBII, TEI);
+    arma::mat33 TDI = tdi84(lon, lat, alt, TEI);
 
     // Earth's angular velocity skew-symmetric matrix (3x3)
     arma::mat33 WEII(arma::fill::zeros);
@@ -314,41 +315,46 @@ arma::vec3 cad::grav84(arma::vec3 SBII, const double &time)
 arma::vec3 cad::in_geo84(const double lon,
                          const double lat,
                          const double alt,
-                         const double &time)
+                         arma::mat33 TEI)
 {
     arma::vec3 SBID;
+    arma::vec3 SBII;
 
     // deflection of the normal, dd, and length of earth's radius to ellipse
     // surface, R0
-    double r0 = SMAJOR_AXIS * (1. - FLATTENING * (1. - cos(2. * lat)) / 2. +
-                               5. * pow(FLATTENING, 2) * (1. - cos(4. * lat)) /
-                                   16.);  // eq 4-21
+    // double r0 = SMAJOR_AXIS * (1. - FLATTENING * (1. - cos(2. * lat)) / 2. +
+    //                            5. * pow(FLATTENING, 2) * (1. - cos(4. * lat)) /
+    //                                16.);  // eq 4-21
+    double r0 = SMAJOR_AXIS/sqrt(1 - FLATTENING * (2 - FLATTENING) * sin(lat) * sin(lat));
     double dd = FLATTENING * sin(2. * lat) *
                 (1. - FLATTENING / 2. - alt / r0);  // eq 4-15
 
+    double e = sqrt(2 * FLATTENING - FLATTENING * FLATTENING);
     // vehicle's displacement vector from earth's center SBID(3x1) in geodetic
     // coord.
     double dbi = r0 + alt;
-    SBID(0, 0) = -dbi * sin(dd);
-    SBID(1, 0) = 0.;
-    SBID(2, 0) = -dbi * cos(dd);
-
+    SBID(0, 0) = dbi * cos(lat)* cos(lon);
+    SBID(1, 0) = dbi * cos(lat) * sin(lon);
+    SBID(2, 0) = ((1. - e * e) * r0 + alt) * sin(lat);
+    // arma::mat33 TDI = cad::tdi84(lon, lat, alt, TEI);
+    SBII = trans(TEI) * SBID;
     // celestial longitude of vehicle at simulation 'time'
-    double lon_cel = GW_CLONG + WEII3 * time + lon;
+    //double lon_cel = GW_CLONG + WEII3 * time + lon;
 
     // vehicle's displacement vector in inertial coord.
     // SBII(3x1)=TID(3x3)xSBID(3x3)
-    double slat = sin(lat);
-    double clat = cos(lat);
-    double slon = sin(lon_cel);
-    double clon = cos(lon_cel);
-    double sbid1 = SBID(0, 0);
-    double sbid3 = SBID(2, 0);
-    double sbii1 = -slat * clon * sbid1 - clat * clon * sbid3;
-    double sbii2 = -slat * slon * sbid1 - clat * slon * sbid3;
-    double sbii3 = clat * sbid1 - slat * sbid3;
+    // double slat = sin(lat);
+    // double clat = cos(lat);
+    // double slon = sin(lon_cel);
+    // double clon = cos(lon_cel);
+    // double sbid1 = SBID(0, 0);
+    // double sbid3 = SBID(2, 0);
+    // double sbii1 = -slat * clon * sbid1 - clat * clon * sbid3;
+    // double sbii2 = -slat * slon * sbid1 - clat * slon * sbid3;
+    // double sbii3 = clat * sbid1 - slat * sbid3;
 
-    return arma::vec3({sbii1, sbii2, sbii3});
+    // return arma::vec3({sbii1, sbii2, sbii3});
+    return SBII;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -812,18 +818,18 @@ int cad::orb_in(double &semi,
 arma::mat33 cad::tdi84(const double &lon,
                            const double &lat,
                            const double &alt,
-                           const double &time)
+                           arma::mat33 TEI)
 {
     arma::mat33 TDI;
 
     // celestial longitude of vehicle at simulation 'time'
-    double lon_cel = GW_CLONG + WEII3 * time + lon;
+    //double lon_cel = GW_CLONG + WEII3 * time + lon;
 
     // T.M. of geodetic coord wrt inertial coord., TDI(3x3)
     double tdi13 = cos(lat);
     double tdi33 = -sin(lat);
-    double tdi22 = cos(lon_cel);
-    double tdi21 = -sin(lon_cel);
+    double tdi22 = cos(lon);
+    double tdi21 = -sin(lon);
     TDI(0, 0) = tdi33 * tdi22;
     TDI(0, 1) = -tdi33 * tdi21;
     TDI(0, 2) = tdi13;
@@ -834,7 +840,7 @@ arma::mat33 cad::tdi84(const double &lon,
     TDI(2, 1) = tdi13 * tdi21;
     TDI(2, 2) = tdi33;
 
-    return TDI;
+    return TDI * TEI;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -915,9 +921,9 @@ arma::mat33 cad::tge(const double &lon, const double &lat)
 arma::mat33 cad::tgi84(const double &lon,
                   const double &lat,
                   const double &alt,
-                  const double &time)
+                  arma::mat33 TEI)
 {
-    arma::mat33 TDI = tdi84(lon, lat, alt, time);
+    arma::mat33 TDI = tdi84(lon, lat, alt, TEI);
     arma::mat33 TGD(arma::fill::zeros);
 
     // deflection of the normal, dd, and length of earth's radius to ellipse

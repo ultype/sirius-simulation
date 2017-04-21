@@ -15,7 +15,7 @@ class GPS_FSW{
 
 	TRICK_INTERFACE(GPS_FSW);
     public:
-    	GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons);
+    	GPS_FSW(time_management &time_ma);
     	GPS_FSW(const GPS_FSW &other);
     	GPS_FSW & operator= (const GPS_FSW &other);
 
@@ -26,11 +26,12 @@ class GPS_FSW{
         std::function<arma::vec3()> grab_SBIIC;
         std::function<arma::vec3()> grab_VBIIC;
         std::function<arma::vec3()> grab_WBICI;
+        std::function<channel_t*()> grab_channel;
 
 
         // int get_gps_update() { return gps_update; };
         // void clear_gps_flag() { gps_update = 0; };
-        void initialize(double int_step, time_management &time_ma, GPS_constellation &gps_cons);
+        void initialize(double int_step, time_management &time_ma);
 
         arma::vec3 get_SXH();
 		arma::vec3 get_VXH();
@@ -80,9 +81,6 @@ class GPS_FSW{
 
     private:
         time_management * time;
-    	GPS_constellation * gps_con;
-
- 
 
         /* Internal variables */
         bool gps_acq;               /* ** (--)      GPS Signal Acquired? */
