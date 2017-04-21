@@ -1,23 +1,23 @@
-#include "rocket/GPS_receiver.hh"
-#include "trick_utils/math/include/quat_macros.h"
-#include "trick_utils/math/include/matrix_macros.h"
-#include "trick_utils/math/include/vector_macros.h"
-#include "trick_utils/math/include/trick_math_proto.h"
+#include "GPS_receiver.hh"
+#include "trick_utils/include/quat_macros.h"
+#include "trick_utils/include/matrix_macros.h"
+#include "trick_utils/include/vector_macros.h"
+#include "trick_utils/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
 
-#include "aux/global_constants.hh"
-#include "math/stochastic.hh"
-#include "math/matrix/utility.hh"
+#include "global_constants.hh"
+#include "stochastic.hh"
+#include "matrix/utility.hh"
 
-#include "cad/utility.hh"
+#include "cad_utility.hh"
 
 #include <armadillo>
 
-#include "rocket/GPS_satellites.hh"
-#include "rocket/Newton.hh"
-#include "rocket/Euler.hh"
-#include "rocket/Earth.hh"
-#include "fsw/Ins.hh"
+#include "GPS_satellites.hh"
+#include "Newton.hh"
+#include "Euler.hh"
+#include "Earth.hh"
+#include "Ins.hh"
 
 GPS_Receiver::GPS_Receiver(Newton &ntn, _Euler_ &elr)
     :   newton(&ntn), euler(&elr),

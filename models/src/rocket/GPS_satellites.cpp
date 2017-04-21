@@ -1,10 +1,10 @@
-#include "rocket/GPS_satellites.hh"
-#include "trick_utils/math/include/quat_macros.h"
-#include "trick_utils/math/include/matrix_macros.h"
-#include "trick_utils/math/include/trick_math_proto.h"
+#include "GPS_satellites.hh"
+#include "trick_utils/include/quat_macros.h"
+#include "trick_utils/include/matrix_macros.h"
+#include "trick_utils/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
 
-#include "aux/global_constants.hh"
+#include "global_constants.hh"
 
 void GPS_Satellites::default_data(){
     //Setup Orbit related constants

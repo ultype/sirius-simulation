@@ -1,19 +1,19 @@
-#include "trick_utils/math/include/quat_macros.h"
-#include "trick_utils/math/include/matrix_macros.h"
-#include "trick_utils/math/include/vector_macros.h"
-#include "trick_utils/math/include/trick_math_proto.h"
+#include "trick_utils/include/quat_macros.h"
+#include "trick_utils/include/matrix_macros.h"
+#include "trick_utils/include/vector_macros.h"
+#include "trick_utils/include/trick_math_proto.h"
 #include "sim_services/include/simtime.h"
 
-#include "aux/global_constants.hh"
-#include "math/stochastic.hh"
-#include "math/matrix/utility.hh"
+#include "global_constants.hh"
+#include "stochastic.hh"
+#include "matrix/utility.hh"
 
-#include "cad/utility.hh"
+#include "cad_utility.hh"
 
 #include <armadillo>
 
-#include "fsw/Ins.hh"
-#include "fsw/GPS.hh"
+#include "Ins.hh"
+#include "GPS.hh"
 GPS_FSW::GPS_FSW(time_management &time_ma, GPS_constellation &gps_cons)
 :   time(&time_ma),
     gps_con(&gps_cons),
