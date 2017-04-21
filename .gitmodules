@@ -1,0 +1,3 @@
+[submodule "models/gnc"]
+	path = models/gnc
+	url = git@tainan.tispace.com:Models/GNC.git
