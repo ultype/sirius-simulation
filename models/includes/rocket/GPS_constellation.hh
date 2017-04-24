@@ -99,6 +99,15 @@ struct channel_t
 	range_t rho0;
 };
 
+struct transmit_channel
+{
+	int prn;
+	double pos[3];
+	double vel[3];
+	double range;
+	double clk[2];
+};
+
 
 class GPS_constellation{
 	
@@ -115,6 +124,7 @@ class GPS_constellation{
 		void compute();
 		void show();
 		channel_t* get_channel();
+		transmit_channel* get_transmit_data();
 		unsigned int get_gps_update() { return gps_update; }
 		void clear_gps_flag() { gps_update = 0; };
 		
@@ -146,6 +156,7 @@ class GPS_constellation{
 		arma::mat33 enu2ecef(arma::vec3 llh);
 		arma::mat33 enu2atenna(double phi, double tht, double psi);
 		void GDOP(channel_t *chan, arma::vec3 xyz);
+		void packet();
 
 		time_management *time;
 		Newton *newton;
@@ -157,6 +168,7 @@ class GPS_constellation{
 		
 		int nsat;	/*	*io  (--)								*/
 		channel_t chan[MAX_CHAN];	
+		transmit_channel trans_chan[MAX_CHAN];
 		ionoutc_t ionoutc;			
 		ephem_t eph[EPHEM_ARRAY_SIZE][MAX_SAT];	
 

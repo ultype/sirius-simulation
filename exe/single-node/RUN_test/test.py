@@ -2,7 +2,7 @@
 #execfile("Modified_data/rocket.dr")
 execfile("Modified_data/test.dr")
 execfile("Modified_data/gps.dr")
-execfile("Modified_data/NSPO.dr")
+# execfile("Modified_data/chang.dr")
 # execfile("Modified_data/wangwang.dr")
 #trick.exec_set_enable_freeze(True)
 #trick.exec_set_freeze_command(True)

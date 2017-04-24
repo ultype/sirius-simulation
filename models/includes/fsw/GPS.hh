@@ -26,8 +26,8 @@ class GPS_FSW{
         std::function<arma::vec3()> grab_SBIIC;
         std::function<arma::vec3()> grab_VBIIC;
         std::function<arma::vec3()> grab_WBICI;
-        std::function<channel_t*()> grab_channel;
-
+        // std::function<channel_t*()> grab_channel;
+        std::function<transmit_channel*()> grab_transmit_data;
 
         // int get_gps_update() { return gps_update; };
         // void clear_gps_flag() { gps_update = 0; };
@@ -40,6 +40,7 @@ class GPS_FSW{
 		std::function<arma::vec3()>		grab_SBEEC;
 		std::function<arma::vec3()>		grab_VBEEC;
 		std::function<arma::mat33()>	grab_TEIC;
+
 
 		void filter_extrapolation(double int_step);
         void measure(double int_step);

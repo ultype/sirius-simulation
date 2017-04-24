@@ -13,6 +13,7 @@ ICG: (No)
 
 #include <type_traits>
 
+
 #define TRICK_INTERFACE(class_name) \
         friend class InputProcessor; \
         friend void init_attr ## class_name();
@@ -37,5 +38,6 @@ ICG: (No)
 
 #define IMPORT(model, func) \
         #model, #func
+
 
 #endif// utility_header__HPP

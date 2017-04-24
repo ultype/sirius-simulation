@@ -156,8 +156,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             rcs_fc.grab_qqcx                = transceiver(IMPORT(*gyro          , get_qqcx));
             rcs_fc.grab_ppcx                = transceiver(IMPORT(*gyro          , get_ppcx));
             rcs_fc.grab_rrcx                = transceiver(IMPORT(*gyro          , get_rrcx));
-            gps.grab_channel                = transceiver(IMPORT(gps_con        , get_channel));
-
+            gps.grab_transmit_data          = transceiver(IMPORT(gps_con        , get_transmit_data));
+            
             /* XXX */
             ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
             guidance.set_no_thrust  = [this](){ this->no_thrust = 1; };

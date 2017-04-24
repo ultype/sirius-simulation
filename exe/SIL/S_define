@@ -254,7 +254,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             gps.grab_SBEEC = LINK(ins, get_SBEEC);
             gps.grab_VBEEC = LINK(ins, get_VBEEC);
             gps.grab_TEIC = LINK(ins, get_TEIC);
-            gps.grab_channel = LINK(rkt->gps_con, get_channel);
+            // gps.grab_channel = LINK(rkt->gps_con, get_channel);
+            gps.grab_transmit_data = LINK(rkt->gps_con, get_transmit_data);
         };
         FlightComputer_SimObject()
         :   ins         (time ),

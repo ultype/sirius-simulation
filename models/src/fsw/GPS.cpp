@@ -158,19 +158,23 @@ void GPS_FSW::measure(double int_step){
     arma::vec8 XH(arma::fill::zeros);           // local
     arma::mat88 RR(arma::fill::zeros);          // local
     arma::mat88 HH(arma::fill::zeros);          // local
+    arma::vec3 pos(arma::fill::zeros);
+    arma::vec3 vel(arma::fill::zeros);
+    arma::vec2 clk(arma::fill::zeros);
 
     // arma::vec4 pesudo_range(arma::fill::zeros);
     // arma::vec4 pesudo_range_rate(arma::fill::zeros);
     arma::vec4 channel_id(arma::fill::zeros);
     arma::mat33 TEIC = grab_TEIC();
-    channel_t* chan = grab_channel();
+
+    transmit_channel* trans_chan = grab_transmit_data();
     // arma::mat33 TEI = environment->get_TEI();
     int ii(0);
   // Pseudo-range and range-rate measurements
     for(int i = 0; i < MAX_CHAN; i++){
 
 
-        if(chan[i].prn > 0){
+        if(trans_chan[i].prn > 0){
             // pesudo_range(ii) = gps_con->chan[i].rho0.range;
             // pesudo_range_rate(ii) = gps_con->chan[i].rho0.rate;
             channel_id(ii) = i;
@@ -225,18 +229,27 @@ void GPS_FSW::measure(double int_step){
         // arma::vec3 SSBI;
         // SSBI = (trans(TEIC) * gps_con->chan[id].rho0.pos - SBIIC);
 
-        arma::vec3 SSBIC;
-        SSBIC = (trans(TEIC) * chan[id].rho0.pos - SBIIC);
 
-        double dsb_meas = chan[id].rho0.range;//norm(SSBI) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
+        for(int j = 0;j < 3;j++){
+            pos(j) = trans_chan[id].pos[j];
+            vel(j) = trans_chan[id].vel[j];
+        }
+        for(int k = 0;k < 2;k++){
+            clk(k) = trans_chan[id].clk[k];
+        }
+
+        arma::vec3 SSBIC;
+        SSBIC = (trans(TEIC) * pos - SBIIC);
+
+        double dsb_meas = trans_chan[id].range;//norm(SSBI) - SPEED_OF_LIGHT * gps_con->chan[id].rho0.clk(0);
 
         arma::vec3 velECI;
-        velECI = trans(TEIC) * (chan[id].rho0.vel + cross(WEII, chan[id].rho0.pos));
+        velECI = trans(TEIC) * (vel + cross(WEII, pos));
 
         double dvsb_meas = dot(velECI, SSBIC)/dsb_meas;
         /////////////////////////////////////////////////////////////////////////////////////////////////
 
-        double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * chan[id].rho0.clk(0);
+        double dsbc = norm(SSBIC) - SPEED_OF_LIGHT * clk(0);
 
         double dvsbc = dot(velECI, SSBIC)/dsbc;
 

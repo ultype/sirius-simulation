@@ -81,6 +81,10 @@ public:
     operator std::function<arma::mat33()> () {
         return transceiver->get_mat(cid, id);
     }
+
+    operator std::function<arma::vec2()> () {
+        return transceiver->get_mat(cid, id);
+    }
 #endif
 #endif
 };

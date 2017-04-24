@@ -92,6 +92,7 @@ void GPS_constellation::compute()
                         chan[i].azel(1)=rho.azel(1);
                     }
     }
+    packet();
     GDOP(chan, SBEE);
     gps_update = 1;
 }
@@ -1463,3 +1464,22 @@ channel_t *GPS_constellation::get_channel()
 
 // 	return(c);
 // }
+void GPS_constellation::packet(){
+	for(int i = 0;i < MAX_CHAN;i++){
+		trans_chan[i].prn = chan[i].prn;
+		trans_chan[i].range = chan[i].rho0.range;
+
+		for(int j = 0;j < 2;j++){
+			trans_chan[i].clk[j] = chan[i].rho0.clk(j);
+		}
+
+		for(int k = 0;k < 3;k++){
+			trans_chan[i].pos[k] = chan[i].rho0.pos(k);
+			trans_chan[i].vel[k] = chan[i].rho0.vel(k);
+		}
+	}
+}
+
+transmit_channel * GPS_constellation::get_transmit_data(){
+	return this->trans_chan;
+}
