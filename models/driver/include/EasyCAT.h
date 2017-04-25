@@ -108,6 +108,8 @@
 #define ECAT_SPI_CLK 25000000
 #endif
 
+#define BUFF_SIZE (16 << 2)
+
 //----- standard SPI chip select management
 //------------------------------------------------------
 #define SCS_Low_macro
