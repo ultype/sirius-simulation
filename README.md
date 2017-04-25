@@ -2,6 +2,7 @@ Sirius is a Simulation of rocket
 From version 0.1.0, it is ported form Rocket Simulation in 6DOF.
 The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
 
+
 # Dependencies
  - NASA Trick 17.0.5
    - Github [NASA/trick](https://github.com/nasa/trick)
@@ -10,9 +11,13 @@ The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
  - Python 2.7
  - [Armadillo Matrix Library](http://arma.sourceforge.net/)
  - Boost Serialization
-
-# Models
+## Models
 You will need to init and update the submodules for the model codes
+Issue the following commands after cloning
+```bash
+    $ git submodule init
+    $ git submodule update
+```
 
 # Type of Simulation
 These simulation as different S_defines resides in exe/ directory.
