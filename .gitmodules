@@ -9,4 +9,4 @@
 	url = git@tainan.tispace.com:Models/CADAC.git
 [submodule "models/dm"]
 	path = models/dm
-	url = git@tainan.tispace.com:sonicyang/DynamicModels.git
+	url = git@tainan.tispace.com:Models/DynamicModels.git
