@@ -75,7 +75,7 @@ class Ecio {
         int get_ltg_thrust_flag();
 
     private:
-        typedef struct {
+        typedef struct __attribute__((__packed__)) {
             double accel_FSPCB[3];
             double accel_EFSPB[3];
             double aero_value[11];
@@ -83,7 +83,6 @@ class Ecio {
             double gyro_WBICB[3];
             double gyro_EWBIB[3];
             int gpsr_gps_update;
-            int gpsr_flag_for_clear_flag;
             double gpsr_SXH[3];
             double gpsr_VXH[3];
             double kinematics_TBI[3][3];
@@ -91,8 +90,6 @@ class Ecio {
             double newton_VBII[3];
             double newton_TDI[3][3];
             int propulsion_thrust_state;   /* *o (--)     Propulsion mode, See THRUST TYPE*/
-            int propulsion_flag_for_set_no_thrust;
-            int propulsion_flag_for_set_ltg_thrust;
             double propulsion_fmassr;              /* *o (kg)     Remaining fuel mass*/
             double newton_dvbe;
             double newton_dbi;
@@ -101,7 +98,9 @@ class Ecio {
             double gyro_qqcx;
             double gyro_ppcx;
             double gyro_rrcx;
+        } net_data_tx_t;
 
+        typedef struct __attribute__((__packed__)) {
             double control_delrcx;
             double control_delecx;
             int rcs_isEnable;
@@ -112,15 +111,13 @@ class Ecio {
             double ins_SBIIC[3];
             double ins_VBIIC[3];
             double ins_WBICI[3];
-        } net_data_t;
+            int gpsr_flag_for_clear_flag;
+            int propulsion_flag_for_set_no_thrust;
+            int propulsion_flag_for_set_ltg_thrust;
+        } net_data_rx_t;
 
-        int sockfd, portno;
-        struct sockaddr_in serv_addr;
-        struct hostent *server;
-
-        net_data_t data_in;
-
-        void socket_bind_connection();
+        net_data_tx_t dataa_out;
+        net_data_rx_t data_in;
 
         void vec3_to_array(arma::vec3 in, double array[3]);
         void mat33_to_array(arma::mat33 in, double array[3][3]);
