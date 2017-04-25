@@ -99,7 +99,7 @@ struct channel_t
 	range_t rho0;
 };
 
-struct transmit_channel
+struct __attribute__((packed)) transmit_channel
 {
 	int prn;
 	double pos[3];

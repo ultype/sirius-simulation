@@ -170,7 +170,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             this->ltg_thrust = 0;
         }
 
-        FlightComputer_SimObject() : ins(time){
+        FlightComputer_SimObject() : ins(time),
+                                     gps(time)
+        {
 
             ("default_data") clear_flag();
             ("default_data") guidance.default_data();

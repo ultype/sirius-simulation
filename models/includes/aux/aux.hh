@@ -39,5 +39,4 @@ ICG: (No)
 #define IMPORT(model, func) \
         #model, #func
 
-
 #endif// utility_header__HPP

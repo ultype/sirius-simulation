@@ -15,6 +15,7 @@ LIBRARY DEPENDENCY:
 #include <map>
 #include <set>
 #include <list>
+#include "rocket/GPS_constellation.hh"
 
 class Transceiver;
 class TransceiverProxy;
@@ -27,6 +28,7 @@ class Transceiver {
 
         void register_for_transmit(std::string cid, std::string id, std::function<double()> in);
         void register_for_transmit(std::string cid, std::string id, std::function<arma::mat()> in);
+        void register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in);
 
         void transmit();
         void receive();
@@ -35,6 +37,7 @@ class Transceiver {
 
         std::function<double()> get_double(std::string cid, std::string id);
         std::function<arma::mat()> get_mat(std::string cid, std::string id);
+        std::function<transmit_channel*()> get_gpsr(std::string cid, std::string id);
 
     private:
         TCDevice dev;
@@ -42,9 +45,11 @@ class Transceiver {
 
         std::map<std::string, std::function<double()>> data_double_out;
         std::map<std::string, std::function<arma::mat()>> data_mat_out;
+        std::map<std::string, std::function<transmit_channel*()>> data_gpsr_out;
 
         std::map<std::string, double> data_double_in;
         std::map<std::string, arma::mat> data_mat_in;
+        std::map<std::string, transmit_channel*> data_gpsr_in;
 };
 
 class TransceiverProxy{
@@ -84,6 +89,10 @@ public:
 
     operator std::function<arma::vec2()> () {
         return transceiver->get_mat(cid, id);
+    }
+
+    operator std::function<transmit_channel*()> (){
+        return transceiver->get_gpsr(cid, id);
     }
 #endif
 #endif

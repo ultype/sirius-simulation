@@ -10,7 +10,8 @@
 
 enum packet_type{
     DOUBLE,
-    MAT
+    MAT,
+    STRUCT
 };
 
 struct __attribute__ ((__packed__)) generic_header{
@@ -48,8 +49,14 @@ void Transceiver::register_for_transmit(std::string cid, std::string id, std::fu
     data_mat_out[tid] = in;
 }
 
+void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in){
+    std::string tid = cid + "." +id;
+    if(tid.length() > 127) throw std::out_of_range("ID too long");
+    data_gpsr_out[tid] = in;
+}
+
 void Transceiver::transmit(){
-    uint32_t size = data_double_out.size() + data_mat_out.size();
+    uint32_t size = data_double_out.size() + data_mat_out.size() + data_gpsr_out.size();
     if (tc_isValid(&dev)) {
         tc_write(&dev, (char*)&size, sizeof(uint32_t));
     }
@@ -72,6 +79,15 @@ void Transceiver::transmit(){
 
         auto out_fn = [this](double& val) { tc_write(&dev, (char*)&val, sizeof(double)); };
         it->second().for_each(out_fn);
+    }
+
+    for (auto it = data_gpsr_out.begin(); it != data_gpsr_out.end(); ++it) {
+        struct generic_header gh = { .type = STRUCT, .name_length = (unsigned int)it->first.length() };
+        transmit_channel * tmp;
+        tc_write(&dev, (char*)&gh, sizeof(gh));
+        tc_write(&dev, (char*)it->first.c_str(), gh.name_length);
+        tmp = it->second();
+        tc_write(&dev, (char*)&tmp, sizeof(tmp));
     }
 }
 
@@ -119,6 +135,19 @@ void Transceiver::receive(){
                     }
                 }
                 break;
+            case STRUCT:
+                {
+                    buf = new char[gh.name_length];
+                    tc_read(&dev, buf, gh.name_length);
+                    buf[gh.name_length] = '\0';
+                    std::string name(buf);
+                    delete[] buf;
+
+                    transmit_channel * in;
+                    tc_read(&dev, (char*)&in, sizeof(in));
+                    data_gpsr_in[name] = in;
+                }
+                break;    
             default:
                 throw std::runtime_error("Received Data Corrupted");
                 break;
@@ -139,4 +168,8 @@ std::function<double()> Transceiver::get_double(std::string cid, std::string id)
 
 std::function<arma::mat()> Transceiver::get_mat(std::string cid, std::string id){
     return [this, cid, id](){ return data_mat_in[cid + "." + id]; };
+}
+
+std::function<transmit_channel *()> Transceiver::get_gpsr(std::string cid, std::string id){
+    return [this, cid, id](){ return data_gpsr_in[cid + "." + id]; };
 }
