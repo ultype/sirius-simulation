@@ -40,16 +40,17 @@ int Init(void)
     ULONG TempLong;
     int i = 0;
 
-    if (spi_configure(ECAT_SPI_DEV, ECAT_SPI_CLK,
-		      SPI_BIT_MSBFIRST, SPI_MODE0) < 0) {
+    if (spi_configure(ECAT_SPI_DEV, ECAT_SPI_CLK, SPI_BIT_MSBFIRST, SPI_MODE0) <
+        0) {
         dbg_printf("%s: Fail to configure spi\n", __func__);
         return -1;
     }
 
     TempLong.Long = 0;
     do {
-        TempLong.Long = SPIReadRegisterDirect(BYTE_TEST, 8);  // read test register
-	i++;
+        TempLong.Long =
+            SPIReadRegisterDirect(BYTE_TEST, 8);  // read test register
+        i++;
     } while (i < MAX_RETRY && TempLong.Long != 0x87654321);
 
     if (TempLong.Long == 0x87654321) {  // if the test register is ok
@@ -77,21 +78,19 @@ void MainTask(void *MasterToSlave,
     uint32_t WatchDogStatus = 0;
     uint32_t ALStatus = 0;
 
-    if (spi_configure(ECAT_SPI_DEV, ECAT_SPI_CLK,
-		      SPI_BIT_MSBFIRST, SPI_MODE0) < 0) {
+    if (spi_configure(ECAT_SPI_DEV, ECAT_SPI_CLK, SPI_BIT_MSBFIRST, SPI_MODE0) <
+        0) {
         dbg_printf("%s: Fail to configure spi\n", __func__);
         return;
     }
 
-    if (MasterToSlave == NULL || MasterToSlaveSize == 0 ||
-        MasterToSlaveSize > 64) {
+    if (MasterToSlave == NULL || MasterToSlaveSize == 0) {
         dbg_printf("MasterToSlave is NULL or its size %d is invalid\n",
                    MasterToSlaveSize);
         return;
     }
 
-    if (SlaveToMaster == NULL || SlaveToMasterSize == 0 ||
-        SlaveToMasterSize > 64) {
+    if (SlaveToMaster == NULL || SlaveToMasterSize == 0) {
         dbg_printf("SlaveToMaster is NULL or its size %d is invalid\n",
                    SlaveToMaster);
         return;
@@ -266,34 +265,36 @@ void SPIReadProcRamFifo(char *data,
 // that will be use by our application to write the outputs
 {
     ULONG TempLong;
+    char buff[BUFF_SIZE + 4];
+    size_t total_read_size = 0;
 
-    /*
-     *  0x00201000);	// we always read 32 bytes
-     *				0x0020----
-     *			// output process ram offset 0x----1000
-     */
-
-    char buff[64];
-
-    if (size > 64)
-        return;
+    SPIWriteRegisterDirect(ECAT_PRAM_RD_CMD, 1 << 30);
 
     SPIWriteRegisterDirect(ECAT_PRAM_RD_ADDR_LEN, (size << 16 | 0x1000));
     SPIWriteRegisterDirect(ECAT_PRAM_RD_CMD, 0x80000000);  // start command
 
-    do {  // wait for data to be transferred
-          // from the output process ram
-        TempLong.Long =
-            SPIReadRegisterDirect(ECAT_PRAM_RD_CMD, 4);  // to the read fifo
-    }                                                    //
-    while (!(TempLong.Byte[0] & PRAM_READ_AVAIL) /*|| (TempLong.Byte[1] != 8)*/);
+    while (total_read_size < size) {
+        size_t read_size = 0;
+        size_t remain_size = size - total_read_size;
 
-    memset(buff, 0xff, sizeof(buff));
-    buff[0] = COMM_SPI_READ;  // SPI read command
-    buff[1] = 0;
-    buff[2] = 0;
-    spi_transfern(ECAT_SPI_DEV, buff, size + 3);
-    memcpy(data, buff + 3, size);
+        do {
+            TempLong.Long = SPIReadRegisterDirect(ECAT_PRAM_RD_CMD, 4);
+
+        } while (!(TempLong.Byte[0] & PRAM_READ_AVAIL));
+
+        read_size = TempLong.Byte[1] << 2;
+        read_size = (BUFF_SIZE > read_size) ? read_size : BUFF_SIZE;
+        read_size = (remain_size > read_size) ? read_size : remain_size;
+
+        memset(buff, 0xff, sizeof(buff));
+        buff[0] = COMM_SPI_READ;  // SPI read command
+        buff[1] = 0;
+        buff[2] = 0;
+
+        spi_transfern(ECAT_SPI_DEV, buff, read_size + 3);
+        memcpy(data + total_read_size, buff + 3, read_size);
+        total_read_size += read_size;
+    }
 }
 
 
@@ -308,30 +309,35 @@ void SPIWriteProcRamFifo(char *data,
 // application and that will be sent to the EtherCAT master
 {
     ULONG TempLong;
-    char buff[64];
+    char buff[BUFF_SIZE + 4];
+    size_t total_wrt_size = 0;
 
-    if (size > 64)
-        return;
 
-    SPIWriteRegisterDirect(ECAT_PRAM_WR_ADDR_LEN, (size << 16 | 0x1200));
-    // we always write 32 bytes 0x0020----
-    // input process ram offset 0x----1200
+    // Abort previous transmission
+    SPIWriteRegisterDirect(ECAT_PRAM_WR_CMD, 1 << 30);
 
+    SPIWriteRegisterDirect(ECAT_PRAM_WR_ADDR_LEN, (size << 16 | 0x1800));
     SPIWriteRegisterDirect(ECAT_PRAM_WR_CMD, 0x80000000);  // start command
 
-    do {
-        // check fifo has available space
-        // for data to be written
-        TempLong.Long = SPIReadRegisterDirect(ECAT_PRAM_WR_CMD, 4);  //
-    }                                                                //
-    while (!(TempLong.Byte[0] & PRAM_WRITE_AVAIL) || (TempLong.Byte[1] < 8));
+    while (total_wrt_size < size) {
+        size_t wrt_size = 0;
+        size_t remain_size = size - total_wrt_size;
 
+        do {
+            TempLong.Long = SPIReadRegisterDirect(ECAT_PRAM_WR_CMD, 4);
+        } while (!(TempLong.Byte[0] & PRAM_WRITE_AVAIL));
 
-    memset(buff, 0, sizeof(buff));
-    buff[0] = COMM_SPI_WRITE;  // SPI write command
-    buff[1] = 0x00;            // address of the write fifo
-    buff[2] = 0x20;            // MsByte first
+        wrt_size = TempLong.Byte[1] << 2;
+        wrt_size = (BUFF_SIZE > wrt_size) ? wrt_size : BUFF_SIZE;
+        wrt_size = (remain_size > wrt_size) ? wrt_size : remain_size;
 
-    memcpy(buff + 3, data, size);
-    spi_transfern(ECAT_SPI_DEV, buff, size + 3);
+        memset(buff, 0, sizeof(buff));
+        buff[0] = COMM_SPI_WRITE;  // SPI write command
+        buff[1] = 0x00;            // address of the write fifo
+        buff[2] = 0x20;            // MsByte first
+
+        memcpy(buff + 3, data + total_wrt_size, wrt_size);
+        spi_transfern(ECAT_SPI_DEV, buff, wrt_size + 3);
+        total_wrt_size += wrt_size;
+    }
 }

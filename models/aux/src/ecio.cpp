@@ -18,8 +18,6 @@ extern "C"{
 #define PPS_GPIO 27
 #define SYNC_GPIO 4
 
-#define LOCAL_PORT 23138
-
 Ecio::Ecio(){
     std::cout << "EtherCAT IO Realy Initialization" << std::endl;
 
@@ -40,8 +38,6 @@ Ecio::Ecio(){
         spi_exit();
         exit(-1);
     }
-
-    socket_bind_connection();
 
     //config PPS output
     gpio_config_input(PPS_GPIO);  //must set before output
@@ -64,67 +60,47 @@ Ecio::~Ecio(){
     spi_exit();
 }
 
-void Ecio::socket_bind_connection(){
-    portno = LOCAL_PORT;
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0)  puts("ERROR opening socket");
-    server = gethostbyname("10.0.0.168");
-    if (server == NULL) {
-        fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
-    }
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr,
-            (char *)&serv_addr.sin_addr.s_addr,
-            server->h_length);
-    serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-        puts("ERROR connecting");
-}
-
 void Ecio::prepare_ethercat_packet(){
-    net_data_t data;
 
-    vec3_to_array(grab_computed_FSPB(), data.accel_FSPCB);
-    vec3_to_array(grab_error_of_computed_FSPB(), data.accel_EFSPB);
-    data.aero_value[0] = grab_gymax();
-    data.aero_value[1] = grab_dyb();
-    data.aero_value[2] = grab_dnb();
-    data.aero_value[3] = grab_dnr();
-    data.aero_value[4] = grab_dndr();
-    data.aero_value[5] = grab_dla();
-    data.aero_value[6] = grab_dma();
-    data.aero_value[7] = grab_dmq();
-    data.aero_value[8] = grab_dmde();
-    data.aero_value[9] = grab_dnd();
-    data.aero_value[10] = grab_dlde();
-    data.env_pdynmc = grab_pdynmc();
-    vec3_to_array(grab_computed_WBIB(), data.gyro_WBICB);
-    vec3_to_array(grab_error_of_computed_WBIB(), data.gyro_EWBIB);
-    vec3_to_array(grab_SXH(), data.gpsr_SXH);
-    vec3_to_array(grab_VXH(), data.gpsr_VXH);
-    data.gpsr_gps_update = grab_gps_update();
-    mat33_to_array(grab_TBI(), data.kinematics_TBI);
-    vec3_to_array(grab_SBII(), data.newton_SBII);
-    vec3_to_array(grab_VBII(), data.newton_VBII);
-    data.propulsion_thrust_state = (enum Propulsion::THRUST_TYPE)grab_mprop();
-    data.propulsion_fmassr = grab_fmassr();
-    data.newton_dvbe = grab_dvbe();
-    data.newton_dbi = grab_dbi();
-    data.newton_dvbi = grab_dvbi();
-    data.newton_thtvdx = grab_thtvdx();
-    data.gyro_qqcx = grab_qqcx();
-    data.gyro_ppcx = grab_ppcx();
-    data.gyro_rrcx = grab_rrcx();
+    vec3_to_array(grab_computed_FSPB(), data_out.accel_FSPCB);
+    vec3_to_array(grab_error_of_computed_FSPB(), data_out.accel_EFSPB);
+    data_out.aero_value[0] = grab_gymax();
+    data_out.aero_value[1] = grab_dyb();
+    data_out.aero_value[2] = grab_dnb();
+    data_out.aero_value[3] = grab_dnr();
+    data_out.aero_value[4] = grab_dndr();
+    data_out.aero_value[5] = grab_dla();
+    data_out.aero_value[6] = grab_dma();
+    data_out.aero_value[7] = grab_dmq();
+    data_out.aero_value[8] = grab_dmde();
+    data_out.aero_value[9] = grab_dnd();
+    data_out.aero_value[10] = grab_dlde();
+    data_out.env_pdynmc = grab_pdynmc();
+    vec3_to_array(grab_computed_WBIB(), data_out.gyro_WBICB);
+    vec3_to_array(grab_error_of_computed_WBIB(), data_out.gyro_EWBIB);
+    vec3_to_array(grab_SXH(), data_out.gpsr_SXH);
+    vec3_to_array(grab_VXH(), data_out.gpsr_VXH);
+    data_out.gpsr_gps_update = grab_gps_update();
+    mat33_to_array(grab_TBI(), data_out.kinematics_TBI);
+    vec3_to_array(grab_SBII(), data_out.newton_SBII);
+    vec3_to_array(grab_VBII(), data_out.newton_VBII);
+    data_out.propulsion_thrust_state = (enum Propulsion::THRUST_TYPE)grab_mprop();
+    data_out.propulsion_fmassr = grab_fmassr();
+    data_out.newton_dvbe = grab_dvbe();
+    data_out.newton_dbi = grab_dbi();
+    data_out.newton_dvbi = grab_dvbi();
+    data_out.newton_thtvdx = grab_thtvdx();
+    data_out.gyro_qqcx = grab_qqcx();
+    data_out.gyro_ppcx = grab_ppcx();
+    data_out.gyro_rrcx = grab_rrcx();
 
-    int send_size = send(sockfd, &data, sizeof(net_data_t), 0);
+    Maintask(data_out,sizeof(data_out),data_in,sizeof(data_in));
 }
 
 void Ecio::send_pps(){
     //PPS pulse
     gpio_set(PPS_GPIO);
-    usleep(10000);
+    usleep(1);
     gpio_clr(PPS_GPIO);
 }
 
@@ -137,16 +113,7 @@ void Ecio::wait_ready(){
 }
 
 void Ecio::receive_fc_data(){
-    int read_size;
-    int total = 0;
-    uint8_t *buffer = (uint8_t *)&data_in;
-
-
-    while( total != sizeof(net_data_t) && (read_size = recv(sockfd , buffer, sizeof(net_data_t), 0)) > 0 ){
-        buffer += read_size;
-        total += read_size;
-    }
-
+    Maintask(data_out,sizeof(data_out),data_in,sizeof(data_in));
 }
 
 void Ecio::vec3_to_array(arma::vec3 in, double array[3]){
