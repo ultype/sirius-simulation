@@ -73,9 +73,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_roll));
             transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_pitch));
             transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_yaw));
-            transceiver.register_for_transmit(EXPORT(ins, get_SBIIC));
-            transceiver.register_for_transmit(EXPORT(ins, get_VBIIC));
-            transceiver.register_for_transmit(EXPORT(ins, get_WBICI));
+            // transceiver.register_for_transmit(EXPORT(ins, get_SBIIC));
+            // transceiver.register_for_transmit(EXPORT(ins, get_VBIIC));
+            // transceiver.register_for_transmit(EXPORT(ins, get_WBICI));
 
             /* XXX */
             transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });

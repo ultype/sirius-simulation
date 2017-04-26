@@ -34,6 +34,9 @@ fc.ins.set_non_ideal(frax_algnmnt)
 """
 fc.ins.set_ideal()
 
+gpsupdate  = 0
+fc.ins.set_gps_correction(gpsupdate);
+
 fc.rcs_fc.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs
 fc.rcs_fc.set_rcs_tau(1)             #Slope of the switching function - sec  module rcs
 fc.rcs_fc.set_thtbdcomx(0)           #Pitch angle command - deg  module rcs
@@ -42,6 +45,35 @@ fc.rcs_fc.set_psibdcomx(-85)         #Yaw angle command - deg  module rcs
 alphacomx = 0   #Alpha command - deg  module guidance
 betacomx = 0    #Beta command - deg  module guidance
 fc.guidance.set_degree(alphacomx, betacomx)
+
+### GPS
+fc.gps.ucfreq_noise      = 0.1 #User clock frequency error - m/s MARKOV  module gps
+fc.gps.ucbias_error      = 0 #User clock bias error - m GAUSS  module gps
+
+fc.gps.PR_BIAS           = [0, 0, 0, 0] #Pseudo-range bias - m GAUSS  module gps
+fc.gps.PR_NOISE          = [0.25, 0.25, 0.25, 0.25] #Pseudo-range noise - m MARKOV  module gps
+fc.gps.DR_NOISE          = [0.03, 0.03, 0.03, 0.03] #Delta-range noise - m/s MARKOV  module gps
+
+gpsr_factp       = 0   #Factor to modifiy initial P-matrix P(1+factp)=module gps
+gpsr_pclockb     = 3   #Init 1sig clock bias error of state cov matrix - m=module gps
+gpsr_pclockf     = 1   #Init 1sig clock freq error of state cov matrix - m/s=module gps
+fc.gps.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf)
+
+gpsr_factq       = 0   #Factor to modifiy the Q-matrix Q(1+factq)=module gps
+gpsr_qclockb     = 0.5 #1sig clock bias error of process cov matrix - m=module gps
+gpsr_qclockf     = 0.1 #1sig clock freq error of process cov matrix - m/s=module gps
+fc.gps.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf)
+
+gpsr_uctime_cor = 100  #User clock correlation time constant - s=module gps
+fc.gps.setup_fundamental_dynamic_matrix(gpsr_uctime_cor)
+
+fc.gps.ppos        = 5  #Init 1sig pos values of state cov matrix - m=module gps
+fc.gps.pvel        = 0.2  #Init 1sig vel values of state cov matrix - m/s=module gps
+fc.gps.qpos        = 0.1  #1sig pos values of process cov matrix - m=module gps
+fc.gps.qvel        = 0.01  #1sig vel values of process cov matrix - m/s=module gps
+fc.gps.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
+fc.gps.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
+fc.gps.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 ######################################################################################################
 
 #Event0:rcs_on

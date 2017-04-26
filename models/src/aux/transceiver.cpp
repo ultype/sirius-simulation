@@ -53,7 +53,6 @@ void Transceiver::register_for_transmit(std::string cid, std::string id, std::fu
 void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in){
     std::string tid = cid + "." +id;
     if(tid.length() > 127) throw std::out_of_range("ID too long");
-    cout<<in;
     data_gpsr_out[tid] = in;
 }
 
@@ -89,7 +88,7 @@ void Transceiver::transmit(){
         tc_write(&dev, (char*)&gh, sizeof(gh));
         tc_write(&dev, (char*)it->first.c_str(), gh.name_length);
         tmp = it->second();
-        tc_write(&dev, (char*)&tmp, sizeof(tmp));
+        tc_write(&dev, (char*)tmp, sizeof(transmit_channel)*12);
     }
 }
 
@@ -146,7 +145,8 @@ void Transceiver::receive(){
                     delete[] buf;
 
                     transmit_channel * in;
-                    tc_read(&dev, (char*)&in, sizeof(in));
+                    in = new transmit_channel[12];
+                    tc_read(&dev, (char*)in, sizeof(transmit_channel)*12);
                     data_gpsr_in[name] = in;
                 }
                 break;    
