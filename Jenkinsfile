@@ -63,4 +63,30 @@ builds['PIL'] = {
     }
 }
 
+builds['Check Style'] = {
+    node{
+        def workspace = pwd()
+
+        stage('Checkout Source Code') {
+            checkout scm
+        }
+
+        stage ('Check Style') {
+            try {
+                sh '''
+                    find ./ -regex ".*\\.\\(c\\|h\\|cc\\|hh\\|cpp\\)" | xargs python tools/cpplint.py --counting=detailed --extensions=c,h,cc,hh,cpp --verbose=0 > style_report 2>&1
+                '''
+            }
+            catch (error) {
+                sh '''
+                    cat style_report
+                '''
+                archiveArtifacts artifacts: 'style_report',
+                        fingerprint: true
+                throw error
+            }
+        }
+    }
+}
+
 parallel builds
