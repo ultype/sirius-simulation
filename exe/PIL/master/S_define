@@ -9,7 +9,6 @@ LIBRARY DEPENDENCIES:
 #include "sim_objects/default_trick_sys.sm"
 // ##include "rocket/Earth.hh"
 // ##include "rocket/GPS_satellites.hh"
-##include "rocket/GPS_receiver.hh"
 ##include "rocket/Newton.hh"
 ##include "rocket/Euler.hh"
 ##include "rocket/Tvc.hh"
@@ -74,7 +73,7 @@ class Rocket_SimObject : public Trick::SimObject {
         AeroDynamics aerodynamics;
         Propulsion propulsion;
 
-        GPS_Receiver gpsr;
+      //  GPS_Receiver gpsr;
         sensor::Gyro *gyro;
         sensor::Accelerometer *accelerometer;
 
@@ -128,7 +127,7 @@ class Rocket_SimObject : public Trick::SimObject {
         void exec_receive(){
             /* XXX */
             if(((std::function<double()>)transceiver(IMPORT(ins, clear_gps_flag)))()){
-                gpsr.clear_gps_flag();
+                gps_con.clear_gps_flag();
             }
             if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
                 propulsion.set_no_thrust();
@@ -158,7 +157,7 @@ class Rocket_SimObject : public Trick::SimObject {
             :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
-                gpsr        ( newton     , euler )        ,
+               // gpsr        ( newton     , euler )        ,
                 env         ( newton     , aerodynamics , kinematics , time ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
@@ -182,6 +181,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") rcs.initialize();
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
+            ("initialization") gps_con.initialize();
 
             P1 (0.001, "scheduled") time.dm_time();
             //P1 (0.001, "scheduled") gpsr.update_markov(0.001);

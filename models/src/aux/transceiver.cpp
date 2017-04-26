@@ -15,8 +15,9 @@ enum packet_type{
 };
 
 struct __attribute__ ((__packed__)) generic_header{
-    unsigned int type : 1;
-    unsigned int name_length : 7;
+    unsigned int type ;
+    unsigned int name_length ;
+    // unsigned int name_length : 7;
 };
 
 struct __attribute__ ((__packed__)) mat_header{
@@ -52,6 +53,7 @@ void Transceiver::register_for_transmit(std::string cid, std::string id, std::fu
 void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in){
     std::string tid = cid + "." +id;
     if(tid.length() > 127) throw std::out_of_range("ID too long");
+    cout<<in;
     data_gpsr_out[tid] = in;
 }
 
