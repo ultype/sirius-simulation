@@ -81,6 +81,8 @@ builds['Check Style'] = {
                 sh '''
                     cat style_report
                 '''
+                archiveArtifacts artifacts: 'style_report',
+                        fingerprint: true
                 throw error
             }
         }
