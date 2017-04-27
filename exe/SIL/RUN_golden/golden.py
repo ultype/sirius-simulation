@@ -12,6 +12,7 @@ Min = 0
 Sec = 0
 rkt.time.load_start_time(Year, DOY, Hour, Min, Sec)
 fc.time.load_start_time(Year, DOY, Hour, Min, Sec)
+rkt.env.dm_RNP()
 
 #SLV
 lonx       = 120.893501 # Vehicle longitude - deg  module newton

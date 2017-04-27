@@ -88,7 +88,7 @@ class Rocket_SimObject : public Trick::SimObject {
         GPS_constellation gps_con;
 
         Rocket_SimObject() 
-            :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
+            :   newton      ( kinematics , euler        , env          , propulsion   , forces)      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
                 env         ( newton     , aerodynamics , kinematics , time ) ,
@@ -254,24 +254,26 @@ class FlightComputer_SimObject : public Trick::SimObject {
             gps.grab_SBEEC = LINK(ins, get_SBEEC);
             gps.grab_VBEEC = LINK(ins, get_VBEEC);
             gps.grab_TEIC = LINK(ins, get_TEIC);
+            // gps.grab_channel = LINK(rkt->gps_con, get_channel);
+            gps.grab_transmit_data = LINK(rkt->gps_con, get_transmit_data);
         };
         FlightComputer_SimObject()
         :   ins         (time ),
-            gps         (time        , rkt->gps_con)
+            gps         (time )
         {
             ("default_data") guidance.default_data();
 
             ("initialization") link();
             
-            ("initialization") gps.initialize(0.001, time, rkt->gps_con);
+            ("initialization") gps.initialize(0.005, time);
             ("initialization") guidance.initialize();
             ("initialization") control.initialize();
             ("initialization") ins.initialize(time);
             ("initialization") rcs_fc.initialize();
 
-            P2 (0.1, "scheduled") gps.filter_extrapolation(0.1);
-            P2 (0.1, "scheduled") gps.measure(0.1);
             P2 (0.001, "scheduled") time.dm_time();
+            P2 (0.005, "scheduled") gps.filter_extrapolation(0.005);
+            P2 (0.005, "scheduled") gps.measure(0.005);
             P2 (0.005, "scheduled") ins.update(0.005);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);
             P2 (0.05, "scheduled") control.control(0.05);

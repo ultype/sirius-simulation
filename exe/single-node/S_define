@@ -7,9 +7,7 @@ LIBRARY DEPENDENCIES:
 *************************************************************/
 
 #include "sim_objects/default_trick_sys.sm"
-##include "Earth.hh"
-##include "GPS_satellites.hh"
-##include "GPS_receiver.hh"
+
 ##include "Newton.hh"
 ##include "Euler.hh"
 ##include "Tvc.hh"
@@ -194,10 +192,13 @@ class Rocket_SimObject : public Trick::SimObject {
             gps.grab_SBEEC = LINK(ins, get_SBEEC);
             gps.grab_VBEEC = LINK(ins, get_VBEEC);
             gps.grab_TEIC = LINK(ins, get_TEIC);
+            // gps.grab_channel = LINK(gps_con, get_channel);
+            gps.grab_transmit_data = LINK(gps_con, get_transmit_data);
+
         };
 
         Rocket_SimObject() 
-            :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
+            :   newton      ( kinematics , euler        , env          , propulsion   , forces)      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
                 //gpsr        ( newton     , euler )      ,
@@ -209,7 +210,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
                 time        () ,
                 gps_con     ( time       , newton       , env          , kinematics) ,
-                gps         (time        , gps_con) ,
+                gps         (time ) ,
                 ins         (time )
             {
 
@@ -222,7 +223,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") aerodynamics.initialize();
             ("initialization") euler.initialize();
             //("initialization") gpsr.initialize(gps_sats, 0.001);
-            ("initialization") gps.initialize(0.05, time, gps_con);
+            ("initialization") gps.initialize(0.005, time);
             ("initialization") tvc.initialize();
             ("initialization") rcs.initialize();
             ("initialization") propulsion.initialize();

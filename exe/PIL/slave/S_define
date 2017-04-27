@@ -7,15 +7,14 @@ LIBRARY DEPENDENCIES:
 *************************************************************/
 
 #include "sim_objects/default_trick_sys.sm"
-##include "Earth.hh"
-##include "GPS_satellites.hh"
-##include "GPS_receiver.hh"
+
 ##include "Time_management.hh"
 
 ##include "Ins.hh"
 ##include "RcsFc.hh"
 ##include "Control.hh"
 ##include "Guidance.hh"
+##include "GPS.hh"
 
 ##include "cad_utility.hh"
 ##include "datadeck.hh"
@@ -46,6 +45,7 @@ LIBRARY DEPENDENCIES:
 
 ##include "transceiver.hh"
 
+
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
 
@@ -62,6 +62,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
         Transceiver transceiver;
 
+        GPS_FSW gps;
+
         void setup_export(){
             transceiver.register_for_transmit(EXPORT(control, get_delrcx));
             transceiver.register_for_transmit(EXPORT(control, get_delecx));
@@ -70,9 +72,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_roll));
             transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_pitch));
             transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_yaw));
-            transceiver.register_for_transmit(EXPORT(ins, get_SBIIC));
-            transceiver.register_for_transmit(EXPORT(ins, get_VBIIC));
-            transceiver.register_for_transmit(EXPORT(ins, get_WBICI));
+            // transceiver.register_for_transmit(EXPORT(ins, get_SBIIC));
+            // transceiver.register_for_transmit(EXPORT(ins, get_VBIIC));
+            // transceiver.register_for_transmit(EXPORT(ins, get_WBICI));
 
             /* XXX */
             transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });
@@ -101,6 +103,17 @@ class FlightComputer_SimObject : public Trick::SimObject {
             rcs_fc.grab_alphacomx = LINK(guidance, get_alphacomx);
             rcs_fc.grab_betacomx  = LINK(guidance, get_betacomx);
 
+            gps.grab_SBIIC = LINK(ins, get_SBIIC);
+            gps.grab_VBIIC = LINK(ins, get_VBIIC);
+            gps.grab_WBICI = LINK(ins, get_WBICI);
+            gps.grab_SBEEC = LINK(ins, get_SBEEC);
+            gps.grab_VBEEC = LINK(ins, get_VBEEC);
+            gps.grab_TEIC = LINK(ins, get_TEIC);
+
+            ins.grab_SXH                    = LINK(gps           , get_SXH);
+            ins.grab_VXH                    = LINK(gps           , get_VXH);
+            
+
             /* remote */
             control.grab_mprop              = transceiver(IMPORT(propulsion     , get_mprop));
             control.grab_dvbe               = transceiver(IMPORT(newton         , get_dvbe));
@@ -127,14 +140,12 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ins.grab_VBII                   = transceiver(IMPORT(newton         , get_VBII));
             ins.grab_dbi                    = transceiver(IMPORT(newton         , get_dbi));
             ins.grab_TBI                    = transceiver(IMPORT(kinematics     , get_TBI));
-            ins.grab_SXH                    = transceiver(IMPORT(gpsr           , get_SXH));
-            ins.grab_VXH                    = transceiver(IMPORT(gpsr           , get_VXH));
-            ins.grab_gps_update             = transceiver(IMPORT(gpsr           , get_gps_update));
             ins.grab_SBEE                   = transceiver(IMPORT(newton         , get_SBEE));
             ins.grab_VBEE                   = transceiver(IMPORT(newton         , get_VBEE));
             ins.grab_phibdx                 = transceiver(IMPORT(kinematics     , get_phibdx));
             ins.grab_thtbdx                 = transceiver(IMPORT(kinematics     , get_thtbdx));
             ins.grab_psibdx                 = transceiver(IMPORT(kinematics     , get_psibdx));
+            ins.grab_gps_update             = transceiver(IMPORT(gps_con           , get_gps_update));
             guidance.grab_mprop             = transceiver(IMPORT(propulsion     , get_mprop));
             guidance.grab_dbi               = transceiver(IMPORT(newton         , get_dbi));
             guidance.grab_dvbi              = transceiver(IMPORT(newton         , get_dvbi));
@@ -144,7 +155,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             rcs_fc.grab_qqcx                = transceiver(IMPORT(*gyro          , get_qqcx));
             rcs_fc.grab_ppcx                = transceiver(IMPORT(*gyro          , get_ppcx));
             rcs_fc.grab_rrcx                = transceiver(IMPORT(*gyro          , get_rrcx));
-
+            gps.grab_transmit_data          = transceiver(IMPORT(gps_con        , get_transmit_data));
+            
             /* XXX */
             ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
             guidance.set_no_thrust  = [this](){ this->no_thrust = 1; };
@@ -157,7 +169,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             this->ltg_thrust = 0;
         }
 
-        FlightComputer_SimObject() : ins(time){
+        FlightComputer_SimObject() : ins(time),
+                                     gps(time)
+        {
 
             ("default_data") clear_flag();
             ("default_data") guidance.default_data();
@@ -165,6 +179,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
             ("initialization") setup_export();
             ("initialization") link();
+            ("initialization") gps.initialize(0.005, time);
             ("initialization") guidance.initialize();
             ("initialization") control.initialize();
             ("initialization") ins.initialize(time);
@@ -175,6 +190,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") transceiver.receive();
 
             P2 (0.05, "scheduled") clear_flag();
+
+            P2 (0.005, "scheduled") gps.filter_extrapolation(0.005);
+            P2 (0.005, "scheduled") gps.measure(0.005);
 
             P2 (0.005, "scheduled") ins.update(0.005);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);

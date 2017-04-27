@@ -1,0 +1,39 @@
+global DR_GROUP_ID
+global drg
+try:
+    if DR_GROUP_ID >= 0:
+        DR_GROUP_ID += 1
+except NameError:
+    DR_GROUP_ID = 0
+    drg = []
+
+drg.append(trick.DRAscii("gps"))
+drg[DR_GROUP_ID].set_freq(trick.DR_Always)
+drg[DR_GROUP_ID].set_cycle(0.1)
+drg[DR_GROUP_ID].set_single_prec_only(False)
+drg[DR_GROUP_ID].add_variable("rkt.gps_con.gdop")
+drg[DR_GROUP_ID].add_variable("rkt.gps_con.gdop")
+drg[DR_GROUP_ID].add_variable("rkt.gps_con.nsat")
+drg[DR_GROUP_ID].add_variable("fc.gps.state_pos")
+drg[DR_GROUP_ID].add_variable("fc.gps.state_vel")
+drg[DR_GROUP_ID].add_variable("fc.gps.state_pos")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_pos_err")
+drg[DR_GROUP_ID].add_variable("fc.gps.state_pos")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_vel_err")
+drg[DR_GROUP_ID].add_variable("fc.gps.state_pos")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_pose_err")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_vele_err")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_phi_err")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_tht_err")
+drg[DR_GROUP_ID].add_variable("fc.ins.thtbdcx")
+drg[DR_GROUP_ID].add_variable("fc.ins.phibdcx")
+drg[DR_GROUP_ID].add_variable("fc.ins.psibdcx")
+drg[DR_GROUP_ID].add_variable("fc.ins.ins_psi_err")
+drg[DR_GROUP_ID].add_variable("rkt.newton._SBII[0]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._SBII[1]")
+drg[DR_GROUP_ID].add_variable("rkt.newton._SBII[2]")
+drg[DR_GROUP_ID].add_variable("fc.ins._WBICI[0]")
+drg[DR_GROUP_ID].add_variable("fc.ins._WBICI[1]")
+drg[DR_GROUP_ID].add_variable("fc.ins._WBICI[2]")
+trick.add_data_record_group(drg[DR_GROUP_ID], trick.DR_Buffer)
+drg[DR_GROUP_ID].enable()
