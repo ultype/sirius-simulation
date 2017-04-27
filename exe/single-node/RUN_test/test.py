@@ -108,7 +108,7 @@ rkt.gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.
 # Create a Ideal Gyro
 # rkt.gyro = trick.GyroIdeal(rkt.euler);
 
-gpsupdate  = 1
+gpsupdate  = 0
 rkt.ins.set_gps_correction(gpsupdate);
 
 #GPS
