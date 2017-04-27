@@ -7,7 +7,6 @@ LIBRARY DEPENDENCIES:
 *************************************************************/
 
 #include "sim_objects/default_trick_sys.sm"
-##include "Earth.hh"
 ##include "Newton.hh"
 ##include "Euler.hh"
 ##include "Tvc.hh"
