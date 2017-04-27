@@ -7,9 +7,6 @@ LIBRARY DEPENDENCIES:
 *************************************************************/
 
 #include "sim_objects/default_trick_sys.sm"
-// ##include "rocket/Earth.hh"
-// ##include "rocket/GPS_satellites.hh"
-// ##include "rocket/GPS_receiver.hh"
 ##include "rocket/Time_management.hh"
 
 ##include "fsw/GPS.hh"

@@ -36,6 +36,7 @@ DP_Product/
 
 *.header
 *.trk
+.~lock.log_gps.csv#
 
 MONTE_RUN_golden/RUN_*
 MONTE_RUN_golden/monte_header
