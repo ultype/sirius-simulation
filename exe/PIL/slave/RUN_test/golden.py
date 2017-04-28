@@ -28,13 +28,13 @@ beta0x     = 0    #Initial sideslip angle    - deg  module newton
 dvbe       = 0    #Vehicle geographic speed  - m/s  module newton
 fc.ins.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 
-"""
+
 frax_algnmnt = 0
 fc.ins.set_non_ideal(frax_algnmnt)
-"""
-fc.ins.set_ideal()
 
-gpsupdate  = 0
+# fc.ins.set_ideal()
+
+gpsupdate  = 1
 fc.ins.set_gps_correction(gpsupdate);
 
 fc.rcs_fc.disable_rcs();        #'int' Attitude control, =|rcs_type||rcs_mode|, see table  module rcs

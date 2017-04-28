@@ -3,6 +3,7 @@
 # execfile("../../../public/Modified_data/ui.py")
 execfile("../../../public/Modified_data/golden.dr")
 execfile("Modified_data/gps.dr")
+execfile("Modified_data/NSPO.dr")
 ##########################################################
 new_connection = trick.MSSocket()
 new_slave = trick.SlaveInfo()
@@ -44,25 +45,25 @@ rkt.euler.load_angular_velocity(0, 0, 0)
 
 #INS Accel
 # Create a Errorous Accelerometer
-"""
+
 EMISA  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALA = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASA = [0, 0, 0]      #gauss(0, 1.e-6)
 rkt.accelerometer = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
-"""
+
 # Create a Ideal Accelerometer
-rkt.accelerometer = trick.AccelerometerIdeal(rkt.newton);
+#rkt.accelerometer = trick.AccelerometerIdeal(rkt.newton);
 
 #ins gyro
 # Create a Errorous Gyro
-"""
+
 EMISG  = [0, 0, 0]      #gauss(0, 1.1e-4)
 ESCALG = [0, 0, 0]      #gauss(0, 2.e-5)
 EBIASG = [0, 0, 0]      #gauss(0, 1.e-6)
 rkt.gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
-"""
+
 # Create a Ideal Gyro
-rkt.gyro = trick.GyroIdeal(rkt.euler);
+#rkt.gyro = trick.GyroIdeal(rkt.euler);
 
 #environment
 #rkt.env.atmosphere_use_weather_deck("auxiliary/weather_table.txt")
