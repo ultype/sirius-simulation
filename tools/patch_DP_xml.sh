@@ -1,5 +1,6 @@
 #!/bin/sh
 
+sed -i "s/<var scale/<var units=\"--\" scale/g" DP_Product/DP_rt_frame.xml
 sed -i "s/<var>/<var units=\"s\">/g" DP_Product/DP_rt_frame.xml
 
 sed -i "s/<var>/<var units=\"s\">/g" DP_Product/DP_rt_timeline.xml
