@@ -46,6 +46,7 @@ LIBRARY DEPENDENCIES:
 ##include "accel/accelerometer_ideal.hh"
 ##include "accel/accelerometer_rocket6g.hh"
 
+##include "time_utility.hh"
 ##include "math_utility.hh"
 ##include "integrate.hh"
 ##include "stochastic.hh"
