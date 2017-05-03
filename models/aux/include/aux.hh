@@ -12,6 +12,7 @@ ICG: (No)
 #define aux_header__HPP
 
 #include <type_traits>
+#include "sim_services/include/simtime.h"
 
 
 #define TRICK_INTERFACE(class_name) \
@@ -38,5 +39,7 @@ ICG: (No)
 
 #define IMPORT(model, func) \
         #model, #func
+
+inline double get_elapsed_time() { return get_rettime(); };
 
 #endif// utility_header__HPP
