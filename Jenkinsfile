@@ -74,15 +74,11 @@ builds['Check Style'] = {
         stage ('Check Style') {
             try {
                 sh '''
-                    find ./ -regex ".*\\.\\(c\\|h\\|cc\\|hh\\|cpp\\)" | xargs python tools/cpplint.py --counting=detailed --extensions=c,h,cc,hh,cpp --verbose=0 > style_report 2>&1
+                    ./tools/lint.sh junit 2> style_report.xml
                 '''
             }
             catch (error) {
-                sh '''
-                    cat style_report
-                '''
-                archiveArtifacts artifacts: 'style_report',
-                        fingerprint: true
+                junit keepLongStdio: true, testResults: 'style_report.xml'
                 throw error
             }
         }
