@@ -70,7 +70,7 @@ class Rocket_SimObject : public Trick::SimObject {
         TVC tvc;
         RCS rcs;
 
-        time_management *time = time_management->get_instance();
+        time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
 
         Transceiver transceiver;
