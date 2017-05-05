@@ -2,6 +2,8 @@
 
 time_management::time_management()
 {
+    last_time = 0;
+
     caldate.Year = 0;
     caldate.DOY = 0;
     caldate.Hour = 0;
@@ -16,10 +18,13 @@ time_management::time_management()
 
 void time_management::dm_time()/* convert simulation time to gps time */
 {
+    double this_time = get_rettime();
 
 	/* Get current GPS time */
 	/* deduct DM_dt because PV comes from dm_att() output of previous cycle */
-	gps_increment(&utctime, 0.001);
+	gps_increment(&utctime, this_time - last_time);
+
+    last_time = this_time;
 
 	utctime2gpstime(&utctime, &gpstime);
 

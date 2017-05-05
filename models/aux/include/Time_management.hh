@@ -43,6 +43,8 @@ class time_management {
     private:
         time_management();
 
+        double last_time;
+
         time_util::GPS_TIME_t gpstime;
         time_util::GPS_TIME_t utctime;
         time_util::CAL_DATE_t caldate;
