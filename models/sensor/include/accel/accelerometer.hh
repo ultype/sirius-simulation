@@ -4,9 +4,6 @@
 PURPOSE:
       (Accelerometer model interface definition)
 *******************************************************************************/
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 #include <armadillo>
 #include <aux.hh>
 
@@ -16,12 +13,6 @@ namespace sensor {
         TRICK_INTERFACE(sensor__Accelerometer);
 
         public:
-            template<class Archive>
-            void serialize(Archive & ar, const unsigned int version){
-                ar & _FSPCB;
-                ar & _EFSPB;
-            };
-
             char name[256];
 
             Accelerometer() : VECTOR_INIT(FSPCB, 3), VECTOR_INIT(EFSPB, 3) {};

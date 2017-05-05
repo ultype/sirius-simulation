@@ -16,15 +16,6 @@ namespace sensor {
         TRICK_INTERFACE(sensor__Gyro);
 
         public:
-            template<class Archive>
-            void serialize(Archive & ar, const unsigned int version){
-                ar & _WBICB;
-                ar & _EWBIB;
-                ar & qqcx;
-                ar & rrcx;
-                ar & ppcx;
-            };
-
             char name[256];
 
             Gyro() : VECTOR_INIT(EWBIB, 3), VECTOR_INIT(WBICB, 3) {};

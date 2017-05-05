@@ -16,8 +16,6 @@ LIBRARY DEPENDENCY:
 #include "Euler.hh"
 #include "Kinematics.hh"
 
-#include <boost/archive/text_oarchive.hpp>
-
 class Kinematics;
 class Newton;
 class _Euler_;
@@ -28,23 +26,6 @@ namespace sensor {
         TRICK_INTERFACE(sensor__GyroRocket6G);
 
         public:
-            template<class Archive>
-            void serialize(Archive & ar, const unsigned int version){
-                ar & boost::serialization::base_object<Gyro>(*this);
-
-                ar & newton;
-                ar & euler;
-                ar & kinematics;
-
-                ar & _EUG;
-                ar & _EWG;
-                ar & _EWALKG;
-                ar & _EUNBG;
-                ar & _EMISG;
-                ar & _ESCALG;
-                ar & _EBIASG;
-            };
-
             GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3], Newton &newt, _Euler_ &eul, Kinematics &kine);
 
             virtual ~GyroRocket6G() {};
