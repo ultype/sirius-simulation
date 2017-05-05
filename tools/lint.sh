@@ -8,7 +8,7 @@ output=${1:-emacs}
 cpplint \
   --counting=detailed \
   --extensions=h,hh,c,cc,cpp \
-  --filter=-build/include,-legal/copyright \
+  --filter=-build/include,-legal/copyright,-runtime/references \
   --linelength=1024 \
   --output=${output} \
   --recursive \
