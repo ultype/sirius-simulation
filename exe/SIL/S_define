@@ -85,21 +85,21 @@ class Rocket_SimObject : public Trick::SimObject {
         TVC tvc;
         RCS rcs;
 
-        time_management time;
         GPS_constellation gps_con;
+
+        time_management *time = time_management::get_instance();
 
         Rocket_SimObject() 
             :   newton      ( kinematics , euler        , env          , propulsion   , forces)      ,
                 kinematics  ( newton     , env          , euler )      ,
                 euler       ( kinematics , propulsion   , forces )     ,
-                env         ( newton     , aerodynamics , kinematics , time ) ,
+                env         ( newton     , aerodynamics , kinematics ) ,
                 propulsion  ( env )      ,
                 aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
                 tvc         ( env        , kinematics   , propulsion ) ,
                 rcs         ( propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
-                time        (),
-                gps_con     ( time       , newton       , env          , kinematics)
+                gps_con     ( newton     , env          , kinematics)
             {
 
             ("initialization") kinematics.initialize();
@@ -114,7 +114,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
 
-            P1 (0.001, "scheduled") time.dm_time();
+            P1 (0.001, "scheduled") time->dm_time();
             //P1 (0.001, "scheduled") gpsr.update_markov(0.001);
             P1 (0.001, "scheduled") kinematics.propagate(0.001);
 	        P1 (0.001, "scheduled") env.propagate(0.001);
@@ -140,6 +140,9 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "logging") euler.update_diagnostic_attributes(0.001);
 
         }
+
+        Rocket_SimObject(const Rocket_SimObject &) = delete;
+        Rocket_SimObject& operator=(const Rocket_SimObject &) = delete;
 };
 
 Rocket_SimObject rkt;
@@ -147,8 +150,6 @@ Rocket_SimObject rkt;
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
         Rocket_SimObject *rkt;
-
-        time_management time;
 
         INS ins;
         GPS_FSW gps;
@@ -258,21 +259,21 @@ class FlightComputer_SimObject : public Trick::SimObject {
             // gps.grab_channel = LINK(rkt->gps_con, get_channel);
             gps.grab_transmit_data = LINK(rkt->gps_con, get_transmit_data);
         };
+
         FlightComputer_SimObject()
-        :   ins         (time ),
-            gps         (time )
+        :   ins         (),
+            gps         ()
         {
             ("default_data") guidance.default_data();
 
             ("initialization") link();
             
-            ("initialization") gps.initialize(0.005, time);
+            ("initialization") gps.initialize(0.005);
             ("initialization") guidance.initialize();
             ("initialization") control.initialize();
-            ("initialization") ins.initialize(time);
+            ("initialization") ins.initialize();
             ("initialization") rcs_fc.initialize();
 
-            P2 (0.001, "scheduled") time.dm_time();
             P2 (0.005, "scheduled") gps.filter_extrapolation(0.005);
             P2 (0.005, "scheduled") gps.measure(0.005);
             P2 (0.005, "scheduled") ins.update(0.005);
@@ -280,6 +281,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") control.control(0.05);
             P2 (0.05, "scheduled") rcs_fc.actuate();
         }
+
+        FlightComputer_SimObject(const FlightComputer_SimObject & FC) = delete;
+        FlightComputer_SimObject& operator=(const FlightComputer_SimObject & FC) = delete;
 };
 
 FlightComputer_SimObject fc;
