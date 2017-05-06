@@ -26,11 +26,12 @@ struct __attribute__((__packed__)) mat_header {
 };
 
 void Transceiver::initialize_connection(char* name) {
-    memset(reinterpret_cast<void*>&err_hndlr, '\0', sizeof(TrickErrorHndlr));
+    memset(reinterpret_cast<void*>(&err_hndlr), '\0', sizeof(TrickErrorHndlr));
     trick_error_init(&err_hndlr, (TrickErrorFuncPtr)NULL,
                      (TrickErrorDataPtr)NULL, TRICK_ERROR_TRIVIAL);
 
-    int status = tc_multiconnect(&dev , name , reinterpret_cast<char*>"SIRIUS" , &err_hndlr);
+    char buf[32] = "SIRIUS";
+    int status = tc_multiconnect(&dev, name, buf, &err_hndlr);
     tc_blockio(&dev, TC_COMM_BLOCKIO);
     if (status != TC_SUCCESS) {
         perror("Error from tc_multiconnect\n");
@@ -59,50 +60,56 @@ void Transceiver::register_for_transmit(std::string cid, std::string id, std::fu
 void Transceiver::transmit() {
     uint32_t size = data_double_out.size() + data_mat_out.size() + data_gpsr_out.size();
     if (tc_isValid(&dev)) {
-        tc_write(&dev, reinterpret_cast<char*>&size, sizeof(uint32_t));
+        tc_write(&dev, reinterpret_cast<char*>(&size), sizeof(uint32_t));
     }
 
     for (auto it = data_double_out.begin(); it != data_double_out.end(); ++it) {
         struct generic_header gh = { .type = DOUBLE, .name_length = (unsigned int)it->first.length() };
         double tmp;
-        tc_write(&dev, reinterpret_cast<char*>&gh, sizeof(gh));
-        tc_write(&dev, reinterpret_cast<char*>it->first.c_str(), gh.name_length);
+        char buf[256];
+        strcpy(buf, it->first.c_str());
+        tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
+        tc_write(&dev, buf, gh.name_length);
         tmp = it->second();
-        tc_write(&dev, reinterpret_cast<char*>&tmp, sizeof(double));
+        tc_write(&dev, reinterpret_cast<char*>(&tmp), sizeof(double));
     }
 
     for (auto it = data_mat_out.begin(); it != data_mat_out.end(); ++it) {
         struct generic_header gh = { .type = MAT, .name_length = (unsigned int)it->first.length() };
         struct mat_header mh = { .x = it->second().n_rows, .y = it->second().n_cols };
-        tc_write(&dev, reinterpret_cast<char*>&gh, sizeof(gh));
-        tc_write(&dev, reinterpret_cast<char*>&mh, sizeof(mh));
-        tc_write(&dev, reinterpret_cast<char*>it->first.c_str(), gh.name_length);
+        char buf[256];
+        strcpy(buf, it->first.c_str());
+        tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
+        tc_write(&dev, reinterpret_cast<char*>(&mh), sizeof(mh));
+        tc_write(&dev, buf, gh.name_length);
 
-        auto out_fn = [this](double& val) { tc_write(&dev, reinterpret_cast<char*>&val, sizeof(double)); };
+        auto out_fn = [this](double& val) { tc_write(&dev, reinterpret_cast<char*>(&val), sizeof(double)); };
         it->second().for_each(out_fn);
     }
 
     for (auto it = data_gpsr_out.begin(); it != data_gpsr_out.end(); ++it) {
         struct generic_header gh = { .type = STRUCT, .name_length = (unsigned int)it->first.length() };
         transmit_channel * tmp;
-        tc_write(&dev, reinterpret_cast<char*>&gh, sizeof(gh));
-        tc_write(&dev, reinterpret_cast<char*>it->first.c_str(), gh.name_length);
+        char buf[256];
+        strcpy(buf, it->first.c_str());
+        tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
+        tc_write(&dev, buf, gh.name_length);
         tmp = it->second();
-        tc_write(&dev, reinterpret_cast<char*>tmp, sizeof(transmit_channel)*12);
+        tc_write(&dev, reinterpret_cast<char*>(tmp), sizeof(transmit_channel)*12);
     }
 }
 
 void Transceiver::receive() {
     uint32_t size;
     if (tc_isValid(&dev)) {
-        tc_read(&dev, reinterpret_cast<char*>&size, sizeof(uint32_t));
+        tc_read(&dev, reinterpret_cast<char*>(&size), sizeof(uint32_t));
     }
 
     for (int i = 0; i < size; i++) {
         char *buf;
         struct generic_header gh;
         struct mat_header mh;
-        tc_read(&dev, reinterpret_cast<char*>&gh, sizeof(gh));
+        tc_read(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
         switch (gh.type) {
             case DOUBLE:
                 {
@@ -113,13 +120,13 @@ void Transceiver::receive() {
                     delete[] buf;
 
                     double in;
-                    tc_read(&dev, reinterpret_cast<char*>&in, sizeof(double));
+                    tc_read(&dev, reinterpret_cast<char*>(&in), sizeof(double));
                     data_double_in[name] = in;
                 }
                 break;
             case MAT:
                 {
-                    tc_read(&dev, reinterpret_cast<char*>&mh, sizeof(mh));
+                    tc_read(&dev, reinterpret_cast<char*>(&mh), sizeof(mh));
                     buf = new char[gh.name_length + 1];
                     tc_read(&dev, buf, gh.name_length);
                     buf[gh.name_length] = '\0';
@@ -127,7 +134,7 @@ void Transceiver::receive() {
                     delete[] buf;
 
                     arma::mat in(mh.x, mh.y);
-                    auto in_fn = [this](double& val) { tc_read(&dev, reinterpret_cast<char*>&val, sizeof(double)); };
+                    auto in_fn = [this](double& val) { tc_read(&dev, reinterpret_cast<char*>(&val), sizeof(double)); };
                     in.for_each(in_fn);
                     if (!data_mat_in.count(name)) {
                         data_mat_in.insert(std::make_pair(name, in));
@@ -146,7 +153,7 @@ void Transceiver::receive() {
 
                     transmit_channel * in;
                     in = new transmit_channel[12];
-                    tc_read(&dev, reinterpret_cast<char*>in, sizeof(transmit_channel)*12);
+                    tc_read(&dev, reinterpret_cast<char*>(in), sizeof(transmit_channel)*12);
                     data_gpsr_in[name] = in;
                 }
                 break;
