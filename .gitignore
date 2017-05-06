@@ -24,6 +24,7 @@ S_source.hh
 build
 trick
 DP_Product/
+jitlib
 
 *.csv
 
