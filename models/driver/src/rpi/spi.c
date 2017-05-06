@@ -15,8 +15,7 @@ uint32_t bcm2835_spi_mode[] = {
 int spi_configure(uint32_t sdev,
                   uint32_t clk,
                   uint32_t bit_order,
-                  uint32_t spi_mode)
-{
+                  uint32_t spi_mode) {
     uint32_t clk_divider;
     uint32_t cs = sdev; /* In Rpi3, use CS to select device.  */
 
@@ -72,8 +71,7 @@ int spi_configure(uint32_t sdev,
     return 0;
 }
 
-int spi_init(void)
-{
+int spi_init(void) {
     if (!bcm2835_init()) {
         dbg_printf("bcm2835_init failed\n");
         return -1;
@@ -90,8 +88,7 @@ int spi_init(void)
     return 0;
 }
 
-int spi_transfern(uint32_t sdev, char *buff, size_t size)
-{
+int spi_transfern(uint32_t sdev, char *buff, size_t size) {
     /* In RPI3, sdev is ignored in this function because
      * SPI device is selected by CS which should be
      * configuted before transmission.
@@ -101,8 +98,7 @@ int spi_transfern(uint32_t sdev, char *buff, size_t size)
     return 0;
 }
 
-void spi_exit(void)
-{
+void spi_exit(void) {
     bcm2835_spi_end();
     bcm2835_close();
 }

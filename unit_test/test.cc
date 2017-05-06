@@ -10,18 +10,18 @@ class Propulsion;
 class Forces;
 
 class Fake : public Kinematics {
-	public:
-		arma::mat get_TBI() {
-			arma::mat dum;
-			return dum;
-		}
+ public:
+    arma::mat get_TBI() {
+        arma::mat dum;
+        return dum;
+    }
 };
 
 TEST(EulerTest, General) {
     Fake *dum;
-    _Euler_ euler(*(Kinematics*)dum, *(Propulsion*)NULL, *(Forces*)NULL);
-    euler.load_angular_velocity(0.1f,0.1f,0.1f);
-    EXPECT_EQ(0.1f ,euler.get_ppx());
-    EXPECT_EQ(0.1f ,euler.get_qqx());
-    EXPECT_EQ(0.1f ,euler.get_rrx());
+    _Euler_ euler(*reinterpret_cast<Kinematics*>dum, *reinterpret_cast<Propulsion*>NULL, *reinterpret_cast<Forces*>NULL);
+    euler.load_angular_velocity(0.1f, 0.1f, 0.1f);
+    EXPECT_EQ(0.1f, euler.get_ppx());
+    EXPECT_EQ(0.1f, euler.get_qqx());
+    EXPECT_EQ(0.1f, euler.get_rrx());
 }

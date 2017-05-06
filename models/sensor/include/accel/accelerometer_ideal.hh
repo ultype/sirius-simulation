@@ -14,20 +14,19 @@ LIBRARY DEPENDENCY:
 #include "Newton.hh"
 
 namespace sensor {
-    class AccelerometerIdeal : public Accelerometer
-    {
-        TRICK_INTERFACE(sensor__AccelerometerIdeal);
+class AccelerometerIdeal : public Accelerometer {
+    TRICK_INTERFACE(sensor__AccelerometerIdeal);
 
-        public:
-            AccelerometerIdeal(Newton &newt);
+ public:
+    AccelerometerIdeal(Newton &newt);
 
-            virtual ~AccelerometerIdeal() {};
+    virtual ~AccelerometerIdeal() {}
 
-            virtual void propagate_error(double int_step);
+    virtual void propagate_error(double int_step);
 
-        private:
-            Newton * newton;
-    };
-}
+ private:
+    Newton * newton;
+};
+}  // namespace sensor
 
-#endif//__ACCEL_IDEAL__
+#endif  // __ACCEL_IDEAL__

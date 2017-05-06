@@ -116,7 +116,7 @@
 // bcm2835_spi_setChipSelectPolarity(SPI_CS, LOW);
 
 #define SCS_High_macro
-//	 bcm2835_spi_setChipSelectPolarity(SPI_CS, HIGH);
+// bcm2835_spi_setChipSelectPolarity(SPI_CS, HIGH);
 
 
 //---- typedef

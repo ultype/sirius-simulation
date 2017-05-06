@@ -35,8 +35,7 @@
 //---------------------------------------------------------------
 #define MAX_RETRY 10000
 
-int Init(void)
-{
+int Init(void) {
     ULONG TempLong;
     int i = 0;
 
@@ -62,7 +61,7 @@ int Init(void)
 
     dbg_printf("LAN9252 is not ready\n");
     return -1;  // initialization failed
-};
+}
 
 
 //---- EtherCAT task
@@ -71,8 +70,7 @@ int Init(void)
 void MainTask(void *MasterToSlave,
               size_t MasterToSlaveSize,
               void *SlaveToMaster,
-              size_t SlaveToMasterSize)
-{
+              size_t SlaveToMasterSize) {
     int WatchDog = 0;
     int Operational = 0;
     uint32_t WatchDogStatus = 0;
@@ -133,14 +131,12 @@ void MainTask(void *MasterToSlave,
 //---- read a directly addressable registers
 //-----------------------------------------------------
 
-unsigned long SPIReadRegisterDirect(unsigned short Address, unsigned char Len)
-
 // Address = register to read
 // Len = number of bytes to read (1,2,3,4)
 //
 // a long is returned but only the requested bytes
 // are meaningful, starting from LsByte
-{
+unsigned long SPIReadRegisterDirect(unsigned short Address, unsigned char Len) {
     uint32_t Result;
     UWORD Addr;
     Addr.Word = Address;
@@ -164,11 +160,9 @@ unsigned long SPIReadRegisterDirect(unsigned short Address, unsigned char Len)
 //---- write a directly addressable registers
 //----------------------------------------------------
 
-void SPIWriteRegisterDirect(unsigned short Address, unsigned long DataOut)
-
 // Address = register to write
 // DataOut = data to write
-{
+void SPIWriteRegisterDirect(unsigned short Address, unsigned long DataOut) {
     ULONG Data;
     UWORD Addr;
     char buff[64];
@@ -194,14 +188,12 @@ void SPIWriteRegisterDirect(unsigned short Address, unsigned long DataOut)
 //---- read an undirectly addressable registers
 //--------------------------------------------------
 
-unsigned long SPIReadRegisterIndirect(unsigned short Address, unsigned char Len)
-
 // Address = register to read
 // Len = number of bytes to read (1,2,3,4)
 //
 // a long is returned but only the requested bytes
 // are meaningful, starting from LsByte
-{
+unsigned long SPIReadRegisterIndirect(unsigned short Address, unsigned char Len) {
     ULONG TempLong;
     UWORD Addr;
 
@@ -216,8 +208,7 @@ unsigned long SPIReadRegisterIndirect(unsigned short Address, unsigned char Len)
 
     do {  // wait for command execution
         TempLong.Long = SPIReadRegisterDirect(ECAT_CSR_CMD, 4);  //
-    }                                                            //
-    while (TempLong.Byte[3] & ECAT_CSR_BUSY);                    //
+    } while (TempLong.Byte[3] & ECAT_CSR_BUSY);                  //
 
 
     TempLong.Long = SPIReadRegisterDirect(ECAT_CSR_DATA,
@@ -229,11 +220,9 @@ unsigned long SPIReadRegisterIndirect(unsigned short Address, unsigned char Len)
 //---- write an undirectly addressable registers
 //-------------------------------------------------
 
-void SPIWriteRegisterIndirect(unsigned long DataOut, unsigned short Address)
-
 // Address = register to write
 // DataOut = data to write
-{
+void SPIWriteRegisterIndirect(unsigned long DataOut, unsigned short Address) {
     ULONG TempLong;
     UWORD Addr;
 
@@ -250,20 +239,19 @@ void SPIWriteRegisterIndirect(unsigned long DataOut, unsigned short Address)
 
     do {  // wait for command execution
         TempLong.Long = SPIReadRegisterDirect(ECAT_CSR_CMD, 4);  //
-    }                                                            //
-    while (TempLong.Byte[3] & ECAT_CSR_BUSY);                    //
+    } while (TempLong.Byte[3] & ECAT_CSR_BUSY);                  //
 }
 
 
 //---- read from process ram fifo
 //----------------------------------------------------------------
 
-void SPIReadProcRamFifo(char *data,
-                        size_t size)  // read from the output process
+// read from the output process
 // ram, through the fifo
 // these are the bytes received from the EtherCAT master and
 // that will be use by our application to write the outputs
-{
+void SPIReadProcRamFifo(char *data,
+                        size_t size) {
     ULONG TempLong;
     char buff[BUFF_SIZE + 4];
     size_t total_read_size = 0;
@@ -279,7 +267,6 @@ void SPIReadProcRamFifo(char *data,
 
         do {
             TempLong.Long = SPIReadRegisterDirect(ECAT_PRAM_RD_CMD, 4);
-
         } while (!(TempLong.Byte[0] & PRAM_READ_AVAIL));
 
         read_size = TempLong.Byte[1] << 2;
@@ -301,13 +288,13 @@ void SPIReadProcRamFifo(char *data,
 //---- write to the process ram fifo
 //--------------------------------------------------------------
 
-void SPIWriteProcRamFifo(char *data,
-                         size_t size)  // write to the input process ram,
-                                       // through the fifo
-                                       //
+// write to the input process ram,
+// through the fifo
+//
 // these are the bytes that we have read from the inputs of our
 // application and that will be sent to the EtherCAT master
-{
+void SPIWriteProcRamFifo(char *data,
+                         size_t size) {
     ULONG TempLong;
     char buff[BUFF_SIZE + 4];
     size_t total_wrt_size = 0;

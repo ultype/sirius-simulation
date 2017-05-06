@@ -17,28 +17,25 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
         VECTOR_INIT(EUNBG  , 3),
         VECTOR_INIT(EMISG  , 3),
         VECTOR_INIT(ESCALG , 3),
-        VECTOR_INIT(EBIASG , 3)
-{
+        VECTOR_INIT(EBIASG , 3) {
     strcpy(name, "Rocket6G Gyro Sensor Model");
 
     EUG.zeros();
     EWG.zeros();
     EWALKG.zeros();
     EUNBG.zeros();
-    srand( (unsigned)time(NULL) );
-    for(int i = 0;i < 3;i++){
-    
+    srand((unsigned)time(NULL));
+    for (int i = 0; i < 3; i++) {
         EMISG(i)  = gauss(0, 1.1e-4);
         ESCALG(i) = gauss(0, 2.e-5);
         EBIASG(i) = gauss(0, 1.e-6);
-   
     }
     // EMISG  = arma::vec3(emisg);
     // ESCALG = arma::vec3(escalg);
     // EBIASG = arma::vec3(ebiasg);
 }
 
-void sensor::GyroRocket6G::propagate_error(double int_step){
+void sensor::GyroRocket6G::propagate_error(double int_step) {
     arma::vec3 WBIB = euler->get_WBIB();
     arma::vec3 FSPB = newton->get_FSPB();
     //-------------------------------------------------------------------------

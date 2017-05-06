@@ -33,8 +33,7 @@
 // I/O access
 static volatile unsigned *gpio = NULL;
 
-void gpio_init(void)
-{
+void gpio_init(void) {
     int mem_fd;
     /* open /dev/mem */
     if ((mem_fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) {
@@ -49,8 +48,7 @@ void gpio_init(void)
         PROT_READ | PROT_WRITE,  // Enable reading & writting to mapped memory
         MAP_SHARED,              // Shared with other processes
         mem_fd,                  // File to map
-        GPIO_BASE                // Offset to GPIO peripheral
-        );
+        GPIO_BASE);              // Offset to GPIO peripheral
 
     close(mem_fd);  // No need to keep mem_fd open after mmap
 
@@ -61,27 +59,22 @@ void gpio_init(void)
 }
 
 
-void gpio_config_input(uint32_t g)
-{
+void gpio_config_input(uint32_t g) {
     INP_GPIO(g);
 }
 
-void gpio_config_output(uint32_t g)
-{
+void gpio_config_output(uint32_t g) {
     OUT_GPIO(g);
 }
 
-void gpio_set(uint32_t g)
-{
+void gpio_set(uint32_t g) {
     GPIO_SET = 1 << g;
 }
 
-void gpio_clr(uint32_t g)
-{
+void gpio_clr(uint32_t g) {
     GPIO_CLR = 1 << g;
 }
 
-uint32_t gpio_get(uint32_t g)
-{
+uint32_t gpio_get(uint32_t g) {
     return GET_GPIO(g);
 }

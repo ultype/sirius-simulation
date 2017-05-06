@@ -21,45 +21,45 @@ class Transceiver;
 class TransceiverProxy;
 
 class Transceiver {
-    public:
-        Transceiver() {};
+ public:
+    Transceiver() {}
 
-        void initialize_connection(char* name);
+    void initialize_connection(char* name);
 
-        void register_for_transmit(std::string cid, std::string id, std::function<double()> in);
-        void register_for_transmit(std::string cid, std::string id, std::function<arma::mat()> in);
-        void register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in);
+    void register_for_transmit(std::string cid, std::string id, std::function<double()> in);
+    void register_for_transmit(std::string cid, std::string id, std::function<arma::mat()> in);
+    void register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in);
 
-        void transmit();
-        void receive();
+    void transmit();
+    void receive();
 
-        TransceiverProxy operator ()(std::string cid, std::string id);
+    TransceiverProxy operator()(std::string cid, std::string id);
 
-        std::function<double()> get_double(std::string cid, std::string id);
-        std::function<arma::mat()> get_mat(std::string cid, std::string id);
-        std::function<transmit_channel*()> get_gpsr(std::string cid, std::string id);
+    std::function<double()> get_double(std::string cid, std::string id);
+    std::function<arma::mat()> get_mat(std::string cid, std::string id);
+    std::function<transmit_channel*()> get_gpsr(std::string cid, std::string id);
 
-    private:
-        TCDevice dev;
-        TrickErrorHndlr   err_hndlr;
+ private:
+    TCDevice dev;
+    TrickErrorHndlr   err_hndlr;
 
-        std::map<std::string, std::function<double()>> data_double_out;
-        std::map<std::string, std::function<arma::mat()>> data_mat_out;
-        std::map<std::string, std::function<transmit_channel*()>> data_gpsr_out;
+    std::map<std::string, std::function<double()>> data_double_out;
+    std::map<std::string, std::function<arma::mat()>> data_mat_out;
+    std::map<std::string, std::function<transmit_channel*()>> data_gpsr_out;
 
-        std::map<std::string, double> data_double_in;
-        std::map<std::string, arma::mat> data_mat_in;
-        std::map<std::string, transmit_channel*> data_gpsr_in;
+    std::map<std::string, double> data_double_in;
+    std::map<std::string, arma::mat> data_mat_in;
+    std::map<std::string, transmit_channel*> data_gpsr_in;
 };
 
 class TransceiverProxy{
     Transceiver *transceiver;
     std::string cid;
     std::string id;
-public:
+
+ public:
     TransceiverProxy(Transceiver *trans , std::string cid, std::string id)
-        :   transceiver(trans), cid(cid), id(id)
-    {
+        :   transceiver(trans), cid(cid), id(id) {
     }
 #ifndef TRICK_ICG
 #ifndef SWIG
@@ -91,7 +91,7 @@ public:
         return transceiver->get_mat(cid, id);
     }
 
-    operator std::function<transmit_channel*()> (){
+    operator std::function<transmit_channel*()> () {
         return transceiver->get_gpsr(cid, id);
     }
 #endif

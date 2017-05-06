@@ -11,44 +11,43 @@ PURPOSE:
 #include "global_constants.hh"
 
 namespace sensor {
-    class Gyro
-    {
-        TRICK_INTERFACE(sensor__Gyro);
+class Gyro {
+    TRICK_INTERFACE(sensor__Gyro);
 
-        public:
-            char name[256];
+ public:
+    char name[256];
 
-            Gyro() : VECTOR_INIT(EWBIB, 3), VECTOR_INIT(WBICB, 3) {};
+    Gyro() : VECTOR_INIT(EWBIB, 3), VECTOR_INIT(WBICB, 3) {};
 
-            virtual ~Gyro(){};
+    virtual ~Gyro() {}
 
-            virtual void propagate_error(double int_step) {};
-            virtual void update_diagnostic_attributes(double int_step) {
-                    // decomposing computed body rates
-                    ppcx = get_ppcx();
-                    rrcx = get_rrcx();
-                    qqcx = get_qqcx();
-                };
+    virtual void propagate_error(double int_step) {}
+    virtual void update_diagnostic_attributes(double int_step) {
+            // decomposing computed body rates
+            ppcx = get_ppcx();
+            rrcx = get_rrcx();
+            qqcx = get_qqcx();
+    }
 
-            virtual arma::vec3 get_computed_WBIB() { return WBICB; };
-            virtual arma::vec3 get_error_of_computed_WBIB() { return EWBIB; };
+    virtual arma::vec3 get_computed_WBIB() { return WBICB; }
+    virtual arma::vec3 get_error_of_computed_WBIB() { return EWBIB; }
 
-            virtual double get_ppcx() { return WBICB(0) * DEG; };
-            virtual double get_qqcx() { return WBICB(1) * DEG; };
-            virtual double get_rrcx() { return WBICB(2) * DEG; };
+    virtual double get_ppcx() { return WBICB(0) * DEG; }
+    virtual double get_qqcx() { return WBICB(1) * DEG; }
+    virtual double get_rrcx() { return WBICB(2) * DEG; }
 
-        protected:
-            arma::vec WBICB;     /* *o  (r/s)   Computed inertial body rate in body coordinate */
-            double _WBICB[3];    /* *o  (r/s)   Computed inertial body rate in body coordinate */
+ protected:
+    arma::vec WBICB;     /* *o  (r/s)   Computed inertial body rate in body coordinate */
+    double _WBICB[3];    /* *o  (r/s)   Computed inertial body rate in body coordinate */
 
-            arma::vec EWBIB;     /* *o  (r/s)   Error in angular vel of body wrt earth */
-            double _EWBIB[3];    /* *o  (r/s)   Error in angular vel of body wrt earth */
+    arma::vec EWBIB;     /* *o  (r/s)   Error in angular vel of body wrt earth */
+    double _EWBIB[3];    /* *o  (r/s)   Error in angular vel of body wrt earth */
 
-        private:
-            double qqcx;        /* *o  (d/s)   INS computed pitch rate */
-            double rrcx;        /* *o  (d/s)   INS computed yaw rate */
-            double ppcx;        /* *o  (d/s)   INS computed roll rate */
-    };
-}
+ private:
+    double qqcx;        /* *o  (d/s)   INS computed pitch rate */
+    double rrcx;        /* *o  (d/s)   INS computed yaw rate */
+    double ppcx;        /* *o  (d/s)   INS computed roll rate */
+};
+}  // namespace sensor
 
-#endif//__GYRO__
+#endif  // __GYRO__

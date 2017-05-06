@@ -19,37 +19,37 @@ PROGRAMMERS:
 class time_management {
     TRICK_INTERFACE(time_management);
 
-    public:
-        static time_management* get_instance() {
-            static time_management time;
+ public:
+    static time_management* get_instance() {
+        static time_management time;
 
-            return &time;
-        };
+        return &time;
+    }
 
-        time_management(const time_management &other) = delete;
-        time_management& operator=(const time_management &other) = delete;
+    time_management(const time_management &other) = delete;
+    time_management& operator=(const time_management &other) = delete;
 
-        ~time_management(){};
+    ~time_management() {}
 
-        void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
-        void dm_time();/* convert simulation time to gps time */
+    void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
+    void dm_time();/* convert simulation time to gps time */
 
-        time_util::GPS_TIME_t get_gpstime();
-        time_util::GPS_TIME_t get_utctime();
-        time_util::CAL_DATE_t get_caldate();
+    time_util::GPS_TIME_t get_gpstime();
+    time_util::GPS_TIME_t get_utctime();
+    time_util::CAL_DATE_t get_caldate();
 
-        double get_julian_date();
+    double get_julian_date();
 
-    private:
-        time_management();
+ private:
+    time_management();
 
-        double last_time;
+    double last_time;
 
-        time_util::GPS_TIME_t gpstime;
-        time_util::GPS_TIME_t utctime;
-        time_util::CAL_DATE_t caldate;
+    time_util::GPS_TIME_t gpstime;
+    time_util::GPS_TIME_t utctime;
+    time_util::CAL_DATE_t caldate;
 
-        double Julian_Date;
+    double Julian_Date;
 };
 
 #endif

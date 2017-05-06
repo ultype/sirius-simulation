@@ -17,21 +17,20 @@ LIBRARY DEPENDENCY:
 class _Euler_;
 
 namespace sensor {
-    class GyroIdeal : public Gyro
-    {
-        TRICK_INTERFACE(sensor__GyroIdeal);
+class GyroIdeal : public Gyro {
+    TRICK_INTERFACE(sensor__GyroIdeal);
 
-        public:
-            GyroIdeal(_Euler_ &eul);
+ public:
+    GyroIdeal(_Euler_ &eul);
 
-            virtual ~GyroIdeal() {};
+    virtual ~GyroIdeal() {}
 
-            virtual void propagate_error(double int_step);
+    virtual void propagate_error(double int_step);
 
-        private:
-            /* Routing components */
-            _Euler_ * euler;
-    };
-}
+ private:
+    /* Routing components */
+    _Euler_ * euler;
+};
+}  // namespace sensor
 
-#endif//__GYRO_IDEAL__
+#endif  // __GYRO_IDEAL__

@@ -40,6 +40,6 @@ ICG: (No)
 #define IMPORT(model, func) \
         #model, #func
 
-inline double get_elapsed_time() { return get_rettime(); };
+inline double get_elapsed_time() { return get_rettime(); }
 
-#endif// utility_header__HPP
+#endif  // utility_header__HPP
