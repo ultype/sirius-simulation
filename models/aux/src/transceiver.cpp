@@ -21,8 +21,8 @@ struct __attribute__((__packed__)) generic_header {
 };
 
 struct __attribute__((__packed__)) mat_header {
-    long long unsigned int x : 4;
-    long long unsigned int y : 4;
+    uint64_t x : 4;
+    uint64_t y : 4;
 };
 
 void Transceiver::initialize_connection(char* name) {
@@ -67,7 +67,7 @@ void Transceiver::transmit() {
         struct generic_header gh = { .type = DOUBLE, .name_length = (unsigned int)it->first.length() };
         double tmp;
         char buf[256];
-        strcpy(buf, it->first.c_str());
+        snprintf(buf, sizeof(buf), "%s", it->first.c_str());
         tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
         tc_write(&dev, buf, gh.name_length);
         tmp = it->second();
@@ -78,7 +78,7 @@ void Transceiver::transmit() {
         struct generic_header gh = { .type = MAT, .name_length = (unsigned int)it->first.length() };
         struct mat_header mh = { .x = it->second().n_rows, .y = it->second().n_cols };
         char buf[256];
-        strcpy(buf, it->first.c_str());
+        snprintf(buf, sizeof(buf), "%s", it->first.c_str());
         tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
         tc_write(&dev, reinterpret_cast<char*>(&mh), sizeof(mh));
         tc_write(&dev, buf, gh.name_length);
@@ -91,7 +91,7 @@ void Transceiver::transmit() {
         struct generic_header gh = { .type = STRUCT, .name_length = (unsigned int)it->first.length() };
         transmit_channel * tmp;
         char buf[256];
-        strcpy(buf, it->first.c_str());
+        snprintf(buf, sizeof(buf), "%s", it->first.c_str());
         tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
         tc_write(&dev, buf, gh.name_length);
         tmp = it->second();

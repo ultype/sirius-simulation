@@ -1,5 +1,5 @@
-#ifndef MODELS_DRIVER_INCLUDE_EASYCAT_H_
-#define MODELS_DRIVER_INCLUDE_EASYCAT_H_
+#ifndef MODELS_DRIVER_INCLUDE_DRIVER_EASYCAT_H_
+#define MODELS_DRIVER_INCLUDE_DRIVER_EASYCAT_H_
 #include <stddef.h>
 #include <stdint.h>
 
@@ -159,4 +159,4 @@ void MainTask(void *MasterToSlave,
               size_t SlaveToMasterSize);
 
 
-#endif  // MODELS_DRIVER_INCLUDE_EASYCAT_H_
+#endif  // MODELS_DRIVER_INCLUDE_DRIVER_EASYCAT_H_
