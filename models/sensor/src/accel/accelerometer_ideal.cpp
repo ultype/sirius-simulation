@@ -2,7 +2,7 @@
 
 sensor::AccelerometerIdeal::AccelerometerIdeal(Newton &newt)
     :   newton(&newt) {
-    strcpy(name, "Ideal Accelerometer Sensor");
+    snprintf(name, sizeof(name), "Ideal Accelerometer Sensor");
 }
 
 void sensor::AccelerometerIdeal::propagate_error(double int_step) {

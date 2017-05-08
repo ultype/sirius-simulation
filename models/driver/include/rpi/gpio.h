@@ -1,5 +1,5 @@
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef MODELS_DRIVER_INCLUDE_RPI_GPIO_H_
+#define MODELS_DRIVER_INCLUDE_RPI_GPIO_H_
 #include <stdint.h>
 
 void gpio_init(void);
@@ -8,4 +8,4 @@ void gpio_config_output(uint32_t g);
 void gpio_set(uint32_t g);
 void gpio_clr(uint32_t g);
 uint32_t gpio_get(uint32_t g);
-#endif
+#endif  // MODELS_DRIVER_INCLUDE_RPI_GPIO_H_

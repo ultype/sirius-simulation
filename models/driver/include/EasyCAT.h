@@ -1,6 +1,5 @@
-
-#ifndef ABT_EasyCAT_H
-#define ABT_EasyCAT_H
+#ifndef MODELS_DRIVER_INCLUDE_DRIVER_EASYCAT_H_
+#define MODELS_DRIVER_INCLUDE_DRIVER_EASYCAT_H_
 #include <stddef.h>
 #include <stdint.h>
 
@@ -123,30 +122,30 @@
 //------------------------------------------------------------------------------------
 
 typedef union {
-    unsigned short Word;
-    unsigned char Byte[2];
+    uint16_t Word;
+    uint8_t Byte[2];
 } UWORD;
 
 typedef union {
-    unsigned long Long;
-    unsigned short Word[2];
-    unsigned char Byte[4];
+    uint32_t Long;
+    uint16_t Word[2];
+    uint8_t Byte[4];
 } ULONG;
 
 typedef union {
-    unsigned char Byte[32];
+    uint8_t Byte[32];
     uint32_t Long[8];
 } PROCBUFFER;
 
 
 //-------------------------------------------------------------------------------------------------
-void SPIWriteRegisterDirect(unsigned short Address, unsigned long DataOut);
+void SPIWriteRegisterDirect(uint16_t Address, uint32_t DataOut);
 
-unsigned long SPIReadRegisterDirect(unsigned short Address, unsigned char Len);
+unsigned long SPIReadRegisterDirect(uint16_t Address, uint8_t Len);
 
-void SPIWriteRegisterIndirect(unsigned long DataOut, unsigned short Address);
-unsigned long SPIReadRegisterIndirect(unsigned short Address,
-                                      unsigned char Len);
+void SPIWriteRegisterIndirect(uint32_t DataOut, uint16_t Address);
+unsigned long SPIReadRegisterIndirect(uint16_t Address,
+                                      uint8_t Len);
 
 void SPIReadProcRamFifo(char *out, size_t size);
 void SPIWriteProcRamFifo(char *data, size_t size);
@@ -162,4 +161,4 @@ void MainTask(void *MasterToSlave,
               size_t SlaveToMasterSize);
 
 
-#endif
+#endif  // MODELS_DRIVER_INCLUDE_DRIVER_EASYCAT_H_

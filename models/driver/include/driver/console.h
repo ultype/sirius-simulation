@@ -1,5 +1,5 @@
-#ifndef __CONSOLE_H__
-#define __CONSOLE_H__
+#ifndef MODELS_DRIVER_INCLUDE_CONSOLE_H_
+#define MODELS_DRIVER_INCLUDE_CONSOLE_H_
 
 #ifdef __unix__
 #include <stdio.h>
@@ -12,4 +12,4 @@ int dbg_printf(const char *format, ...);
 
 int TestPrintf(void);
 
-#endif
+#endif  // MODELS_DRIVER_INCLUDE_CONSOLE_H_

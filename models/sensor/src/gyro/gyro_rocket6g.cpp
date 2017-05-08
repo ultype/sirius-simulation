@@ -18,7 +18,7 @@ sensor::GyroRocket6G::GyroRocket6G(double emisg[3], double escalg[3], double ebi
         VECTOR_INIT(EMISG  , 3),
         VECTOR_INIT(ESCALG , 3),
         VECTOR_INIT(EBIASG , 3) {
-    strcpy(name, "Rocket6G Gyro Sensor Model");
+    snprintf(name, sizeof(name), "Rocket6G Gyro Sensor Model");
 
     EUG.zeros();
     EWG.zeros();

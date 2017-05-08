@@ -8,7 +8,7 @@ sensor::AccelerometerRocket6G::AccelerometerRocket6G(double emisa[3], double esc
         VECTOR_INIT(EMISA, 3),
         VECTOR_INIT(ESCALA, 3),
         VECTOR_INIT(EBIASA, 3) {
-    strcpy(name, "Rocket6G Non-Ideal Accelerometer Sensor");
+    snprintf(name, sizeof(name), "Rocket6G Non-Ideal Accelerometer Sensor");
 
     EWALKA.zeros();
     EMISA.zeros();

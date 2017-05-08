@@ -1,5 +1,5 @@
-#ifndef __PLATFORM_SPI_H__
-#define __PLATFORM_SPI_H__
+#ifndef MODELS_DRIVER_INCLUDE_DRIVER_RPI_SPI_H_
+#define MODELS_DRIVER_INCLUDE_DRIVER_RPI_SPI_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -29,4 +29,4 @@ int spi_configure(uint32_t sdev,
 int spi_transfern(uint32_t sdev, char *buff, size_t size);
 void spi_exit(void);
 
-#endif
+#endif  // MODELS_DRIVER_INCLUDE_DRIVER_RPI_SPI_H_
