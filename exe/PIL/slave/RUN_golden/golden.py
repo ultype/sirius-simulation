@@ -1,5 +1,5 @@
 # execfile("Modified_data/test.dr")
-execfile("Modified_data/gps.dr")
+# execfile("Modified_data/gps.dr")
 ##########################################################
 new_connection = trick.MSSocket()
 trick_master_slave.slave.set_connection_type(new_connection)
