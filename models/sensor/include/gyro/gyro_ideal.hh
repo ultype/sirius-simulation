@@ -21,7 +21,7 @@ class GyroIdeal : public Gyro {
     TRICK_INTERFACE(sensor__GyroIdeal);
 
  public:
-    GyroIdeal(_Euler_ &eul);
+    explicit GyroIdeal(_Euler_ &eul);
 
     virtual ~GyroIdeal() {}
 

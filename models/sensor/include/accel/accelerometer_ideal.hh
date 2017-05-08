@@ -18,7 +18,7 @@ class AccelerometerIdeal : public Accelerometer {
     TRICK_INTERFACE(sensor__AccelerometerIdeal);
 
  public:
-    AccelerometerIdeal(Newton &newt);
+    explicit AccelerometerIdeal(Newton &newt);
 
     virtual ~AccelerometerIdeal() {}
 
