@@ -27,18 +27,18 @@ void time_management::load_start_time(unsigned int Year, unsigned int DOY, unsig
 }
 
 time_util::GPS_TIME time_management::get_gpstime() {
-    //cout<<setprecision(10)<<"gps week: "<<gpstime.get_week()<<'\t'<<"gps sow :"<<gpstime.get_SOW()<<'\t'<<endl;
+    // cout<<setprecision(10)<<"gps week: "<<gpstime.get_week()<<'\t'<<"gps sow :"<<gpstime.get_SOW()<<'\t'<<endl;
     return gpstime;
 }
 
 time_util::UTC_TIME time_management::get_utctime() {
     time_util::UTC_TIME ret(gpstime);
-    //cout<<setprecision(10)<<"Year: "<<ret.get_year()<<'\t'<<"Month: "<<ret.get_month()<<'\t'<<"Day: "<<ret.get_day()<<'\t'<<"Min: "<<ret.get_min()<<'\t'<<"Sec: "<<ret.get_sec()<<endl;
+    // cout<<setprecision(10)<<"Year: "<<ret.get_year()<<'\t'<<"Month: "<<ret.get_month()<<'\t'<<"Day: "<<ret.get_day()<<'\t'<<"Min: "<<ret.get_min()<<'\t'<<"Sec: "<<ret.get_sec()<<endl;
     return ret;
 }
 
 time_util::Modified_julian_date time_management::get_modified_julian_date() {
     time_util::Modified_julian_date ret(gpstime);
-    //cout<<setprecision(20)<<"Julian_Date: "<<ret.get_jd()<<endl;
+    // cout<<setprecision(20)<<"Julian_Date: "<<ret.get_jd()<<endl;
     return ret;
 }
