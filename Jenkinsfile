@@ -76,6 +76,7 @@ builds['Check Style'] = {
                 sh '''
                     ./tools/lint.sh junit 2> style_report.xml
                 '''
+                junit keepLongStdio: true, testResults: 'style_report.xml'
             }
             catch (error) {
                 junit keepLongStdio: true, testResults: 'style_report.xml'
