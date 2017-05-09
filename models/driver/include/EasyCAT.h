@@ -141,10 +141,10 @@ typedef union {
 //-------------------------------------------------------------------------------------------------
 void SPIWriteRegisterDirect(uint16_t Address, uint32_t DataOut);
 
-unsigned long SPIReadRegisterDirect(uint16_t Address, uint8_t Len);
+uint32_t SPIReadRegisterDirect(uint16_t Address, uint8_t Len);
 
 void SPIWriteRegisterIndirect(uint32_t DataOut, uint16_t Address);
-unsigned long SPIReadRegisterIndirect(uint16_t Address,
+uint32_t SPIReadRegisterIndirect(uint16_t Address,
                                       uint8_t Len);
 
 void SPIReadProcRamFifo(char *out, size_t size);

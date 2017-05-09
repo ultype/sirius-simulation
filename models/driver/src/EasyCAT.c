@@ -136,7 +136,7 @@ void MainTask(void *MasterToSlave,
 //
 // a long is returned but only the requested bytes
 // are meaningful, starting from LsByte
-unsigned long SPIReadRegisterDirect(uint16_t Address, uint8_t Len) {
+uint32_t SPIReadRegisterDirect(uint16_t Address, uint8_t Len) {
     uint32_t Result;
     UWORD Addr;
     Addr.Word = Address;
@@ -193,7 +193,7 @@ void SPIWriteRegisterDirect(uint16_t Address, uint32_t DataOut) {
 //
 // a long is returned but only the requested bytes
 // are meaningful, starting from LsByte
-unsigned long SPIReadRegisterIndirect(uint16_t Address, uint8_t Len) {
+uint32_t SPIReadRegisterIndirect(uint16_t Address, uint8_t Len) {
     ULONG TempLong;
     UWORD Addr;
 
