@@ -6,7 +6,7 @@
 
 output=${1:-emacs}
 # Find files with Emacs Regular Expression.
-files=$( find ./ -iregex ".*/\(unit_test\|aux\|driver\|sensor\)/.*\.\(h\|hh\|c\|cc\|cpp\)" )
+files=$( find ./ -iregex ".*/\(unit_test\|aux\|driver\)/.*\.\(h\|hh\|c\|cc\|cpp\)" )
 cpplint \
   --counting=detailed \
   --extensions=h,hh,c,cc,cpp \
