@@ -10,3 +10,6 @@
 [submodule "models/dm"]
 	path = models/dm
 	url = git@tainan.tispace.com:Models/DynamicModels.git
+[submodule "models/sensor"]
+	path = models/sensor
+	url = git@tainan.tispace.com:Models/Sensor.git
