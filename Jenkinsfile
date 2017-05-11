@@ -67,7 +67,7 @@ builds['Check Style'] = {
     node {
         def workspace = pwd()
 
-        stage('Checkout Source Code') {
+        stage('Lint Checkout Source Code') {
             checkout scm
         }
 
@@ -76,15 +76,35 @@ builds['Check Style'] = {
                 sh '''
                     ./tools/lint.sh junit 2> style_report.xml
                 '''
+                currentBuild.result = 'SUCCESS'
             }
             catch (error) {
+                currentBuild.result = 'FAILURE'
                 throw error
             }
             finally {
                 junit keepLongStdio: true, testResults: 'style_report.xml'
+                notifyBuild(currentBuild.result)
             }
         }
     }
 }
 
 parallel builds
+
+def notifyBuild(String buildStatus) {
+    def colorCode = '#AAAAAA'
+    def projectMsg = "Project Name: ${env.JOB_NAME}"
+    def resultMsg = "Result: ${buildStatus}, URL: ${env.BUILD_URL}"
+    def msg = "${projectMsg}\n${resultMsg}"
+
+    if (buildStatus == 'SUCCESS') {
+        colorCode = '#00FF00'
+    } else if (buildStatus == 'FAILURE') {
+        colorCode = '#FF0000'
+    } else if (buildStatus == 'UNSTABLE') {
+        colorCode = '#00FFFF'
+    }
+
+    slackSend(color: colorCode, message: msg)
+}
