@@ -5,8 +5,8 @@
 # If the first parameter is unset, the default value would be "emacs".
 
 output=${1:-emacs}
-# Find files with Emacs Regular Expression.
-files=$( find ./ -iregex ".*/\(unit_test\|aux\|driver\)/.*\.\(h\|hh\|c\|cc\|cpp\)" )
+# Find files with Emacs Regular Expression and exclude submodule directories.
+files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\)/.*" -prune -o -iregex ".*\.\(h\|hh\|c\|cc\|cpp\)" -print )
 cpplint \
   --counting=detailed \
   --extensions=h,hh,c,cc,cpp \
