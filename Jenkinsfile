@@ -2,7 +2,7 @@
 def builds = [:]
 
 builds['single-node'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('Single-Node Checkout Source Code') {
@@ -22,7 +22,7 @@ builds['single-node'] = {
 }
 
 builds['SIL'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('SIL Checkout Source Code') {
@@ -42,7 +42,7 @@ builds['SIL'] = {
 }
 
 builds['PIL'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('PIL Checkout Source Code') {
@@ -64,7 +64,7 @@ builds['PIL'] = {
 }
 
 builds['Check Style'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('Checkout Source Code') {
@@ -76,11 +76,12 @@ builds['Check Style'] = {
                 sh '''
                     ./tools/lint.sh junit 2> style_report.xml
                 '''
-                junit keepLongStdio: true, testResults: 'style_report.xml'
             }
             catch (error) {
-                junit keepLongStdio: true, testResults: 'style_report.xml'
                 throw error
+            }
+            finally {
+                junit keepLongStdio: true, testResults: 'style_report.xml'
             }
         }
     }
