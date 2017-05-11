@@ -83,7 +83,7 @@ void ezio::slave::process_incoming_command() {
 
     tc_read(&dev, reinterpret_cast<char*>(&command), sizeof(uint32_t));
 
-    switch(command) {
+    switch (command) {
         case SEND_PPS:
             generate_pps_callback(pps_width);
             break;

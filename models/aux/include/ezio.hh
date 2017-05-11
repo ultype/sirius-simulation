@@ -67,7 +67,7 @@ enum COMMAND{
 
 class master {
  public:
-    master(char* name);
+    explicit master(char* name);
     virtual ~master();
 
     void send_pps();
@@ -83,7 +83,7 @@ class master {
 
 class slave {
  public:
-    slave(char* name);
+    explicit slave(char* name);
     virtual ~slave();
 
     std::function<void(uint32_t)> generate_pps_callback;
