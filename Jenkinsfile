@@ -93,17 +93,17 @@ builds['Check Style'] = {
 parallel builds
 
 def notifyBuild(String buildStatus) {
-    def colorCode = '#AAAAAA'
+    def colorCode = '#E8E8E8'  // color grey
     def projectMsg = "Project Name: ${env.JOB_NAME}"
     def resultMsg = "Result: ${buildStatus}, URL: ${env.BUILD_URL}"
     def msg = "${projectMsg}\n${resultMsg}"
 
     if (buildStatus == 'SUCCESS') {
-        colorCode = '#00FF00'
+        colorCode = '#36A64F'  // color green
     } else if (buildStatus == 'FAILURE') {
-        colorCode = '#FF0000'
+        colorCode = '#D00000'  // color red
     } else if (buildStatus == 'UNSTABLE') {
-        colorCode = '#00FFFF'
+        colorCode = '#00FFFF'  // color yellow
     }
 
     slackSend(color: colorCode, message: msg)
