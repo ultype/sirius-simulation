@@ -1,3 +1,6 @@
+#ifndef PUBLIC_MODIFIED_DATA_GOLDEN_H_
+#define PUBLIC_MODIFIED_DATA_GOLDEN_H_
+
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
 #include "trick/data_record_proto.h"
@@ -30,3 +33,5 @@ extern "C" void record_golden() {
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
+
+#endif  // PUBLIC_MODIFIED_DATA_GOLDEN_H_

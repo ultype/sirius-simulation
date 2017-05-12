@@ -1,3 +1,6 @@
+#ifndef EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+#define EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
 #include "trick/data_record_proto.h"
@@ -34,3 +37,5 @@ extern "C" void record_golden() {
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
+
+#endif  // EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
