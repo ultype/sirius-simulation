@@ -8,9 +8,9 @@
 extern "C" void record_gps() {
     Trick::DRAscii *drg = new Trick::DRAscii("gps");
     drg->set_freq(Trick::DR_Always);
-    drg->set_cycle(0.001);
+    drg->set_cycle(0.05);
     drg->set_single_prec_only(false);
-    drg->add_variable("rkt.GPS_TIME.SOW");
+    drg->add_variable("rkt.time->gpstime.SOW");
     drg->add_variable("rkt.gps_con.gdop");
     drg->add_variable("rkt.gps_con.nsat");
     drg->add_variable("fc.gps.state_pos");
