@@ -1,4 +1,3 @@
-
 def builds = [:]
 
 builds['single-node'] = {
@@ -95,7 +94,7 @@ parallel builds
 def notifyBuild(String buildStatus) {
     def colorCode = '#E8E8E8'  // color grey
     def projectMsg = "Project Name: ${env.JOB_NAME}"
-    def resultMsg = "Result: ${buildStatus}, URL: ${env.BUILD_URL}"
+    def resultMsg = "Result: ${buildStatus}\nJob-URL: ${env.JOB_URL}\n${env.BUILD_DISPLAY_NAME} Build-URL: ${env.BUILD_URL}"
     def msg = "${projectMsg}\n${resultMsg}"
 
     if (buildStatus == 'SUCCESS') {
