@@ -1,8 +1,7 @@
-
 def builds = [:]
 
 builds['single-node'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('Single-Node Checkout Source Code') {
@@ -22,7 +21,7 @@ builds['single-node'] = {
 }
 
 builds['SIL'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('SIL Checkout Source Code') {
@@ -42,7 +41,7 @@ builds['SIL'] = {
 }
 
 builds['PIL'] = {
-    node{
+    node {
         def workspace = pwd()
 
         stage('PIL Checkout Source Code') {
@@ -64,10 +63,10 @@ builds['PIL'] = {
 }
 
 builds['Check Style'] = {
-    node{
+    node {
         def workspace = pwd()
 
-        stage('Checkout Source Code') {
+        stage('Lint Checkout Source Code') {
             checkout scm
         }
 
@@ -76,14 +75,37 @@ builds['Check Style'] = {
                 sh '''
                     ./tools/lint.sh junit 2> style_report.xml
                 '''
-                junit keepLongStdio: true, testResults: 'style_report.xml'
+                currentBuild.result = 'SUCCESS'
             }
             catch (error) {
-                junit keepLongStdio: true, testResults: 'style_report.xml'
+                currentBuild.result = 'FAILURE'
                 throw error
+            }
+            finally {
+                junit keepLongStdio: true, testResults: 'style_report.xml'
+                notifyBuild(currentBuild.result)
             }
         }
     }
 }
 
 parallel builds
+
+def notifyBuild(String buildStatus) {
+    def colorCode = '#E8E8E8'  // color grey
+    def projectMsg = "Project Name: ${env.JOB_NAME}"
+    def resultMsg = "Result: ${buildStatus}\nJob-URL: ${env.JOB_URL}\n${env.BUILD_DISPLAY_NAME} Build-URL: ${env.BUILD_URL}"
+    def gitMsg = sh returnStdout:true,
+                    script: 'git log -1 --pretty=format:"Author: %an%nCommiter: %cn%nCommit Message: %s%nCommit: %h"'
+    def msg = "${projectMsg}\n\n${resultMsg}\n\n${gitMsg}"
+
+    if (buildStatus == 'SUCCESS') {
+        colorCode = '#36A64F'  // color green
+    } else if (buildStatus == 'FAILURE') {
+        colorCode = '#D00000'  // color red
+    } else if (buildStatus == 'UNSTABLE') {
+        colorCode = '#00FFFF'  // color yellow
+    }
+
+    slackSend(color: colorCode, message: msg)
+}
