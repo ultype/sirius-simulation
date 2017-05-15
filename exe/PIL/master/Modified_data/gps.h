@@ -17,7 +17,7 @@ extern "C" void record_gps() {
     drg->add_variable("fc.gps.state_vel");
     drg->add_variable("fc.ins.ins_pos_err");
     drg->add_variable("fc.gps.state_pos");
-    drg->add_variable("fc.ins.ins_vel_err");;
+    drg->add_variable("fc.ins.ins_vel_err");
     drg->add_variable("fc.ins.ins_pose_err");
     drg->add_variable("fc.ins.ins_vele_err");
     drg->add_variable("fc.ins.ins_phi_err");
