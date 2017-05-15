@@ -13,7 +13,7 @@ extern "C" void master_startup() {
     Trick::SlaveInfo *new_slave = new Trick::SlaveInfo();
     new_slave->set_connection_type(new_connection);
 
-    if(std::getenv("WORKSPACE") == NULL) {
+    if (std::getenv("WORKSPACE") == NULL) {
         throw std::invalid_argument("Must set $WORKSPACE");
     }
 
@@ -26,16 +26,16 @@ extern "C" void master_startup() {
 }
 
 extern "C" int event_start() {
-    double xcg_0          = 12.032;   //  vehicle initial xcg
-    double xcg_1          = 7.965;    //  vehicle final xcg
-    double moi_roll_0     = 2426.8;   //  vehicle initial moi in roll direction
-    double moi_roll_1     = 914.5;    //  vehicle final moi in roll direction
-    double moi_trans_0    = 244537.9; //  vehicle initial transverse moi
-    double moi_trans_1    = 87392.2;  //  vehicle final transverse moi
-    double spi            = 255.0;    //  Specific impusle
-    double fuel_flow_rate = 88.89;    //  fuel flow rate
+    double xcg_0          = 12.032;    //  vehicle initial xcg
+    double xcg_1          = 7.965;     //  vehicle final xcg
+    double moi_roll_0     = 2426.8;    //  vehicle initial moi in roll direction
+    double moi_roll_1     = 914.5;     //  vehicle final moi in roll direction
+    double moi_trans_0    = 244537.9;  //  vehicle initial transverse moi
+    double moi_trans_1    = 87392.2;   //  vehicle final transverse moi
+    double spi            = 255.0;     //  Specific impusle
+    double fuel_flow_rate = 88.89;     //  fuel flow rate
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);
-    return 0 ;
+    return 0;
 }
 
 extern "C" int event_separation_1() {
@@ -46,33 +46,33 @@ extern "C" int event_separation_1() {
     rkt.propulsion.set_vmass0(3893);
     rkt.propulsion.set_fmass0(2963);
 
-    double xcg_0          = 5.829 ;
-    double xcg_1          = 4.683 ;
-    double moi_roll_0     = 615.2 ;
-    double moi_roll_1     = 151.0 ;
+    double xcg_0          = 5.829;
+    double xcg_1          = 4.683;
+    double moi_roll_0     = 615.2;
+    double moi_roll_1     = 151.0;
     double moi_trans_0    = 7407.4;
     double moi_trans_1    = 3752.1;
-    double spi            = 290   ;
-    double fuel_flow_rate = 29.63 ;
+    double spi            = 290;
+    double fuel_flow_rate = 29.63;
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);
 
     rkt.aerodynamics.load_aerotable("../../../auxiliary/aero_table_slv2.txt");
 
-    //speration_2.set_cycle(0.001)
+    // speration_2.set_cycle(0.001)
     jit_add_read(350.001, "event_separation_2");
 
-    return 0 ;
+    return 0;
 }
 
 extern "C" int event_separation_2() {
     rkt.propulsion.set_vmass0(3863);
 
-    jit_add_event("event_separation_3", "event_separation_3", 0.001) ;
-    return 0 ;
+    jit_add_event("event_separation_3", "event_separation_3", 0.001);
+    return 0;
 }
 
 extern "C" int event_separation_3() {
-    if(rkt.newton.get_thtvdx() < 3.728) {
+    if (rkt.newton.get_thtvdx() < 3.728) {
         rkt.rcs.set_rcs_thrust(10);
         rkt.aerodynamics.set_xcg_ref(3.2489);
         rkt.rcs.set_roll_mom_max(10);
@@ -83,37 +83,38 @@ extern "C" int event_separation_3() {
         rkt.propulsion.set_fmass0(360);
 
         double xcg_0          = 1.942;
-        double xcg_1          = 2.02 ;
-        double moi_roll_0     = 72.7 ;
-        double moi_roll_1     = 61.9 ;
+        double xcg_1          = 2.02;
+        double moi_roll_0     = 72.7;
+        double moi_roll_1     = 61.9;
         double moi_trans_0    = 140.7;
-        double moi_trans_1    = 88.8 ;
-        double spi            = 300  ;
-        double fuel_flow_rate = 3.33 ;
+        double moi_trans_1    = 88.8;
+        double spi            = 300;
+        double fuel_flow_rate = 3.33;
         rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);
 
         rkt.aerodynamics.load_aerotable("../../../auxiliary/aero_table_slv1.txt");
 
         event_manager_get_event("event_separation_3")->deactivate();
-        jit_add_event("event_MECO", "event_MECO", 0.05) ;
+        jit_add_event("event_MECO", "event_MECO", 0.05);
     }
-    return 0 ;
+    return 0;
 }
 
 extern "C" int event_MECO() {
-    if(rkt.newton.get_dvbi() > 7613.5) {
+    if (rkt.newton.get_dvbi() > 7613.5) {
         rkt.propulsion.set_no_thrust();
         // rkt.propulsion.set_vmass0(0);
 
         event_manager_get_event("event_MECO")->deactivate();
     }
-    return 0 ;
+    return 0;
 }
 
 
 extern "C" int run_me() {
     record_golden();
-    realtime();
+    // realtime();
+
 
     master_startup();
 
@@ -127,14 +128,14 @@ extern "C" int run_me() {
     rkt.env.dm_RNP();
 
     // SLV
-    double lonx       = 120.893501; //  Vehicle longitude - deg  module newton
-    double latx       = 22.138917;  //  Vehicle latitude  - deg  module newton
-    double alt        = 100;        //  Vehicle altitude  - m  module newton
+    double lonx       = 120.893501;  //  Vehicle longitude - deg  module newton
+    double latx       = 22.138917;   //  Vehicle latitude  - deg  module newton
+    double alt        = 100;         //  Vehicle altitude  - m  module newton
     rkt.newton.load_location(lonx, latx, alt);
 
-    double phibdx = 0;      //  Rolling  angle of veh wrt geod coord - deg  module kinematics
-    double thtbdx = 86.635; //  Pitching angle of veh wrt geod coord - deg  module kinematics
-    double psibdx = 90;     //  Yawing   angle of veh wrt geod coord - deg  module kinematics
+    double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
+    double thtbdx = 86.635;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+    double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
 
     double alpha0x    = 0;    // Initial angle-of-attack   - deg  module newton
@@ -160,18 +161,18 @@ extern "C" int run_me() {
     rkt.propulsion.set_vmass0(13970);       // vehicle initial mass
     rkt.propulsion.set_fmass0(8888.9);      // vehicle initail fuel mass
 
-    double xcg_0          = 12.032;   //  vehicle initial xcg
-    double xcg_1          = 7.965;    //  vehicle final xcg
-    double moi_roll_0     = 2426.8;   //  vehicle initial moi in roll direction
-    double moi_roll_1     = 914.5;    //  vehicle final moi in roll direction
-    double moi_trans_0    = 244537.9; //  vehicle initial transverse moi
-    double moi_trans_1    = 87392.2;  //  vehicle final transverse moi
-    double spi            = 255.0;    //  Specific impusle
-    double fuel_flow_rate = 88.89;    //  fuel flow rate
-    rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate); //  get variable for input file
+    double xcg_0          = 12.032;    //  vehicle initial xcg
+    double xcg_1          = 7.965;     //  vehicle final xcg
+    double moi_roll_0     = 2426.8;    //  vehicle initial moi in roll direction
+    double moi_roll_1     = 914.5;     //  vehicle final moi in roll direction
+    double moi_trans_0    = 244537.9;  //  vehicle initial transverse moi
+    double moi_trans_1    = 87392.2;   //  vehicle final transverse moi
+    double spi            = 255.0;     //  Specific impusle
+    double fuel_flow_rate = 88.89;     //  fuel flow rate
+    rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);  //  get variable for input file
 
-    rkt.propulsion.set_aexit(0.258242843); // nozzle exhaust area
-    rkt.propulsion.set_payload(98); // payload mass
+    rkt.propulsion.set_aexit(0.258242843);  // nozzle exhaust area
+    rkt.propulsion.set_payload(98);  // payload mass
 
     // INS Accel
     //  Create a Errorous Accelerometer
@@ -215,5 +216,5 @@ extern "C" int run_me() {
 
     exec_set_terminate_time(880.0);
 
-    return 0 ;
+    return 0;
 }

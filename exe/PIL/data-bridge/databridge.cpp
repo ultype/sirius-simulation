@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 
     initialization();
 
-    while(1){
+    while (1) {
         slave.process_incoming_command();
     }
 
