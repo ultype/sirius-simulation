@@ -7,6 +7,7 @@
 
 #include "../../../public/Modified_data/golden.h"
 #include "../../../public/Modified_data/realtime.h"
+#include "../Modified_data/gps.h"
 
 extern "C" void master_startup() {
     Trick::MSSocket *new_connection = new Trick::MSSocket();
@@ -113,6 +114,7 @@ extern "C" int event_MECO() {
 
 extern "C" int run_me() {
     record_golden();
+    record_gps();
     //realtime();
 
     master_startup();

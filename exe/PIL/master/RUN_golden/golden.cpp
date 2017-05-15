@@ -113,7 +113,7 @@ extern "C" int event_MECO() {
 
 extern "C" int run_me() {
     record_golden();
-    //realtime();
+    realtime();
 
     master_startup();
 

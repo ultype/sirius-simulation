@@ -181,7 +181,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
             ("initialization") setup_export();
             ("initialization") link();
-            ("initialization") gps.initialize(0.005);
+            ("initialization") gps.initialize(0.05);
             ("initialization") guidance.initialize();
             ("initialization") control.initialize();
             ("initialization") ins.initialize();
@@ -193,8 +193,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             P2 (0.05, "scheduled") clear_flag();
 
-            P2 (0.005, "scheduled") gps.filter_extrapolation(0.005);
-            P2 (0.005, "scheduled") gps.measure(0.005);
+            P2 (0.05, "scheduled") gps.filter_extrapolation(0.05);
+            P2 (0.05, "scheduled") gps.measure(0.05);
 
             P2 (0.005, "scheduled") ins.update(0.005);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);
