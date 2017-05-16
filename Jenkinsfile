@@ -1,4 +1,3 @@
-
 def builds = [:]
 
 builds['single-node'] = {
@@ -95,8 +94,10 @@ parallel builds
 def notifyBuild(String buildStatus) {
     def colorCode = '#E8E8E8'  // color grey
     def projectMsg = "Project Name: ${env.JOB_NAME}"
-    def resultMsg = "Result: ${buildStatus}, URL: ${env.BUILD_URL}"
-    def msg = "${projectMsg}\n${resultMsg}"
+    def resultMsg = "Result: ${buildStatus}\nJob-URL: ${env.JOB_URL}\n${env.BUILD_DISPLAY_NAME} Build-URL: ${env.BUILD_URL}"
+    def gitMsg = sh returnStdout:true,
+                    script: 'git log -1 --pretty=format:"Author: %an%nCommiter: %cn%nCommit Message: %s%nCommit: %h"'
+    def msg = "${projectMsg}\n\n${resultMsg}\n\n${gitMsg}"
 
     if (buildStatus == 'SUCCESS') {
         colorCode = '#36A64F'  // color green

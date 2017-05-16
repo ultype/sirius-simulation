@@ -19,9 +19,7 @@ GTEST_DIR = ../../googletest/googletest
 # Where to find user code.
 USER_DIR = ../samples
 
-INCLUDE_DIR = ../models/includes/rocket
-SRC_DIR = ../models/src/rocket
-INCLUDE_R_DIR = ../models/includes
+MODELS_DIR = ../models/
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -29,11 +27,11 @@ INCLUDE_R_DIR = ../models/includes
 CPPFLAGS += -isystem $(GTEST_DIR)/include -std=c++11
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -I$(INCLUDE_R_DIR) -I ./
+CXXFLAGS += -g -Wall -Wextra -pthread -I$(MODELS_DIR) -I ./
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = eulerTest
+TESTS = timeTest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -93,3 +91,10 @@ test.o : ./test.cc
 
 eulerTest : test.o Euler.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+timeTest : test.o time_utility.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+time_utility.o : $(MODELS_DIR)/math/include/time_utility.hh $(MODELS_DIR)/math/src/time_utility.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
+	-c $(MODELS_DIR)/math/src/time_utility.cpp
