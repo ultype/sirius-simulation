@@ -1,5 +1,5 @@
-#ifndef EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
-#define EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+#ifndef EXE_SIL_MODIFIED_DATA_GPS_H_
+#define EXE_SIL_MODIFIED_DATA_GPS_H_
 
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
@@ -39,4 +39,4 @@ extern "C" void record_gps() {
     drg->enable();
 }
 
-#endif  // EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+#endif  // EXE_SIL_MODIFIED_DATA_GPS_H_
