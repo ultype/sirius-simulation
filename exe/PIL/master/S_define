@@ -168,7 +168,7 @@ class Rocket_SimObject : public Trick::SimObject {
 	        P1 (0.001, "scheduled") env.propagate(0.001);
             P1 (0.001, "scheduled") propulsion.propagate(0.001);
             P1 (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
-            P1 (0.1, "scheduled") gps_con.compute();
+            P1 (0.05, "scheduled") gps_con.compute();
             P1 (0.05, "scheduled") gyro->propagate_error(0.05);
             P1 (0.05, "scheduled") accelerometer->propagate_error(0.05);
 

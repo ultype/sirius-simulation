@@ -5,7 +5,13 @@ builds['single-node'] = {
         def workspace = pwd()
 
         stage('Single-Node Checkout Source Code') {
-            checkout scm
+            try {
+                checkout scm
+            }
+            catch (error) {
+                notifySCMFail()
+                throw error
+            }
         }
 
         stage ('Test Single Node') {
@@ -25,7 +31,13 @@ builds['SIL'] = {
         def workspace = pwd()
 
         stage('SIL Checkout Source Code') {
-            checkout scm
+            try {
+                checkout scm
+            }
+            catch (error) {
+                notifySCMFail()
+                throw error
+            }
         }
 
         stage ('Test SIL') {
@@ -45,7 +57,13 @@ builds['PIL'] = {
         def workspace = pwd()
 
         stage('PIL Checkout Source Code') {
-            checkout scm
+            try {
+                checkout scm
+            }
+            catch (error) {
+                notifySCMFail()
+                throw error
+            }
         }
 
         stage ('Test PIL') {
@@ -67,7 +85,13 @@ builds['Check Style'] = {
         def workspace = pwd()
 
         stage('Lint Checkout Source Code') {
-            checkout scm
+            try {
+                checkout scm
+            }
+            catch (error) {
+                notifySCMFail()
+                throw error
+            }
         }
 
         stage ('Check Style') {
@@ -106,6 +130,16 @@ def notifyBuild(String buildStatus) {
     } else if (buildStatus == 'UNSTABLE') {
         colorCode = '#00FFFF'  // color yellow
     }
+
+    slackSend(color: colorCode, message: msg)
+}
+
+def notifySCMFail() {
+    def colorCode = '#D00000'  // color red
+    def projectMsg = "Project Name: ${env.JOB_NAME}"
+    def resultMsg = "Result: Fail to get source code\nJob-URL: ${env.JOB_URL}"
+
+    def msg = "${projectMsg}\n\n${resultMsg}"
 
     slackSend(color: colorCode, message: msg)
 }

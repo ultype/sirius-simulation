@@ -196,7 +196,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") gps.filter_extrapolation(0.05);
             P2 (0.05, "scheduled") gps.measure(0.05);
 
-            P2 (0.005, "scheduled") ins.update(0.005);
+            P2 (0.05, "scheduled") ins.update(0.05);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);
             P2 (0.05, "scheduled") control.control(0.05);
             P2 (0.05, "scheduled") rcs_fc.actuate();

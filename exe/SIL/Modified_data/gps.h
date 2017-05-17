@@ -1,5 +1,5 @@
-#ifndef EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
-#define EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+#ifndef EXE_SIL_MODIFIED_DATA_GPS_H_
+#define EXE_SIL_MODIFIED_DATA_GPS_H_
 
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
@@ -35,11 +35,8 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.newton._SBEE[0]");
     drg->add_variable("rkt.newton._SBEE[1]");
     drg->add_variable("rkt.newton._SBEE[2]");
-    drg->add_variable("rkt.newton._VBEE[0]");
-    drg->add_variable("rkt.newton._VBEE[1]");
-    drg->add_variable("rkt.newton._VBEE[2]");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
 
-#endif  // EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+#endif  // EXE_SIL_MODIFIED_DATA_GPS_H_
