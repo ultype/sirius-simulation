@@ -16,13 +16,15 @@ builds['single-node'] = {
 
         stage ('Test Single Node') {
             try {
-                sh '''
-                    cd exe/single-node
-                    ./test.sh
-                    python ../../tools/ci_test.py result.csv 1e-5 > test_result
-                '''
-                archiveArtifacts artifacts: 'exe/single-node/result.csv, exe/single-node/test_result',
-                                 fingerprint: true
+                timeout(10) {  // execute at most 10 minutes
+                    sh '''
+                        cd exe/single-node
+                        ./test.sh
+                        python ../../tools/ci_test.py result.csv 1e-5 > test_result
+                    '''
+                    archiveArtifacts artifacts: 'exe/single-node/result.csv, exe/single-node/test_result',
+                                     fingerprint: true
+                }
             }
             catch (error) {
                 notifyResult('FAILURE')
@@ -48,13 +50,15 @@ builds['SIL'] = {
 
         stage ('Test SIL') {
             try {
-                sh '''
-                    cd exe/SIL
-                    ./test.sh
-                    python ../../tools/ci_test.py result.csv 1e-5 > test_result
-                '''
-                archiveArtifacts artifacts: 'exe/SIL/result.csv, exe/SIL/test_result',
-                                 fingerprint: true
+                timeout(10) {  // execute at most 10 minutes
+                    sh '''
+                        cd exe/SIL
+                        ./test.sh
+                        python ../../tools/ci_test.py result.csv 1e-5 > test_result
+                    '''
+                    archiveArtifacts artifacts: 'exe/SIL/result.csv, exe/SIL/test_result',
+                                     fingerprint: true
+                }
             }
             catch (error) {
                 notifyResult('FAILURE')
@@ -80,15 +84,17 @@ builds['PIL'] = {
 
         stage ('Test PIL') {
             try {
-                sh '''
-                    cd exe/PIL/slave
-                    trick-CP
-                    cd ../master
-                    ./test.sh
-                    python ../../../tools/ci_test.py result.csv 1e-5 > test_result
-                '''
-                archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
-                                 fingerprint: true
+                timeout(10) {  // execute at most 10 minutes
+                    sh '''
+                        cd exe/PIL/slave
+                        trick-CP
+                        cd ../master
+                        ./test.sh
+                        python ../../../tools/ci_test.py result.csv 1e-5 > test_result
+                    '''
+                    archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
+                                     fingerprint: true
+                }
             }
             catch (error) {
                 notifyResult('FAILURE')
