@@ -143,9 +143,9 @@ def notifyResult(String result) {
                     script: 'git log -1 --pretty=format:"Author: %an%nCommiter: %cn%nCommit Message: %s%nCommit: %h"'
     def msg = "${projectMsg}\n\n${resultMsg}\n\n${gitMsg}"
 
-    if (buildStatus == 'SUCCESS') {
+    if (result == 'SUCCESS') {
         colorCode = '#36A64F'  // color green
-    } else if (buildStatus == 'FAILURE') {
+    } else if (result == 'FAILURE') {
         colorCode = '#D00000'  // color red
     }
 
