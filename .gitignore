@@ -47,3 +47,8 @@ MONTE_RUN_golden/run_summary
 MONTE_RUN_monte
 
 !golden*.csv
+
+integration_test/RocketCFS
+integration_test/CMakeLists.txt
+integration_test/ins_class.cpp
+
