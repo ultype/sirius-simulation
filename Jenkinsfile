@@ -136,6 +136,7 @@ builds['Testing'] = {
         stage ('Unit Test') {
             try {
                 sh '''
+                    git clone https://github.com/google/googletest.git
                     cd unit_test
                     make
                     cd -
@@ -172,7 +173,7 @@ builds['Testing'] = {
                             $class:                'GoogleTestType',
                             deleteOutputFiles:     true,
                             failIfNotNew:          true,
-                            pattern:               'unit_test/unit_test.xml',
+                            pattern:               'unit_test.xml',
                             skipNoTestFiles:       false,
                             stopProcessingIfError: true
                         ]
