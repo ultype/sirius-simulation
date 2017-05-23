@@ -104,11 +104,11 @@ builds['PIL'] = {
     }
 }
 
-builds['Check Style'] = {
+builds['Testing'] = {
     node {
         def workspace = pwd()
 
-        stage('Lint Checkout Source Code') {
+        stage('Testing Checkout Source Code') {
             try {
                 checkout scm
             }
@@ -130,6 +130,54 @@ builds['Check Style'] = {
             }
             finally {
                 junit keepLongStdio: true, testResults: 'style_report.xml'
+            }
+        }
+
+        stage ('Unit Test') {
+            try {
+                sh '''
+                    cd unit_test
+                    make
+                    cd -
+                    ./unit-test/timeTest --gtest_output=xml:unit_test.xml
+                '''
+            }
+            catch (error) {
+                notifyResult('FAILURE')
+                throw error
+            }
+            finally {
+                step ([
+                    $class:         'XUnitPublisher',
+                    testTimeMargin: '3000',
+                    thresholdMode:  1,
+                    thresholds: [
+                        [
+                            $class:               'FailedThreshold',
+                            failureNewThreshold:  '0',
+                            failureThreshold:     '0',
+                            unstableNewThreshold: '0',
+                            unstableThreshold:    '0'
+                        ],
+                        [
+                            $class:               'SkippedThreshold',
+                            failureNewThreshold:  '0',
+                            failureThreshold:     '0',
+                            unstableNewThreshold: '0',
+                            unstableThreshold:    '0'
+                        ]
+                    ],
+                    tools: [
+                        [
+                            $class:                'GoogleTestType',
+                            deleteOutputFiles:     true,
+                            failIfNotNew:          true,
+                            pattern:               'unit_test/unit_test.xml',
+                            skipNoTestFiles:       false,
+                            stopProcessingIfError: true
+                        ]
+                    ]
+                ])
             }
         }
     }
