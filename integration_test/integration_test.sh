@@ -16,6 +16,7 @@ echo "Clone Flight Software..."
 git clone git@tainan.tispace.com:FSW/RocketCFS.git $FSW_DIR
 cd "$FSW_DIR" && (git submodule update --init --recursive) && (git submodule foreach --recursive git checkout master)
 ln -s $FSW_DIR/configs/Hapith-I_defs $FSW_DIR
+cd "$FSW_DIR/apps/ecm" && git checkout redundant
 
 # Remove FSW models and link to sirus' models
 echo "Replace FSW Models' Directory..."
