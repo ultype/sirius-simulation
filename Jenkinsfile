@@ -140,7 +140,7 @@ builds['Testing'] = {
                     cd unit_test
                     make
                     cd -
-                    ./unit-test/timeTest --gtest_output=xml:unit_test.xml
+                    ./unit_test/timeTest --gtest_output=xml:unit_test.xml
                 '''
             }
             catch (error) {
