@@ -19,7 +19,7 @@ GTEST_DIR = ../../googletest/googletest
 # Where to find user code.
 USER_DIR = ../samples
 
-MODELS_DIR = ../models/
+MODELS_DIR = ../models
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
