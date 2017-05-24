@@ -24,7 +24,7 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.newton._VBEE[2]");
     drg->add_variable("rkt.newton._ABEE[0]");
     drg->add_variable("rkt.newton._ABEE[1]");
-    drg->add_variable("rkt.newton._ABEE[2]");    
+    drg->add_variable("rkt.newton._ABEE[2]");
     drg->add_variable("rkt.gps_con.chan[0].prn");
     drg->add_variable("rkt.gps_con.chan[0].rho0.range");
     drg->add_variable("rkt.gps_con.chan[0].rho0.rate");
