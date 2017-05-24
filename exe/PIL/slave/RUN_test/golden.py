@@ -19,7 +19,7 @@ alt        = 100        # Vehicle altitude  - m  module newton
 fc.ins.load_location(lonx, latx, alt)
 
 phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
-thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 86.9 # Pitching angle of veh wrt geod coord - deg  module kinematics
 psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
 fc.ins.load_angle(psibdx, phibdx, thtbdx)
 
@@ -98,4 +98,4 @@ speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
 speration_3.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 #############################################################
 
-trick.stop(880)
+trick.stop(1200)

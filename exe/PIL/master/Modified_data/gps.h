@@ -22,6 +22,9 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.newton._VBEE[0]");
     drg->add_variable("rkt.newton._VBEE[1]");
     drg->add_variable("rkt.newton._VBEE[2]");
+    drg->add_variable("rkt.newton._ABEE[0]");
+    drg->add_variable("rkt.newton._ABEE[1]");
+    drg->add_variable("rkt.newton._ABEE[2]");    
     drg->add_variable("rkt.gps_con.chan[0].prn");
     drg->add_variable("rkt.gps_con.chan[0].rho0.range");
     drg->add_variable("rkt.gps_con.chan[0].rho0.rate");
@@ -37,6 +40,9 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.newton._FSPB[0]");
     drg->add_variable("rkt.newton._FSPB[1]");
     drg->add_variable("rkt.newton._FSPB[2]");
+    drg->add_variable("rkt.env._GRAVG[0]");
+    drg->add_variable("rkt.env._GRAVG[1]");
+    drg->add_variable("rkt.env._GRAVG[2]");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }

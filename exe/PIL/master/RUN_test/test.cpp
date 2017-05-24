@@ -136,7 +136,7 @@ extern "C" int run_me() {
     rkt.newton.load_location(lonx, latx, alt);
 
     double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
-    double thtbdx = 86.635;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+    double thtbdx = 86.9;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
 
@@ -216,7 +216,7 @@ extern "C" int run_me() {
     jit_add_read(180.001, "event_start");
     jit_add_read(281.001, "event_separation_1");
 
-    exec_set_terminate_time(880.0);
+    exec_set_terminate_time(1200.0);
 
     return 0;
 }
