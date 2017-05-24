@@ -134,7 +134,7 @@ extern "C" int run_me() {
     rkt.newton.load_location(lonx, latx, alt);
 
     double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
-    double thtbdx = 86.635;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+    double thtbdx = 86.9;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
 

@@ -34,6 +34,9 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.gps_con.chan[3].prn");
     drg->add_variable("rkt.gps_con.chan[3].rho0.range");
     drg->add_variable("rkt.gps_con.chan[3].rho0.rate");
+    drg->add_variable("rkt.newton._FSPB[0]");
+    drg->add_variable("rkt.newton._FSPB[1]");
+    drg->add_variable("rkt.newton._FSPB[2]");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
