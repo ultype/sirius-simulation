@@ -43,6 +43,9 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.env._GRAVG[0]");
     drg->add_variable("rkt.env._GRAVG[1]");
     drg->add_variable("rkt.env._GRAVG[2]");
+    drg->add_variable("rkt.newton._inclination");
+    drg->add_variable("rkt.newton._eccentricity");
+    drg->add_variable("rkt.newton._semi_major");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
