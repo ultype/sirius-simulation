@@ -216,7 +216,7 @@ extern "C" int run_me() {
     jit_add_read(180.001, "event_start");
     jit_add_read(281.001, "event_separation_1");
 
-    exec_set_terminate_time(12000.0);
+    exec_set_terminate_time(880.0);
 
     return 0;
 }
