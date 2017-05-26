@@ -19,7 +19,7 @@ alt        = 100        # Vehicle altitude  - m  module newton
 fc.ins.load_location(lonx, latx, alt)
 
 phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
-thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 86.615 # Pitching angle of veh wrt geod coord - deg  module kinematics
 psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
 fc.ins.load_angle(psibdx, phibdx, thtbdx)
 

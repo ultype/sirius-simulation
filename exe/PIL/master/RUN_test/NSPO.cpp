@@ -136,7 +136,7 @@ extern "C" int run_me() {
     rkt.newton.load_location(lonx, latx, alt);
 
     double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
-    double thtbdx = 86.635;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+    double thtbdx = 86.615;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
 
@@ -174,7 +174,7 @@ extern "C" int run_me() {
     rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);  //  get variable for input file
 
     rkt.propulsion.set_aexit(0.258242843);  // nozzle exhaust area
-    rkt.propulsion.set_payload(98);  // payload mass
+    rkt.propulsion.set_payload(96);  // payload mass
 
     // INS Accel
     // Create a Errorous Accelerometer
