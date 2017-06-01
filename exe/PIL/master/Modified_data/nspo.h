@@ -10,6 +10,7 @@ extern "C" void record_nspo() {
     drg->set_freq(Trick::DR_Always);
     drg->set_cycle(0.001);
     drg->set_single_prec_only(false);
+    drg->add_variable("rkt.time->gpstime.SOW");
     drg->add_variable("rkt.newton._SBEE[0]");
     drg->add_variable("rkt.newton._SBEE[1]");
     drg->add_variable("rkt.newton._SBEE[2]");

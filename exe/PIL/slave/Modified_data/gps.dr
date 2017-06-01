@@ -9,7 +9,7 @@ except NameError:
 
 drg.append(trick.DRAscii("gps_slave"))
 drg[DR_GROUP_ID].set_freq(trick.DR_Always)
-drg[DR_GROUP_ID].set_cycle(0.1)
+drg[DR_GROUP_ID].set_cycle(0.05)
 drg[DR_GROUP_ID].set_single_prec_only(False)
 drg[DR_GROUP_ID].add_variable("fc.time->gpstime.SOW")
 drg[DR_GROUP_ID].add_variable("fc.gps.state_pos")
