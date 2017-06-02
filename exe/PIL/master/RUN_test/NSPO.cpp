@@ -179,24 +179,24 @@ extern "C" int run_me() {
     // INS Accel
     // Create a Errorous Accelerometer
 
-    double EMISA[3];      // gauss(0, 1.1e-4)
-    double ESCALA[3];      // gauss(0, 2.e-5)
-    double EBIASA[3];      // gauss(0, 1.e-6)
-    rkt.accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
+    // double EMISA[3];      // gauss(0, 1.1e-4)
+    // double ESCALA[3];      // gauss(0, 2.e-5)
+    // double EBIASA[3];      // gauss(0, 1.e-6)
+    // rkt.accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
 
     // Create a Ideal Accelerometer
-    // rkt.accelerometer = new sensor::AccelerometerIdeal(rkt.newton);
+    rkt.accelerometer = new sensor::AccelerometerIdeal(rkt.newton);
 
     // INS gyro
     // Create a Errorous Gyro
 
-    double EMISG[3];      // gauss(0, 1.1e-4)
-    double ESCALG[3];      // gauss(0, 2.e-5)
-    double EBIASG[3];      // gauss(0, 1.e-6)
-    rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+    // double EMISG[3];      // gauss(0, 1.1e-4)
+    // double ESCALG[3];      // gauss(0, 2.e-5)
+    // double EBIASG[3];      // gauss(0, 1.e-6)
+    // rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
 
     // Create a Ideal Gyro
-    // rkt.gyro = new sensor::GyroIdeal(rkt.euler);
+    rkt.gyro = new sensor::GyroIdeal(rkt.euler);
 
     rkt.rcs.set_roll_mom_max(100);      // RCS rolling moment max value - Nm  module rcs
     rkt.rcs.set_pitch_mom_max(200000);  // RCS pitching moment max value - Nm  module rcs

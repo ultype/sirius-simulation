@@ -64,6 +64,12 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.accelerometer->_FSPCB[0]");
     drg->add_variable("rkt.accelerometer->_FSPCB[1]");
     drg->add_variable("rkt.accelerometer->_FSPCB[2]");
+    drg->add_variable("rkt.newton._VBII[0]");
+    drg->add_variable("rkt.newton._VBII[1]");
+    drg->add_variable("rkt.newton._VBII[2]");
+    drg->add_variable("rkt.newton._ABII[0]");
+    drg->add_variable("rkt.newton._ABII[1]");
+    drg->add_variable("rkt.newton._ABII[2]");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
