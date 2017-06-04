@@ -9,29 +9,6 @@ class CCSDS_CUC;
 class Modified_julian_date;
 }
 
-/*
-class Kinematics;
-class Propulsion;
-class Forces;
-
-class Fake : public Kinematics {
- public:
-    arma::mat get_TBI() {
-        arma::mat dum;
-        return dum;
-    }
-};
-
-TEST(EulerTest, General) {
-    Fake *dum;
-    _Euler_ euler(*reinterpret_cast<Kinematics*>dum, *reinterpret_cast<Propulsion*>NULL, *reinterpret_cast<Forces*>NULL);
-    euler.load_angular_velocity(0.1f, 0.1f, 0.1f);
-    EXPECT_EQ(0.1f, euler.get_ppx());
-    EXPECT_EQ(0.1f, euler.get_qqx());
-    EXPECT_EQ(0.1f, euler.get_rrx());
-}
-*/
-
 TEST(timeTest, UTCtoOther) {
     time_util::UTC_TIME utc;
 
@@ -102,3 +79,26 @@ TEST(timeTest, JuliantoOther) {
     EXPECT_EQ(20, utc.get_min());
     EXPECT_NEAR(20, utc.get_sec(), 1e-3);
 }
+
+/*
+class Kinematics;
+class Propulsion;
+class Forces;
+
+class Fake : public Kinematics {
+ public:
+    arma::mat get_TBI() {
+        arma::mat dum;
+        return dum;
+    }
+};
+
+TEST(EulerTest, General) {
+    Fake *dum;
+    _Euler_ euler(*reinterpret_cast<Kinematics*>dum, *reinterpret_cast<Propulsion*>NULL, *reinterpret_cast<Forces*>NULL);
+    euler.load_angular_velocity(0.1f, 0.1f, 0.1f);
+    EXPECT_EQ(0.1f, euler.get_ppx());
+    EXPECT_EQ(0.1f, euler.get_qqx());
+    EXPECT_EQ(0.1f, euler.get_rrx());
+}
+*/

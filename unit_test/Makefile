@@ -14,7 +14,7 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = ../googletest/googletest
+GTEST_DIR = ../../googletest/googletest
 
 # Where to find user code.
 USER_DIR = ../samples
@@ -86,15 +86,25 @@ sample1_unittest : sample1.o sample1_unittest.o gtest_main.a
 Euler.o : $(SRC_DIR)/Euler.cpp $(INCLUDE_DIR)/Euler.hh $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(SRC_DIR)/Euler.cpp
 
-test.o : ./test.cc
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./test.cc
-
 eulerTest : test.o Euler.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-timeTest : test.o time_utility.o gtest_main.a
+time_utility.o : $(MODELS_DIR)/math/include/time_utility.hh $(MODELS_DIR)/math/src/time_utility.cpp
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
+		-c $(MODELS_DIR)/math/src/time_utility.cpp
+
+timeTest.o : ./timeTest.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./timeTest.cc
+
+timeTest : timeTest.o time_utility.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-time_utility.o : $(MODELS_DIR)/math/include/time_utility.hh $(MODELS_DIR)/math/src/time_utility.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
-	-c $(MODELS_DIR)/math/src/time_utility.cpp
+math_utility.o : $(MODELS_DIR)/math/include/math_utility.hh $(MODELS_DIR)/math/src/math_utility.cpp
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
+		-c $(MODELS_DIR)/math/src/math_utility.cpp
+
+mathTest.o : ./mathTest.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mathTest.cc
+
+mathTest : mathTest.o math_utility.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
