@@ -31,7 +31,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread -I$(MODELS_DIR) -I ./
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = timeTest
+TESTS = timeTest mathTest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -89,6 +89,8 @@ Euler.o : $(SRC_DIR)/Euler.cpp $(INCLUDE_DIR)/Euler.hh $(GTEST_HEADERS)
 eulerTest : test.o Euler.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
+#timeTest=====================================================================
+
 time_utility.o : $(MODELS_DIR)/math/include/time_utility.hh $(MODELS_DIR)/math/src/time_utility.cpp
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
 		-c $(MODELS_DIR)/math/src/time_utility.cpp
@@ -99,6 +101,8 @@ timeTest.o : ./timeTest.cc
 timeTest : timeTest.o time_utility.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
+#mathTest=====================================================================
+
 math_utility.o : $(MODELS_DIR)/math/include/math_utility.hh $(MODELS_DIR)/math/src/math_utility.cpp
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
 		-c $(MODELS_DIR)/math/src/math_utility.cpp
@@ -108,3 +112,16 @@ mathTest.o : ./mathTest.cc
 
 mathTest : mathTest.o math_utility.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+#stochasticTest=====================================================================
+
+stochastic.o : $(MODELS_DIR)/math/include/stochastic.hh $(MODELS_DIR)/math/src/stochastic.cpp
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I $(MODELS_DIR)/math/include/ \
+		-c $(MODELS_DIR)/math/src/stochastic.cpp
+
+stochasticTest.o : ./stochasticTest.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./stochasticTest.cc
+
+stochasticTest : stochasticTest.o stochastic.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	
