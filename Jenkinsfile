@@ -1,3 +1,5 @@
+#!/usr/bin/env groovy
+
 def builds = [:]
 
 builds['single-node'] = {
