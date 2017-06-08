@@ -151,37 +151,7 @@ builds['Testing'] = {
                 throw error
             }
             finally {
-                step ([
-                    $class:         'XUnitPublisher',
-                    testTimeMargin: '3000',
-                    thresholdMode:  1,
-                    thresholds: [
-                        [
-                            $class:               'FailedThreshold',
-                            failureNewThreshold:  '0',
-                            failureThreshold:     '0',
-                            unstableNewThreshold: '0',
-                            unstableThreshold:    '0'
-                        ],
-                        [
-                            $class:               'SkippedThreshold',
-                            failureNewThreshold:  '0',
-                            failureThreshold:     '0',
-                            unstableNewThreshold: '0',
-                            unstableThreshold:    '0'
-                        ]
-                    ],
-                    tools: [
-                        [
-                            $class:                'GoogleTestType',
-                            deleteOutputFiles:     true,
-                            failIfNotNew:          true,
-                            pattern:               'timeTest.xml',
-                            skipNoTestFiles:       false,
-                            stopProcessingIfError: true
-                        ]
-                    ]
-                ])
+                junit keepLongStdio: true, testResults: 'timeTest.xml, mathTest.xml'
             }
         }
     }
