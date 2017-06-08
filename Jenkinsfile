@@ -142,7 +142,8 @@ builds['Testing'] = {
                     cd unit_test
                     make
                     cd -
-                    ./unit_test/timeTest --gtest_output=xml:unit_test.xml
+                    ./unit_test/timeTest --gtest_output=xml:timeTest.xml
+                    ./unit_test/mathTest --gtest_output=xml:mathTest.xml
                 '''
             }
             catch (error) {
@@ -175,7 +176,7 @@ builds['Testing'] = {
                             $class:                'GoogleTestType',
                             deleteOutputFiles:     true,
                             failIfNotNew:          true,
-                            pattern:               'unit_test.xml',
+                            pattern:               'timeTest.xml',
                             skipNoTestFiles:       false,
                             stopProcessingIfError: true
                         ]
