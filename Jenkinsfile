@@ -1,3 +1,5 @@
+#!/usr/bin/env groovy
+
 def builds = [:]
 
 builds['single-node'] = {
@@ -140,7 +142,8 @@ builds['Testing'] = {
                     cd unit_test
                     make
                     cd -
-                    ./unit_test/timeTest --gtest_output=xml:unit_test.xml
+                    ./unit_test/timeTest --gtest_output=xml:timeTest.xml
+                    ./unit_test/mathTest --gtest_output=xml:mathTest.xml
                 '''
             }
             catch (error) {
@@ -148,37 +151,7 @@ builds['Testing'] = {
                 throw error
             }
             finally {
-                step ([
-                    $class:         'XUnitPublisher',
-                    testTimeMargin: '3000',
-                    thresholdMode:  1,
-                    thresholds: [
-                        [
-                            $class:               'FailedThreshold',
-                            failureNewThreshold:  '0',
-                            failureThreshold:     '0',
-                            unstableNewThreshold: '0',
-                            unstableThreshold:    '0'
-                        ],
-                        [
-                            $class:               'SkippedThreshold',
-                            failureNewThreshold:  '0',
-                            failureThreshold:     '0',
-                            unstableNewThreshold: '0',
-                            unstableThreshold:    '0'
-                        ]
-                    ],
-                    tools: [
-                        [
-                            $class:                'GoogleTestType',
-                            deleteOutputFiles:     true,
-                            failIfNotNew:          true,
-                            pattern:               'unit_test.xml',
-                            skipNoTestFiles:       false,
-                            stopProcessingIfError: true
-                        ]
-                    ]
-                ])
+                junit keepLongStdio: true, testResults: 'timeTest.xml, mathTest.xml'
             }
         }
     }
