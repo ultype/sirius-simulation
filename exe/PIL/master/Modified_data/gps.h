@@ -70,6 +70,9 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.newton._ABII[0]");
     drg->add_variable("rkt.newton._ABII[1]");
     drg->add_variable("rkt.newton._ABII[2]");
+    drg->add_variable("rkt.env._GRAVGE[0]");
+    drg->add_variable("rkt.env._GRAVGE[1]");
+    drg->add_variable("rkt.env._GRAVGE[2]");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }
