@@ -134,26 +134,6 @@ builds['Testing'] = {
                 junit keepLongStdio: true, testResults: 'style_report.xml'
             }
         }
-
-        stage ('Unit Test') {
-            try {
-                sh '''
-                    git clone https://github.com/google/googletest.git
-                    cd unit_test
-                    make
-                    cd -
-                    ./unit_test/timeTest --gtest_output=xml:timeTest.xml
-                    ./unit_test/mathTest --gtest_output=xml:mathTest.xml
-                '''
-            }
-            catch (error) {
-                notifyResult('FAILURE')
-                throw error
-            }
-            finally {
-                junit keepLongStdio: true, testResults: 'timeTest.xml, mathTest.xml'
-            }
-        }
     }
 }
 
