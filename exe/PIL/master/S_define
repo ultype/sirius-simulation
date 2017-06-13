@@ -99,15 +99,18 @@ class Rocket_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT( newton        , get_SBEE));
             transceiver.register_for_transmit(EXPORT( newton        , get_VBEE));
             transceiver.register_for_transmit(EXPORT( kinematics    , get_TBI));
-            transceiver.register_for_transmit(EXPORT(*gyro          , get_computed_WBIB));
-            transceiver.register_for_transmit(EXPORT(*gyro          , get_error_of_computed_WBIB));
-            transceiver.register_for_transmit(EXPORT(*accelerometer , get_computed_FSPB));
-            transceiver.register_for_transmit(EXPORT(*accelerometer , get_error_of_computed_FSPB));
-            transceiver.register_for_transmit(EXPORT(*gyro          , get_qqcx));
-            transceiver.register_for_transmit(EXPORT(*gyro          , get_ppcx));
-            transceiver.register_for_transmit(EXPORT(*gyro          , get_rrcx));
-            transceiver.register_for_transmit(EXPORT(gps_con        , get_transmit_data));
-            transceiver.register_for_transmit(EXPORT(gps_con        , get_gps_update));
+            transceiver.register_for_transmit(EXPORT( *gyro         , get_computed_WBIB));
+            transceiver.register_for_transmit(EXPORT( *gyro         , get_error_of_computed_WBIB));
+            transceiver.register_for_transmit(EXPORT( *accelerometer, get_computed_FSPB));
+            transceiver.register_for_transmit(EXPORT( *accelerometer, get_error_of_computed_FSPB));
+            transceiver.register_for_transmit(EXPORT( *gyro         , get_qqcx));
+            transceiver.register_for_transmit(EXPORT( *gyro         , get_ppcx));
+            transceiver.register_for_transmit(EXPORT( *gyro         , get_rrcx));
+            transceiver.register_for_transmit(EXPORT( gps_con       , get_transmit_data));
+            transceiver.register_for_transmit(EXPORT( gps_con       , get_gps_update));
+            transceiver.register_for_transmit(EXPORT( kinematics    , get_phibdx));
+            transceiver.register_for_transmit(EXPORT( kinematics    , get_thtbdx));
+            transceiver.register_for_transmit(EXPORT( kinematics    , get_psibdx));
 
         };
 
