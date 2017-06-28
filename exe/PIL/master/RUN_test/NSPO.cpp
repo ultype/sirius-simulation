@@ -135,6 +135,10 @@ extern "C" int run_me() {
     double alt        = 100;         //  Vehicle altitude  - m  module newton
     rkt.newton.load_location(lonx, latx, alt);
 
+    double con_ang = 0.0;
+    double con_w = 20.0;
+    rkt.newton.load_coning_var(con_ang, con_w);
+
     double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
     double thtbdx = 86.615;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
@@ -190,13 +194,13 @@ extern "C" int run_me() {
     // INS gyro
     // Create a Errorous Gyro
 
-    // double EMISG[3];      // gauss(0, 1.1e-4)
-    // double ESCALG[3];      // gauss(0, 2.e-5)
-    // double EBIASG[3];      // gauss(0, 1.e-6)
-    // rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+    double EMISG[3];      // gauss(0, 1.1e-4)
+    double ESCALG[3];      // gauss(0, 2.e-5)
+    double EBIASG[3];      // gauss(0, 1.e-6)
+    rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
 
     // Create a Ideal Gyro
-    rkt.gyro = new sensor::GyroIdeal(rkt.euler);
+    // rkt.gyro = new sensor::GyroIdeal(rkt.euler);
 
     rkt.rcs.set_roll_mom_max(100);      // RCS rolling moment max value - Nm  module rcs
     rkt.rcs.set_pitch_mom_max(200000);  // RCS pitching moment max value - Nm  module rcs
@@ -213,10 +217,10 @@ extern "C" int run_me() {
     rkt.gps_con.readfile("../../../auxiliary/brdc0810.17n");
 
     /* events */
-    jit_add_read(180.001, "event_start");
-    jit_add_read(281.001, "event_separation_1");
+    // jit_add_read(180.001, "event_start");
+    // jit_add_read(281.001, "event_separation_1");
 
-    exec_set_terminate_time(880.0);
+    exec_set_terminate_time(8640.0);
 
     return 0;
 }

@@ -138,6 +138,10 @@ extern "C" int run_me() {
     double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
 
+    double con_ang = 0.0;
+    double con_w = 20.0;
+    rkt.newton.load_coning_var(con_ang, con_w);
+
     double alpha0x    = 0;    // Initial angle-of-attack   - deg  module newton
     double beta0x     = 0;    // Initial sideslip angle    - deg  module newton
     double dvbe       = 0;    // Vehicle geographic speed  - m/s  module newton

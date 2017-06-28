@@ -77,25 +77,25 @@ fc.gps.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 ######################################################################################################
 
 #Event0:rcs_on
-rcs_on = trick.new_event("rcs_on")
-rcs_on.set_cycle(0.001)
-rcs_on.condition(0, "trick.exec_get_sim_time() == 185.001")
-rcs_on.action(0, "fc.rcs_fc.enable_rcs()")
-trick.add_event(rcs_on)
-rcs_on.activate()
-#Event1:Stage 2 ignition
-speration_1 = trick.new_event("speration_1")
-speration_1.set_cycle(0.001)
-speration_1.condition(0, "trick.exec_get_sim_time() == 281.001")
-speration_1.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
-trick.add_event(speration_1)
-speration_1.activate()
-##############################################################
-#Event3:Stage 3 ignition
-speration_3=trick.new_event("speration_3")
-speration_3.set_cycle(0.001)
-speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
-speration_3.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
-############################################################
+# rcs_on = trick.new_event("rcs_on")
+# rcs_on.set_cycle(0.001)
+# rcs_on.condition(0, "trick.exec_get_sim_time() == 185.001")
+# rcs_on.action(0, "fc.rcs_fc.enable_rcs()")
+# trick.add_event(rcs_on)
+# rcs_on.activate()
+# #Event1:Stage 2 ignition
+# speration_1 = trick.new_event("speration_1")
+# speration_1.set_cycle(0.001)
+# speration_1.condition(0, "trick.exec_get_sim_time() == 281.001")
+# speration_1.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+# trick.add_event(speration_1)
+# speration_1.activate()
+# ##############################################################
+# #Event3:Stage 3 ignition
+# speration_3=trick.new_event("speration_3")
+# speration_3.set_cycle(0.001)
+# speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
+# speration_3.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
+# ############################################################
 
-trick.stop(880)
+trick.stop(8640)

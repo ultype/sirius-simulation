@@ -142,6 +142,7 @@ class Rocket_SimObject : public Trick::SimObject {
             rcs.grab_e_yaw            = transceiver(IMPORT(rcs_fc  , get_e_yaw));
             sdt.grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt.grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
+            sdt.grab_CONING           = LINK( newton , get_CONING);
         };
 
         Rocket_SimObject() 
@@ -154,7 +155,8 @@ class Rocket_SimObject : public Trick::SimObject {
                 tvc         ( env        , kinematics   , propulsion ) ,
                 rcs         ( propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
-                gps_con     ( newton     , env          , kinematics)
+                gps_con     ( newton     , env          , kinematics) ,
+                sdt         ()
             {
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
