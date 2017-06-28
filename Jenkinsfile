@@ -8,62 +8,6 @@ node { // for loading the shared functions
     common = load 'common.groovy'
 }
 
-builds['single-node'] = {
-    node {
-        def workspace = pwd()
-
-        stage('Single-Node Checkout Source Code') {
-            common.checkoutSource()
-        }
-
-        stage ('Test Single Node') {
-            try {
-                timeout(10) {  // execute at most 10 minutes
-                    sh '''
-                        cd exe/single-node
-                        ./test.sh
-                        python ../../tools/ci_test.py result.csv 1e-5 > test_result
-                    '''
-                    archiveArtifacts artifacts: 'exe/single-node/result.csv, exe/single-node/test_result',
-                                     fingerprint: true
-                }
-            }
-            catch (error) {
-                common.notifyResult('FAILURE')
-                throw error
-            }
-        }
-    }
-}
-
-builds['SIL'] = {
-    node {
-        def workspace = pwd()
-
-        stage('SIL Checkout Source Code') {
-            common.checkoutSource()
-        }
-
-        stage ('Test SIL') {
-            try {
-                timeout(10) {  // execute at most 10 minutes
-                    sh '''
-                        cd exe/SIL
-                        ./test.sh
-                        python ../../tools/ci_test.py result.csv 1e-5 > test_result
-                    '''
-                    archiveArtifacts artifacts: 'exe/SIL/result.csv, exe/SIL/test_result',
-                                     fingerprint: true
-                }
-            }
-            catch (error) {
-                common.notifyResult('FAILURE')
-                throw error
-            }
-        }
-    }
-}
-
 builds['PIL'] = {
     node {
         def workspace = pwd()
