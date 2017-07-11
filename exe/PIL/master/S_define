@@ -183,10 +183,10 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") accelerometer->propagate_error(0.005);
             P1 (0.005, "scheduled") sdt.compute(0.005);
 
-            P2 (0.05, "scheduled") transceiver.transmit();
+            P2 (0.01, "scheduled") transceiver.transmit();
 ;
-            P2 (0.05, "scheduled") transceiver.receive();
-            P2 (0.05, "scheduled") exec_receive();
+            P2 (0.01, "scheduled") transceiver.receive();
+            P2 (0.01, "scheduled") exec_receive();
 
             P3 (0.001, "scheduled") tvc.actuate(0.001);
             P3 (0.001, "scheduled") rcs.rcs_schmitt_thrust();

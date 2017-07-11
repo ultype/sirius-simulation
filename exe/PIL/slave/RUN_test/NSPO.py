@@ -98,4 +98,4 @@ fc.gps.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 # speration_3.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
 # ############################################################
 
-trick.stop(8640)
+trick.stop(880)

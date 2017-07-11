@@ -136,7 +136,7 @@ extern "C" int run_me() {
     rkt.newton.load_location(lonx, latx, alt);
 
     double con_ang = 0.0;
-    double con_w = 20.0;
+    double con_w = 50.0;
     rkt.newton.load_coning_var(con_ang, con_w);
 
     double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
@@ -220,7 +220,7 @@ extern "C" int run_me() {
     // jit_add_read(180.001, "event_start");
     // jit_add_read(281.001, "event_separation_1");
 
-    exec_set_terminate_time(8640.0);
+    exec_set_terminate_time(880.0);
 
     return 0;
 }
