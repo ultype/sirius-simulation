@@ -197,10 +197,10 @@ extern "C" int run_me() {
     double EMISG[3];      // gauss(0, 1.1e-4)
     double ESCALG[3];      // gauss(0, 2.e-5)
     double EBIASG[3];      // gauss(0, 1.e-6)
-    rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+    // rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
 
     // Create a Ideal Gyro
-    // rkt.gyro = new sensor::GyroIdeal(rkt.euler);
+    rkt.gyro = new sensor::GyroIdeal(rkt.euler);
 
     rkt.rcs.set_roll_mom_max(100);      // RCS rolling moment max value - Nm  module rcs
     rkt.rcs.set_pitch_mom_max(200000);  // RCS pitching moment max value - Nm  module rcs
@@ -217,8 +217,8 @@ extern "C" int run_me() {
     rkt.gps_con.readfile("../../../auxiliary/brdc0810.17n");
 
     /* events */
-    // jit_add_read(180.001, "event_start");
-    // jit_add_read(281.001, "event_separation_1");
+    jit_add_read(180.001, "event_start");
+    jit_add_read(281.001, "event_separation_1");
 
     exec_set_terminate_time(880.0);
 

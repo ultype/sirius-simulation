@@ -75,7 +75,13 @@ fc.gps.rpos        = 1  #1sig pos value of meas cov matrix - m=module gps
 fc.gps.rvel        = 0.1  #1sig vel value of meas cov matrix - m/s=module gps
 fc.gps.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 ######################################################################################################
-
+#Event:liftoff
+liftoff = trick.new_event("liftoff")
+liftoff.set_cycle(0.001)
+liftoff.condition(0, "trick.exec_get_sim_time() == 180.002")
+liftoff.action(0, "fc.ins.set_liftoff(1)")
+trick.add_event(liftoff)
+liftoff.activate()
 #Event0:rcs_on
 rcs_on = trick.new_event("rcs_on")
 rcs_on.set_cycle(0.001)
