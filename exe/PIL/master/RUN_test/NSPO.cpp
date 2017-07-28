@@ -183,9 +183,9 @@ extern "C" int run_me() {
     // INS Accel
     // Create a Errorous Accelerometer
 
-    // double EMISA[3];      // gauss(0, 1.1e-4)
-    // double ESCALA[3];      // gauss(0, 2.e-5)
-    // double EBIASA[3];      // gauss(0, 1.e-6)
+    double EMISA[3];      // gauss(0, 1.1e-4)
+    double ESCALA[3];      // gauss(0, 2.e-5)
+    double EBIASA[3];      // gauss(0, 1.e-6)
     // rkt.accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
 
     // Create a Ideal Accelerometer
