@@ -150,6 +150,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ins.grab_gps_update             = transceiver(IMPORT(gps_con        , get_gps_update));
             ins.grab_PHI                    = transceiver(IMPORT(sdt            , get_PHI));
             ins.grab_DELTA_VEL              = transceiver(IMPORT(sdt            , get_DELTA_VEL));
+            ins.grab_PHI_HIGH               = transceiver(IMPORT(sdt            , get_PHI_HIGH));
+            ins.grab_PHI_LOW                = transceiver(IMPORT(sdt            , get_PHI_LOW));
             ins.grab_TEI                    = transceiver(IMPORT(env            , get_TEI));
             guidance.grab_mprop             = transceiver(IMPORT(propulsion     , get_mprop));
             guidance.grab_dbi               = transceiver(IMPORT(newton         , get_dbi));
