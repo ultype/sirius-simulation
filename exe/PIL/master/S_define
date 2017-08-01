@@ -115,6 +115,8 @@ class Rocket_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT( kinematics    , get_psibdx));
             transceiver.register_for_transmit(EXPORT( sdt           , get_PHI));
             transceiver.register_for_transmit(EXPORT( sdt           , get_DELTA_VEL));
+            transceiver.register_for_transmit(EXPORT( sdt           , get_PHI_HIGH));
+            transceiver.register_for_transmit(EXPORT( sdt           , get_PHI_LOW));
             transceiver.register_for_transmit(EXPORT( env           , get_TEI));
 
         };
@@ -145,6 +147,8 @@ class Rocket_SimObject : public Trick::SimObject {
             sdt.grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt.grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
             sdt.grab_CONING           = LINK( newton , get_CONING);
+            sdt.grab_HIGH             = LINK( *gyro   , get_HIGH);
+            sdt.grab_LOW              = LINK( *gyro   , get_LOW);
         };
 
         Rocket_SimObject() 

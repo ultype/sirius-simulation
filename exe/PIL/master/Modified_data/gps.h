@@ -61,9 +61,9 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.gyro->_WBICB[0]");
     drg->add_variable("rkt.gyro->_WBICB[1]");
     drg->add_variable("rkt.gyro->_WBICB[2]");
-    // drg->add_variable("rkt.gyro->_EWBIB[0]");
-    // drg->add_variable("rkt.gyro->_EWBIB[1]");
-    // drg->add_variable("rkt.gyro->_EWBIB[2]");
+    drg->add_variable("rkt.gyro->_EWBIB[0]");
+    drg->add_variable("rkt.gyro->_EWBIB[1]");
+    drg->add_variable("rkt.gyro->_EWBIB[2]");
     // drg->add_variable("rkt.accelerometer->_EFSPB[0]");
     // drg->add_variable("rkt.accelerometer->_EFSPB[1]");
     // drg->add_variable("rkt.accelerometer->_EFSPB[2]");
