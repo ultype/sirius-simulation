@@ -1,5 +1,5 @@
 # execfile("Modified_data/test.dr")
-# execfile("Modified_data/gps.dr")
+execfile("Modified_data/gps.dr")
 ##########################################################
 new_connection = trick.MSSocket()
 trick_master_slave.slave.set_connection_type(new_connection)
@@ -19,7 +19,7 @@ alt        = 100        # Vehicle altitude  - m  module newton
 fc.ins.load_location(lonx, latx, alt)
 
 phibdx = 0      # Rolling  angle of veh wrt geod coord - deg  module kinematics
-thtbdx = 86.635 # Pitching angle of veh wrt geod coord - deg  module kinematics
+thtbdx = 86.615 # Pitching angle of veh wrt geod coord - deg  module kinematics
 psibdx = 90     # Yawing   angle of veh wrt geod coord - deg  module kinematics
 fc.ins.load_angle(psibdx, phibdx, thtbdx)
 
@@ -28,10 +28,6 @@ beta0x     = 0    #Initial sideslip angle    - deg  module newton
 dvbe       = 0    #Vehicle geographic speed  - m/s  module newton
 fc.ins.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 
-"""
-frax_algnmnt = 0
-fc.ins.set_non_ideal(frax_algnmnt)
-"""
 fc.ins.set_ideal()
 
 gpsupdate  = 0
@@ -102,6 +98,6 @@ speration_3=trick.new_event("speration_3")
 speration_3.set_cycle(0.001)
 speration_3.condition(0, "rkt.newton.get_thtvdx() < 3.728")
 speration_3.action(0, "fc.rcs_fc.set_mode(fc.rcs_fc.INCIDENCE_AND_ROLL_ANGLE_CONTROL)")
-#############################################################
+############################################################
 
 trick.stop(880)

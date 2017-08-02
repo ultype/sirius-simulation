@@ -39,6 +39,8 @@ LIBRARY DEPENDENCIES:
 ##include "accel/accelerometer.hh"
 ##include "accel/accelerometer_ideal.hh"
 ##include "accel/accelerometer_rocket6g.hh"
+##include "sdt/SDT_NONIDEAL.hh"
+##include "sdt/SDT_IDEAL.hh"
 ##include "sdt/SDT.hh"
 
 ##include "time_utility.hh"
@@ -67,7 +69,7 @@ class Rocket_SimObject : public Trick::SimObject {
 
         sensor::Gyro *gyro;
         sensor::Accelerometer *accelerometer;
-        SDT sdt;
+        SDT *sdt;
 
         TVC tvc;
         RCS rcs;
@@ -113,10 +115,10 @@ class Rocket_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT( kinematics    , get_phibdx));
             transceiver.register_for_transmit(EXPORT( kinematics    , get_thtbdx));
             transceiver.register_for_transmit(EXPORT( kinematics    , get_psibdx));
-            transceiver.register_for_transmit(EXPORT( sdt           , get_PHI));
-            transceiver.register_for_transmit(EXPORT( sdt           , get_DELTA_VEL));
-            transceiver.register_for_transmit(EXPORT( sdt           , get_PHI_HIGH));
-            transceiver.register_for_transmit(EXPORT( sdt           , get_PHI_LOW));
+            transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI));
+            transceiver.register_for_transmit(EXPORT( *sdt           , get_DELTA_VEL));
+            transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI_HIGH));
+            transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI_LOW));
             transceiver.register_for_transmit(EXPORT( env           , get_TEI));
 
         };
@@ -144,11 +146,12 @@ class Rocket_SimObject : public Trick::SimObject {
             rcs.grab_e_roll           = transceiver(IMPORT(rcs_fc  , get_e_roll));
             rcs.grab_e_pitch          = transceiver(IMPORT(rcs_fc  , get_e_pitch));
             rcs.grab_e_yaw            = transceiver(IMPORT(rcs_fc  , get_e_yaw));
-            sdt.grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
-            sdt.grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
-            sdt.grab_CONING           = LINK( newton , get_CONING);
-            sdt.grab_HIGH             = LINK( *gyro   , get_HIGH);
-            sdt.grab_LOW              = LINK( *gyro   , get_LOW);
+
+            sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
+            sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
+            sdt->grab_CONING           = LINK( newton , get_CONING);
+            sdt->grab_HIGH             = LINK( *gyro   , get_HIGH);
+            sdt->grab_LOW              = LINK( *gyro   , get_LOW);
         };
 
         Rocket_SimObject() 
@@ -161,8 +164,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 tvc         ( env        , kinematics   , propulsion ) ,
                 rcs         ( propulsion ) ,
                 forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
-                gps_con     ( newton     , env          , kinematics) ,
-                sdt         ()
+                gps_con     ( newton     , env          , kinematics)
             {
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
@@ -187,7 +189,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.05, "scheduled") gps_con.compute();
             P1 (0.005, "scheduled") gyro->propagate_error(0.005);
             P1 (0.005, "scheduled") accelerometer->propagate_error(0.005);
-            P1 (0.005, "scheduled") sdt.compute(0.005);
+            P1 (0.005, "scheduled") sdt->compute(0.005);
 
             P2 (0.01, "scheduled") transceiver.transmit();
 ;

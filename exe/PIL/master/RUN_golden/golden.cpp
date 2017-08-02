@@ -6,7 +6,9 @@
 #include "trick/external_application_c_intf.h"
 
 #include "../../../public/Modified_data/golden.h"
+#include "../Modified_data/nspo.h"
 #include "../../../public/Modified_data/realtime.h"
+#include "../Modified_data/gps.h"
 
 extern "C" void master_startup() {
     Trick::MSSocket *new_connection = new Trick::MSSocket();
@@ -113,6 +115,8 @@ extern "C" int event_MECO() {
 
 extern "C" int run_me() {
     record_golden();
+    record_nspo();
+    record_gps();
     // realtime();
 
 
@@ -133,14 +137,14 @@ extern "C" int run_me() {
     double alt        = 100;         //  Vehicle altitude  - m  module newton
     rkt.newton.load_location(lonx, latx, alt);
 
+    double con_ang = 0.0;
+    double con_w = 50.0;
+    rkt.newton.load_coning_var(con_ang, con_w);
+
     double phibdx = 0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
     double thtbdx = 86.615;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
-
-    double con_ang = 0.0;
-    double con_w = 20.0;
-    rkt.newton.load_coning_var(con_ang, con_w);
 
     double alpha0x    = 0;    // Initial angle-of-attack   - deg  module newton
     double beta0x     = 0;    // Initial sideslip angle    - deg  module newton
@@ -179,26 +183,29 @@ extern "C" int run_me() {
     rkt.propulsion.set_payload(96);  // payload mass
 
     // INS Accel
-    //  Create a Errorous Accelerometer
-    /*
-    EMISA  = [1.1e-4, 1.1e-4, 1.1e-4]      // gauss(0, 1.1e-4)
-    ESCALA = [2.e-5, 2.e-5, 2.e-5]      // gauss(0, 2.e-5)
-    EBIASA = [1.e-6, 1.e-6, 1.e-6]      // gauss(0, 1.e-6)
-    rkt.accelerometer = trick.AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
-    */
-    //  Create a Ideal Accelerometer
+    // Create a Errorous Accelerometer
+
+    double EMISA[3];      // gauss(0, 1.1e-4)
+    double ESCALA[3];      // gauss(0, 2.e-5)
+    double EBIASA[3];      // gauss(0, 1.e-6)
+    // rkt.accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
+
+    // Create a Ideal Accelerometer
     rkt.accelerometer = new sensor::AccelerometerIdeal(rkt.newton);
 
     // INS gyro
-    //  Create a Errorous Gyro
-    /*
-    EMISG  = [0, 0, 0]      // gauss(0, 1.1e-4)
-    ESCALG = [0, 0, 0]      // gauss(0, 2.e-5)
-    EBIASG = [0, 0, 0]      // gauss(0, 1.e-6)
-    rkt.gyro = trick.GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
-    */
-    //  Create a Ideal Gyro
+    // Create a Errorous Gyro
+
+    double EMISG[3];      // gauss(0, 1.1e-4)
+    double ESCALG[3];      // gauss(0, 2.e-5)
+    double EBIASG[3];      // gauss(0, 1.e-6)
+    // rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
+
+    // Create a Ideal Gyro
     rkt.gyro = new sensor::GyroIdeal(rkt.euler);
+
+    // rkt.sdt = new SDT_NONIDEAL();
+    rkt.sdt = new SDT_ideal();
 
     rkt.rcs.set_roll_mom_max(100);      // RCS rolling moment max value - Nm  module rcs
     rkt.rcs.set_pitch_mom_max(200000);  // RCS pitching moment max value - Nm  module rcs

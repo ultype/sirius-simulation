@@ -202,6 +202,9 @@ extern "C" int run_me() {
     // Create a Ideal Gyro
     // rkt.gyro = new sensor::GyroIdeal(rkt.euler);
 
+    rkt.sdt = new SDT_NONIDEAL();
+    // rkt.sdt = new SDT_ideal();
+
     rkt.rcs.set_roll_mom_max(100);      // RCS rolling moment max value - Nm  module rcs
     rkt.rcs.set_pitch_mom_max(200000);  // RCS pitching moment max value - Nm  module rcs
     rkt.rcs.set_yaw_mom_max(200000);    // RCS yawing moment max value - Nm  module rcs
