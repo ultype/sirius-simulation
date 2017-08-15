@@ -150,8 +150,10 @@ class Rocket_SimObject : public Trick::SimObject {
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
             sdt->grab_CONING           = LINK( newton , get_CONING);
-            sdt->grab_HIGH             = LINK( *gyro   , get_HIGH);
-            sdt->grab_LOW              = LINK( *gyro   , get_LOW);
+            sdt->grab_GHIGH             = LINK( *gyro   , get_HIGH);
+            sdt->grab_GLOW              = LINK( *gyro   , get_LOW);
+            sdt->grab_AHIGH             = LINK( *accelerometer   , get_HIGH);
+            sdt->grab_ALOW              = LINK( *accelerometer   , get_LOW);
         };
 
         Rocket_SimObject() 

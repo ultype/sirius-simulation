@@ -29,8 +29,8 @@ dvbe       = 0    #Vehicle geographic speed  - m/s  module newton
 fc.ins.load_geodetic_velocity(alpha0x, beta0x, dvbe)
 
 
-# fc.ins.set_ideal()
-fc.ins.set_non_ideal()
+fc.ins.set_ideal()
+# fc.ins.set_non_ideal()
 
 gpsupdate  = 0
 fc.ins.set_gps_correction(gpsupdate);
