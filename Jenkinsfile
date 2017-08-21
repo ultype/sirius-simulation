@@ -20,11 +20,8 @@ builds['PIL'] = {
             try {
                 timeout(10) {  // execute at most 10 minutes
                     sh '''
-                        cd exe/PIL/slave
-                        trick-CP
-                        cd ../master
+                        cd exe/PIL/master
                         ./test.sh
-                        python ../../../tools/ci_test.py result.csv 1e-5 > test_result
                     '''
                     archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
                                      fingerprint: true
