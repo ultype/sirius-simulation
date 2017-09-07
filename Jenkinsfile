@@ -18,13 +18,15 @@ builds['PIL'] = {
 
         stage ('Test PIL') {
             try {
-                timeout(10) {  // execute at most 10 minutes
-                    sh '''
-                        cd exe/PIL/master
-                        ./test.sh
-                    '''
-                    archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
-                                     fingerprint: true
+                retry(2) {  // retry at most 2 times
+                    timeout(10) {  // execute at most 10 minutes
+                        sh '''
+                            cd exe/PIL/master
+                            ./test.sh
+                        '''
+                        archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
+                                         fingerprint: true
+                    }
                 }
             }
             catch (error) {
