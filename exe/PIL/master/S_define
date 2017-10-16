@@ -138,6 +138,8 @@ class Rocket_SimObject : public Trick::SimObject {
             sdt->grab_CONING           = LINK( newton , get_CONING);
             sdt->grab_GHIGH             = LINK( *gyro   , get_HIGH);
             sdt->grab_GLOW              = LINK( *gyro   , get_LOW);
+            sdt->grab_AHIGH             = LINK( *accelerometer   , get_HIGH);
+            sdt->grab_ALOW              = LINK( *accelerometer   , get_LOW);
         };
 
         Rocket_SimObject() 
