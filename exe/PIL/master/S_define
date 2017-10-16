@@ -82,17 +82,6 @@ class Rocket_SimObject : public Trick::SimObject {
         void setup_export(){
             transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));
             transceiver.register_for_transmit(EXPORT( propulsion    , get_fmassr));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_gymax));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dyb));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dnb));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dnr));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dndr));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dla));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dma));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dmq));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dmde));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dnd));
-            transceiver.register_for_transmit(EXPORT( aerodynamics  , get_dlde));
             transceiver.register_for_transmit(EXPORT( env           , get_pdynmc));
             transceiver.register_for_transmit(EXPORT( newton        , get_SBII));
             transceiver.register_for_transmit(EXPORT( newton        , get_VBII));
@@ -137,21 +126,18 @@ class Rocket_SimObject : public Trick::SimObject {
         };
 
         void link(){
-            tvc.grab_delrcx           = transceiver(IMPORT(control , get_delrcx));
-            tvc.grab_delecx           = transceiver(IMPORT(control , get_delecx));
+            tvc.grab_theta_a_cmd      = transceiver(IMPORT(control , get_theta_a_cmd));
+            tvc.grab_theta_b_cmd      = transceiver(IMPORT(control , get_theta_b_cmd));
+            tvc.grab_theta_c_cmd      = transceiver(IMPORT(control , get_theta_c_cmd));
+            tvc.grab_theta_d_cmd      = transceiver(IMPORT(control , get_theta_d_cmd));
 
-            forces.grab_rcs_isEnabled = transceiver(IMPORT(rcs_fc  , isEnabled));
-            forces.grab_rcs_mode      = transceiver(IMPORT(rcs_fc  , get_rcs_mode));
 
-            rcs.grab_e_roll           = transceiver(IMPORT(rcs_fc  , get_e_roll));
-            rcs.grab_e_pitch          = transceiver(IMPORT(rcs_fc  , get_e_pitch));
-            rcs.grab_e_yaw            = transceiver(IMPORT(rcs_fc  , get_e_yaw));
 
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
             sdt->grab_CONING           = LINK( newton , get_CONING);
-            sdt->grab_HIGH             = LINK( *gyro   , get_HIGH);
-            sdt->grab_LOW              = LINK( *gyro   , get_LOW);
+            sdt->grab_GHIGH             = LINK( *gyro   , get_HIGH);
+            sdt->grab_GLOW              = LINK( *gyro   , get_LOW);
         };
 
         Rocket_SimObject() 
@@ -191,13 +177,13 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") accelerometer->propagate_error(0.005);
             P1 (0.005, "scheduled") sdt->compute(0.005);
 
-            P2 (0.01, "scheduled") transceiver.transmit();
+            P2 (0.05, "scheduled") transceiver.transmit();
 ;
-            P2 (0.01, "scheduled") transceiver.receive();
-            P2 (0.01, "scheduled") exec_receive();
+            P2 (0.05, "scheduled") transceiver.receive();
+            P2 (0.05, "scheduled") exec_receive();
 
             P3 (0.001, "scheduled") tvc.actuate(0.001);
-            P3 (0.001, "scheduled") rcs.rcs_schmitt_thrust();
+            // P3 (0.001, "scheduled") rcs.rcs_schmitt_thrust();
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
             P3 (0.001, "scheduled") newton.propagate(0.001);
             P3 (0.001, "scheduled") euler.propagate(0.001);

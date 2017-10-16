@@ -67,16 +67,10 @@ class FlightComputer_SimObject : public Trick::SimObject {
         GPS_FSW gps;
 
         void setup_export(){
-            transceiver.register_for_transmit(EXPORT(control, get_delrcx));
-            transceiver.register_for_transmit(EXPORT(control, get_delecx));
-            transceiver.register_for_transmit(EXPORT(rcs_fc, isEnabled));
-            transceiver.register_for_transmit(EXPORT(rcs_fc, get_rcs_mode));
-            transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_roll));
-            transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_pitch));
-            transceiver.register_for_transmit(EXPORT(rcs_fc, get_e_yaw));
-            // transceiver.register_for_transmit(EXPORT(ins, get_SBIIC));
-            // transceiver.register_for_transmit(EXPORT(ins, get_VBIIC));
-            // transceiver.register_for_transmit(EXPORT(ins, get_WBICI));
+            transceiver.register_for_transmit(EXPORT(control, get_theta_a_cmd));
+            transceiver.register_for_transmit(EXPORT(control, get_theta_b_cmd));
+            transceiver.register_for_transmit(EXPORT(control, get_theta_c_cmd));
+            transceiver.register_for_transmit(EXPORT(control, get_theta_d_cmd));
 
             /* XXX */
             transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });
@@ -88,22 +82,13 @@ class FlightComputer_SimObject : public Trick::SimObject {
             control.grab_dvbec = LINK(ins, get_dvbec);
             control.grab_thtvdcx = LINK(ins, get_thtvdcx);
             control.grab_thtbdcx = LINK(ins, get_thtbdcx);
-
-            guidance.grab_TBIC   = LINK(ins, get_TBIC);
-
-            guidance.grab_VBIIC  = LINK(ins, get_VBIIC);
-            guidance.grab_SBIIC  = LINK(ins, get_SBIIC);
-
-            rcs_fc.grab_alphacx = LINK(ins, get_alphacx);
-            rcs_fc.grab_betacx = LINK(ins, get_betacx);
-
-            rcs_fc.grab_thtbdcx = LINK(ins, get_thtbdcx);
-            rcs_fc.grab_psibdcx = LINK(ins, get_psibdcx);
-            rcs_fc.grab_phibdcx = LINK(ins, get_phibdcx);
-
-            rcs_fc.grab_UTBC = LINK(guidance, get_UTBC);
-            rcs_fc.grab_alphacomx = LINK(guidance, get_alphacomx);
-            rcs_fc.grab_betacomx  = LINK(guidance, get_betacomx);
+            control.grab_phibdcx = LINK(ins, get_phibdcx);
+            control.grab_psibdcx = LINK(ins, get_psibdcx);
+            control.grab_TBDQ = LINK(ins, get_TBDQ);
+            control.grab_TBD = LINK(ins, get_TBD);
+            control.grab_alphacx = LINK(ins, get_alphacx);
+            control.grab_TBICI = LINK(ins, get_TBICI);
+            control.grab_TBIC = LINK(ins, get_TBIC);
 
             gps.grab_SBIIC = LINK(ins, get_SBIIC);
             gps.grab_VBIIC = LINK(ins, get_VBIIC);
@@ -119,21 +104,11 @@ class FlightComputer_SimObject : public Trick::SimObject {
             /* remote */
             control.grab_mprop              = transceiver(IMPORT(propulsion     , get_mprop));
             control.grab_dvbe               = transceiver(IMPORT(newton         , get_dvbe));
-            control.grab_gymax              = transceiver(IMPORT(aerodynamics   , get_gymax));
-            control.grab_dyb                = transceiver(IMPORT(aerodynamics   , get_dyb));
-            control.grab_dnb                = transceiver(IMPORT(aerodynamics   , get_dnb));
-            control.grab_dnr                = transceiver(IMPORT(aerodynamics   , get_dnr));
-            control.grab_dndr               = transceiver(IMPORT(aerodynamics   , get_dndr));
-            control.grab_dla                = transceiver(IMPORT(aerodynamics   , get_dla));
-            control.grab_dma                = transceiver(IMPORT(aerodynamics   , get_dma));
-            control.grab_dmq                = transceiver(IMPORT(aerodynamics   , get_dmq));
-            control.grab_dmde               = transceiver(IMPORT(aerodynamics   , get_dmde));
-            control.grab_dnd                = transceiver(IMPORT(aerodynamics   , get_dnd));
-            control.grab_dlde               = transceiver(IMPORT(aerodynamics   , get_dlde));
             control.grab_pdynmc             = transceiver(IMPORT(environment    , get_pdynmc));
             control.grab_qqcx               = transceiver(IMPORT(*gyro          , get_qqcx));
             control.grab_rrcx               = transceiver(IMPORT(*gryo          , get_rrcx));
             control.grab_FSPCB              = transceiver(IMPORT(*accelerometer , get_computed_FSPB));
+            control.grab_computed_WBIB      = transceiver(IMPORT(*gyro          , get_computed_WBIB));
             ins.grab_computed_WBIB          = transceiver(IMPORT(*gyro          , get_computed_WBIB));
             ins.grab_error_of_computed_WBIB = transceiver(IMPORT(*gyro          , get_error_of_computed_WBIB));
             ins.grab_computed_FSPB          = transceiver(IMPORT(*accelerometer , get_computed_FSPB));
@@ -153,15 +128,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ins.grab_PHI_HIGH               = transceiver(IMPORT(*sdt            , get_PHI_HIGH));
             ins.grab_PHI_LOW                = transceiver(IMPORT(*sdt            , get_PHI_LOW));
             ins.grab_TEI                    = transceiver(IMPORT(env            , get_TEI));
-            guidance.grab_mprop             = transceiver(IMPORT(propulsion     , get_mprop));
-            guidance.grab_dbi               = transceiver(IMPORT(newton         , get_dbi));
-            guidance.grab_dvbi              = transceiver(IMPORT(newton         , get_dvbi));
-            guidance.grab_thtvdx            = transceiver(IMPORT(newton         , get_thtvdx));
-            guidance.grab_fmassr            = transceiver(IMPORT(propulsion     , get_fmassr));
-            guidance.grab_FSPCB             = transceiver(IMPORT(*accelerometer , get_computed_FSPB));
-            rcs_fc.grab_qqcx                = transceiver(IMPORT(*gyro          , get_qqcx));
-            rcs_fc.grab_ppcx                = transceiver(IMPORT(*gyro          , get_ppcx));
-            rcs_fc.grab_rrcx                = transceiver(IMPORT(*gyro          , get_rrcx));
             gps.grab_transmit_data          = transceiver(IMPORT(gps_con        , get_transmit_data));
             
             /* XXX */
@@ -187,26 +153,26 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("initialization") setup_export();
             ("initialization") link();
             ("initialization") gps.initialize(0.05);
-            ("initialization") guidance.initialize();
+            // ("initialization") guidance.initialize();
             ("initialization") control.initialize();
             ("initialization") ins.initialize();
-            ("initialization") rcs_fc.initialize();
+            // ("initialization") rcs_fc.initialize();
 
             P1 (0.001, "scheduled") time->dm_time();
 
-            P2 (0.01, "scheduled") transceiver.receive();
+            P2 (0.05, "scheduled") transceiver.receive();
 
             P2 (0.01, "scheduled") clear_flag();
 
             P2 (0.05, "scheduled") gps.filter_extrapolation(0.05);
             P2 (0.05, "scheduled") gps.measure(0.05);
 
-            P2 (0.01, "scheduled") ins.update(0.01);
+            P2 (0.05, "scheduled") ins.update(0.05);
             // P2 (0.001, "scheduled") guidance.guidance(0.001);
             P2 (0.05, "scheduled") control.control(0.05);
-            P2 (0.05, "scheduled") rcs_fc.actuate();
+            // P2 (0.05, "scheduled") rcs_fc.actuate();
 
-            P2 (0.01, "scheduled") transceiver.transmit();
+            P2 (0.05, "scheduled") transceiver.transmit();
 ;
         }
 };
