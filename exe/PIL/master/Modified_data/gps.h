@@ -22,9 +22,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.newton._SBII[0]");
     // drg->add_variable("rkt.newton._SBII[1]");
     // drg->add_variable("rkt.newton._SBII[2]");
-    // drg->add_variable("rkt.newton._VBII[0]");
-    // drg->add_variable("rkt.newton._VBII[1]");
-    // drg->add_variable("rkt.newton._VBII[2]");
+    drg->add_variable("rkt.newton._VBII[0]");
+    drg->add_variable("rkt.newton._VBII[1]");
+    drg->add_variable("rkt.newton._VBII[2]");
     // drg->add_variable("rkt.newton._ABII[0]");
     // drg->add_variable("rkt.newton._ABII[1]");
     // drg->add_variable("rkt.newton._ABII[2]");
@@ -90,6 +90,8 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.kinematics.alphax");
     drg->add_variable("rkt.env.vmach");
     drg->add_variable("rkt.kinematics.alppx");
+    drg->add_variable("rkt.newton._thtvdx");
+    drg->add_variable("rkt.newton._grndtrck");
     // drg->add_variable("rkt.kinematics.phipx");
     // drg->add_variable("rkt.env.wind->_VAED[0]");
     // drg->add_variable("rkt.env.wind->_VAED[1]");
@@ -122,9 +124,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.forces._FAPB[0]");
     // drg->add_variable("rkt.forces._FAPB[1]");
     // drg->add_variable("rkt.forces._FAPB[2]");
-    // drg->add_variable("rkt.forces._FMAB[0]");
-    // drg->add_variable("rkt.forces._FMAB[1]");
-    // drg->add_variable("rkt.forces._FMAB[2]");
+    drg->add_variable("rkt.forces._FMAB[0]");
+    drg->add_variable("rkt.forces._FMAB[1]");
+    drg->add_variable("rkt.forces._FMAB[2]");
     // drg->add_variable("rkt.kinematics.alppx");
     // drg->add_variable("rkt.env.vmach");
     // drg->add_variable("rkt.aerodynamics.xcp");
@@ -155,10 +157,10 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.tvc.s2_act3_y1");
     // drg->add_variable("rkt.tvc.s2_act2_y1");
     // drg->add_variable("rkt.tvc.s2_act4_y1");
-    // drg->add_variable("rkt.tvc.s3_act1_y2");
-    // drg->add_variable("rkt.tvc.s3_act2_y2");
-    // drg->add_variable("rkt.tvc.s3_act3_y2");
-    // drg->add_variable("rkt.tvc.s3_act4_y2");
+    drg->add_variable("rkt.tvc.s3_act1_y2");
+    drg->add_variable("rkt.tvc.s3_act2_y2");
+    drg->add_variable("rkt.tvc.s3_act3_y2");
+    drg->add_variable("rkt.tvc.s3_act4_y2");
     drg->add_variable("rkt.tvc.s2_act1_rate");
     drg->add_variable("rkt.tvc.s2_act3_rate");
     drg->add_variable("rkt.tvc.s2_act2_rate");
@@ -169,10 +171,10 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.forces._FMB[0]");
     // drg->add_variable("rkt.forces._FMB[1]");
     // drg->add_variable("rkt.forces._FMB[2]");
-    drg->add_variable("rkt.tvc._FMPB[0]");
-    drg->add_variable("rkt.tvc._FMPB[1]");
-    drg->add_variable("rkt.tvc._FMPB[2]");
-    drg->add_variable("rkt.env.pdynmc");
+    // drg->add_variable("rkt.tvc._FMPB[0]");
+    // drg->add_variable("rkt.tvc._FMPB[1]");
+    // drg->add_variable("rkt.tvc._FMPB[2]");
+    // drg->add_variable("rkt.env.pdynmc");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }

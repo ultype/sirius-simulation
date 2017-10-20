@@ -100,7 +100,7 @@ S2_kaoad = 0.01
 S2_kaoapp = 9.375
 S2_aoaN = 1000.0
 S2_rollcmd = 0.0
-S2_pitchcmd = -6.0
+S2_pitchcmd = -7.0
 S2_yawcmd = 0.0
 S2_aoacmd = 0.0
 ################################################################################################
@@ -139,6 +139,7 @@ S3_aoaN = 1000.0
 S3_rollcmd = 0.0
 S3_pitchcmd = 0.0
 S3_yawcmd = 0.0
+S3_aoacmd = -29.0
 #################################################################################################
 fc.control.set_controller_var(S2_mdot, S2_fmass0, S2_xcg_1, S2_xcg_0, S2_isp)
 fc.control.set_IBBB0(S2_moi_roll_0, S2_moi_pitch_0, S2_moi_yaw_0)
@@ -181,10 +182,17 @@ control_on.condition(0, "trick.exec_get_sim_time() == 5.001")
 control_on.action(0, "fc.control.set_S2_PITCH_DOWN()")
 trick.add_event(control_on)
 control_on.activate()
+######################################################### Event0:control_on
+control_on2 = trick.new_event("control_on2")
+control_on2.set_cycle(0.001)
+control_on2.condition(0, "trick.exec_get_sim_time() == 15.001")
+control_on2.action(0, "fc.control.set_attcmd(S2_rollcmd, -9.0, S2_yawcmd)")
+trick.add_event(control_on2)
+control_on2.activate()
 ######################################################### Event0:AOA_on
 aoac_on = trick.new_event("aoac_on")
 aoac_on.set_cycle(0.001)
-aoac_on.condition(0, "trick.exec_get_sim_time() == 15.001")
+aoac_on.condition(0, "trick.exec_get_sim_time() == 23.001")
 aoac_on.action(0, "fc.control.set_S2_AOA()")
 trick.add_event(aoac_on)
 aoac_on.activate()
@@ -206,6 +214,7 @@ s3_control_on.action(3, "fc.control.get_control_gain(S3_kpp, S3_kpi, S3_kpd, S3_
 s3_control_on.action(4, "fc.control.set_attcmd(S3_rollcmd, S3_pitchcmd, S3_yawcmd)")
 s3_control_on.action(5, "fc.control.set_S3_AOA()")
 s3_control_on.action(6, "fc.control.set_ierror_zero()")
+s3_control_on.action(7, "fc.control.set_aoacmd(S3_aoacmd)")
 trick.add_event(s3_control_on)
 s3_control_on.activate()
 ###############################################################Event1:Stage 2 ignition

@@ -68,7 +68,7 @@ extern "C" int event_separation_1() {
     rkt.tvc.set_s3_tau2(20.0);
     rkt.tvc.set_s3_tau3(20.0);
     rkt.tvc.set_s3_tau4(20.0);
-    rkt.tvc.set_s3_ratelim(16.0 * RAD);
+    rkt.tvc.set_s3_ratelim(16.0 * 2.0 * RAD);
     rkt.tvc.set_s3_tvclim(7 * RAD);
     rkt.tvc.set_S3_TVC();
 
@@ -178,8 +178,8 @@ extern "C" int run_me() {
     rkt.tvc.set_s2_tau3(20.0);
     rkt.tvc.set_s2_tau4(20.0);
 
-    rkt.tvc.set_s2_ratelim(16 * RAD);
-    rkt.tvc.set_s2_tvclim(7 * RAD);
+    rkt.tvc.set_s2_ratelim(16.0 * RAD);
+    rkt.tvc.set_s2_tvclim(7.0 * RAD);
     /**********************************************************************************************************************************/
 
 
