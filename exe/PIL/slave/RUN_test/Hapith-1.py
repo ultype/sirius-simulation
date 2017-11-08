@@ -202,7 +202,7 @@ control_off.set_cycle(0.001)
 control_off.condition(0, "trick.exec_get_sim_time() == 200.001")
 control_off.action(0, "fc.control.set_NO_CONTROL()")
 trick.add_event(control_off)
-control_off.activate()
+# control_off.activate()
 ######################################################### Event0:S3 control
 s3_control_on = trick.new_event("s3_control_on")
 s3_control_on.set_cycle(0.001)
