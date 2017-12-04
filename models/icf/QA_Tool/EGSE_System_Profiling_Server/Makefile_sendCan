@@ -1,0 +1,43 @@
+BIN_IMAGE = sendCan
+###### C flags #####
+CC = gcc
+CFLAGS = -Wall -g
+CFLAGS += -I./
+CFLAGS += -pthread -lrt
+##### C++ flags #####
+CXX = g++
+
+CXXFLAGS =-g \
+	  -I./gpio_sync_timer \
+	  -lbiodaq \
+	  -I.
+
+##### C Source #####
+C_SOURCES = sendCan.c
+
+##### C++ Source #####
+
+CPP_SOURCES = gpio_sync_timer/DIInterrupt.cpp
+##### OBJECTS #####
+OBJECTS = $(patsubst %.cpp, %.o, $(CPP_SOURCES))
+OBJECTS += $(patsubst %.c, %.o, $(C_SOURCES))
+
+##### Target malloc LIB#####
+
+all: $(BIN_IMAGE)
+
+deps := $(OBJECTS:%.o=%.o.d)
+
+
+%.o: %.c
+	$(CC) -c $< -o $@ $(CFLAGS)
+%.o: %.cpp
+	$(CXX) -c $< -o $@ -MMD -MF $@.d  $(CXXFLAGS) 
+
+$(BIN_IMAGE): $(OBJECTS)
+	$(CXX) -o $@ $(OBJECTS) $(CXXFLAGS) $(CFLAGS)
+.PHONY : clean
+clean:
+	rm -f $(BIN_IMAGE)
+	find . -name "*.o" -type f -delete
+	find . -name "*.d" -type f -delete
