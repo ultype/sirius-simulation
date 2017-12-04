@@ -52,6 +52,4 @@ integration_test/RocketCFS
 integration_test/CMakeLists.txt
 integration_test/ins_class.cpp
 
-exe/PIL/master/Modified_data/gps.h
-
 googletest/

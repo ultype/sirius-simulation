@@ -170,7 +170,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gps_con.initialize();
 
             P1 (0.001, "scheduled") time->dm_time();
-            P1 (0.001, "scheduled") kinematics.propagate(0.001);
+            // P1 (0.001, "scheduled") kinematics.propagate(0.001);
 	        P1 (0.001, "scheduled") env.propagate(0.001);
             P1 (0.001, "scheduled") propulsion.propagate(0.001);
             P1 (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
@@ -189,6 +189,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
             P3 (0.001, "scheduled") newton.propagate(0.001);
             P3 (0.001, "scheduled") euler.propagate(0.001);
+            P3 (0.001, "scheduled") kinematics.propagate(0.001);
 
             (10.0, "scheduled") gps_con.show();
 
