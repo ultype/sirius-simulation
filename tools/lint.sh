@@ -6,7 +6,8 @@
 
 output=${1:-emacs}
 # Find files with Emacs Regular Expression and exclude submodule directories.
-files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\)/.*" -prune -o -iregex ".*\.\(h\|hh\|c\|cc\|cpp\)" -print )
+files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\)/.*" -prune -o -iregex ".*\.\(h\|hh\|c\|cc\|cpp\)" -print \
+| grep -vE \QA_Tool)
 cpplint \
   --counting=detailed \
   --extensions=h,hh,c,cc,cpp \

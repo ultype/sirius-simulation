@@ -1,15 +1,15 @@
-#ifndef __SOCKET_CAN_H__
-#define __SOCKET_CAN_H__
+#ifndef MODELS_ICF_INCLUDE_SOCKET_CAN_H_
+#define MODELS_ICF_INCLUDE_SOCKET_CAN_H_
 
 #include "icf_export.h"
 
 #define CAN_MAX_DLEN  8
 #define RX_CAN_BUFFER_SIZE ((CONFIG_EGSE_CRC_HEADER_ENABLE ? (56) : (8)))
 struct can_device_info_t {
-	char ifname[IFNAMSIZ];
-	int can_fd;
-	struct ifreq ifr;
-	struct sockaddr_can addr;
+    char ifname[IFNAMSIZ];
+    int can_fd;
+    struct ifreq ifr;
+    struct sockaddr_can addr;
 };
 
 
@@ -22,4 +22,4 @@ int can_data_recv(int can_fd, uint8_t *rx_buff, uint32_t buff_size);
 #ifdef __cplusplus
 }
 #endif
-#endif /* __SOCKET_CAN_H__ */
+#endif   // MODELS_ICF_INCLUDE_SOCKET_CAN_H_

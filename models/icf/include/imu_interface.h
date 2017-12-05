@@ -1,5 +1,5 @@
-#ifndef __IMU_INTERFACE_H__
-#define __IMU_INTERFACE_H__
+#ifndef MODELS_ICF_INCLUDE_IMU_INTERFACE_H_
+#define MODELS_ICF_INCLUDE_IMU_INTERFACE_H_
 /********************************* TRICK HEADER *******************************
 PURPOSE:
       (IMU related interface definition)
@@ -34,4 +34,4 @@ struct IMU_filtered_data_t {
     int32_t q12;
 } __attribute__((packed));
 
-#endif  // __IMU_INTERFACE__
+#endif  // MODELS_ICF_INCLUDE_IMU_INTERFACE_H_

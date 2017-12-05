@@ -1,5 +1,5 @@
-#ifndef __ICF_EXPORT_H__
-#define __ICF_EXPORT_H__
+#ifndef MODELS_ICF_INCLUDE_ICF_EXPORT_H_
+#define MODELS_ICF_INCLUDE_ICF_EXPORT_H_
 
 #include <stdio.h>   /* Standard input/output definitions */
 #include <string.h>  /* String function definitions */
@@ -22,4 +22,4 @@
 #include "rs422_serialport.h"
 #include "socket_can.h"
 
-#endif /* __ICF_EXPORT_H__ */
+#endif  //  MODELS_ICF_INCLUDE_ICF_EXPORT_H_

@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 			}
 			//hex_dump("RX data", (uint8_t *)dev_info.payload, p_data_info->payload_len + RS422_HEADER_SIZE);
 #if CONFIG_ESPS_HEADER_ENABLE
-			if(crc_checker(dev_info.frame.crc, (char *)(dev_info.payload + RS422_HEADER_SIZE),dev_info.frame.payload_len) == 0){
+			if(crc_checker(dev_info.frame.crc, (dev_info.payload + RS422_HEADER_SIZE),dev_info.frame.payload_len) == 0){
 				error_cnt++;
 				printf("[%lf: error cnt: %d] SEQ: %d , %s CRC ERROR !!!!\n", get_curr_time(), error_cnt, dev_info.frame.seq_no,portname);
 				exit(EXIT_FAILURE);

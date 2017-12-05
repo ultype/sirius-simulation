@@ -1,5 +1,5 @@
-#ifndef __NSPO_GPS_H__
-#define __NSPO_GPS_H__
+#ifndef MODELS_ICF_INCLUDE_NSPO_GPS_H_
+#define MODELS_ICF_INCLUDE_NSPO_GPS_H_
 /********************************* TRICK HEADER *******************************
 PURPOSE:
       (NSPO GPS Receiver interface definition)
@@ -127,7 +127,7 @@ struct NSPO_GPSR_SCI_TLM_t {
     struct GPS_UTC_clock_correction_parameter_t    GPS_UTC_clock_correction_parameter;
     float                                   reserved_0;
     float                                   reserved_1;
-    uint8_t				    reserved[2];
+    uint8_t                                 reserved[2];
 } __attribute__((packed));
 
-#endif  // __NSPO_GPS__
+#endif  // MODELS_ICF_INCLUDE_NSPO_GPS_H_
