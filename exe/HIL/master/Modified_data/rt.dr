@@ -1,0 +1,42 @@
+global DR_GROUP_ID
+global drg
+try:
+    if DR_GROUP_ID >= 0:
+        DR_GROUP_ID += 1
+except NameError:
+    DR_GROUP_ID = 0
+    drg = []
+
+drg.append(trick.DRAscii("rt_record"))
+drg[DR_GROUP_ID].set_freq(trick.DR_Always)
+drg[DR_GROUP_ID].set_cycle(0.001)
+drg[DR_GROUP_ID].set_single_prec_only(False)
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.enable_flag")
+drg[DR_GROUP_ID].add_variable("trick_real_time.itimer.enabled")
+drg[DR_GROUP_ID].add_variable("trick_real_time.itimer.active")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.disable_flag")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.active")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.freeze_frame")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.freeze_time_tics")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.frame_overrun_cnt")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.total_overrun")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_max_overrun_cnt")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_max_overrun_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_max_overrun_time_tics")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_overrun_freeze")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.frame_sched_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.frame_overrun_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.tics_per_sec")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.last_clock_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.align_sim_to_wall_clock")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.align_tic_mult")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.freeze_shutdown")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.sim_start_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.sim_end_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.sim_end_init_time")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_clock[0].name")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_clock[0].clock_tics_per_sec")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_clock[0].sim_tic_ratio")
+drg[DR_GROUP_ID].add_variable("trick_real_time.rt_sync.rt_clock[0].rt_clock_ratio")
+trick.add_data_record_group(drg[DR_GROUP_ID], trick.DR_Buffer)
+drg[DR_GROUP_ID].enable()
