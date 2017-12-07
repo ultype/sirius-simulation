@@ -17,9 +17,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-
-#include "icf_utility.h"
-#include "rs422_serialport.h"
-#include "socket_can.h"
+#include <time.h>
+#include <arpa/inet.h>
 
 #endif  //  MODELS_ICF_INCLUDE_ICF_EXPORT_H_

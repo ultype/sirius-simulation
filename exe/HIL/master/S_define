@@ -1,11 +1,3 @@
-/************************TRICK HEADER*************************
-PURPOSE:
-    (Lists out the other object files that are not included from C++ headers)
-LIBRARY DEPENDENCIES:
-(
-)
-*************************************************************/
-
 #include "sim_objects/default_trick_sys.sm"
 
 ##include "Newton.hh"
@@ -52,6 +44,8 @@ LIBRARY DEPENDENCIES:
 
 ##include "transceiver.hh"
 
+##include  "icf_trx_ctrl.h"
+
 
 
 class Rocket_SimObject : public Trick::SimObject {
@@ -78,6 +72,8 @@ class Rocket_SimObject : public Trick::SimObject {
         GPS_constellation gps_con;
 
         Transceiver transceiver;
+
+        struct icf_rx_ctrl_t   rxctrl;
 
         void setup_export(){
             transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));
@@ -169,6 +165,8 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
 
+            P1(0.01, "scheduled") icf_rx_ctrl_job(&rxctrl);
+
             P1 (0.001, "scheduled") time->dm_time();
             // P1 (0.001, "scheduled") kinematics.propagate(0.001);
 	        P1 (0.001, "scheduled") env.propagate(0.001);
@@ -180,7 +178,6 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") sdt->compute(0.005);
 
             P2 (0.05, "scheduled") transceiver.transmit();
-;
             P2 (0.05, "scheduled") transceiver.receive();
             P2 (0.05, "scheduled") exec_receive();
 
@@ -190,6 +187,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (0.001, "scheduled") newton.propagate(0.001);
             P3 (0.001, "scheduled") euler.propagate(0.001);
             P3 (0.001, "scheduled") kinematics.propagate(0.001);
+
 
             (10.0, "scheduled") gps_con.show();
 

@@ -1,7 +1,7 @@
 #ifndef MODELS_ICF_INCLUDE_SOCKET_CAN_H_
 #define MODELS_ICF_INCLUDE_SOCKET_CAN_H_
 
-#include "icf_export.h"
+#include "icf_utility.h"
 
 #define CAN_MAX_DLEN  8
 #define RX_CAN_BUFFER_SIZE ((CONFIG_EGSE_CRC_HEADER_ENABLE ? (56) : (8)))

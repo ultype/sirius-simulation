@@ -1,11 +1,8 @@
 #ifndef MODELS_ICF_INCLUDE_ICF_UTILITY_H_
 #define MODELS_ICF_INCLUDE_ICF_UTILITY_H_
-#include <stdint.h>
+#include "icf_export.h"
 #include "nspo_gps.h"
 #include "imu_interface.h"
-#include <time.h>
-#include <stdio.h>
-#include <arpa/inet.h>
 
 #define CONFIG_ESPS_HEADER_ENABLE 1
 #define CONFIG_EGSE_CRC_HEADER_ENABLE 1

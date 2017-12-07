@@ -1,7 +1,16 @@
 #ifndef MODELS_ICF_INCLUDE_RS422_SERIALPORT_H_
 #define MODELS_ICF_INCLUDE_RS422_SERIALPORT_H_
-
-#include "icf_export.h"
+/********************************* TRICK HEADER *******************************
+PURPOSE:
+      RX Ctrl
+LIBRARY DEPENDENCY:
+      (
+      	(../src/icf_utility.c)
+      	(../src/rs422_serialport.c)
+      )
+PROGRAMMERS:
+      (((Dung-Ru Tsai) () () () ))
+*******************************************************************************/
 
 #define SERIAL_PORT(idx) "/dev/ttyAP"#idx
 #define RS422_SERIAL_BUFFER_SIZE 1024
