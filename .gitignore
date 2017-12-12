@@ -53,3 +53,6 @@ integration_test/CMakeLists.txt
 integration_test/ins_class.cpp
 
 googletest/
+
+C_style_report
+Cpp_style_report

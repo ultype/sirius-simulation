@@ -47,8 +47,9 @@ builds['Testing'] = {
 
         stage ('Check Style') {
             try {
+                // "lint.sh" generates the xml files "C_style_report" and "Cpp_style_report"
                 sh '''
-                    ./tools/lint.sh junit 2> style_report.xml
+                    ./tools/lint.sh junit
                 '''
             }
             catch (error) {
@@ -56,7 +57,8 @@ builds['Testing'] = {
                 throw error
             }
             finally {
-                junit keepLongStdio: true, testResults: 'style_report.xml'
+                junit keepLongStdio: true, testResults: 'C_style_report'
+                junit keepLongStdio: true, testResults: 'Cpp_style_report'
             }
         }
     }
