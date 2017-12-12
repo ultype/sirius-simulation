@@ -12,9 +12,9 @@ PROGRAMMERS:
 #include "aux.hh"
 #include <ctime>
 #include "sim_services/include/simtime.h"
-#include "Environment.hh"
 #include <iomanip>
 #include "time_utility.hh"
+#include <armadillo>
 
 class time_management {
     TRICK_INTERFACE(time_management);
