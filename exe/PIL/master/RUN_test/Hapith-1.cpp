@@ -107,23 +107,23 @@ extern "C" int run_me() {
     double lonx       = 120.893501;  //  Vehicle longitude - deg  module newton
     double latx       = 22.138917;   //  Vehicle latitude  - deg  module newton
     double alt        = 5.0;         //  Vehicle altitude  - m  module newton
-    rkt.newton.load_location(lonx, latx, alt);
+    rkt.dynamics.load_location(lonx, latx, alt);
 
     double con_ang = 0.0;
     double con_w = 50.0;
-    rkt.newton.load_coning_var(con_ang, con_w);
+    rkt.dynamics.load_coning_var(con_ang, con_w);
 
     double phibdx = 0.0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
     double thtbdx = 90.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
-    rkt.kinematics.load_angle(psibdx, phibdx, thtbdx);
+    rkt.dynamics.load_angle(psibdx, phibdx, thtbdx);
 
     double alpha0x    = 0;    // Initial angle-of-attack   - deg  module newton
     double beta0x     = 0;    // Initial sideslip angle    - deg  module newton
     double dvbe       = 0;    // Vehicle geographic speed  - m/s  module newton
-    rkt.newton.load_geodetic_velocity(alpha0x, beta0x, dvbe);
+    rkt.dynamics.load_geodetic_velocity(alpha0x, beta0x, dvbe);
 
-    rkt.euler.load_angular_velocity(0, 0, 0);
+    rkt.dynamics.load_angular_velocity(0, 0, 0);
     /************************************aerodynamics*******************************************************/
     rkt.aerodynamics.load_aerotable("../../../auxiliary/Aero_0721_S2+S3.txt");
     rkt.aerodynamics.set_refa(1.1309);       // Reference area for aero coefficients - m^2
@@ -157,7 +157,7 @@ extern "C" int run_me() {
     double EBIASA[3];      // gauss(0, 1.e-6)
     // rkt.accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt.newton);
     // Create a Ideal Accelerometer
-    rkt.accelerometer = new sensor::AccelerometerIdeal(rkt.newton);
+    rkt.accelerometer = new sensor::AccelerometerIdeal();
 
     // gyro
     double EMISG[3];      // gauss(0, 1.1e-4)
@@ -166,7 +166,7 @@ extern "C" int run_me() {
     // rkt.gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt.newton, rkt.euler, rkt.kinematics);
 
     // Create a Ideal Gyro
-    rkt.gyro = new sensor::GyroIdeal(rkt.euler);
+    rkt.gyro = new sensor::GyroIdeal();
 
     // rkt.sdt = new SDT_NONIDEAL();
     rkt.sdt = new SDT_ideal();
