@@ -1,14 +1,19 @@
-#include "sim_objects/default_trick_sys.sm"
+/************************TRICK HEADER*************************
+PURPOSE:
+    (Lists out the other object files that are not included from C++ headers)
+LIBRARY DEPENDENCIES:
+(
+)
+*************************************************************/
 
-##include "Newton.hh"
-##include "Euler.hh"
+#include "sim_objects/default_trick_sys.sm"
 ##include "Tvc.hh"
-##include "Rcs.hh"
 ##include "Force.hh"
 ##include "Propulsion.hh"
 ##include "Aerodynamics.hh"
 ##include "Time_management.hh"
 ##include "GPS_constellation.hh"
+##include "Rocket_Flight_DM.hh"
 
 ##include "cad_utility.hh"
 ##include "datadeck.hh"
@@ -51,22 +56,15 @@
 class Rocket_SimObject : public Trick::SimObject {
     public:
 
+        Rocket_Flight_DM dynamics;
         Environment env;
-        Newton newton;
-        _Euler_ euler;
-
-        Kinematics kinematics;
         Forces forces;
-
         AeroDynamics aerodynamics;
         Propulsion propulsion;
-
         sensor::Gyro *gyro;
         sensor::Accelerometer *accelerometer;
         SDT *sdt;
-
         TVC tvc;
-        RCS rcs;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -76,18 +74,18 @@ class Rocket_SimObject : public Trick::SimObject {
         struct icf_rx_ctrl_t   rxctrl;
 
         void setup_export(){
-            transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));
-            transceiver.register_for_transmit(EXPORT( propulsion    , get_fmassr));
-            transceiver.register_for_transmit(EXPORT( env           , get_pdynmc));
-            transceiver.register_for_transmit(EXPORT( newton        , get_SBII));
-            transceiver.register_for_transmit(EXPORT( newton        , get_VBII));
-            transceiver.register_for_transmit(EXPORT( newton        , get_dbi));
-            transceiver.register_for_transmit(EXPORT( newton        , get_dvbe));
-            transceiver.register_for_transmit(EXPORT( newton        , get_dvbi));
-            transceiver.register_for_transmit(EXPORT( newton        , get_thtvdx));
-            transceiver.register_for_transmit(EXPORT( newton        , get_SBEE));
-            transceiver.register_for_transmit(EXPORT( newton        , get_VBEE));
-            transceiver.register_for_transmit(EXPORT( kinematics    , get_TBI));
+            // transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));
+            // transceiver.register_for_transmit(EXPORT( propulsion    , get_fmassr));
+            // transceiver.register_for_transmit(EXPORT( env           , get_pdynmc));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_SBII));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_VBII));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_dbi));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_dvbe));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_dvbi));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_thtvdx));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_SBEE));
+            // transceiver.register_for_transmit(EXPORT( dynamics        , get_VBEE));
+            // transceiver.register_for_transmit(EXPORT( dynamics    , get_TBI));
             transceiver.register_for_transmit(EXPORT( *gyro         , get_computed_WBIB));
             transceiver.register_for_transmit(EXPORT( *gyro         , get_error_of_computed_WBIB));
             transceiver.register_for_transmit(EXPORT( *accelerometer, get_computed_FSPB));
@@ -97,14 +95,14 @@ class Rocket_SimObject : public Trick::SimObject {
             transceiver.register_for_transmit(EXPORT( *gyro         , get_rrcx));
             transceiver.register_for_transmit(EXPORT( gps_con       , get_transmit_data));
             transceiver.register_for_transmit(EXPORT( gps_con       , get_gps_update));
-            transceiver.register_for_transmit(EXPORT( kinematics    , get_phibdx));
-            transceiver.register_for_transmit(EXPORT( kinematics    , get_thtbdx));
-            transceiver.register_for_transmit(EXPORT( kinematics    , get_psibdx));
+            // transceiver.register_for_transmit(EXPORT( dynamics    , get_phibdx));
+            // transceiver.register_for_transmit(EXPORT( dynamics    , get_thtbdx));
+            // transceiver.register_for_transmit(EXPORT( dynamics    , get_psibdx));
             transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI));
             transceiver.register_for_transmit(EXPORT( *sdt           , get_DELTA_VEL));
             transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI_HIGH));
             transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI_LOW));
-            transceiver.register_for_transmit(EXPORT( env           , get_TEI));
+            // transceiver.register_for_transmit(EXPORT( env           , get_TEI));
 
         };
 
@@ -113,54 +111,119 @@ class Rocket_SimObject : public Trick::SimObject {
             if(((std::function<double()>)transceiver(IMPORT(ins, clear_gps_flag)))()){
                 gps_con.clear_gps_flag();
             }
-            if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
-                propulsion.set_no_thrust();
-            }
-            if(((std::function<double()>)transceiver(IMPORT(guidance, ltg_thrust)))()){
-                propulsion.set_ltg_thrust();
-            }
+            // if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
+            //     propulsion.set_no_thrust();
+            // }
+            // if(((std::function<double()>)transceiver(IMPORT(guidance, ltg_thrust)))()){
+            //     propulsion.set_ltg_thrust();
+            // }
         };
 
         void link(){
-            tvc.grab_theta_a_cmd      = transceiver(IMPORT(control , get_theta_a_cmd));
-            tvc.grab_theta_b_cmd      = transceiver(IMPORT(control , get_theta_b_cmd));
-            tvc.grab_theta_c_cmd      = transceiver(IMPORT(control , get_theta_c_cmd));
-            tvc.grab_theta_d_cmd      = transceiver(IMPORT(control , get_theta_d_cmd));
-
-
+            tvc.grab_theta_a_cmd       = transceiver(IMPORT(control , get_theta_a_cmd));
+            tvc.grab_theta_b_cmd       = transceiver(IMPORT(control , get_theta_b_cmd));
+            tvc.grab_theta_c_cmd       = transceiver(IMPORT(control , get_theta_c_cmd));
+            tvc.grab_theta_d_cmd       = transceiver(IMPORT(control , get_theta_d_cmd));
 
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
-            sdt->grab_CONING           = LINK( newton , get_CONING);
-            sdt->grab_GHIGH             = LINK( *gyro   , get_HIGH);
-            sdt->grab_GLOW              = LINK( *gyro   , get_LOW);
-            sdt->grab_AHIGH             = LINK( *accelerometer   , get_HIGH);
-            sdt->grab_ALOW              = LINK( *accelerometer   , get_LOW);
+            sdt->grab_CONING           = LINK( dynamics , get_CONING);
+            sdt->grab_GHIGH            = LINK( *gyro   , get_HIGH);
+            sdt->grab_GLOW             = LINK( *gyro   , get_LOW);
+            sdt->grab_AHIGH            = LINK( *accelerometer   , get_HIGH);
+            sdt->grab_ALOW             = LINK( *accelerometer   , get_LOW);
+
+            tvc.grab_pdynmc            = LINK( env, get_pdynmc);
+            tvc.grab_xcg               = LINK( propulsion, get_xcg);
+            tvc.grab_thrust            = LINK( propulsion, get_thrust);
+            tvc.grab_alphax            = LINK( dynamics, get_alphax);
+
+            aerodynamics.grab_alppx    = LINK( dynamics, get_alppx);
+            aerodynamics.grab_phipx    = LINK( dynamics, get_phipx);
+            aerodynamics.grab_alphax   = LINK( dynamics, get_alphax);
+            aerodynamics.grab_betax    = LINK( dynamics, get_betax);
+            aerodynamics.grab_rho      = LINK( env, get_rho);
+            aerodynamics.grab_vmach    = LINK( env, get_vmach);
+            aerodynamics.grab_pdynmc   = LINK( env, get_pdynmc);
+            aerodynamics.grab_tempk    = LINK( env, get_tempk);
+            aerodynamics.grab_dvba     = LINK( env, get_dvba);
+            aerodynamics.grab_ppx      = LINK( dynamics, get_ppx);
+            aerodynamics.grab_qqx      = LINK( dynamics, get_qqx);
+            aerodynamics.grab_rrx      = LINK( dynamics, get_rrx);
+            aerodynamics.grab_WBIB     = LINK( dynamics, get_WBIB);
+            aerodynamics.grab_alt      = LINK( dynamics, get_alt);
+            aerodynamics.grab_xcg      = LINK( propulsion, get_xcg);
+            aerodynamics.grab_liftoff  = LINK( dynamics, get_liftoff);
+
+            env.grab_dvbe              = LINK( dynamics, get_dvbe);
+            env.grab_SBII              = LINK( dynamics, get_SBII);
+            env.grab_VBED              = LINK( dynamics, get_VBED);
+            env.grab_alt               = LINK( dynamics, get_alt);
+            env.grab_TGI               = LINK( dynamics, get_TGI);
+            env.grab_TBI               = LINK( dynamics, get_TBI);
+            env.grab_TBD               = LINK( dynamics, get_TBD);
+            env.grab_alppx             = LINK( dynamics, get_alppx);
+            env.grab_phipx             = LINK( dynamics, get_phipx);
+            env.grab_VBEE              = LINK( dynamics, get_VBEE);
+            env.grab_TDE               = LINK( dynamics, get_TDE);
+
+            forces.grab_pdynmc         = LINK( env, get_pdynmc);
+            forces.grab_thrust         = LINK( propulsion, get_thrust);
+            forces.grab_refa           = LINK( aerodynamics, get_refa);
+            forces.grab_refd           = LINK( aerodynamics, get_refd);
+            forces.grab_cy             = LINK( aerodynamics, get_cy);
+            forces.grab_cll            = LINK( aerodynamics, get_cll);
+            forces.grab_clm            = LINK( aerodynamics, get_clm);
+            forces.grab_cln            = LINK( aerodynamics, get_cln);
+            forces.grab_cx             = LINK( aerodynamics, get_cx);
+            forces.grab_cz             = LINK( aerodynamics, get_cz);
+            forces.grab_FPB            = LINK( tvc, get_FPB);
+            forces.grab_FMPB           = LINK( tvc, get_FMPB);
+
+            gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
+            gps_con.grab_TEI           = LINK( env, get_TEI);
+            gps_con.grab_phibdx        = LINK( dynamics, get_phibdx);
+            gps_con.grab_thtbdx        = LINK( dynamics, get_thtbdx);
+            gps_con.grab_psibdx        = LINK( dynamics, get_psibdx);
+            gps_con.grab_TBI           = LINK( dynamics, get_TBI);
+
+            dynamics.grab_TEI          = LINK( env, get_TEI);
+            dynamics.grab_dvba         = LINK( env, get_dvba);
+            dynamics.grab_VAED         = LINK( env, get_VAED);
+            dynamics.grab_FMB          = LINK( forces, get_FMB);
+            dynamics.grab_IBBB         = LINK( propulsion, get_IBBB);
+            dynamics.grab_vmass        = LINK( propulsion, get_vmass);
+            dynamics.grab_FAPB         = LINK( forces, get_FAPB);
+            dynamics.grab_FAP          = LINK( forces, get_FAP);
+            dynamics.grab_GRAVG        = LINK( env, get_GRAVG);
+            dynamics.grab_grav         = LINK( env, get_grav);
+
+            accelerometer->grab_FSPB   = LINK( dynamics, get_FSPB);
+
+            gyro->grab_WBIB            = LINK( dynamics, get_WBIB);
+            gyro->grab_FSPB            = LINK( dynamics, get_FSPB);
+
+            propulsion.grab_press      = LINK( env, get_press);
+
+
         };
 
         Rocket_SimObject() 
-            :   newton      ( kinematics , euler        , env          , propulsion   , forces )      ,
-                kinematics  ( newton     , env          , euler )      ,
-                euler       ( kinematics , propulsion   , forces )     ,
-                env         ( newton     , aerodynamics , kinematics ) ,
-                propulsion  ( env )      ,
-                aerodynamics( kinematics , env          , propulsion   , euler        , newton        , tvc ) ,
-                tvc         ( env        , kinematics   , propulsion ) ,
-                rcs         ( propulsion ) ,
-                forces      ( env        , propulsion   , rcs          , aerodynamics , tvc ) ,
-                gps_con     ( newton     , env          , kinematics)
+            :   env         (  ) ,
+                propulsion  (  )      ,
+                aerodynamics( propulsion ) ,
+                tvc         (  ) ,
+                forces      ( propulsion   , tvc ) ,
+                gps_con     (  ),
+                dynamics    (  )
             {
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
             ("initialization") setup_export();
-
-            ("initialization") kinematics.initialize();
-            ("initialization") env.initialize();
-            ("initialization") newton.initialize();
             ("initialization") aerodynamics.initialize();
-            ("initialization") euler.initialize();
+            ("initialization") dynamics.initialize();
+            ("initialization") env.initialize();
             ("initialization") tvc.initialize();
-            ("initialization") rcs.initialize();
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
@@ -168,7 +231,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1(0.01, "scheduled") icf_rx_ctrl_job(&rxctrl);
 
             P1 (0.001, "scheduled") time->dm_time();
-            // P1 (0.001, "scheduled") kinematics.propagate(0.001);
+            P1 (0.001, "scheduled") dynamics.propagate(0.001);
 	        P1 (0.001, "scheduled") env.propagate(0.001);
             P1 (0.001, "scheduled") propulsion.propagate(0.001);
             P1 (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
@@ -182,19 +245,11 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") exec_receive();
 
             P3 (0.001, "scheduled") tvc.actuate(0.001);
-            // P3 (0.001, "scheduled") rcs.rcs_schmitt_thrust();
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
-            P3 (0.001, "scheduled") newton.propagate(0.001);
-            P3 (0.001, "scheduled") euler.propagate(0.001);
-            P3 (0.001, "scheduled") kinematics.propagate(0.001);
 
-
-            (10.0, "scheduled") gps_con.show();
-
-            (0.001, "logging") kinematics.update_diagnostic_attributes(0.001);
+            // (10.0, "scheduled") gps_con.show();
             (0.001, "logging") env.update_diagnostic_attributes(0.001);
-            (0.001, "logging") newton.update_diagnostic_attributes(0.001);
-            (0.001, "logging") euler.update_diagnostic_attributes(0.001);
+            (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
 
         }
 };
