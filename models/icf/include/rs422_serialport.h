@@ -11,7 +11,7 @@ LIBRARY DEPENDENCY:
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
 *******************************************************************************/
-
+#include "icf_export.h"
 #define SERIAL_PORT(idx) "/dev/ttyAP"#idx
 #define RS422_SERIAL_BUFFER_SIZE 1024
 #define USER_BAUD_RATE (B921600)

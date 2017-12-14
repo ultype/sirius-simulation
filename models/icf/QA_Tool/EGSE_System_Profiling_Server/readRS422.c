@@ -7,6 +7,7 @@
 #include <time.h>
 #include "rs422_serialport.h"
 #include "icf_utility.h"
+#include <stdint.h>
 
 #define CFG_GPIO_ENABLE 0
 

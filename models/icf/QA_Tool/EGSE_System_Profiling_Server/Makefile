@@ -59,6 +59,7 @@ $(BIN_IMAGE): $(OBJECTS)
 	@echo "Build PASS !!!!"
 
 .PHONY : clean
+
 clean:
 	rm -f $(BIN_IMAGE)
 	rm -rf $(BUILD_DIR)
