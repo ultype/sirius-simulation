@@ -72,6 +72,7 @@ class Rocket_SimObject : public Trick::SimObject {
         Transceiver transceiver;
 
         struct icf_rx_ctrl_t   rxctrl;
+        struct icf_tx_ctrl_t   txctrl;
 
         void setup_export(){
             // transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));

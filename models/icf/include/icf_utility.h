@@ -21,6 +21,9 @@
 
 #define errExit(msg)    do { perror(msg); \
                              exit(EXIT_FAILURE);} while (0)
+#define DEBUG_ENABLE 0
+#define debug_print(...) do { if (DEBUG_ENABLE) \
+                                   fprintf(stderr, __VA_ARGS__);} while (0)
 
 /**
  * @brief   TiSPACE EGSE System Profiling Server (ESPS)
@@ -101,6 +104,7 @@ int32_t imu_pattern_init(struct IMU_filtered_data_t *imu);
 int32_t rate_table_pattern_init(struct ProAxeSE_data_t *position);
 int32_t gpsr_pattern_init(void *gpsr_data);
 void hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen);
+void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen);
 uint32_t invert_crc32(uint32_t crc);
 uint32_t crc_checker(uint32_t rx_crc, const uint8_t *buf, uint32_t size);
 double get_curr_time(void);

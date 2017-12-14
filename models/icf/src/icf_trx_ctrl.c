@@ -42,12 +42,35 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C) {
             exit(EXIT_FAILURE);
         }
 #endif /* CONFIG_EGSE_CRC_HEADER_ENABLE */
-        fprintf(stderr, "[%lf] RX CAN Received !!\n", get_curr_time());
+          debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
         //  hex_dump("gather rx can", rx_buff, RX_CAN_BUFFER_SIZE);
     }
     return 0;
 }
 
+
+
+int icf_tx_direct(struct icf_tx_ctrl_t* C, uint8_t que_idx, void *payload, uint32_t size) {
+
+    return 0;
+}
+
+int icf_tx_send2ring(struct icf_tx_ctrl_t* C, uint8_t que_idx) {
+
+    return 0;
+}
+
+int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, uint8_t que_idx) {
+
+    return 0;
+}
+
+int icf_tx_ctrl_init(struct icf_rx_ctrl_t* C) {
+
+}
+int icf_tx_ctrl_deinit(struct icf_rx_ctrl_t* C) {
+
+}
 
 void *icf_alloc_mem(size_t size) {
     return malloc(size);

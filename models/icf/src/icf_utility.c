@@ -10,6 +10,21 @@ double get_curr_time(void) {
     return g_timestamp.tv_sec + (double)g_timestamp.tv_nsec / (double)BILLION;
 }
 
+void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
+    uint8_t *pt;
+    uint32_t x;
+    pt = pSrcBufVA;
+    debug_print("%s: %p, len = %d\n\r", str, pSrcBufVA, SrcBufLen);
+    for (x = 0; x < SrcBufLen; x++) {
+        if (x % 16 == 0) {
+            debug_print("0x%04x : ", x);
+        }
+        debug_print("%02x ", ((uint8_t)pt[x]));
+        if (x % 16 == 15) { debug_print("\n\r"); }
+    }
+    debug_print("\n\r");
+}
+
 void hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
     uint8_t *pt;
     uint32_t x;
@@ -121,10 +136,10 @@ uint32_t invert_crc32(uint32_t crc) {
                ((crc & (0x1 << 28)) >> 28);
     inv_crc = (crc_30_00 & 0x7fffffff) | ((crc_31 << 31) & 0x80000000);
 
-    printf("  Invert_CRC crc32=0x%8x \n", inv_crc);
+    debug_print("  Invert_CRC crc32=0x%8x \n", inv_crc);
     ucPoint = (uint8_t *)&inv_crc;
     crc_tmp = crc32(crc, ucPoint);
-    printf("  After Invert CRC==> 0x%x\n", crc_tmp);
+    debug_print("  After Invert CRC==> 0x%x\n", crc_tmp);
     return inv_crc;
 }
 
