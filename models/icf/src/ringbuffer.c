@@ -32,8 +32,8 @@ void rb_put(struct ringbuffer_t *rb, void *payload)
         pthread_mutex_lock(&rb->ring_lock);
         while (rb->writer_idx == (rb->ring_size + rb->reader_idx)) // ring buffer is full
         { 
-            pthread_cond_wait(&rb->cond_space, &rb->ring_lock);
             rb->full_cnt++;
+            pthread_cond_wait(&rb->cond_space, &rb->ring_lock);
         }
         rb->pCell[GET_RINGCELL_IDX(rb->writer_idx)] = payload;
         rb->writer_idx++;
@@ -50,10 +50,8 @@ void *rb_get(struct ringbuffer_t *rb)
         pthread_mutex_lock(&rb->ring_lock);
         while (rb->writer_idx == rb->reader_idx) //ring buffer is empty
         {
-            fprintf(stderr, "[dungru:%d:%s] \n", __LINE__, __FUNCTION__);
             //pthread_mutex_unlock(&rb->ring_lock);
             pthread_cond_wait(&rb->cond_count,  &rb->ring_lock);
-            fprintf(stderr, "[dungru:%d:%s] \n", __LINE__, __FUNCTION__);
         }
         ret = rb->pCell[GET_RINGCELL_IDX(rb->reader_idx)];
         rb->reader_idx++;
