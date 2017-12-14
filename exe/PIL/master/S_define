@@ -238,7 +238,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") transceiver.receive();
             P2 (0.05, "scheduled") exec_receive();
 
-            P3 (0.001, "scheduled") tvc.actuate(0.001);
+            P3 (0.001, "scheduled") tvc.actuate(0.001,NULL);
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
 
             // (10.0, "scheduled") gps_con.show();
