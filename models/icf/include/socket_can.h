@@ -19,6 +19,7 @@ extern "C" {
 int socket_can_init(struct can_device_info_t *can_device, const char * ifname, uint32_t name_size);
 int can_data_recv_gather(int can_fd, uint8_t *rx_buff, uint32_t buff_size);
 int can_data_recv(int can_fd, uint8_t *rx_buff, uint32_t buff_size);
+int can_frame_recv(int can_fd, struct can_frame *pframe);
 #ifdef __cplusplus
 }
 #endif

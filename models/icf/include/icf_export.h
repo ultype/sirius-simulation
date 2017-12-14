@@ -19,5 +19,6 @@
 #include <sys/ioctl.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #endif  //  MODELS_ICF_INCLUDE_ICF_EXPORT_H_

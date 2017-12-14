@@ -42,6 +42,15 @@ int socket_can_init(struct can_device_info_t *can_device, const char * ifname, u
     return 0;
 }
 
+int socket_can_deinit(struct can_device_info_t *can_device) {
+    struct can_device_info_t *dev_info;
+    dev_info = can_device;
+    close(dev_info->can_fd);
+    printf("Closeing %s \n", dev_info->ifr.ifr_name);
+    return 0;
+}
+
+
 int can_data_recv_gather(int can_fd, uint8_t *rx_buff, uint32_t buff_size) {
     int rx_nbytes;
     struct can_frame frame;
@@ -90,6 +99,19 @@ int can_data_recv(int can_fd, uint8_t *rx_buff, uint32_t buff_size) {
         hex_dump("single rx can", rx_buff, CAN_MAX_DLEN);
     }
     return ret;
+}
+
+int can_frame_recv(int can_fd, struct can_frame *pframe) {
+    int rx_nbytes;
+    rx_nbytes = read(can_fd, pframe, sizeof(struct can_frame));
+    if (rx_nbytes > 0) {
+        if (pframe->can_id & CAN_ERR_FLAG) {
+            fprintf(stderr, "error frame\n");
+            exit(EXIT_FAILURE);
+        }
+        //hex_dump("CAN RX recive",(uint8_t *)pframe, 16);
+    }
+    return rx_nbytes;
 }
 #ifdef __cplusplus
     }
