@@ -15,14 +15,12 @@ int32_t rb_init(struct ringbuffer_t *rb, uint32_t size)
     }
     pthread_mutex_init(&rb->ring_lock, NULL);
     pthread_cond_init(&rb->cond_space, NULL);
-    pthread_cond_init(&rb->cond_count, NULL);
     return 0;
 }
 
 void rb_deinit(struct ringbuffer_t *rb)
 {
     pthread_mutex_destroy(&rb->ring_lock);
-    pthread_cond_destroy(&rb->cond_count);
     pthread_cond_destroy(&rb->cond_space);
     fprintf(stderr, "[%s] Full count: %d \n", __FUNCTION__, rb->full_cnt);
 }
@@ -38,25 +36,21 @@ void rb_put(struct ringbuffer_t *rb, void *payload)
         rb->pCell[GET_RINGCELL_IDX(rb->writer_idx)] = payload;
         rb->writer_idx++;
         rb->elem_num++;
-        fprintf(stderr, "[%s].\n", __FUNCTION__);
         pthread_mutex_unlock(&rb->ring_lock);
-        pthread_cond_signal(&rb->cond_count);
-
 }
 
 void *rb_get(struct ringbuffer_t *rb)
 {
         void *ret;
         pthread_mutex_lock(&rb->ring_lock);
-        while (rb->writer_idx == rb->reader_idx) //ring buffer is empty
-        {
-            //pthread_mutex_unlock(&rb->ring_lock);
-            pthread_cond_wait(&rb->cond_count,  &rb->ring_lock);
+        if (rb->writer_idx == rb->reader_idx) {//ring buffer is empty
+            pthread_mutex_unlock(&rb->ring_lock);
+            return NULL;
         }
         ret = rb->pCell[GET_RINGCELL_IDX(rb->reader_idx)];
         rb->reader_idx++;
         rb->elem_num--;
-        pthread_mutex_unlock(&rb->ring_lock);
         pthread_cond_signal(&rb->cond_space);
+        pthread_mutex_unlock(&rb->ring_lock);
         return ret;
 }

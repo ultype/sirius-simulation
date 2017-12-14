@@ -11,7 +11,7 @@ PROGRAMMERS:
 #ifndef MODELS_ICF_INCLUDE_RINGBUFFER_H
 #define MODELS_ICF_INCLUDE_RINGBUFFER_H
 #include "icf_utility.h"
-#define NUM_OF_CELL  1024  //  power of 2
+#define NUM_OF_CELL  256  //  power of 2
 #define GET_RINGCELL_IDX(idx)      ((idx) & (NUM_OF_CELL - 1))
 
 struct ringbuffer_t {
@@ -22,7 +22,6 @@ struct ringbuffer_t {
         uint32_t full_cnt;
         pthread_mutex_t ring_lock;
         pthread_cond_t  cond_space;
-        pthread_cond_t  cond_count;
         struct can_frame *pCell[NUM_OF_CELL];
 };
 

@@ -21,9 +21,8 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C) {
     FD_ZERO(&readfds);
     FD_SET(C->can_info.can_fd, &readfds);
     select(C->can_info.can_fd + 1, &readfds, NULL, NULL, &tv);
-
+/*TODO malloc need use the static memory*/
     if (FD_ISSET(C->can_info.can_fd, &readfds)) {
-fprintf(stderr, "[dungru:%d:%s] \n", __LINE__, __FUNCTION__);
         FTRACE_TIME_STAMP(512);
         //  can_data_recv_gather(C->can_info.can_fd, rx_buff, RX_CAN_BUFFER_SIZE);
         pframe = NULL;
