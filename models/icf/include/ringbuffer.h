@@ -8,8 +8,8 @@ LIBRARY DEPENDENCY:
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
 *******************************************************************************/
-#ifndef MODELS_ICF_INCLUDE_RINGBUFFER_H
-#define MODELS_ICF_INCLUDE_RINGBUFFER_H
+#ifndef MODELS_ICF_INCLUDE_RINGBUFFER_H_
+#define MODELS_ICF_INCLUDE_RINGBUFFER_H_
 #include "icf_utility.h"
 #define NUM_OF_CELL  256  //  power of 2
 #define GET_RINGCELL_IDX(idx)      ((idx) & (NUM_OF_CELL - 1))
@@ -35,4 +35,4 @@ void *rb_get(struct ringbuffer_t *rb);
 #ifdef __cplusplus
 }
 #endif
-#endif // MODELS_ICF_INCLUDE_RINGBUFFER_H
+#endif   //  MODELS_ICF_INCLUDE_RINGBUFFER_H_

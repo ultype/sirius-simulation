@@ -51,13 +51,14 @@ int esps2egse_cmd_init(struct esps2egse_data_t *cmd) {
     return 0;
 }
 
+uint32_t ping_pong = 0;
 int32_t can_data_send_scatter(int fd, uint8_t *payload, uint32_t data_len) {
     uint32_t sent_len = 0, cur_len = 0, nbytes = 0, i = 0;
     uint32_t sent_len_max = CAN_MAX_DLEN;
     struct can_frame frame;
     int ret;
 
-    frame.can_id  = 0x123;
+    frame.can_id  = (ping_pong++ & 0x1)? 0x141:0x142;
     frame.can_dlc = 8;
     while (1) {
         sent_len = (data_len - cur_len) >=  sent_len_max ?
@@ -67,6 +68,9 @@ int32_t can_data_send_scatter(int fd, uint8_t *payload, uint32_t data_len) {
             for (i = 0; i < sent_len; i++, payload++) {
                 frame.data[i] = *payload;
             }
+#if 1
+            frame.data[1] = 0x1f;
+#endif
             ret = write(fd, &frame, sizeof(struct can_frame));
             if (ret < 0)
                 goto error;

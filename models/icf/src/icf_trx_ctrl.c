@@ -21,7 +21,7 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C) {
     FD_ZERO(&readfds);
     FD_SET(C->can_info.can_fd, &readfds);
     select(C->can_info.can_fd + 1, &readfds, NULL, NULL, &tv);
-/*TODO malloc need use the static memory*/
+    /*TODO malloc need use the static memory*/
     if (FD_ISSET(C->can_info.can_fd, &readfds)) {
         FTRACE_TIME_STAMP(512);
         //  can_data_recv_gather(C->can_info.can_fd, rx_buff, RX_CAN_BUFFER_SIZE);
@@ -48,16 +48,16 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C) {
     return 0;
 }
 
-void *icf_alloc_mem (size_t size) {
+
+void *icf_alloc_mem(size_t size) {
     return malloc(size);
 }
 
-void icf_free_mem (void *ptr) {
-    if (ptr)
-    {
+
+void icf_free_mem(void *ptr) {
+    if (ptr) {
         free(ptr);
         ptr = NULL;
     }
-
-    return ;
+    return;
 }

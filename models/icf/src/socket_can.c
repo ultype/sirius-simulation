@@ -109,7 +109,7 @@ int can_frame_recv(int can_fd, struct can_frame *pframe) {
             fprintf(stderr, "error frame\n");
             exit(EXIT_FAILURE);
         }
-        //hex_dump("CAN RX recive",(uint8_t *)pframe, 16);
+        //  hex_dump("CAN RX recive",(uint8_t *)pframe, 16);
     }
     return rx_nbytes;
 }
