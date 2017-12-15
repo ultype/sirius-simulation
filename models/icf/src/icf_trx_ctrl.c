@@ -48,32 +48,95 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C) {
     return 0;
 }
 
+int icf_tx_ctrl_init(struct icf_tx_ctrl_t* C) {
 
+    uint8_t qidx;
+    rs422_devinfo_init(&C->rs422_info[IMU_01], que_port_map[IMU_01], IMU_01);
+    rs422_devinfo_init(&C->rs422_info[RATE_TABLE_X], que_port_map[RATE_TABLE_X], RATE_TABLE_X);
+    rs422_devinfo_init(&C->rs422_info[RATE_TABLE_Y], que_port_map[RATE_TABLE_Y], RATE_TABLE_Y);
+    rs422_devinfo_init(&C->rs422_info[RATE_TABLE_Z], que_port_map[RATE_TABLE_Z], RATE_TABLE_Z);
+    rs422_devinfo_init(&C->rs422_info[IMU_02], que_port_map[IMU_02], IMU_02);
+    rs422_devinfo_init(&C->rs422_info[GPSR_01], que_port_map[GPSR_01], GPSR_01);
+    rs422_devinfo_init(&C->rs422_info[GPSR_02], que_port_map[GPSR_02], GPSR_02);
+    
+    for (qidx = 0; qidx < RS422_TXQ_NUM; qidx++) {
+        if (SERIAL_PORT_IS_ENABLE(qidx)) {
+            rs422_serialport_init(&C->rs422_info[qidx]);
+            rb_init(&C->icf_tx_ring[qidx], NUM_OF_CELL);
+        }
+    }
+    return 0;
+}
 
-int icf_tx_direct(struct icf_tx_ctrl_t* C, uint8_t que_idx, void *payload, uint32_t size) {
+int icf_tx_ctrl_deinit(struct icf_tx_ctrl_t* C) {
+    uint8_t qidx;
+    for (qidx = 0; qidx < RS422_TXQ_NUM; qidx++) {
+        if (SERIAL_PORT_IS_ENABLE(qidx))
+            rs422_serialport_deinit(&C->rs422_info[qidx]);
+    }
+    return 0;
+}
+
+int icf_tx_direct(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size) {
+    
+    uint8_t *tx_buffer = NULL;
+    uint32_t frame_full_size;
+    uint32_t offset = 0;
+
+    FTRACE_TIME_STAMP(511);
+    frame_full_size = size + (CONFIG_EGSE_CRC_HEADER_ENABLE ? RS422_HEADER_SIZE : 0);
+    tx_buffer = icf_alloc_mem(frame_full_size);
+#if CONFIG_EGSE_CRC_HEADER_ENABLE
+    rs422_frame_header_set(&C->rs422_info[qidx].frame, (uint8_t *) payload, size);
+    offset += rs422_frame_header_copy(tx_buffer, &C->rs422_info[qidx].frame);
+#endif /* CONFIG_EGSE_CRC_HEADER_ENABLE */
+    rs422_frame_payload_copy(tx_buffer + offset, (uint8_t *) payload, size);
+    rs422_data_send_scatter(C->rs422_info[qidx].rs422_fd, tx_buffer, frame_full_size);
+    hex_dump("icf_tx_direct", tx_buffer, frame_full_size);
+    icf_free_mem(tx_buffer);
+    return 0;
+}
+
+int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size) {
+    uint8_t *tx_buffer = NULL;
+    struct ringbuffer_t *whichring = NULL;
+    struct ringbuffer_cell_t *txcell;
+    uint32_t frame_full_size;
+    uint32_t offset = 0;
+
+    whichring = &C->icf_tx_ring[qidx];
+    frame_full_size = size + (CONFIG_EGSE_CRC_HEADER_ENABLE ? RS422_HEADER_SIZE : 0);
+    tx_buffer = icf_alloc_mem(frame_full_size);
+#if CONFIG_EGSE_CRC_HEADER_ENABLE
+    rs422_frame_header_set(&C->rs422_info[qidx].frame, (uint8_t *) payload, size);
+    offset += rs422_frame_header_copy(tx_buffer, &C->rs422_info[qidx].frame);
+#endif /* CONFIG_EGSE_CRC_HEADER_ENABLE */
+    rs422_frame_payload_copy(tx_buffer + offset, (uint8_t *) payload, size);
+
+    if(whichring) {
+        txcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
+        txcell->frame_full_size = frame_full_size;
+        txcell->l2frame = tx_buffer;
+        rb_put(whichring, txcell);
+    }
 
     return 0;
 }
 
-int icf_tx_send2ring(struct icf_tx_ctrl_t* C, uint8_t que_idx) {
-
+int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, uint8_t qidx) {
+    struct ringbuffer_cell_t *txcell;
+    struct ringbuffer_t *whichring = NULL;
+    whichring = &C->icf_tx_ring[qidx];
+    txcell = (uint8_t *)rb_get(whichring);
+    rs422_data_send_scatter(C->rs422_info[qidx].rs422_fd, (uint8_t *)txcell->l2frame, txcell->frame_full_size);
+    icf_free_mem(txcell->l2frame);
+    icf_free_mem(txcell);
     return 0;
 }
 
-int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, uint8_t que_idx) {
-
-    return 0;
-}
-
-int icf_tx_ctrl_init(struct icf_rx_ctrl_t* C) {
-
-}
-int icf_tx_ctrl_deinit(struct icf_rx_ctrl_t* C) {
-
-}
 
 void *icf_alloc_mem(size_t size) {
-    return malloc(size);
+    return calloc(1,size);
 }
 
 

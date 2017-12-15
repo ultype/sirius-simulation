@@ -17,6 +17,9 @@ PROGRAMMERS:
 #define USER_BAUD_RATE (B921600)
 #define RS422_HEADER_SIZE sizeof(struct rs422_frame_header_t)
 
+#define SERIAL_PORT_ENABLE_BITMAP (0x1)// (0x7F)
+#define SERIAL_PORT_IS_ENABLE(qidx) ((SERIAL_PORT_ENABLE_BITMAP >> qidx) & 0x1)
+
 extern const char *que_port_map[8];
 
 typedef enum _ENUM_HW_RS422_TX_QUE_T {
@@ -44,8 +47,6 @@ struct rs422_device_info_t {
     int32_t rs422_fd;
     uint8_t qidx;
     struct rs422_frame_header_t frame;
-    uint32_t payload_size;
-    void *payload;
 };
 
 struct rs422_device_name_t {
@@ -57,8 +58,6 @@ extern "C" {
 #endif
 int rs422_devinfo_init(struct rs422_device_info_t *dev_info,
                        const char *portname,
-                       void *payload,
-                       uint32_t payload_size,
                        uint8_t qidx);
 int rs422_serialport_init(struct rs422_device_info_t *rs422_dev);
 int open_port(char *portname);

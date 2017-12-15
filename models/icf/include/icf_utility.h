@@ -21,7 +21,7 @@
 
 #define errExit(msg)    do { perror(msg); \
                              exit(EXIT_FAILURE);} while (0)
-#define DEBUG_ENABLE 0
+#define DEBUG_ENABLE 1
 #define debug_print(...) do { if (DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
 

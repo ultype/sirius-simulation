@@ -21,13 +21,9 @@ const char *que_port_map[8] = {
 
 int rs422_devinfo_init(struct rs422_device_info_t *dev_info,
                        const char *portname,
-                       void *payload,
-                       uint32_t payload_size,
                        uint8_t qidx) {
     strncpy(dev_info->portname, portname, IFNAMSIZ);
     dev_info->qidx = qidx;
-    dev_info->payload_size = payload_size;
-    dev_info->payload = payload;
     dev_info->frame.crc = 0;
     dev_info->frame.payload_len = 0;
     dev_info->frame.seq_no = 0;
@@ -44,6 +40,12 @@ int rs422_serialport_init(struct rs422_device_info_t *rs422_dev) {
         exit(EXIT_FAILURE);
     }
     set_interface_attribs(dev_info->rs422_fd, B921600, 0);
+    return status;
+}
+
+int rs422_serialport_deinit(struct rs422_device_info_t *rs422_dev) {
+    int  status = 0;
+    close(rs422_dev->rs422_fd);
     return status;
 }
 
@@ -128,6 +130,14 @@ error:
 
 uint8_t* rs422_frame_alloc(uint32_t size) {
     return calloc(1, size);
+}
+
+void rs422_frame_free(void *ptr) {
+    if (ptr) {
+        free(ptr);
+        ptr = NULL;
+    }
+    return;
 }
 
 int rs422_frame_header_set(struct rs422_frame_header_t *frame, const uint8_t *payload, const uint32_t data_len) {

@@ -21,7 +21,12 @@ struct ringbuffer_t {
         uint32_t ring_size;
         uint32_t full_cnt;
         pthread_mutex_t ring_lock;
-        struct can_frame *pCell[NUM_OF_CELL];
+        void *pCell[NUM_OF_CELL];
+};
+
+struct ringbuffer_cell_t {
+    uint32_t frame_full_size;
+    void* l2frame; 
 };
 
 #ifdef __cplusplus
