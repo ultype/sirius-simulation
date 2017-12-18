@@ -26,7 +26,7 @@ struct ringbuffer_t {
 
 struct ringbuffer_cell_t {
     uint32_t frame_full_size;
-    void* l2frame; 
+    void *l2frame; 
 };
 
 #ifdef __cplusplus

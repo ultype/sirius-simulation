@@ -11,6 +11,8 @@ double get_curr_time(void) {
 }
 
 void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
+
+#if DEBUG_ENABLE
     uint8_t *pt;
     uint32_t x;
     pt = pSrcBufVA;
@@ -23,6 +25,7 @@ void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
         if (x % 16 == 15) { debug_print("\n\r"); }
     }
     debug_print("\n\r");
+#endif  // DEBUG_ENABLE
 }
 
 void hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
@@ -70,52 +73,6 @@ uint32_t crc32_create(const uint8_t *buf, const uint32_t len) {
         total += 4;
     }
     return crc;
-}
-
-int32_t imu_pattern_init(struct IMU_filtered_data_t *imu) {
-    imu->r1 = 0x0101;
-    imu->r2 = 0x0202;
-    imu->r3 = 0x0303;
-    imu->r4 = 0x0404;
-    imu->r5 = 0x0505;
-    imu->r6 = 0x0606;
-    imu->r7 = 0x0707;
-    imu->r8 = 0x0808;
-    imu->r9 = 0x0909;
-    imu->r10 = 0x0a0a;
-    imu->r11 = 0x0b0b;
-    imu->r12 = 0x0c0c;
-    imu->q1 = 0x0d0d;
-    imu->q2 = 0x0e0e;
-    imu->q3 = 0x0f0f;
-    imu->q4 = 0x1010;
-    imu->q5 = 0x1111;
-    imu->q6 = 0x1212;
-    imu->q7 = 0x1313;
-    imu->q8 = 0x1414;
-    imu->q9 = 0x1515;
-    imu->q10 = 0x1616;
-    imu->q11 = 0x1717;
-    imu->q12 = 0x1818;
-
-    return 0;
-}
-
-int32_t rate_table_pattern_init(struct ProAxeSE_data_t *position) {
-    position->rate.x = htonl(0x3e8);
-    position->rate.y = htonl(0x3e8);
-    position->rate.z = htonl(0x3e8);
-    return 0;
-}
-int32_t gpsr_pattern_init(void *gpsr_data) {
-    uint8_t *tmpbuffer;
-    tmpbuffer = (uint8_t *)gpsr_data;
-    int idx;
-
-    for (idx = 0; idx < sizeof(struct NSPO_GPSR_SCI_TLM_t); idx++) {
-        tmpbuffer[idx] = idx & 0xFF;
-    }
-    return 0;
 }
 
 uint32_t invert_crc32(uint32_t crc) {

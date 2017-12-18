@@ -40,7 +40,7 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C);
 
 int icf_tx_direct(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size);
 int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size);
-int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, uint8_t qidx);
+int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx);
 void *icf_alloc_mem(size_t size);
 void icf_free_mem(void *ptr);
 

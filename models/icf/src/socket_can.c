@@ -96,7 +96,7 @@ int can_data_recv(int can_fd, uint8_t *rx_buff, uint32_t buff_size) {
             rx_buff[buf_offset] = frame.data[idx];
             buf_offset++;
         }
-        hex_dump("single rx can", rx_buff, CAN_MAX_DLEN);
+        debug_hex_dump("can_data_recv", rx_buff, CAN_MAX_DLEN);
     }
     return ret;
 }

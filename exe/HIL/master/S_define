@@ -233,6 +233,7 @@ class Rocket_SimObject : public Trick::SimObject {
 
             
             P1(0.001, "scheduled") icf_rx_ctrl_job(&rxctrl);
+            P1(0.001, "scheduled") icf_tx_ctrl_job(&txctrl, IMU_01);
 
             P1 (0.001, "scheduled") time->dm_time();
             P1 (0.001, "scheduled") dynamics.propagate(0.001);

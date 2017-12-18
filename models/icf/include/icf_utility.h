@@ -1,8 +1,6 @@
 #ifndef MODELS_ICF_INCLUDE_ICF_UTILITY_H_
 #define MODELS_ICF_INCLUDE_ICF_UTILITY_H_
 #include "icf_export.h"
-#include "nspo_gps.h"
-#include "imu_interface.h"
 
 #define CONFIG_ESPS_HEADER_ENABLE 1
 #define CONFIG_EGSE_CRC_HEADER_ENABLE 1
@@ -21,7 +19,7 @@
 
 #define errExit(msg)    do { perror(msg); \
                              exit(EXIT_FAILURE);} while (0)
-#define DEBUG_ENABLE 1
+#define DEBUG_ENABLE 0
 #define debug_print(...) do { if (DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
 
@@ -65,44 +63,11 @@ struct esps2egse_data_t {
 } __attribute__((packed));
 
 
-
-/*
-*
-* /dev/ttyAP0, /dev/ttyAP4: SDT_INTERFACER_t 200HZ for IMU
-* /dev/ttyAP5, /dev/ttyAP6: SDT_INTERFACER_t 20HZ for GPSR
-*
-*/
-struct SDT_INTERFACER_t {
-    struct NSPO_GPSR_SCI_TLM_t     GPS_data_1;  // 624 bytes
-    struct NSPO_GPSR_SCI_TLM_t     GPS_data_2;  // 624 bytes (redundancy)
-    struct IMU_filtered_data_t     IMU_filtered_data_1;  // 96 bytes
-    struct IMU_filtered_data_t     IMU_filtered_data_2;  // 96 bytes (redundancy)
-} __attribute__((packed));
-
-/*
-*
-* /dev/ttyAP1(x), /dev/ttyAP2(y), /dev/ttyAP3(z): ProAxeSE_data_t 1000HZ
-*
-*/
-struct int32_xyz_t {
-    int32_t x;
-    int32_t y;
-    int32_t z;
-} __attribute__((packed));
-
-struct ProAxeSE_data_t {
-    struct int32_xyz_t    rate;            /* *io  (r/s)     X, Y, Z Rate */
-} __attribute__((packed));
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 uint32_t crc32(uint32_t crc, const uint8_t *buf);
 uint32_t crc32_create(const uint8_t *buf, const uint32_t len);
-int32_t imu_pattern_init(struct IMU_filtered_data_t *imu);
-int32_t rate_table_pattern_init(struct ProAxeSE_data_t *position);
-int32_t gpsr_pattern_init(void *gpsr_data);
 void hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen);
 void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen);
 uint32_t invert_crc32(uint32_t crc);
