@@ -21,7 +21,7 @@ void rb_deinit(struct ringbuffer_t *rb) {
     fprintf(stderr, "[%s] Full count: %d \n", __FUNCTION__, rb->full_cnt);
 }
 
-void rb_put(struct ringbuffer_t *rb, void *payload) {
+void rb_push(struct ringbuffer_t *rb, void *payload) {
         pthread_mutex_lock(&rb->ring_lock);
         if (rb->writer_idx == (rb->ring_size + rb->reader_idx)) {
             //  ring buffer is full
@@ -35,7 +35,7 @@ void rb_put(struct ringbuffer_t *rb, void *payload) {
         pthread_mutex_unlock(&rb->ring_lock);
 }
 
-void *rb_get(struct ringbuffer_t *rb) {
+void *rb_pop(struct ringbuffer_t *rb) {
         void *ret;
         pthread_mutex_lock(&rb->ring_lock);
         if (rb->writer_idx == rb->reader_idx) {  //  ring buffer is empty

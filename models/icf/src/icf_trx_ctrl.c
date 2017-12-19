@@ -31,7 +31,7 @@ int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C) {
             fprintf(stderr, "producer frame allocate fail!!\n");
         }
         if (can_frame_recv(C->can_info.can_fd, pframe) > 0) {
-            rb_put(&C->g_tvc_ring, pframe);
+            rb_push(&C->g_tvc_ring, pframe);
         }
 #if 0  // CONFIG_EGSE_CRC_HEADER_ENABLE
         struct esps2egse_header_t *rx_header;
@@ -117,7 +117,7 @@ int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void 
         txcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
         txcell->frame_full_size = frame_full_size;
         txcell->l2frame = tx_buffer;
-        rb_put(whichring, txcell);
+        rb_push(whichring, txcell);
     }
 
     return 0;
@@ -127,7 +127,7 @@ int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx) {
     struct ringbuffer_cell_t *txcell = NULL;
     struct ringbuffer_t *whichring = NULL;
     whichring = &C->icf_tx_ring[qidx];
-    txcell = (uint8_t *)rb_get(whichring);
+    txcell = (uint8_t *)rb_pop(whichring);
     if(txcell) {
         rs422_data_send_scatter(C->rs422_info[qidx].rs422_fd, (uint8_t *)txcell->l2frame, txcell->frame_full_size);
         debug_hex_dump("icf_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);
