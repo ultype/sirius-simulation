@@ -58,6 +58,8 @@ int icf_tx_ctrl_init(struct icf_tx_ctrl_t* C) {
     rs422_devinfo_init(&C->rs422_info[IMU_02], que_port_map[IMU_02], IMU_02);
     rs422_devinfo_init(&C->rs422_info[GPSR_01], que_port_map[GPSR_01], GPSR_01);
     rs422_devinfo_init(&C->rs422_info[GPSR_02], que_port_map[GPSR_02], GPSR_02);
+    ethernet_init(&C->eth_info);
+    rb_init(&C->icf_tx_eth_ring, NUM_OF_CELL);
     
     for (qidx = 0; qidx < RS422_TXQ_NUM; qidx++) {
         if (SERIAL_PORT_IS_ENABLE(qidx)) {
@@ -131,6 +133,59 @@ int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx) {
     if(txcell) {
         rs422_data_send_scatter(C->rs422_info[qidx].rs422_fd, (uint8_t *)txcell->l2frame, txcell->frame_full_size);
         debug_hex_dump("icf_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);
+        icf_free_mem(txcell->l2frame);
+        icf_free_mem(txcell);
+    }
+
+    return 0;
+}
+
+int icf_eth_tx_direct(struct icf_tx_ctrl_t* C, void *payload, uint32_t size) {
+    
+    uint8_t *tx_buffer = NULL;
+    uint32_t frame_full_size;
+    uint32_t offset = 0;
+
+    FTRACE_TIME_STAMP(511);
+    frame_full_size = size;
+    tx_buffer = icf_alloc_mem(frame_full_size);
+    memcpy(tx_buffer + offset, (uint8_t *) payload, size);
+    ethernet_data_send(C->eth_info.client_fd, tx_buffer, frame_full_size);
+    debug_hex_dump("icf_eth_tx_direct", tx_buffer, frame_full_size);
+    icf_free_mem(tx_buffer);
+    return 0;
+}
+
+int icf_eth_tx_enqueue2ring(struct icf_tx_ctrl_t* C, void *payload, uint32_t size) {
+    uint8_t *tx_buffer = NULL;
+    struct ringbuffer_t *whichring = NULL;
+    struct ringbuffer_cell_t *txcell;
+    uint32_t frame_full_size;
+    uint32_t offset = 0;
+
+    whichring = &C->icf_tx_eth_ring;
+    frame_full_size = size;
+    tx_buffer = icf_alloc_mem(frame_full_size);
+    memcpy(tx_buffer, (uint8_t *) payload, size);
+
+    if(whichring) {
+        txcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
+        txcell->frame_full_size = frame_full_size;
+        txcell->l2frame = tx_buffer;
+        rb_push(whichring, txcell);
+    }
+
+    return 0;
+}
+
+int icf_eth_tx_ctrl_job(struct icf_tx_ctrl_t* C) {
+    struct ringbuffer_cell_t *txcell = NULL;
+    struct ringbuffer_t *whichring = NULL;
+    whichring = &C->icf_tx_eth_ring;
+    txcell = (uint8_t *)rb_pop(whichring);
+    if(txcell) {
+        ethernet_data_send(C->eth_info.client_fd, (uint8_t *)txcell->l2frame, txcell->frame_full_size);
+        debug_hex_dump("icf_eth_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);
         icf_free_mem(txcell->l2frame);
         icf_free_mem(txcell);
     }

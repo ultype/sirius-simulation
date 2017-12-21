@@ -10,6 +10,7 @@ LIBRARY DEPENDENCY:
       	(../src/icf_trx_ctrl.c)
         (../src/ringbuffer.c)
         (../src/rs422_serialport.c)
+        (../src/ethernet.c)
       )
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
@@ -18,6 +19,7 @@ PROGRAMMERS:
 #include "icf_utility.h"
 #include "ringbuffer.h"
 #include "rs422_serialport.h"
+#include "ethernet.h"
 
 struct icf_rx_ctrl_t {
     struct can_device_info_t   can_info;
@@ -27,6 +29,8 @@ struct icf_rx_ctrl_t {
 struct icf_tx_ctrl_t {
     struct rs422_device_info_t rs422_info[RS422_TXQ_NUM];
     struct ringbuffer_t icf_tx_ring[RS422_TXQ_NUM];
+    struct ethernet_device_info_t eth_info;
+    struct ringbuffer_t icf_tx_eth_ring;
 
 };
 
@@ -46,6 +50,10 @@ void icf_free_mem(void *ptr);
 
 int icf_tx_ctrl_init(struct icf_tx_ctrl_t* C);
 int icf_tx_ctrl_deinit(struct icf_tx_ctrl_t* C);
+
+int icf_eth_tx_direct(struct icf_tx_ctrl_t* C, void *payload, uint32_t size);
+int icf_eth_tx_enqueue2ring(struct icf_tx_ctrl_t* C, void *payload, uint32_t size);
+int icf_eth_tx_ctrl_job(struct icf_tx_ctrl_t* C);
 
 #ifdef __cplusplus
 }
