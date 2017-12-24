@@ -2,8 +2,8 @@
 
 
 int32_t rb_init(struct ringbuffer_t *rb, uint32_t size) {
-    int idx;
 
+    int idx;
     rb->writer_idx = 0;
     rb->reader_idx = 0;
     rb->elem_num = 0;
