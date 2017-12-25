@@ -110,7 +110,7 @@ static void tx_can_handler(int sig, siginfo_t *si, void *uc) {
 
 int main(int argc, char **argv) {
     int nbytes = 0;
-    char *ifname = "can1";
+    char ifname[IFNAMSIZ] = "can1";
     struct esps2egse_data_t esps_cmd;
     struct can_device_info_t can_device;
 
@@ -129,7 +129,8 @@ int main(int argc, char **argv) {
     while ((opt = getopt(argc, argv, "I:l:")) != -1) {
         switch (opt) {
         case 'I':
-            ifname = optarg;
+            memcpy(ifname, optarg, IFNAMSIZ);
+            //  ifname = optarg;
             break;
         case 'l':
             tx_loop = atoi(optarg);
@@ -139,7 +140,7 @@ int main(int argc, char **argv) {
         }
     }
     p_esps_cmd = (uint8_t *)&esps_cmd;
-    socket_can_init(&can_device, "can1", 4);
+    socket_can_init(&can_device, ifname);
 
     esps2egse_cmd_init((struct esps2egse_data_t *)p_esps_cmd);
     data_len = sizeof(struct esps2egse_data_t);

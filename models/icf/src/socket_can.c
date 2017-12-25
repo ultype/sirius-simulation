@@ -8,11 +8,17 @@ int socket_can_init(void *priv_data, char *ifname) {
     int  status = 0, setflag = 0;
     struct can_device_info_t *dev_info = priv_data;
     dev_info = calloc(1, sizeof(struct can_device_info_t));
-    if (dev_info == NULL)
-    {
+    if (dev_info == NULL) {
         fprintf(stderr, "[%s:%d]Memory allocate fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
         goto error;
     }
+
+    // dev_info->set = calloc(1, sizeof(fd_set));
+    // if (dev_info->set == NULL) {
+    //     fprintf(stderr, "[%s:%d] fd_set Memory allocate fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
+    //     goto error;
+    // }
+
     if ((dev_info->can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
         perror("Error while opening socket");
         goto error;
@@ -40,9 +46,17 @@ int socket_can_init(void *priv_data, char *ifname) {
     if (status != 0) {
         fprintf(stderr, "setsockopt fail. status: %s\n", strerror(errno));
     }
+
+
     printf("Using %s to read\n", dev_info->ifr.ifr_name);
     return 0;
 error:
+
+    // if (dev_info->set) {
+    //     free(dev_info->set);
+    //     dev_info->set = NULL;
+    // }
+
     if (dev_info) {
         free(dev_info);
         dev_info = NULL;
@@ -54,6 +68,11 @@ error:
 int socket_can_deinit(void *priv_data) {
     struct can_device_info_t *dev_info = priv_data;
     close(dev_info->can_fd);
+
+    // if (dev_info->set) {
+    //     free(dev_info->set);
+    //     dev_info->set = NULL;
+    // }
     if (dev_info) {
         free(dev_info);
         dev_info = NULL;
@@ -130,32 +149,37 @@ int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     return rx_nbytes;
 }
 
-int socketcan_select(void *priv_data, fd_set *readfds, fd_set *writefds,
-                     fd_set *exceptfds, struct timeval *timeout) {
+int socketcan_select(void *priv_data, struct timeval *timeout) {
         int ret = 0;
         struct can_device_info_t *dev_info = priv_data;
-        ret = select(dev_info->can_fd + 1, readfds, writefds, exceptfds, timeout);
+        ret = select(dev_info->can_fd + 1, dev_info->set, NULL, NULL, timeout);
         return ret;
 }
 
 
-void socketcan_fd_clr(void *priv_data, fd_set *set) {
+void socketcan_fd_clr(void *priv_data) {
     struct can_device_info_t *dev_info = priv_data;
-    FD_CLR(dev_info->can_fd, set);
+    FD_CLR(dev_info->can_fd, dev_info->set);
 }
-int socketcan_fd_isset(void *priv_data, fd_set *set) {
+int socketcan_fd_isset(void *priv_data) {
     struct can_device_info_t *dev_info = priv_data;
     int ret = 0;
-    ret = FD_ISSET(dev_info->can_fd, set);
+    ret = FD_ISSET(dev_info->can_fd, dev_info->set);
     return ret;
 }
-void socketcan_fd_set(void *priv_data, fd_set *set) {
+void socketcan_fd_set(void *priv_data) {
     struct can_device_info_t *dev_info = priv_data;
-    FD_SET(dev_info->can_fd, set);
+    FD_SET(dev_info->can_fd, dev_info->set);
 }
-void socketcan_fd_zero(void *priv_data, fd_set *set) {
+void socketcan_fd_zero(void *priv_data) {
     struct can_device_info_t *dev_info = priv_data;
-    FD_ZERO(set);
+    FD_ZERO(dev_info->set);
+}
+
+void socketcan_fd_setparams(void *priv_data, void *readfs) {
+    struct can_device_info_t *dev_info = priv_data;
+    dev_info->set = readfs;
+    //FD_ZERO(dev_info->set);
 }
 
 struct icf_driver_ops icf_driver_socketcan_ops = {
@@ -168,5 +192,6 @@ struct icf_driver_ops icf_driver_socketcan_ops = {
     .fd_isset = socketcan_fd_isset,
     .fd_set = socketcan_fd_set,
     .fd_zero = socketcan_fd_zero,
+    .fd_setparams = socketcan_fd_setparams,
     .close_interface = socket_can_deinit,
 };

@@ -18,7 +18,6 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C) {
     int idx;
     for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)) - 1; ++idx) {
         ctrlqueue = &g_egse_queue[idx];
-        printf("idx: %d\n", idx);
         rb_init(ctrlqueue->data_ring, NUM_OF_CELL);
         C->ctrlqueue[idx] = ctrlqueue;
     }
@@ -57,16 +56,17 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
     struct can_frame *pframe = NULL;
-
-    fd_set readfds;
+    fd_set readfd;
     tv.tv_sec = 0;
     tv.tv_usec = 100;
-    drv_ops->fd_zero(ctrlport->drv_priv_data, &readfds);
-    drv_ops->fd_set(ctrlport->drv_priv_data, &readfds);
-    drv_ops->select(ctrlport->drv_priv_data, &readfds, NULL, NULL, &tv);
+    drv_ops->fd_setparams(ctrlport->drv_priv_data, &readfd);
+    drv_ops->fd_zero(ctrlport->drv_priv_data);
+    drv_ops->fd_set(ctrlport->drv_priv_data);
+    drv_ops->select(ctrlport->drv_priv_data, &tv);
     /*TODO malloc need use the static memory*/
-    if (drv_ops->fd_isset(ctrlport->drv_priv_data, &readfds)) {
+    if (drv_ops->fd_isset(ctrlport->drv_priv_data)) {
         FTRACE_TIME_STAMP(512);
+        printf("[dungru:%d:%s] \n", __LINE__, __FUNCTION__);
         //  can_data_recv_gather(C->can_info.can_fd, rx_buff, RX_CAN_BUFFER_SIZE);
         pframe = NULL;
         pframe = icf_alloc_mem(sizeof(struct can_frame));

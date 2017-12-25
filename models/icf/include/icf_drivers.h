@@ -7,11 +7,12 @@ struct icf_driver_ops {
     int (*send_data)(void *priv_data);
     int (*send_directly)(void *priv_data);
 
-    int  (*select)(void *priv_data, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-    void (*fd_clr)(void *priv_data, fd_set *set);
-    int  (*fd_isset)(void *priv_data, fd_set *set);
-    void (*fd_set)(void *priv_data, fd_set *set);
-    void (*fd_zero)(void *priv_data, fd_set *set);
+    int  (*select)(void *priv_data, struct timeval *timeout);
+    void (*fd_clr)(void *priv_data);
+    int  (*fd_isset)(void *priv_data);
+    void (*fd_set)(void *priv_data);
+    void (*fd_zero)(void *priv_data);
+    void (*fd_setparams)(void *priv_data, void *readfs);
 
     int (*close_interface)(void *priv_data);
 };

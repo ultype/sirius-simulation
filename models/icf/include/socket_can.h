@@ -10,6 +10,7 @@ struct can_device_info_t {
     int can_fd;
     struct ifreq ifr;
     struct sockaddr_can addr;
+    fd_set *set;
 };
 
 

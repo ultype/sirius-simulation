@@ -81,6 +81,7 @@ void *icf_alloc_mem(size_t size);
 void icf_free_mem(void *ptr);
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C);
 int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C);
+int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx);
 #if 0
 int icf_tx_direct(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size);
 int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size);
