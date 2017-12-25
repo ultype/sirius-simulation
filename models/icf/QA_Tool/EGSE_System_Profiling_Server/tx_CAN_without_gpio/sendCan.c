@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
     int nbytes = 0;
     char ifname[IFNAMSIZ] = "can1";
     struct esps2egse_data_t esps_cmd;
-    struct can_device_info_t can_device;
+    struct can_device_info_t *can_device;
 
     uint8_t *p_esps_cmd;
     uint32_t data_len, crc;
@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
             /* Critical section need to protect??*/
             send_flag = 0;
             FTRACE_TIME_STAMP(510);
-            nbytes = can_data_send_scatter(can_device.can_fd, tx_buffer, esps2egse_full_size);
+            nbytes = can_data_send_scatter(can_device->can_fd, tx_buffer, esps2egse_full_size);
             printf("[%lf:%02d] TX %s [%d/%d] bytes just send. \n", get_curr_time(), tx_loop , ifname , esps2egse_full_size, nbytes);
             /* Critical section END*/
             tx_loop--;
@@ -200,6 +200,6 @@ int main(int argc, char **argv) {
         }
     }
     free(tx_buffer);
-    close(can_device.can_fd);
+    close(can_device->can_fd);
     return 0;
 }

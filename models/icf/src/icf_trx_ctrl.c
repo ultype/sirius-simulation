@@ -6,9 +6,11 @@ static struct icf_ctrl_port g_egse_port[] = {
     {NULL  ,  NONE_DEVICE_TYPE, NULL, NULL}
 };
 
+struct ringbuffer_t empty_ring;
+
 static struct icf_ctrl_queue g_egse_queue[] = {
-    {TVC_DEVICE_QIDX,   ICF_DIRECTION_RX, &g_egse_port[0] , NULL},
-    {EMPTY_DEVICE_QIDX, 0,                NULL,             NULL}
+    {TVC_DEVICE_QIDX,   ICF_DIRECTION_RX, &g_egse_port[0]},
+    {EMPTY_DEVICE_QIDX, 0,                NULL}
 };
 
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C) {
@@ -18,14 +20,14 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C) {
     int idx;
     for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)) - 1; ++idx) {
         ctrlqueue = &g_egse_queue[idx];
-        rb_init(ctrlqueue->data_ring, NUM_OF_CELL);
+        rb_init(&ctrlqueue->data_ring, NUM_OF_CELL);
         C->ctrlqueue[idx] = ctrlqueue;
     }
     for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)) - 1; ++idx) {
         ctrlport = &g_egse_port[idx];
         ctrlport->drv_priv_ops = icf_drivers[idx];
         drv_ops = ctrlport->drv_priv_ops;
-        drv_ops->open_interface(ctrlport->drv_priv_data, ctrlport->ifname);
+        drv_ops->open_interface(&ctrlport->drv_priv_data, ctrlport->ifname);
     }
     return 0;
 }
@@ -37,7 +39,7 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C) {
     int idx;
     for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)) - 1; ++idx) {
         ctrlqueue = &g_egse_queue[idx];
-        rb_deinit(ctrlqueue->data_ring);
+        rb_deinit(&ctrlqueue->data_ring);
         C->ctrlqueue[idx] = NULL;
     }
     for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)) - 1; ++idx) {
@@ -51,22 +53,23 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C) {
 
 int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     struct timeval tv;
+    int ret;
     //  uint8_t rx_buff[RX_CAN_BUFFER_SIZE] = {0};
     struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
     struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
     struct can_frame *pframe = NULL;
-    fd_set readfd;
     tv.tv_sec = 0;
     tv.tv_usec = 100;
-    drv_ops->fd_setparams(ctrlport->drv_priv_data, &readfd);
+
     drv_ops->fd_zero(ctrlport->drv_priv_data);
     drv_ops->fd_set(ctrlport->drv_priv_data);
-    drv_ops->select(ctrlport->drv_priv_data, &tv);
+    ret = drv_ops->select(ctrlport->drv_priv_data, &tv);
+    if (ret < 0)
+        fprintf(stderr, "select error: %d\n", ret);
     /*TODO malloc need use the static memory*/
     if (drv_ops->fd_isset(ctrlport->drv_priv_data)) {
         FTRACE_TIME_STAMP(512);
-        printf("[dungru:%d:%s] \n", __LINE__, __FUNCTION__);
         //  can_data_recv_gather(C->can_info.can_fd, rx_buff, RX_CAN_BUFFER_SIZE);
         pframe = NULL;
         pframe = icf_alloc_mem(sizeof(struct can_frame));
@@ -74,7 +77,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
             fprintf(stderr, "producer frame allocate fail!!\n");
         }
         if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)pframe, sizeof(struct can_frame)) > 0) {
-            rb_push(ctrlqueue->data_ring, pframe);
+            rb_push(&ctrlqueue->data_ring, pframe);
         }
 #if 0  // CONFIG_EGSE_CRC_HEADER_ENABLE
         struct esps2egse_header_t *rx_header;

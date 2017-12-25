@@ -65,7 +65,7 @@ struct icf_ctrl_queue {
     int queue_idx;
     uint8_t direction;
     struct icf_ctrl_port *port; 
-    struct ringbuffer_t *data_ring;
+    struct ringbuffer_t data_ring;
 };
 
 
