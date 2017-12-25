@@ -24,7 +24,7 @@ int create_client(struct ethernet_device_info_t *dev_info) {
 
     err = connect(dev_info->client_fd,(struct sockaddr *)&dev_info->addr,sizeof(dev_info->addr));
     if(err == -1){
-        printf("Connection error");
+        printf("ethernet client: Connection error !!\n");
     }
 
 }

@@ -4,6 +4,10 @@
 int32_t rb_init(struct ringbuffer_t *rb, uint32_t size) {
 
     int idx;
+    rb = calloc(1, sizeof(struct ringbuffer_t));
+    if (rb == NULL) {
+        goto bad;
+    }
     rb->writer_idx = 0;
     rb->reader_idx = 0;
     rb->elem_num = 0;
@@ -14,10 +18,17 @@ int32_t rb_init(struct ringbuffer_t *rb, uint32_t size) {
     }
     pthread_mutex_init(&rb->ring_lock, NULL);
     return 0;
+bad:
+    free(rb);
+    rb = NULL;
 }
 
 void rb_deinit(struct ringbuffer_t *rb) {
     pthread_mutex_destroy(&rb->ring_lock);
+    if (rb) {
+        free(rb);
+        rb = NULL;
+    }
     fprintf(stderr, "[%s] Full count: %d \n", __FUNCTION__, rb->full_cnt);
 }
 

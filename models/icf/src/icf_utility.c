@@ -109,3 +109,11 @@ uint32_t crc_checker(uint32_t rx_crc, const uint8_t *buf, uint32_t size) {
     // printf("crc 0x%x, rx_crc: 0x%x\n", crc, rx_crc);
     return (rx_crc == crc);
 }
+
+int get_arr_num(int arrary_size, int element_size) {
+    if (arrary_size % element_size) {
+        fprintf(stderr, "Arrary Size and Element size are not maching\n");
+        return -1;
+    }
+    return (arrary_size/element_size);
+}

@@ -1,16 +1,13 @@
 /************************************************************************
 PURPOSE: (Received data by CAN bus.)
 *************************************************************************/
-#ifdef __cplusplus
-    extern "C" {
-#endif
 #include "socket_can.h"
-
-int socket_can_init(void *priv_data, const char *ifname) {
+#include "icf_drivers.h"
+int socket_can_init(void *priv_data, char *ifname) {
 
     int  status = 0, setflag = 0;
-    struct can_device_info_t *dev_info = NULL;
-    dev_info = calloc(1, sizeof(can_device_info_t));
+    struct can_device_info_t *dev_info = priv_data;
+    dev_info = calloc(1, sizeof(struct can_device_info_t));
     if (dev_info == NULL)
     {
         fprintf(stderr, "[%s:%d]Memory allocate fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
@@ -44,12 +41,11 @@ int socket_can_init(void *priv_data, const char *ifname) {
         fprintf(stderr, "setsockopt fail. status: %s\n", strerror(errno));
     }
     printf("Using %s to read\n", dev_info->ifr.ifr_name);
-    priv_data = dev_info;
     return 0;
 error:
     if (dev_info) {
         free(dev_info);
-        dev_info = NULL
+        dev_info = NULL;
     }
     priv_data = NULL;
     return -1;
@@ -60,7 +56,7 @@ int socket_can_deinit(void *priv_data) {
     close(dev_info->can_fd);
     if (dev_info) {
         free(dev_info);
-        dev_info = NULL
+        dev_info = NULL;
     }
     printf("Closeing %s \n", dev_info->ifr.ifr_name);
     return 0;
@@ -124,7 +120,7 @@ int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     int rx_nbytes;
     struct can_device_info_t *dev_info = priv_data;
     struct can_frame *pframe = rx_buff;
-    rx_nbytes = read(dev_info->can_fd, pframe, buff_size));
+    rx_nbytes = read(dev_info->can_fd, pframe, buff_size);
     if (rx_nbytes > 0) {
         if (pframe->can_id & CAN_ERR_FLAG) {
             fprintf(stderr, "error frame\n");
@@ -134,19 +130,43 @@ int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     return rx_nbytes;
 }
 
-struct icf_driver_ops icf_driver_socketcan_ops {
-    /** Name of the driver interface */
-    .name = "socket_can";
-    /** One line description of the driver interface */
-    .desc = "CAN Driver";
-    .open_interface = socket_can_init;
-    .recv_data = can_frame_recv;
-    .send_data = NULL;
-    .send_directly = NULL;
-    .close_interface = socket_can_deinit;
+int socketcan_select(void *priv_data, fd_set *readfds, fd_set *writefds,
+                     fd_set *exceptfds, struct timeval *timeout) {
+        int ret = 0;
+        struct can_device_info_t *dev_info = priv_data;
+        ret = select(dev_info->can_fd + 1, readfds, writefds, exceptfds, timeout);
+        return ret;
+}
+
+
+void socketcan_fd_clr(void *priv_data, fd_set *set) {
+    struct can_device_info_t *dev_info = priv_data;
+    FD_CLR(dev_info->can_fd, set);
+}
+int socketcan_fd_isset(void *priv_data, fd_set *set) {
+    struct can_device_info_t *dev_info = priv_data;
+    int ret = 0;
+    ret = FD_ISSET(dev_info->can_fd, set);
+    return ret;
+}
+void socketcan_fd_set(void *priv_data, fd_set *set) {
+    struct can_device_info_t *dev_info = priv_data;
+    FD_SET(dev_info->can_fd, set);
+}
+void socketcan_fd_zero(void *priv_data, fd_set *set) {
+    struct can_device_info_t *dev_info = priv_data;
+    FD_ZERO(set);
+}
+
+struct icf_driver_ops icf_driver_socketcan_ops = {
+    .open_interface = socket_can_init,
+    .recv_data = can_frame_recv,
+    .send_data = NULL,
+    .send_directly = NULL,
+    .select = socketcan_select,
+    .fd_clr = socketcan_fd_clr,
+    .fd_isset = socketcan_fd_isset,
+    .fd_set = socketcan_fd_set,
+    .fd_zero = socketcan_fd_zero,
+    .close_interface = socket_can_deinit,
 };
-
-
-#ifdef __cplusplus
-    }
-#endif

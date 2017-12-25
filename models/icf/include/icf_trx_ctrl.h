@@ -11,6 +11,7 @@ LIBRARY DEPENDENCY:
         (../src/ringbuffer.c)
         (../src/rs422_serialport.c)
         (../src/ethernet.c)
+        (../src/icf_drivers.c)
       )
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
@@ -20,12 +21,10 @@ PROGRAMMERS:
 #include "ringbuffer.h"
 #include "icf_drivers.h"
 
-extern static struct icf_ctrl_port_info g_egse_port_info[];
-
-#define ICF_TOTAL_EGSE_PORT ((sizeof(g_egse_port_info)/sizeof(struct icf_ctrl_port_info)) - 1)
-
+#define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 
 typedef enum _ENUM_ICF_DEVICE_QIDX {
+    EMPTY_DEVICE_QIDX = -1,
     TVC_DEVICE_QIDX = 0,
     RCS_DEVICE_QIDX = 1,
     VALAVE_DEVICE_QIDX = 2,
@@ -51,22 +50,27 @@ typedef enum _ENUM_ICF_DEVICE_TYPE {
 
 typedef enum _ENUM_ICF_DIRECTION {
     ICF_DIRECTION_RX,
-    ICF_DIRECTION_TX,
+    ICF_DIRECTION_TX
 }ENUM_ICF_DIRECTION;
 
 
-struct icf_ctrl_port_info {
-    const char ifname[IFNAMSIZ];
+struct icf_ctrl_port {
+    char ifname[IFNAMSIZ];
     uint8_t dev_type;
-    uint8_t direction;
-    int qidx;
-    struct icf_driver_ops *drv_priv_ops;
     void *drv_priv_data;
-    struct ringbuffer_t data_ring;
+    struct icf_driver_ops *drv_priv_ops;
 };
 
-struct icf_rx_ctrlblk_t {
-    struct icf_ctrl_port_info *port_info[TOTAL_EGSE_PORT];
+struct icf_ctrl_queue {
+    int queue_idx;
+    uint8_t direction;
+    struct icf_ctrl_port *port; 
+    struct ringbuffer_t *data_ring;
+};
+
+
+struct icf_ctrlblk_t {
+    struct icf_ctrl_queue *ctrlqueue[ICF_CTRLBLK_MAXQUEUE_NUMBER];
 };
 
 #ifdef __cplusplus
@@ -75,8 +79,8 @@ extern "C" {
 
 void *icf_alloc_mem(size_t size);
 void icf_free_mem(void *ptr);
-int icf_rx_ctrl_job(struct icf_rx_ctrl_t* C);
-
+int icf_ctrlblk_init(struct icf_ctrlblk_t* C);
+int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C);
 #if 0
 int icf_tx_direct(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size);
 int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size);

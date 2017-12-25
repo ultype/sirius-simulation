@@ -1,19 +1,21 @@
 #ifndef MODELS_ICF_INCLUDE_ICF_DRIVERS_H
 #define MODELS_ICF_INCLUDE_ICF_DRIVERS_H
-
-
+#include "icf_export.h"
 struct icf_driver_ops {
-    /** Name of the driver interface */
-    const char *name;
-    /** One line description of the driver interface */
-    const char *desc;
-    int (*open_interface)(void *priv_data, const char *ifname);
-    int (*recv_data)(void *priv_data);
+    int (*open_interface)(void *priv_data, char *ifname);
+    int (*recv_data)(void *priv_data, uint8_t *rx_buff, uint32_t buff_size);
     int (*send_data)(void *priv_data);
     int (*send_directly)(void *priv_data);
+
+    int  (*select)(void *priv_data, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+    void (*fd_clr)(void *priv_data, fd_set *set);
+    int  (*fd_isset)(void *priv_data, fd_set *set);
+    void (*fd_set)(void *priv_data, fd_set *set);
+    void (*fd_zero)(void *priv_data, fd_set *set);
+
     int (*close_interface)(void *priv_data);
 };
 
-extern const struct icf_driver_ops *const icf_drivers[];
+extern struct icf_driver_ops *icf_drivers[];
 
 #endif // MODELS_ICF_INCLUDE_ICF_DRIVERS_H

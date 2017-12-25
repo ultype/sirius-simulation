@@ -18,7 +18,7 @@
 #define cpu2le32(x) SWAP32((x))
 
 #define errExit(msg)    do { perror(msg); \
-                             exit(EXIT_FAILURE);} while (0)
+                             while(1);} while (0)
 #define DEBUG_ENABLE 0
 #define debug_print(...) do { if (DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
@@ -73,6 +73,7 @@ void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen);
 uint32_t invert_crc32(uint32_t crc);
 uint32_t crc_checker(uint32_t rx_crc, const uint8_t *buf, uint32_t size);
 double get_curr_time(void);
+int get_arr_num(int arrary_size, int element_size);
 #ifdef __cplusplus
 }
 #endif
