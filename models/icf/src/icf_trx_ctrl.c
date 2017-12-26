@@ -1,32 +1,95 @@
 #include "icf_trx_ctrl.h"
 
+static const struct icf_mapping g_icf_maptbl[] = {
+    {TVC_SW_QIDX,       HW_PORT0, ICF_DRIVERS_ID0},
+    {IMU01_SW_QIDX,     HW_PORT1, ICF_DRIVERS_ID1},
+    {RATETBL_X_SW_QIDX, HW_PORT2, ICF_DRIVERS_ID1},
+    {RATETBL_Y_SW_QIDX, HW_PORT3, ICF_DRIVERS_ID1},
+    {RATETBL_Z_SW_QIDX, HW_PORT4, ICF_DRIVERS_ID1},
+    {IMU02_SW_QIDX,     HW_PORT5, ICF_DRIVERS_ID1},
+    {GPSR01_SW_QIDX,    HW_PORT6, ICF_DRIVERS_ID1},
+    {GPSR02_SW_QIDX,    HW_PORT7, ICF_DRIVERS_ID1}
+};
+
 
 static struct icf_ctrl_port g_egse_port[] = {
-    {"can0",  CAN_DEVICE_TYPE,  NULL, NULL},
-    {NULL  ,  NONE_DEVICE_TYPE, NULL, NULL}
+    {HW_PORT0, "can0",         CAN_DEVICE_TYPE,    NULL, NULL},
+    {HW_PORT1, "/dev/ttyAP0",  RS422_DEVICE_TYPE,  NULL, NULL},
+    {HW_PORT2, "/dev/ttyAP1",  RS422_DEVICE_TYPE,  NULL, NULL},
+    {HW_PORT3, "/dev/ttyAP2",  RS422_DEVICE_TYPE,  NULL, NULL},
+    {HW_PORT4, "/dev/ttyAP3",  RS422_DEVICE_TYPE,  NULL, NULL},
+    {HW_PORT5, "/dev/ttyAP4",  RS422_DEVICE_TYPE,  NULL, NULL},
+    {HW_PORT6, "/dev/ttyAP5",  RS422_DEVICE_TYPE,  NULL, NULL},
+    {HW_PORT7, "/dev/ttyAP6",  RS422_DEVICE_TYPE,  NULL, NULL}
 };
-
-struct ringbuffer_t empty_ring;
 
 static struct icf_ctrl_queue g_egse_queue[] = {
-    {TVC_DEVICE_QIDX,   ICF_DIRECTION_RX, &g_egse_port[0]},
-    {EMPTY_DEVICE_QIDX, 0,                NULL}
+    {TVC_SW_QIDX,         ICF_DIRECTION_RX, &g_egse_port[HW_PORT0]},
+    {IMU01_SW_QIDX,       ICF_DIRECTION_TX, &g_egse_port[HW_PORT1]},
+    {RATETBL_X_SW_QIDX,   ICF_DIRECTION_TX, &g_egse_port[HW_PORT2]},
+    {RATETBL_Y_SW_QIDX,   ICF_DIRECTION_TX, &g_egse_port[HW_PORT3]},
+    {RATETBL_Z_SW_QIDX,   ICF_DIRECTION_TX, &g_egse_port[HW_PORT4]},
+    {IMU02_SW_QIDX,       ICF_DIRECTION_TX, &g_egse_port[HW_PORT5]},
+    {GPSR01_SW_QIDX,      ICF_DIRECTION_TX, &g_egse_port[HW_PORT6]},
+    {GPSR02_SW_QIDX,      ICF_DIRECTION_TX, &g_egse_port[HW_PORT7]}
 };
+
+int icf_qidx_to_drivers_id(int qidx) {
+    int idx = 0;
+    while(idx < get_arr_num(sizeof(g_icf_maptbl), sizeof(struct icf_mapping))) {
+        if (g_icf_maptbl[idx].sw_queue == qidx)
+            break;
+        idx++;
+    }
+    return g_icf_maptbl[idx].driver_id;
+}
+
+int icf_pidx_to_drivers_id(int pidx) {
+    int idx = 0;
+    while(idx < get_arr_num(sizeof(g_icf_maptbl), sizeof(struct icf_mapping))) {
+        if (g_icf_maptbl[idx].hw_port == pidx)
+            break;
+        idx++;
+    }
+    return g_icf_maptbl[idx].driver_id;
+}
+
+int icf_pidx_to_qidx(int pidx) {
+    int idx = 0;
+    while(idx < get_arr_num(sizeof(g_icf_maptbl), sizeof(struct icf_mapping))) {
+        if (g_icf_maptbl[idx].hw_port == pidx)
+            break;
+        idx++;
+    }
+    return g_icf_maptbl[idx].sw_queue;
+}
+
+int icf_qidx_to_pidx (int qidx) {
+    int idx = 0;
+    while(idx < get_arr_num(sizeof(g_icf_maptbl), sizeof(struct icf_mapping))) {
+        if (g_icf_maptbl[idx].sw_queue == qidx)
+            break;
+        idx++;
+    }
+    return g_icf_maptbl[idx].hw_port;
+}
 
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C) {
     struct icf_ctrl_queue *ctrlqueue;
     struct icf_ctrl_port *ctrlport;
     struct icf_driver_ops *drv_ops;
     int idx;
-    for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)) - 1; ++idx) {
+    for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)); idx++) {
         ctrlqueue = &g_egse_queue[idx];
         rb_init(&ctrlqueue->data_ring, NUM_OF_CELL);
         C->ctrlqueue[idx] = ctrlqueue;
     }
-    for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)) - 1; ++idx) {
+    for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)); idx++) {
         ctrlport = &g_egse_port[idx];
-        ctrlport->drv_priv_ops = icf_drivers[idx];
+        ctrlport->drv_priv_ops = icf_drivers[icf_pidx_to_drivers_id(idx)];
         drv_ops = ctrlport->drv_priv_ops;
+        if (idx == 5 || idx == 6)
+            continue;
         drv_ops->open_interface(&ctrlport->drv_priv_data, ctrlport->ifname);
     }
     return 0;
@@ -37,26 +100,27 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C) {
     struct icf_ctrl_port *ctrlport;
     struct icf_driver_ops *drv_ops;
     int idx;
-    for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)) - 1; ++idx) {
+    for (idx = 0; idx < get_arr_num(sizeof(g_egse_queue), sizeof(struct icf_ctrl_queue)); idx++) {
         ctrlqueue = &g_egse_queue[idx];
         rb_deinit(&ctrlqueue->data_ring);
         C->ctrlqueue[idx] = NULL;
     }
-    for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)) - 1; ++idx) {
+    for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)); idx++) {
         ctrlport = &g_egse_port[idx];
         drv_ops = ctrlport->drv_priv_ops;
-        drv_ops->close_interface(ctrlport->drv_priv_data);
+        if (idx == 5 || idx == 6)
+            continue;
+        drv_ops->close_interface(&ctrlport->drv_priv_data);
     }
     return 0;
 }
 
 
-int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
+int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
     struct timeval tv;
     int ret;
-    //  uint8_t rx_buff[RX_CAN_BUFFER_SIZE] = {0};
-    struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
-    struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
+    struct icf_ctrl_queue *ctrlqueue;
+    struct icf_ctrl_port *ctrlport = &g_egse_port[pidx];
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
     struct can_frame *pframe = NULL;
     tv.tv_sec = 0;
@@ -77,6 +141,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
             fprintf(stderr, "producer frame allocate fail!!\n");
         }
         if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)pframe, sizeof(struct can_frame)) > 0) {
+            ctrlqueue = C->ctrlqueue[TVC_SW_QIDX];
             rb_push(&ctrlqueue->data_ring, pframe);
         }
 #if 0  // CONFIG_EGSE_CRC_HEADER_ENABLE
@@ -93,43 +158,50 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     }
     return 0;
 }
-#if 0
-#if 1
-int icf_tx_direct(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size) {
+
+
+int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size) {
     
     uint8_t *tx_buffer = NULL;
     uint32_t frame_full_size;
     uint32_t offset = 0;
+    struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
+    struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
 
     FTRACE_TIME_STAMP(511);
-    frame_full_size = size + (CONFIG_EGSE_CRC_HEADER_ENABLE ? RS422_HEADER_SIZE : 0);
+    frame_full_size = size + (CONFIG_EGSE_CRC_HEADER_ENABLE ? 
+                              (drv_ops->get_header_size(ctrlport->drv_priv_data)) : 0);
     tx_buffer = icf_alloc_mem(frame_full_size);
 #if CONFIG_EGSE_CRC_HEADER_ENABLE
-    rs422_frame_header_set(&C->rs422_info[qidx].frame, (uint8_t *) payload, size);
-    offset += rs422_frame_header_copy(tx_buffer, &C->rs422_info[qidx].frame);
+        drv_ops->header_set(ctrlport->drv_priv_data, (uint8_t *) payload, size);
+        offset += drv_ops->header_copy(ctrlport->drv_priv_data, tx_buffer);
 #endif /* CONFIG_EGSE_CRC_HEADER_ENABLE */
-    rs422_frame_payload_copy(tx_buffer + offset, (uint8_t *) payload, size);
-    rs422_data_send_scatter(C->rs422_info[qidx].rs422_fd, tx_buffer, frame_full_size);
+    memcpy(tx_buffer + offset, (uint8_t *) payload, size);
+    drv_ops->send_data(ctrlport->drv_priv_data, tx_buffer, frame_full_size);
     debug_hex_dump("icf_tx_direct", tx_buffer, frame_full_size);
     icf_free_mem(tx_buffer);
     return 0;
 }
 
-int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void *payload, uint32_t size) {
+int icf_tx_send2ring(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size) {
     uint8_t *tx_buffer = NULL;
     struct ringbuffer_t *whichring = NULL;
     struct ringbuffer_cell_t *txcell;
     uint32_t frame_full_size;
     uint32_t offset = 0;
+    struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
+    struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
+    struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
 
-    whichring = &C->icf_tx_ring[qidx];
-    frame_full_size = size + (CONFIG_EGSE_CRC_HEADER_ENABLE ? RS422_HEADER_SIZE : 0);
+    whichring = &ctrlqueue->data_ring;
+    frame_full_size = size + (CONFIG_EGSE_CRC_HEADER_ENABLE ? 
+                            (drv_ops->get_header_size(ctrlport->drv_priv_data)) : 0);
     tx_buffer = icf_alloc_mem(frame_full_size);
 #if CONFIG_EGSE_CRC_HEADER_ENABLE
-    rs422_frame_header_set(&C->rs422_info[qidx].frame, (uint8_t *) payload, size);
-    offset += rs422_frame_header_copy(tx_buffer, &C->rs422_info[qidx].frame);
+        drv_ops->header_set(ctrlport->drv_priv_data, (uint8_t *) payload, size);
+        offset += drv_ops->header_copy(ctrlport->drv_priv_data, tx_buffer);
 #endif /* CONFIG_EGSE_CRC_HEADER_ENABLE */
-    rs422_frame_payload_copy(tx_buffer + offset, (uint8_t *) payload, size);
+    memcpy(tx_buffer + offset, (uint8_t *) payload, size);
 
     if(whichring) {
         txcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
@@ -141,13 +213,16 @@ int icf_tx_send2ring(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx, void 
     return 0;
 }
 
-int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx) {
+int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     struct ringbuffer_cell_t *txcell = NULL;
     struct ringbuffer_t *whichring = NULL;
-    whichring = &C->icf_tx_ring[qidx];
+    struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
+    struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
+    struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
+    whichring = &ctrlqueue->data_ring;
     txcell = (uint8_t *)rb_pop(whichring);
     if(txcell) {
-        rs422_data_send_scatter(C->rs422_info[qidx].rs422_fd, (uint8_t *)txcell->l2frame, txcell->frame_full_size);
+        drv_ops->send_data(ctrlport->drv_priv_data, txcell->l2frame, txcell->frame_full_size);
         debug_hex_dump("icf_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);
         icf_free_mem(txcell->l2frame);
         icf_free_mem(txcell);
@@ -155,7 +230,7 @@ int icf_tx_ctrl_job(struct icf_tx_ctrl_t* C, ENUM_HW_RS422_TX_QUE_T qidx) {
 
     return 0;
 }
-
+#if 0
 int icf_eth_tx_direct(struct icf_tx_ctrl_t* C, void *payload, uint32_t size) {
     
     uint8_t *tx_buffer = NULL;
@@ -209,7 +284,8 @@ int icf_eth_tx_ctrl_job(struct icf_tx_ctrl_t* C) {
     return 0;
 }
 #endif
-#endif
+
+
 void *icf_alloc_mem(size_t size) {
     return calloc(1,size);
 }

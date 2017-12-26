@@ -67,8 +67,8 @@ error:
     return -1;
 }
 
-int socket_can_deinit(void *priv_data) {
-    struct can_device_info_t *dev_info = priv_data;
+int socket_can_deinit(void **priv_data) {
+    struct can_device_info_t *dev_info = *priv_data;
     close(dev_info->can_fd);
     printf("Closing %s \n", dev_info->ifr.ifr_name);
     if (dev_info->set) {
@@ -79,6 +79,7 @@ int socket_can_deinit(void *priv_data) {
         free(dev_info);
         dev_info = NULL;
     }
+    *priv_data = NULL;
     return 0;
 }
 
@@ -181,7 +182,6 @@ struct icf_driver_ops icf_driver_socketcan_ops = {
     .open_interface = socket_can_init,
     .recv_data = can_frame_recv,
     .send_data = NULL,
-    .send_directly = NULL,
     .select = socketcan_select,
     .fd_clr = socketcan_fd_clr,
     .fd_isset = socketcan_fd_isset,

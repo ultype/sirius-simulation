@@ -37,21 +37,20 @@ void *gpio_ttl_thread(void *arg)
 #endif
 int main(int argc, char *argv[])
 {
-	char *portname = "/dev/ttyAP0";
+	char portname[IFNAMSIZ] = "/dev/ttyAP0";
 	
 	uint32_t pkt_cnt = 0;
 	uint32_t error_cnt = 0;
-	struct rs422_device_info_t dev_info;
+	struct rs422_device_info_t *dev_info;
 	uint8_t rx_buf[1024] = {0};
     uint8_t *rs422payload = rx_buf;
 
 	
 	if (argc != 1) {
 		printf("%s\n", argv[1]);
-		portname = argv[1];
+        memcpy(portname, argv[1], IFNAMSIZ);
 	}
-	rs422_devinfo_init(&dev_info, portname, 0);
-	rs422_serialport_init(&dev_info);
+	rs422_serialport_init(&dev_info, portname);
 
 #if (CFG_GPIO_ENABLE == 1)
 	int ret;
@@ -70,28 +69,28 @@ int main(int argc, char *argv[])
 		struct timespec ts;
 		memset(rs422payload, 0, 1024);
 		
-		while (buf_offset < RS422_HEADER_SIZE) {
-			rdlen = read(dev_info.rs422_fd, rs422payload + buf_offset, RS422_HEADER_SIZE - buf_offset);
+		while (buf_offset < dev_info->header_size) {
+			rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->header_size - buf_offset);
 			buf_offset += rdlen;
 			if(i++ == 10) printf("[%s] pkt_cnt: %d\n" ,portname ,pkt_cnt);
 		}
 
-		if (buf_offset == RS422_HEADER_SIZE) {
-			memcpy(&dev_info.frame, rs422payload, RS422_HEADER_SIZE);
+		if (buf_offset == dev_info->header_size) {
+			memcpy(&dev_info->frame, rs422payload, dev_info->header_size);
 			clock_gettime(CLOCK_MONOTONIC, &ts);
 			pkt_cnt++;
-			while (buf_offset < dev_info.frame.payload_len + RS422_HEADER_SIZE) {
-				rdlen = read(dev_info.rs422_fd, rs422payload + buf_offset, dev_info.frame.payload_len + RS422_HEADER_SIZE - buf_offset);
+			while (buf_offset < dev_info->frame.payload_len + dev_info->header_size) {
+				rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->frame.payload_len + dev_info->header_size - buf_offset);
 				buf_offset += rdlen;
 			}
-			//hex_dump("RX data", (uint8_t *)rs422payload, p_data_info->payload_len + RS422_HEADER_SIZE);
+			//hex_dump("RX data", (uint8_t *)rs422payload, p_data_info->payload_len + dev_info->header_size);
 #if CONFIG_ESPS_HEADER_ENABLE
-			if(crc_checker(dev_info.frame.crc, (rs422payload + RS422_HEADER_SIZE),dev_info.frame.payload_len) == 0){
+			if(crc_checker(dev_info->frame.crc, (rs422payload + dev_info->header_size),dev_info->frame.payload_len) == 0){
 				error_cnt++;
-				printf("[%lf: error cnt: %d] SEQ: %d , %s CRC ERROR !!!!\n", get_curr_time(), error_cnt, dev_info.frame.seq_no,portname);
+				printf("[%lf: error cnt: %d] SEQ: %d , %s CRC ERROR !!!!\n", get_curr_time(), error_cnt, dev_info->frame.seq_no,portname);
 				exit(EXIT_FAILURE);
 			} else {
-				fprintf(stderr, "[%lf:%d] %s CRC PASS !!!!\n", get_curr_time(), dev_info.frame.seq_no, portname);
+				fprintf(stderr, "[%lf:%d] %s CRC PASS !!!!\n", get_curr_time(), dev_info->frame.seq_no, portname);
 			}
 #endif /* CONFIG_ESPS_HEADER_ENABLE */
 		} else if (rdlen < 0) {
@@ -102,6 +101,6 @@ int main(int argc, char *argv[])
 #if (CFG_GPIO_ENABLE == 1)
 	pthread_join(gpio_thread_id, NULL);
 #endif
-	close(dev_info.rs422_fd);
+	close(dev_info->rs422_fd);
 	return 0;
 }

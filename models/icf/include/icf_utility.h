@@ -4,9 +4,14 @@
 
 #define CONFIG_ESPS_HEADER_ENABLE 1
 #define CONFIG_EGSE_CRC_HEADER_ENABLE 1
+#define DEBUG_ENABLE 1
 /* Must can devide by 8*/
 #define BILLION             1000000000L
 #define FTRACE_TIME_STAMP(id) do { syscall(id);} while (0)
+
+#define BIT(n) ((0x1U) << (n))
+#define BITS(m, n) (~(BIT(m) - 1) & ((BIT(n) - 1) | BIT(n)))
+
 
 #define SWAP32(x) \
     ((uint32_t) (\
@@ -19,7 +24,7 @@
 
 #define errExit(msg)    do { perror(msg); \
                              while(1);} while (0)
-#define DEBUG_ENABLE 1
+
 #define debug_print(...) do { if (DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
 
