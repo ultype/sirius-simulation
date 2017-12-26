@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
         }
     }
     p_esps_cmd = (uint8_t *)&esps_cmd;
-    socket_can_init(&can_device, ifname);
+    socket_can_init(&can_device, ifname, -1);
 
     esps2egse_cmd_init((struct esps2egse_data_t *)p_esps_cmd);
     data_len = sizeof(struct esps2egse_data_t);

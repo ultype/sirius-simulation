@@ -3,7 +3,7 @@ PURPOSE: (Received data by CAN bus.)
 *************************************************************************/
 #include "socket_can.h"
 #include "icf_drivers.h"
-int socket_can_init(void **priv_data, char *ifname) {
+int socket_can_init(void **priv_data, char *ifname, int netport) {
 
     int  status = 0, setflag = 0;
     struct can_device_info_t *dev_info = NULL;

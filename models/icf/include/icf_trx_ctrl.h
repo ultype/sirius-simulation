@@ -33,8 +33,8 @@ typedef enum _ENUM_ICF_SW_QUEUE {
     IMU02_SW_QIDX = 5,
     GPSR01_SW_QIDX = 6,
     GPSR02_SW_QIDX = 7,
-    GPSRF_EMULATOR_SW_QIDX = 8,
-    FLIGHT_COMPUTER_SW_QIDX = 9,
+    FLIGHT_COMPUTER_SW_QIDX = 8,
+    GPSRF_EMULATOR_SW_QIDX = 9,
     NUM_OF_SW_QUE
 }ENUM_ICF_SW_QUEUE;
 
@@ -50,9 +50,13 @@ typedef enum _ENUM_ICF_HW_PORT {
     HW_PORT7 = 7,
     HW_PORT8 = 8,
     HW_PORT9 = 9,
-    NUM_OF_DEVICE_PORT
+    NUM_OF_HW_PORT
 }ENUM_ICF_HW_PORT;
 
+typedef enum _ENUM_ICF_NETPORT {
+    EMPTY_NETPORT = -1,
+    NUM_OF_NETPORT
+}ENUM_ICF_NETPORT;
 
 typedef enum _ENUM_ICF_DEVICE_TYPE {
     NONE_DEVICE_TYPE = 0x0,
@@ -84,6 +88,7 @@ struct icf_mapping {
 struct icf_ctrl_port {
     int hw_port;
     char ifname[IFNAMSIZ];
+    int netport;
     uint8_t dev_type;
     void *drv_priv_data;
     struct icf_driver_ops *drv_priv_ops;

@@ -17,7 +17,7 @@ struct can_device_info_t {
 #ifdef __cplusplus
 extern "C" {
 #endif
-int socket_can_init(void **priv_data, char *ifname);
+int socket_can_init(void **priv_data, char *ifname, int netport);
 int can_data_recv_gather(void *priv_data, uint8_t *rx_buff, uint32_t buff_size);
 int can_data_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size);
 int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size);

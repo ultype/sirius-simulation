@@ -5,7 +5,7 @@ PURPOSE: (Send data by RS422 serial port.)
 
 
 
-int rs422_serialport_init(void **priv_data, char *ifname) {
+int rs422_serialport_init(void **priv_data, char *ifname, int netport) {
     struct rs422_device_info_t *dev_info = NULL;
     int  status = 0;
     dev_info = malloc(sizeof(struct rs422_device_info_t));

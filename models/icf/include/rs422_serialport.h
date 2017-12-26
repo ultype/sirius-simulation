@@ -56,7 +56,7 @@ struct rs422_device_name_t {
 #ifdef __cplusplus
 extern "C" {
 #endif
-int rs422_serialport_init(void **priv_data, char *ifname);
+int rs422_serialport_init(void **priv_data, char *ifname, int netport);
 int rs422_serialport_deinit(void **priv_data);
 int open_port(char *portname);
 int set_interface_attribs(int fd, int speed, int parity);

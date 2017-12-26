@@ -8,7 +8,7 @@
 #include "icf_utility.h"
 #define BUFSIZE 1024
 
-#if 1
+
 
 
 #define SERVER_PORT  8700
@@ -279,7 +279,6 @@ int main (int argc, char *argv[]) {
             close(i);
     }
 }
-#endif
 
 #if 0
 int main(int argc , char *argv[])
