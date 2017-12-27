@@ -4,7 +4,7 @@
 
 #define CONFIG_ESPS_HEADER_ENABLE 1
 #define CONFIG_EGSE_CRC_HEADER_ENABLE 1
-#define DEBUG_ENABLE 1
+#define ICF_DEBUG_ENABLE 0
 /* Must can devide by 8*/
 #define BILLION             1000000000L
 #define FTRACE_TIME_STAMP(id) do { syscall(id);} while (0)
@@ -23,9 +23,9 @@
 #define cpu2le32(x) SWAP32((x))
 
 #define errExit(msg)    do { perror(msg); \
-                             while(1);} while (0)
+                             while (1) {}} while (0)
 
-#define debug_print(...) do { if (DEBUG_ENABLE) \
+#define debug_print(...) do { if (ICF_DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
 
 /**

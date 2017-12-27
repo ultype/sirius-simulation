@@ -11,8 +11,7 @@ double get_curr_time(void) {
 }
 
 void debug_hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
-
-#if DEBUG_ENABLE
+#if ICF_DEBUG_ENABLE
     uint8_t *pt;
     uint32_t x;
     pt = pSrcBufVA;

@@ -19,7 +19,7 @@ PROGRAMMERS:
 #define USER_BAUD_RATE (B921600)
 #define RS422_HEADER_SIZE sizeof(struct rs422_frame_header_t)
 
-#define SERIAL_PORT_ENABLE_BITMAP (0x1)// (0x7F)
+#define SERIAL_PORT_ENABLE_BITMAP (0x1)  // (0x7F)
 #define SERIAL_PORT_IS_ENABLE(qidx) ((SERIAL_PORT_ENABLE_BITMAP >> qidx) & 0x1)
 
 typedef enum _ENUM_HW_RS422_TX_QUE_T {

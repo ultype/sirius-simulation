@@ -4,7 +4,6 @@ PURPOSE: (Received data by CAN bus.)
 #include "socket_can.h"
 #include "icf_drivers.h"
 int socket_can_init(void **priv_data, char *ifname, int netport) {
-
     int  status = 0, setflag = 0;
     struct can_device_info_t *dev_info = NULL;
     dev_info = malloc(sizeof(struct can_device_info_t));
@@ -85,7 +84,6 @@ int socket_can_deinit(void **priv_data) {
 
 
 int can_data_recv_gather(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
-    
     int rx_nbytes;
     struct can_frame frame;
     uint32_t buf_offset = 0;
@@ -102,7 +100,7 @@ int can_data_recv_gather(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) 
             rx_count--;
             if (frame.can_id & CAN_ERR_FLAG) {
                 fprintf(stderr, "error frame\n");
-                exit(EXIT_FAILURE);
+                errExit(__FUNCTION__);
             }
             for (idx = 0; idx < CAN_MAX_DLEN; ++idx) {
                 rx_buff[buf_offset] = frame.data[idx];
@@ -126,7 +124,7 @@ int can_data_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     if (rx_nbytes > 0) {
         if (frame.can_id & CAN_ERR_FLAG) {
             fprintf(stderr, "error frame\n");
-            exit(EXIT_FAILURE);
+            errExit(__FUNCTION__);
         }
         for (idx = 0; idx < CAN_MAX_DLEN; ++idx) {
             rx_buff[buf_offset] = frame.data[idx];
@@ -145,17 +143,17 @@ int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     if (rx_nbytes > 0) {
         if (pframe->can_id & CAN_ERR_FLAG) {
             fprintf(stderr, "error frame\n");
-            exit(EXIT_FAILURE);
+            errExit(__FUNCTION__);
         }
     }
     return rx_nbytes;
 }
 
 int socketcan_select(void *priv_data, struct timeval *timeout) {
-        int ret = 0;
-        struct can_device_info_t *dev_info = priv_data;
-        ret = select(dev_info->can_fd + 1, dev_info->set, NULL, NULL, timeout);
-        return ret;
+    int ret = 0;
+    struct can_device_info_t *dev_info = priv_data;
+    ret = select(dev_info->can_fd + 1, dev_info->set, NULL, NULL, timeout);
+    return ret;
 }
 
 

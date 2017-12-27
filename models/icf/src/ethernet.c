@@ -25,7 +25,6 @@ error:
 }
 
 int ethernet_deinit(void **priv_data) {
-    
     struct ethernet_device_info_t *dev_info = *priv_data;
     close(dev_info->client_fd);
     printf("Closing %s \n", dev_info->ifr.ifr_name);
@@ -38,9 +37,8 @@ int ethernet_deinit(void **priv_data) {
 }
 
 int create_client(struct ethernet_device_info_t *dev_info, char *ifname, int net_port) {
-
-   int err;
-   if ((dev_info->client_fd = socket(AF_INET , SOCK_STREAM , 0)) < 0) {
+    int err;
+    if ((dev_info->client_fd = socket(AF_INET , SOCK_STREAM , 0)) < 0) {
         errExit("Error while opening socket");
         return -1;
     }
@@ -48,9 +46,10 @@ int create_client(struct ethernet_device_info_t *dev_info, char *ifname, int net
     dev_info->addr.sin_addr.s_addr = inet_addr(ifname);
     dev_info->addr.sin_port = htons(net_port);
 
-    err = connect(dev_info->client_fd,(struct sockaddr *)&dev_info->addr,sizeof(dev_info->addr));
-    if(err == -1){
+    err = connect(dev_info->client_fd, (struct sockaddr *)&dev_info->addr, sizeof(dev_info->addr));
+    if (err == -1) {
         fprintf(stderr, "create_client: Connection error !!\n");
+        errExit(__FUNCTION__);
     } else {
         fprintf(stderr, "create_client: Connection %s:%d\n", ifname, net_port);
     }
@@ -58,33 +57,30 @@ int create_client(struct ethernet_device_info_t *dev_info, char *ifname, int net
 }
 
 int create_server(struct ethernet_device_info_t *dev_info) {
-
 }
 
 int ethernet_data_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
-    
     uint32_t offset = 0;
     int32_t rdlen = 0;
     struct ethernet_device_info_t *dev_info = priv_data;
     do {
-            rdlen = recv(dev_info->client_fd, rx_buff + offset, buff_size - offset, 0);
-            offset += rdlen;
+        rdlen = recv(dev_info->client_fd, rx_buff + offset, buff_size - offset, 0);
+        offset += rdlen;
     } while (offset < buff_size && rdlen > 0);
     return offset;
 }
 
 int ethernet_data_send(void *priv_data, uint8_t *payload, uint32_t frame_len) {
-    
     uint32_t offset = 0;
     int32_t wdlen = 0;
     struct ethernet_device_info_t *dev_info = priv_data;
     while (offset < frame_len) {
-            wdlen = send(dev_info->client_fd, payload + offset, frame_len - offset, 0);
-            if (wdlen < 0) {
-                fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
-                break;
-            }
-            offset += wdlen;
+        wdlen = send(dev_info->client_fd, payload + offset, frame_len - offset, 0);
+        if (wdlen < 0) {
+            fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
+            break;
+        }
+        offset += wdlen;
     }
     return offset;
 }
