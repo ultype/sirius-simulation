@@ -14,15 +14,15 @@ static const struct icf_mapping g_icf_maptbl[] = {
 
 
 static struct icf_ctrl_port g_egse_port[] = {
-    {HW_PORT0, "can0",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT1, "/dev/ttyAP0", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT2, "/dev/ttyAP1", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT3, "/dev/ttyAP2", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT4, "/dev/ttyAP3", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {HW_PORT8, "127.0.0.1",   8700,          ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {1, HW_PORT0, "can0",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT1, "/dev/ttyAP0", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT2, "/dev/ttyAP1", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT3, "/dev/ttyAP2", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT4, "/dev/ttyAP3", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {0, HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {0, HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT8, "127.0.0.1",   8700,          ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
@@ -111,7 +111,7 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C) {
     for (idx = 0; idx < get_arr_num(sizeof(g_egse_port), sizeof(struct icf_ctrl_port)); idx++) {
         ctrlport = &g_egse_port[idx];
         drv_ops = ctrlport->drv_priv_ops;
-        if (idx == 5 || idx == 6)
+        if (ctrlport->enable == 0)
             continue;
         drv_ops->close_interface(&ctrlport->drv_priv_data);
     }

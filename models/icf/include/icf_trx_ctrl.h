@@ -86,6 +86,7 @@ struct icf_mapping {
 
 
 struct icf_ctrl_port {
+    int enable;
     int hw_port;
     char ifname[IFNAMSIZ];
     int netport;
