@@ -121,13 +121,8 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx);
 int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
 int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
 int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx);
+void icf_heartbeat(void);
 
-
-#if 0
-int icf_eth_tx_direct(struct icf_tx_ctrl_t* C, void *payload, uint32_t size);
-int icf_eth_tx_enqueue2ring(struct icf_tx_ctrl_t* C, void *payload, uint32_t size);
-int icf_eth_tx_ctrl_job(struct icf_tx_ctrl_t* C);
-#endif
 #ifdef __cplusplus
 }
 #endif

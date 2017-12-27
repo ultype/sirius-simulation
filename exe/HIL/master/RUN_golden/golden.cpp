@@ -79,7 +79,7 @@ extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
-    // realtime();
+    realtime();
 
 
     master_startup();
