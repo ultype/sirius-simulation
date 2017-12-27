@@ -151,7 +151,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
         if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)pframe, sizeof(struct can_frame)) > 0) {
             /* TODO: Queue selection Algorithm.*/
             ctrlqueue = C->ctrlqueue[TVC_SW_QIDX];
-            FTRACE_TIME_STAMP(510 + ctrlqueue->queue_idx);
+            FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
             rb_push(&ctrlqueue->data_ring, pframe);
         }
         debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
@@ -222,7 +222,7 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
     whichring = &ctrlqueue->data_ring;
     txcell = (uint8_t *)rb_pop(whichring);
-    FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 510);
+    FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
     if (txcell) {
         drv_ops->send_data(ctrlport->drv_priv_data, txcell->l2frame, txcell->frame_full_size);
         debug_hex_dump("icf_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);
