@@ -49,7 +49,6 @@ int create_client(struct ethernet_device_info_t *dev_info, char *ifname, int net
     err = connect(dev_info->client_fd, (struct sockaddr *)&dev_info->addr, sizeof(dev_info->addr));
     if (err == -1) {
         fprintf(stderr, "create_client: Connection error !!\n");
-        errExit(__FUNCTION__);
     } else {
         fprintf(stderr, "create_client: Connection %s:%d\n", ifname, net_port);
     }
@@ -77,7 +76,7 @@ int ethernet_data_send(void *priv_data, uint8_t *payload, uint32_t frame_len) {
     while (offset < frame_len) {
         wdlen = send(dev_info->client_fd, payload + offset, frame_len - offset, 0);
         if (wdlen < 0) {
-            fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
+            //  fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
             break;
         }
         offset += wdlen;

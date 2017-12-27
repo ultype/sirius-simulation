@@ -118,6 +118,12 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C) {
     return 0;
 }
 
+int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void **payload, uint32_t size) {
+    struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
+    *payload = rb_pop(&ctrlqueue->data_ring);
+    debug_hex_dump("icf_rx_dequeue", payload, size);
+    return 0;
+}
 
 int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
     struct timeval tv;
@@ -144,6 +150,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
             fprintf(stderr, "producer frame allocate fail!!\n");
         }
         if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)pframe, sizeof(struct can_frame)) > 0) {
+            /* TODO: Queue selection Algorithm.*/
             ctrlqueue = C->ctrlqueue[TVC_SW_QIDX];
             rb_push(&ctrlqueue->data_ring, pframe);
         }
@@ -177,7 +184,7 @@ int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t siz
     return 0;
 }
 
-int icf_tx_send2ring(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size) {
+int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size) {
     uint8_t *tx_buffer = NULL;
     struct ringbuffer_t *whichring = NULL;
     struct ringbuffer_cell_t *txcell;
