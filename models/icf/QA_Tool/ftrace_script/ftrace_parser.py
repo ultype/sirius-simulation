@@ -32,21 +32,21 @@ file_out.close()
 with open("output.txt", "r") as file_out:
     data = file_out.readlines()
 
-# GNU PLOT Tittle 
-gtitle= "EGSE ......"
-xlabel = "Timeframe (200 HZ)"
-ylabel = "Schedule Job"
-
+#### GNU PLOT Setting: User defined #### 
+search_string = "sys_enter: NR 502"
+gtitle= "[HIL] EGSE Rateble_X (Simulation Time: 200 secs)"
+xlabel = "Timeframe (1000 HZ)"
+ylabel = "Schedule Period (ms)"
+photo_name = gtitle +".png"
+################################
 trip_time_ms_list = []
 abnormal_cnt = 0
 irq_count = 0
 start_time = 0
 end_time = 0
 
-## 1. Normal log: 1st pcan_pci_irqhandler, 2nd NR511
-## 2. Reorder log: 1st NR511 , 2nd pcan_pci_irqhandler
 for idx, element in enumerate(data):
-    if element.find("serialadv_start_tx") > 0:
+    if element.find(search_string) > 0:
         temp_list = re.findall("\d+\.\d+", data[idx])
         end_time = float(temp_list[0])
         if start_time != 0:
@@ -97,10 +97,11 @@ with open("plot_data_input.txt", "w") as file_out:
 
 data_string = " count=" + "\\n" + str(len(trip_time_ms_list)) + "\\n"
 data_string += " Max=" + "\\n" + str(max(trip_time_ms_list)) + "\\n"
+data_string += " Min=" + "\\n" + str(min(trip_time_ms_list)) + "\\n"
 data_string += " Avg=" + "\\n" + str(sum(trip_time_ms_list)/len(trip_time_ms_list)) + "\\n"
 data_string += " sigma=" + "\\n" + str(numpy.std(trip_time_ms_list)) + "\\n"
 
 print "Please use the following command to plot:"
-print "gnuplot -e 'in=\"plot_data_input.txt\";out=\"output1.png\";gtitle=\"%s\"; \
+print "gnuplot -e 'in=\"plot_data_input.txt\";out=\"%s\";gtitle=\"%s\"; \
 data_string=\"%s\";xlabel=\"%s\" ;ylabel=\"%s\"' plot.gp" \
-% (gtitle, data_string, xlabel, ylabel)
+% (photo_name,gtitle, data_string, xlabel, ylabel)
