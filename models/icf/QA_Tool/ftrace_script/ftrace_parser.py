@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import re
 import numpy
+import sys
 def counting_actual_size(file, output):
     body_size = 0
     not_counting_size = 0
@@ -33,9 +34,20 @@ with open("output.txt", "r") as file_out:
     data = file_out.readlines()
 
 #### GNU PLOT Setting: User defined #### 
-search_string = "sys_enter: NR 502"
-gtitle= "[HIL] EGSE Rateble_X (Simulation Time: 200 secs)"
-xlabel = "Timeframe (1000 HZ)"
+PLOT_CONFIG_INFO = [
+    ["sys_enter: NR 501", "[HIL] IMU01 (SIM Time: 200 secs)", "Timeframe 200 Hz"],
+    ["sys_enter: NR 502", "[HIL] Ratetable_X (SIM Time: 200 secs)", "Timeframe 1000 Hz"],
+    ["sys_enter: NR 506", "[HIL] GPSR01 (SIM Time: 200 secs)", "Timeframe 20 Hz"],
+    ["sys_enter: NR 508", "[HIL] Flight Computer (SIM Time: 200 secs)", "Timeframe 20 Hz"],
+]
+if len(sys.argv) < 0:
+    print "Please imput the PLOT_CONFIG_INFO : 0~3"
+    sys.exit(0)
+IDX = int(sys.argv[1])
+
+search_string = PLOT_CONFIG_INFO[IDX][0]
+gtitle= PLOT_CONFIG_INFO[IDX][1]
+xlabel = PLOT_CONFIG_INFO[IDX][2]
 ylabel = "Schedule Period (ms)"
 photo_name = gtitle +".png"
 ################################
