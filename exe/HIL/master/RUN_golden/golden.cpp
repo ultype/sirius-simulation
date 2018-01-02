@@ -92,6 +92,9 @@ extern "C" int run_me() {
     uint32_t Sec = 0;
     rkt.time->load_start_time(Year, DOY, Hour, Min, Sec);
     /***************************************************************************************************************/
+    fprintf(stderr, "time_tic_value = %d tics per seconds\n", exec_get_time_tic_value());
+    fprintf(stderr, "software_frame = %lf second per frame.\n", exec_get_software_frame());
+    fprintf(stderr, "software_frame_tics = %lld tics per_frame\n", exec_get_software_frame_tics());
     /***************************************environment*************************************************************/
     rkt.env.dm_RNP();
     // rkt.env.atmosphere_use_weather_deck("../../../auxiliary/weather_table.txt");
