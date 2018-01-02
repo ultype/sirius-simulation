@@ -68,17 +68,17 @@ fc.gps.factr       = 0  #Factor to modifiy the R-matrix R(1+factr)=module gps
 
 ##############################Control variable#################################################
 ##############################################S2###############################################
-S2_mdot = 31.3974
-S2_fmass0 = 3139.74
+S2_mdot = 29.587
+S2_fmass0 = 2958.7
 S2_xcg_1 = 4.7888
 S2_xcg_0 = 6.4138
 S2_isp = 274.8
-S2_moi_roll_0     = 180.39
-S2_moi_roll_1     = 114.46
-S2_moi_pitch_0    = 15883.31
-S2_moi_pitch_1    = 7353.05
-S2_moi_yaw_0    = 15881.97
-S2_moi_yaw_1    = 7351.71
+S2_moi_roll_0     = 517.8
+S2_moi_roll_1     = 180.9
+S2_moi_pitch_0    = 32525.4
+S2_moi_pitch_1    = 19377.7
+S2_moi_yaw_0    = 32519.8
+S2_moi_yaw_1    = 19372.3
 S2_kpp = 3.0
 S2_kpi = 0.08
 S2_kpd = 0.01
@@ -94,28 +94,28 @@ S2_kyi = 0.08
 S2_kyd = 0.01
 S2_kypp = 7.5
 S2_yN = 1000.0
-S2_kaoap = 2.2
-S2_kaoai = 1.3
+S2_kaoap = 3.0
+S2_kaoai = 0.15
 S2_kaoad = 0.01
 S2_kaoapp = 9.375
 S2_aoaN = 1000.0
 S2_rollcmd = 0.0
-S2_pitchcmd = -7.0
+S2_pitchcmd = -4.0
 S2_yawcmd = 0.0
 S2_aoacmd = 0.0
 ################################################################################################
 #########################################S3#####################################################
-S3_mdot = 3.4931
-S3_fmass0 = 379.31
+S3_mdot = 3.814
+S3_fmass0 = 381.4
 S3_xcg_1 = 2.5371
 S3_xcg_0 = 2.5808
 S3_isp = 290
-S3_moi_roll_0     = 26.25
-S3_moi_roll_1     = 25.97
-S3_moi_pitch_0    = 181.69
-S3_moi_pitch_1    = 181.68
-S3_moi_yaw_0    = 182.27
-S3_moi_yaw_1    = 180.58
+S3_moi_roll_0     = 65.3
+S3_moi_roll_1     = 50.8
+S3_moi_pitch_0    = 633.6
+S3_moi_pitch_1    = 421.8
+S3_moi_yaw_0    = 628.0
+S3_moi_yaw_1    = 419.0
 S3_kpp = 3.0
 S3_kpi = 0.08
 S3_kpd = 0.01
@@ -131,15 +131,15 @@ S3_kyi = 0.08
 S3_kyd = 0.01
 S3_kypp = 7.5
 S3_yN = 1000.0
-S3_kaoap = 2.2
-S3_kaoai = 1.3
+S3_kaoap = 3.0
+S3_kaoai = 0.15
 S3_kaoad = 0.01
 S3_kaoapp = 9.375
 S3_aoaN = 1000.0
 S3_rollcmd = 0.0
 S3_pitchcmd = 0.0
 S3_yawcmd = 0.0
-S3_aoacmd = -29.0
+S3_aoacmd = -0.0
 #################################################################################################
 fc.control.set_controller_var(S2_mdot, S2_fmass0, S2_xcg_1, S2_xcg_0, S2_isp)
 fc.control.set_IBBB0(S2_moi_roll_0, S2_moi_pitch_0, S2_moi_yaw_0)
@@ -186,13 +186,13 @@ control_on.activate()
 control_on2 = trick.new_event("control_on2")
 control_on2.set_cycle(0.001)
 control_on2.condition(0, "trick.exec_get_sim_time() == 15.001")
-control_on2.action(0, "fc.control.set_attcmd(S2_rollcmd, -9.0, S2_yawcmd)")
+control_on2.action(0, "fc.control.set_attcmd(S2_rollcmd, -5.0, S2_yawcmd)")
 trick.add_event(control_on2)
 control_on2.activate()
 ######################################################### Event0:AOA_on
 aoac_on = trick.new_event("aoac_on")
 aoac_on.set_cycle(0.001)
-aoac_on.condition(0, "trick.exec_get_sim_time() == 23.001")
+aoac_on.condition(0, "trick.exec_get_sim_time() == 25.001")
 aoac_on.action(0, "fc.control.set_S2_AOA()")
 trick.add_event(aoac_on)
 aoac_on.activate()

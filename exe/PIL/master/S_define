@@ -53,7 +53,7 @@ LIBRARY DEPENDENCIES:
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
-
+        double int_step = 0.001;
         Rocket_Flight_DM dynamics;
         Environment env;
         Forces forces;
@@ -133,6 +133,8 @@ class Rocket_SimObject : public Trick::SimObject {
             tvc.grab_xcg               = LINK( propulsion, get_xcg);
             tvc.grab_thrust            = LINK( propulsion, get_thrust);
             tvc.grab_alphax            = LINK( dynamics, get_alphax);
+            tvc.grab_TBI               = LINK( dynamics, get_TBI);
+            tvc.grab_SBII              = LINK( dynamics, get_SBII);
 
             aerodynamics.grab_alppx    = LINK( dynamics, get_alppx);
             aerodynamics.grab_phipx    = LINK( dynamics, get_phipx);
@@ -175,6 +177,16 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_cz             = LINK( aerodynamics, get_cz);
             forces.grab_FPB            = LINK( tvc, get_FPB);
             forces.grab_FMPB           = LINK( tvc, get_FMPB);
+            forces.grab_Q_TVC          = LINK( tvc, get_Q_TVC);
+            forces.grab_lx             = LINK( tvc, get_lx);
+            forces.grab_GRAVG          = LINK( env, get_GRAVG);
+            forces.grab_vmass          = LINK( propulsion, get_vmass);
+            forces.grab_TBI            = LINK( dynamics, get_TBI);
+            forces.grab_IBBB           = LINK( propulsion, get_IBBB);
+            forces.grab_WBIBD          = LINK( dynamics, get_WBIBD);
+            forces.grab_WBIB           = LINK( dynamics, get_WBIB);
+            forces.grab_ABII           = LINK( dynamics, get_ABII);
+            forces.grab_xcg_0          = LINK( propulsion, get_xcg_0);
 
             gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
             gps_con.grab_TEI           = LINK( env, get_TEI);
@@ -189,10 +201,16 @@ class Rocket_SimObject : public Trick::SimObject {
             dynamics.grab_FMB          = LINK( forces, get_FMB);
             dynamics.grab_IBBB         = LINK( propulsion, get_IBBB);
             dynamics.grab_vmass        = LINK( propulsion, get_vmass);
+            dynamics.grab_xcg_0        = LINK( propulsion, get_xcg_0);
             dynamics.grab_FAPB         = LINK( forces, get_FAPB);
             dynamics.grab_FAP          = LINK( forces, get_FAP);
             dynamics.grab_GRAVG        = LINK( env, get_GRAVG);
             dynamics.grab_grav         = LINK( env, get_grav);
+            dynamics.grab_ddrP_1       = LINK( forces, get_ddrP_1);
+            dynamics.grab_ddang_1      = LINK( forces, get_ddang_1);
+            dynamics.grab_thrust       = LINK( propulsion, get_thrust);
+            dynamics.grab_rhoC_1       = LINK( forces, get_rhoC_1);
+            dynamics.grab_ddrhoC_1     = LINK( forces, get_ddrhoC_1);
 
             accelerometer->grab_FSPB   = LINK( dynamics, get_FSPB);
 
@@ -224,11 +242,11 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
 
-            P1 (0.001, "scheduled") time->dm_time();
-            P1 (0.001, "scheduled") dynamics.propagate(0.001);
-	        P1 (0.001, "scheduled") env.propagate(0.001);
-            P1 (0.001, "scheduled") propulsion.propagate(0.001);
-            P1 (0.001, "scheduled") aerodynamics.calculate_aero(0.001);
+            P1 (int_step, "scheduled") time->dm_time();
+            P1 (int_step, "scheduled") dynamics.propagate(int_step);
+	        P1 (int_step, "scheduled") env.propagate(int_step);
+            P1 (int_step, "scheduled") propulsion.propagate(int_step);
+            P1 (int_step, "scheduled") aerodynamics.calculate_aero(int_step);
             P1 (0.05, "scheduled") gps_con.compute();
             P1 (0.005, "scheduled") gyro->propagate_error(0.005);
             P1 (0.005, "scheduled") accelerometer->propagate_error(0.005);
@@ -238,10 +256,10 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") transceiver.receive();
             P2 (0.05, "scheduled") exec_receive();
 
-            P3 (0.001, "scheduled") tvc.actuate(0.001);
-            P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
+            P3 (int_step, "scheduled") tvc.actuate(int_step);
+            P3 (int_step, "scheduled") forces.collect_forces_and_propagate();
 
-            // (10.0, "scheduled") gps_con.show();
+            (10.0, "scheduled") gps_con.show();
             (0.001, "logging") env.update_diagnostic_attributes(0.001);
             (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
 
