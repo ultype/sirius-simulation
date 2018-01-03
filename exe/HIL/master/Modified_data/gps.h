@@ -224,4 +224,4 @@ extern "C" void record_gps() {
     drg->enable();
 }
 
-#endif  // EXE_PIL_MASTER_MODIFIED_DATA_GPS_H_
+#endif  // EXE_HIL_MASTER_MODIFIED_DATA_GPS_H_
