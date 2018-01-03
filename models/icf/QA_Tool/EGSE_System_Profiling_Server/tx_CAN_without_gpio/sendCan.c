@@ -51,13 +51,14 @@ int esps2egse_cmd_init(struct esps2egse_data_t *cmd) {
     return 0;
 }
 
+uint32_t ping_pong = 0;
 int32_t can_data_send_scatter(int fd, uint8_t *payload, uint32_t data_len) {
     uint32_t sent_len = 0, cur_len = 0, nbytes = 0, i = 0;
     uint32_t sent_len_max = CAN_MAX_DLEN;
     struct can_frame frame;
     int ret;
 
-    frame.can_id  = 0x123;
+    frame.can_id  = (ping_pong++ & 0x1)? 0x141:0x142;
     frame.can_dlc = 8;
     while (1) {
         sent_len = (data_len - cur_len) >=  sent_len_max ?
@@ -67,6 +68,9 @@ int32_t can_data_send_scatter(int fd, uint8_t *payload, uint32_t data_len) {
             for (i = 0; i < sent_len; i++, payload++) {
                 frame.data[i] = *payload;
             }
+#if 1
+            frame.data[1] = 0x1f;
+#endif
             ret = write(fd, &frame, sizeof(struct can_frame));
             if (ret < 0)
                 goto error;
@@ -106,9 +110,9 @@ static void tx_can_handler(int sig, siginfo_t *si, void *uc) {
 
 int main(int argc, char **argv) {
     int nbytes = 0;
-    char *ifname = "can1";
+    char ifname[IFNAMSIZ] = "can1";
     struct esps2egse_data_t esps_cmd;
-    struct can_device_info_t can_device;
+    struct can_device_info_t *can_device;
 
     uint8_t *p_esps_cmd;
     uint32_t data_len, crc;
@@ -125,7 +129,8 @@ int main(int argc, char **argv) {
     while ((opt = getopt(argc, argv, "I:l:")) != -1) {
         switch (opt) {
         case 'I':
-            ifname = optarg;
+            memcpy(ifname, optarg, IFNAMSIZ);
+            //  ifname = optarg;
             break;
         case 'l':
             tx_loop = atoi(optarg);
@@ -135,7 +140,7 @@ int main(int argc, char **argv) {
         }
     }
     p_esps_cmd = (uint8_t *)&esps_cmd;
-    socket_can_init(&can_device, "can1", 4);
+    socket_can_init(&can_device, ifname, -1);
 
     esps2egse_cmd_init((struct esps2egse_data_t *)p_esps_cmd);
     data_len = sizeof(struct esps2egse_data_t);
@@ -183,9 +188,10 @@ int main(int argc, char **argv) {
         if (send_flag && tx_loop > 0) {
             /* Critical section need to protect??*/
             send_flag = 0;
-            FTRACE_TIME_STAMP(510);
-            nbytes = can_data_send_scatter(can_device.can_fd, tx_buffer, esps2egse_full_size);
+            FTRACE_TIME_STAMP(520);
+            nbytes = can_data_send_scatter(can_device->can_fd, tx_buffer, esps2egse_full_size);
             printf("[%lf:%02d] TX %s [%d/%d] bytes just send. \n", get_curr_time(), tx_loop , ifname , esps2egse_full_size, nbytes);
+
             /* Critical section END*/
             tx_loop--;
         }
@@ -195,6 +201,6 @@ int main(int argc, char **argv) {
         }
     }
     free(tx_buffer);
-    close(can_device.can_fd);
+    close(can_device->can_fd);
     return 0;
 }

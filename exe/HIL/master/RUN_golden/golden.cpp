@@ -30,14 +30,14 @@ extern "C" void master_startup() {
 extern "C" int event_start() {
     double xcg_0          = 6.4138;    //  vehicle initial xcg
     double xcg_1          = 4.7888;     //  vehicle final xcg
-    double moi_roll_0     = 180.39;    //  vehicle initial moi in roll direction
-    double moi_roll_1     = 114.46;     //  vehicle final moi in roll direction
-    double moi_pitch_0    = 15883.31;  //  vehicle initial transverse moi
-    double moi_pitch_1    = 7353.05;   //  vehicle final transverse moi
-    double moi_yaw_0    = 15881.97;  //  vehicle initial transverse moi
-    double moi_yaw_1    = 7351.71;   //  vehicle final transverse moi
-    double spi            = 274.8;     //  Specific impusle
-    double fuel_flow_rate = 31.3974;     //  fuel flow rate
+    double moi_roll_0     = 517.8;    //  vehicle initial moi in roll direction
+    double moi_roll_1     = 180.9;     //  vehicle final moi in roll direction
+    double moi_pitch_0    = 32525.4;  //  vehicle initial transverse moi
+    double moi_pitch_1    = 19377.7;   //  vehicle final transverse moi
+    double moi_yaw_0    = 32519.8;  //  vehicle initial transverse moi
+    double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
+    double spi            = 291.6145604;     //  Specific impusle 291.6145604 274.8
+    double fuel_flow_rate = 29.587;     //  fuel flow rate
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
     rkt.tvc.set_S2_TVC();
     return 0;
@@ -49,19 +49,19 @@ extern "C" int event_separation_1() {
     rkt.aerodynamics.load_aerotable("../../../auxiliary/Aero_0721_S3.txt");
 
     rkt.propulsion.set_aexit(0);
-    rkt.propulsion.set_vmass0(777.18);
-    rkt.propulsion.set_fmass0(379.31);
+    rkt.propulsion.set_vmass0(721.4);
+    rkt.propulsion.set_fmass0(381.4);
 
     double xcg_0          = 2.5808;
     double xcg_1          = 2.5371;
-    double moi_roll_0     = 26.25;
-    double moi_roll_1     = 25.97;
-    double moi_pitch_0    = 181.69;
-    double moi_pitch_1    = 181.68;
-    double moi_yaw_0    = 182.27;
-    double moi_yaw_1    = 180.58;
-    double spi            = 290;
-    double fuel_flow_rate = 3.4931;
+    double moi_roll_0     = 65.3;
+    double moi_roll_1     = 50.8;
+    double moi_pitch_0    = 633.6;
+    double moi_pitch_1    = 421.8;
+    double moi_yaw_0    = 628.0;
+    double moi_yaw_1    = 419.0;
+    double spi            = 288.4111169;  // 288.4111169 290.0
+    double fuel_flow_rate = 3.814;
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
 
     rkt.tvc.set_s3_tau1(20.0);
@@ -75,11 +75,17 @@ extern "C" int event_separation_1() {
     return 0;
 }
 
+extern "C" int event_fairing_separation() {
+    rkt.propulsion.set_vmass0(691.4);
+
+    return 0;
+}
+
 extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
-    // realtime();
+    realtime();
 
 
     master_startup();
@@ -92,6 +98,9 @@ extern "C" int run_me() {
     uint32_t Sec = 0;
     rkt.time->load_start_time(Year, DOY, Hour, Min, Sec);
     /***************************************************************************************************************/
+    fprintf(stderr, "time_tic_value = %d tics per seconds\n", exec_get_time_tic_value());
+    fprintf(stderr, "software_frame = %lf second per frame.\n", exec_get_software_frame());
+    fprintf(stderr, "software_frame_tics = %lld tics per_frame\n", exec_get_software_frame_tics());
     /***************************************environment*************************************************************/
     rkt.env.dm_RNP();
     // rkt.env.atmosphere_use_weather_deck("../../../auxiliary/weather_table.txt");
@@ -132,23 +141,23 @@ extern "C" int run_me() {
     /********************************************************************************************************/
 
     /******************************propulsion & mass property***************************************************************************/
-    rkt.propulsion.set_vmass0(4057.14);       // vehicle initial mass
-    rkt.propulsion.set_fmass0(3139.74);      // vehicle initail fuel mass
+    rkt.propulsion.set_vmass0(4473.5);       // vehicle initial mass
+    rkt.propulsion.set_fmass0(2958.7);      // vehicle initail fuel mass
 
     double xcg_0          = 6.4138;    //  vehicle initial xcg
     double xcg_1          = 4.7888;     //  vehicle final xcg
-    double moi_roll_0     = 180.39;    //  vehicle initial moi in roll direction
-    double moi_roll_1     = 114.46;     //  vehicle final moi in roll direction
-    double moi_pitch_0    = 15883.31;  //  vehicle initial transverse moi
-    double moi_pitch_1    = 7353.05;   //  vehicle final transverse moi
-    double moi_yaw_0    = 15881.97;  //  vehicle initial transverse moi
-    double moi_yaw_1    = 7351.71;   //  vehicle final transverse moi
-    double spi            = 274.8;     //  Specific impusle
-    double fuel_flow_rate = 31.3974;     //  fuel flow rate
+    double moi_roll_0     = 517.8;    //  vehicle initial moi in roll direction
+    double moi_roll_1     = 180.9;     //  vehicle final moi in roll direction
+    double moi_pitch_0    = 32525.4;  //  vehicle initial transverse moi
+    double moi_pitch_1    = 19377.7;   //  vehicle final transverse moi
+    double moi_yaw_0    = 32519.8;  //  vehicle initial transverse moi
+    double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
+    double spi            = 291.6145604;     //  Specific impusle
+    double fuel_flow_rate = 29.587;     //  fuel flow rate
     rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
 
     rkt.propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
-    rkt.propulsion.set_payload(0);  // payload mass
+    rkt.propulsion.set_payload(100.0);  // payload mass
     /************************************************************************************************************************/
 
     /**************************************************Sensor****************************************************************/
@@ -179,14 +188,15 @@ extern "C" int run_me() {
     rkt.tvc.set_s2_tau3(20.0);
     rkt.tvc.set_s2_tau4(20.0);
 
-    rkt.tvc.set_s2_ratelim(16 * RAD);
-    rkt.tvc.set_s2_tvclim(7 * RAD);
+    rkt.tvc.set_s2_ratelim(16.0 * RAD);
+    rkt.tvc.set_s2_tvclim(7.0 * RAD);
     /**********************************************************************************************************************************/
 
 
     /* events */
     jit_add_read(0.001, "event_start");
-    jit_add_read(100.001, "event_separation_1");
+    jit_add_read(102.001, "event_separation_1");
+    jit_add_read(107.001, "event_fairing_separation");
 
     exec_set_terminate_time(200.0);
 

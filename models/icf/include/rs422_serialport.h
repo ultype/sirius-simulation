@@ -11,13 +11,16 @@ LIBRARY DEPENDENCY:
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
 *******************************************************************************/
-
+#include "icf_export.h"
+#include "icf_utility.h"
+#include "icf_drivers.h"
 #define SERIAL_PORT(idx) "/dev/ttyAP"#idx
 #define RS422_SERIAL_BUFFER_SIZE 1024
 #define USER_BAUD_RATE (B921600)
 #define RS422_HEADER_SIZE sizeof(struct rs422_frame_header_t)
 
-extern const char *que_port_map[8];
+#define SERIAL_PORT_ENABLE_BITMAP (0x1)  // (0x7F)
+#define SERIAL_PORT_IS_ENABLE(qidx) ((SERIAL_PORT_ENABLE_BITMAP >> qidx) & 0x1)
 
 typedef enum _ENUM_HW_RS422_TX_QUE_T {
     IMU_01 = 0,
@@ -42,10 +45,8 @@ struct rs422_frame_header_t {
 struct rs422_device_info_t {
     char portname[IFNAMSIZ];
     int32_t rs422_fd;
-    uint8_t qidx;
     struct rs422_frame_header_t frame;
-    uint32_t payload_size;
-    void *payload;
+    uint32_t header_size;
 };
 
 struct rs422_device_name_t {
@@ -55,19 +56,10 @@ struct rs422_device_name_t {
 #ifdef __cplusplus
 extern "C" {
 #endif
-int rs422_devinfo_init(struct rs422_device_info_t *dev_info,
-                       const char *portname,
-                       void *payload,
-                       uint32_t payload_size,
-                       uint8_t qidx);
-int rs422_serialport_init(struct rs422_device_info_t *rs422_dev);
+int rs422_serialport_init(void **priv_data, char *ifname, int netport);
+int rs422_serialport_deinit(void **priv_data);
 int open_port(char *portname);
 int set_interface_attribs(int fd, int speed, int parity);
-int32_t rs422_data_send_scatter(int fd, uint8_t *payload, uint32_t frame_len);
-uint8_t* rs422_frame_alloc(uint32_t size);
-int rs422_frame_header_set(struct rs422_frame_header_t *frame, const uint8_t *payload, const uint32_t data_len);
-int rs422_frame_payload_copy(uint8_t *out_buff, const uint8_t *payload, const uint32_t data_len);
-int rs422_frame_header_copy(uint8_t *out_buff, struct rs422_frame_header_t *frame);
 
 #ifdef __cplusplus
 }
