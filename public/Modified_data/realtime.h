@@ -11,6 +11,11 @@ extern "C" void realtime() {
     exec_set_thread_priority(0, 1);
     exec_set_thread_cpu_affinity(0, 1);
     frame_log_on();
+#if 0
+    exec_set_freeze_command(1);
+    exec_set_enable_freeze(1);
+    sim_control_panel_set_enabled(1);
+#endif
 }
 
 #endif  // PUBLIC_MODIFIED_DATA_REALTIME_H_

@@ -35,7 +35,8 @@ with open("output.txt", "r") as file_out:
 
 #### GNU PLOT Setting: User defined #### 
 PLOT_CONFIG_INFO = [
-    ["sys_enter: NR 501", "[HIL] IMU01 (SIM Time: 200 secs)", "Timeframe 200 Hz"],
+    ["sys_enter: NR 500", "[HIL] RX CAN (SIM Time: 200 secs)", "Timeframe 100 Hz"],
+    ["sys_enter: NR 501", "[HIL] IMU01 (SIM Time: 200 secs)",  "Timeframe 200 Hz"],
     ["sys_enter: NR 502", "[HIL] Ratetable_X (SIM Time: 200 secs)", "Timeframe 1000 Hz"],
     ["sys_enter: NR 506", "[HIL] GPSR01 (SIM Time: 200 secs)", "Timeframe 20 Hz"],
     ["sys_enter: NR 508", "[HIL] Flight Computer (SIM Time: 200 secs)", "Timeframe 20 Hz"],

@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 		printf("%s\n", argv[1]);
         memcpy(portname, argv[1], IFNAMSIZ);
 	}
-	rs422_serialport_init(&dev_info, portname);
+	rs422_serialport_init(&dev_info, portname, 0);
 
 #if (CFG_GPIO_ENABLE == 1)
 	int ret;

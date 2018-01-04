@@ -2,7 +2,7 @@
 #define MODELS_ICF_INCLUDE_ICF_UTILITY_H_
 #include "icf_export.h"
 
-#define CONFIG_ESPS_HEADER_ENABLE 0
+#define CONFIG_ESPS_HEADER_ENABLE 1
 #define CONFIG_EGSE_CRC_HEADER_ENABLE 1
 #define ICF_DEBUG_ENABLE 0
 /* Must can devide by 8*/
