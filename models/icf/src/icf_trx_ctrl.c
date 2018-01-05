@@ -125,9 +125,33 @@ int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void **payload, uint32_t s
     return 0;
 }
 
+static int icf_dispatch_rx_frame(uint32_t frame_id) {
+    int qidx = 0;
+    switch (frame_id) {
+        case FC2TVC_III_NO1:
+        case FC2TVC_III_NO2:
+        case FC2TVC_II_NO1:
+        case FC2TVC_II_NO2:
+            qidx = TVC_SW_QIDX;
+            break;
+        case FC2VALVE_III_NO1:
+        case FC2RCS_III:
+        case FC2ORDNANCE_FAIRING_III:
+        case FC2VALVE_II_NO1:
+        case FC2ORDNANCE_SEPARATION_II:
+            qidx = EMPTY_SW_QIDX;
+            break;
+        default:
+            fprintf(stderr, "Unknown CAN command. ID = 0x%x\n", frame_id);
+            qidx = EMPTY_SW_QIDX;
+    }
+    return qidx;
+}
+
 int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
     struct timeval tv;
     int ret;
+    int qidx = 0;
     struct icf_ctrl_queue *ctrlqueue;
     struct icf_ctrl_port *ctrlport = &g_egse_port[pidx];
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
@@ -149,10 +173,12 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
             fprintf(stderr, "producer frame allocate fail!!\n");
         }
         if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)pframe, sizeof(struct can_frame)) > 0) {
-            /* TODO: Queue selection Algorithm.*/
-            ctrlqueue = C->ctrlqueue[TVC_SW_QIDX];
-            FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
-            rb_push(&ctrlqueue->data_ring, pframe);
+            qidx = icf_dispatch_rx_frame(pframe->can_id);
+            if (qidx > EMPTY_SW_QIDX) {
+                ctrlqueue = C->ctrlqueue[qidx];
+                FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
+                rb_push(&ctrlqueue->data_ring, pframe);
+            }
         }
         debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
         debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)pframe, sizeof(struct can_frame));

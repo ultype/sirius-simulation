@@ -20,6 +20,7 @@ PROGRAMMERS:
 #include "icf_utility.h"
 #include "ringbuffer.h"
 #include "icf_drivers.h"
+#include "dsp_can_interfaces.h"
 
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 
