@@ -14,15 +14,15 @@ static const struct icf_mapping g_icf_egse_maptbl[] = {
 
 
 static struct icf_ctrl_port g_egse_port[] = {
-    {1, HW_PORT0, "can0",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT1, "/dev/ttyAP0", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT2, "/dev/ttyAP1", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT3, "/dev/ttyAP2", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT4, "/dev/ttyAP3", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {0, HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {0, HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT, RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT8, "127.0.0.1",   8700,          ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {1, HW_PORT0, "can0",        EMPTY_NETPORT, 16,   CAN_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT1, "/dev/ttyAP0", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT2, "/dev/ttyAP1", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT3, "/dev/ttyAP2", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT4, "/dev/ttyAP3", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {0, HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {0, HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT8, "127.0.0.1",   8700,          0,  ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
@@ -188,16 +188,26 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C, int system_type) {
     return 0;
 }
 
-int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void **payload, uint32_t size) {
+int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size) {
     struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
-    *payload = rb_pop(&ctrlqueue->data_ring);
+    struct ringbuffer_cell_t *rxcell = NULL;
+    rxcell = (struct ringbuffer_cell_t *)rb_pop(&ctrlqueue->data_ring);
+    if (rxcell == NULL)
+        goto empty;
+    memcpy(payload, rxcell->l2frame, size);
+    icf_free_mem(rxcell->l2frame);
+    icf_free_mem(rxcell);
     debug_hex_dump("icf_rx_dequeue", payload, size);
+    return 1;
+empty:
     return 0;
 }
 
-static int icf_dispatch_rx_frame(uint32_t frame_id) {
+static int icf_dispatch_rx_frame(void *rxframe) {
     int qidx = 0;
-    switch (frame_id) {
+    struct can_frame *pframe = NULL;
+    pframe = (struct can_frame *)rxframe;
+    switch (pframe->can_id) {
         case FC2TVC_III_NO1:
         case FC2TVC_III_NO2:
         case FC2TVC_II_NO1:
@@ -212,7 +222,7 @@ static int icf_dispatch_rx_frame(uint32_t frame_id) {
             qidx = EMPTY_SW_QIDX;
             break;
         default:
-            fprintf(stderr, "[%s] Unknown CAN command. ID = 0x%x\n", __FUNCTION__, frame_id);
+            fprintf(stderr, "[%s] Unknown CAN command. ID = 0x%x\n", __FUNCTION__, pframe->can_id);
             qidx = EMPTY_SW_QIDX;
     }
     return qidx;
@@ -222,10 +232,10 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
     struct timeval tv;
     int ret;
     int qidx = 0;
+    struct ringbuffer_cell_t *rxcell = NULL;
     struct icf_ctrl_queue *ctrlqueue;
     struct icf_ctrl_port *ctrlport = C->ctrlport[pidx];
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
-    struct can_frame *pframe = NULL;
     tv.tv_sec = 0;
     tv.tv_usec = 100;
 
@@ -236,21 +246,25 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
         fprintf(stderr, "select error: %d\n", ret);
     /*TODO malloc need use the static memory*/
     if (drv_ops->fd_isset(ctrlport->drv_priv_data)) {
-        pframe = NULL;
-        pframe = icf_alloc_mem(sizeof(struct can_frame));
-        if (pframe == NULL) {
-            fprintf(stderr, "producer frame allocate fail!!\n");
+        rxcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
+        if (rxcell == NULL) {
+            fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
         }
-        if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)pframe, sizeof(struct can_frame)) > 0) {
-            qidx = icf_dispatch_rx_frame(pframe->can_id);
+        rxcell->frame_full_size = ctrlport->rx_buff_size;
+        rxcell->l2frame = icf_alloc_mem(rxcell->frame_full_size);
+        if (rxcell->l2frame == NULL) {
+            fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
+        }
+        if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)rxcell->l2frame, rxcell->frame_full_size) > 0) {
+            debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)rxcell->l2frame, rxcell->frame_full_size);
+            qidx = icf_dispatch_rx_frame(rxcell->l2frame);
             if (qidx > EMPTY_SW_QIDX) {
                 ctrlqueue = C->ctrlqueue[qidx];
                 FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
-                rb_push(&ctrlqueue->data_ring, pframe);
+                rb_push(&ctrlqueue->data_ring, rxcell);
             }
         }
         debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
-        debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)pframe, sizeof(struct can_frame));
     }
     return 0;
 }
