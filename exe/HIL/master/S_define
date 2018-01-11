@@ -235,7 +235,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 gps_con     (  ),
                 dynamics    (  )
             {
-            ("initialization") icf_ctrlblk_init(&icf_ctrl);
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
             ("initialization") setup_export();
@@ -248,7 +248,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gps_con.initialize();
 
             P1 (5, "scheduled") icf_heartbeat();
-            P1 (0.010, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0);
+            P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0);
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, IMU01_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, RATETBL_X_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, RATETBL_Y_SW_QIDX);
@@ -278,7 +278,7 @@ class Rocket_SimObject : public Trick::SimObject {
             // (10.0, "scheduled") gps_con.show();
             (0.001, "logging") env.update_diagnostic_attributes(0.001);
             (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
-            ("shutdown") icf_ctrlblk_deinit(&icf_ctrl);
+            ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
 
         }
 };

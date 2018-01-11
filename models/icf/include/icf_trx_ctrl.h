@@ -23,6 +23,7 @@ PROGRAMMERS:
 #include "dsp_can_interfaces.h"
 
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
+#define ICF_CTRLBLK_MAXPORT_NUMBER  16
 
 typedef enum _ENUM_ICF_SW_QUEUE {
     EMPTY_SW_QIDX = -1,
@@ -78,6 +79,10 @@ typedef enum _ENUM_ICF_DRIVERS_ID {
     ICF_DRIVERS_ID2,
 }ENUM_ICF_DRIVERS_ID;
 
+typedef enum _ENUM_ICF_SYSTEM_TYPE {
+    ICF_SYSTEM_TYPE_EGSE = 0,
+    ICF_SYSTEM_TYPE_ESPS = 1
+}ENUM_ICF_SYSTEM_TYPE;
 
 struct icf_mapping {
     int sw_queue;
@@ -105,7 +110,9 @@ struct icf_ctrl_queue {
 
 
 struct icf_ctrlblk_t {
+    int system_type;
     struct icf_ctrl_queue *ctrlqueue[ICF_CTRLBLK_MAXQUEUE_NUMBER];
+    struct icf_ctrl_port *ctrlport[ICF_CTRLBLK_MAXPORT_NUMBER];
 };
 
 #ifdef __cplusplus
@@ -114,8 +121,8 @@ extern "C" {
 
 void *icf_alloc_mem(size_t size);
 void icf_free_mem(void *ptr);
-int icf_ctrlblk_init(struct icf_ctrlblk_t* C);
-int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C);
+int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type);
+int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C, int system_type);
 int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void **payload, uint32_t size);
 int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx);
 

@@ -3,7 +3,6 @@
 #include "icf_export.h"
 
 #define CONFIG_ESPS_HEADER_ENABLE 1
-#define CONFIG_EGSE_CRC_HEADER_ENABLE 1
 #define ICF_DEBUG_ENABLE 0
 /* Must can devide by 8*/
 #define BILLION             1000000000L

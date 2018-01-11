@@ -22,6 +22,7 @@ int socket_can_init(void **priv_data, char *ifname, int netport) {
         perror("Error while opening socket");
         goto error;
     }
+    dev_info->header_size = 0;
     strncpy(dev_info->ifr.ifr_name, ifname, sizeof(dev_info->ifr.ifr_name));
     if (ioctl(dev_info->can_fd, SIOCGIFINDEX, &dev_info->ifr) < 0) {
         errExit("interface not exist !!");
@@ -48,7 +49,7 @@ int socket_can_init(void **priv_data, char *ifname, int netport) {
 
     if (dev_info) {
         *priv_data = dev_info;
-        printf("Using %s to read\n", dev_info->ifr.ifr_name);
+        printf("Using %s to operation\n", dev_info->ifr.ifr_name);
     }
     return 0;
 error:
@@ -149,6 +150,15 @@ int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     return rx_nbytes;
 }
 
+int can_frame_send(void *priv_data, uint8_t *payload, uint32_t frame_len) {
+    int tx_nbytes;
+    struct can_device_info_t *dev_info = priv_data;
+    struct can_frame *pframe = NULL;
+    pframe = (struct can_frame *)payload;
+    tx_nbytes = write(dev_info->can_fd, pframe, frame_len);
+    return tx_nbytes;
+}
+
 int socketcan_select(void *priv_data, struct timeval *timeout) {
     int ret = 0;
     struct can_device_info_t *dev_info = priv_data;
@@ -176,10 +186,16 @@ void socketcan_fd_zero(void *priv_data) {
     FD_ZERO(dev_info->set);
 }
 
+uint32_t socketcan_get_header_size(void *priv_data) {
+    struct can_device_info_t *dev_info = priv_data;
+    return dev_info->header_size;
+}
+
 struct icf_driver_ops icf_driver_socketcan_ops = {
     .open_interface = socket_can_init,
     .recv_data = can_frame_recv,
-    .send_data = NULL,
+    .send_data = can_frame_send,
+    .get_header_size = socketcan_get_header_size,
     .select = socketcan_select,
     .fd_clr = socketcan_fd_clr,
     .fd_isset = socketcan_fd_isset,
