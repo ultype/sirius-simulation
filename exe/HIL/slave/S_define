@@ -79,8 +79,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             // control.grab_mprop              = transceiver(IMPORT(propulsion     , get_mprop));
             // control.grab_dvbe               = transceiver(IMPORT(dynamics       , get_dvbe));
             // control.grab_pdynmc             = transceiver(IMPORT(environment    , get_pdynmc));
-            control.grab_qqcx               = transceiver(IMPORT(*gyro          , get_qqcx));
-            control.grab_rrcx               = transceiver(IMPORT(*gryo          , get_rrcx));
+            // control.grab_qqcx               = transceiver(IMPORT(*gyro          , get_qqcx));
+            // control.grab_rrcx               = transceiver(IMPORT(*gryo          , get_rrcx));
             control.grab_FSPCB              = transceiver(IMPORT(*accelerometer , get_computed_FSPB));
             control.grab_computed_WBIB      = transceiver(IMPORT(*gyro          , get_computed_WBIB));
             ins.grab_computed_WBIB          = transceiver(IMPORT(*gyro          , get_computed_WBIB));
