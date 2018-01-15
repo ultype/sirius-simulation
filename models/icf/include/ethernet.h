@@ -4,8 +4,9 @@
 #include "icf_drivers.h"
 struct ethernet_device_info_t {
     char ifname[IFNAMSIZ];
-    int client_fd;
-    int server_fd;
+    int is_server;
+    int netsock_fd;
+    fd_set *master_set;
     struct ifreq ifr;
     struct sockaddr_in addr;
     uint32_t header_size;

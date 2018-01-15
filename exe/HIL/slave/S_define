@@ -171,8 +171,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             /* TVC no2 Yaw count => Z axis => theta_d*/
             tvc_no2_frame.data[4] = (theta_d_cnt >> 8) & 0xFF;
             tvc_no2_frame.data[5] = (theta_d_cnt & 0xFF);
-            icf_tx_direct(C, TVC_SW_QIDX, (uint8_t *)&tvc_no1_frame, sizeof(struct can_frame));
-            icf_tx_direct(C, TVC_SW_QIDX, (uint8_t *)&tvc_no2_frame, sizeof(struct can_frame));
+            icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no1_frame, sizeof(struct can_frame));
+            icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no2_frame, sizeof(struct can_frame));
             return ret;
         }
 

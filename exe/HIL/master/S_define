@@ -269,6 +269,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gps_con.initialize();
 
             P1 (5, "scheduled") icf_heartbeat();
+            P1 (0.050, "scheduled") uplink_packet_transfer();
             P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0);
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, IMU01_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, RATETBL_X_SW_QIDX);
@@ -278,7 +279,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, GPSR01_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, GPSR02_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, FLIGHT_COMPUTER_SW_QIDX);
-            P1 (0.050, "scheduled") uplink_packet_transfer();
+
 
 
             P1 (int_step, "scheduled") time->dm_time();
