@@ -50,7 +50,7 @@ LIBRARY DEPENDENCIES:
 ##include "transceiver.hh"
 
 ##include  "icf_trx_ctrl.h"
-
+##include  "DM_FSW_Interface.hh"
 
 
 class Rocket_SimObject : public Trick::SimObject {
@@ -65,6 +65,7 @@ class Rocket_SimObject : public Trick::SimObject {
         sensor::Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
+        uplink_packet_format_t uplink_data;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -226,6 +227,26 @@ class Rocket_SimObject : public Trick::SimObject {
 
         };
 
+        void uplink_packet_transfer() {
+            transmit_channel *trans_chan = gps_con.get_transmit_data();
+            memcpy(&uplink_data.gps_con_transmit_data, trans_chan, sizeof(transmit_channel));
+            uplink_data.gps_con_gps_update = gps_con.get_gps_update();
+
+            STORE_VEC3(uplink_data.accel_FSPCB, accelerometer->get_computed_FSPB())
+            STORE_VEC3(uplink_data.accel_EFSPB, accelerometer->get_error_of_computed_FSPB());
+
+            STORE_VEC3(uplink_data.sdt_phi, sdt->get_PHI());
+            STORE_VEC3(uplink_data.sdt_phi_high, sdt->get_PHI_HIGH());
+            STORE_VEC3(uplink_data.sdt_phi_low, sdt->get_PHI_LOW());
+            STORE_VEC3(uplink_data.sdt_delta_vel, sdt->get_DELTA_VEL());
+
+            STORE_VEC3(uplink_data.gyro_WBICB, gyro->get_computed_WBIB());
+            STORE_VEC3(uplink_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB());
+
+            icf_tx_enqueue(&icf_ctrl, FLIGHT_COMPUTER_SW_QIDX, &uplink_data, sizeof(uplink_packet_format_t));
+        };
+
+
         Rocket_SimObject() 
             :   env         (  ) ,
                 propulsion  (  )      ,
@@ -257,6 +278,8 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, GPSR01_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, GPSR02_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, FLIGHT_COMPUTER_SW_QIDX);
+            P1 (0.050, "scheduled") uplink_packet_transfer();
+
 
             P1 (int_step, "scheduled") time->dm_time();
             P1 (int_step, "scheduled") dynamics.propagate(int_step);

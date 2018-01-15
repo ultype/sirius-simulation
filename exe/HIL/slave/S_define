@@ -116,10 +116,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
             // this->ltg_thrust = 0;
         }
 
-        int tx_can_init() {
-            return 0;
-        }
-
         int tvc_cmd2egse(struct icf_ctrlblk_t* C) {
             struct can_frame tvc_no1_frame;
             struct can_frame tvc_no2_frame;
