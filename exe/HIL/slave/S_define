@@ -23,7 +23,7 @@ LIBRARY DEPENDENCIES:
 ##include "global_constants.hh"
 ##include "transceiver.hh"
 ##include  "icf_trx_ctrl.h"
-
+##include  "DM_FSW_Interface.hh"
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
 
@@ -164,7 +164,10 @@ class FlightComputer_SimObject : public Trick::SimObject {
             return ret;
         }
 
-
+        void esps_uplink_data_receive(struct icf_ctrlblk_t* C) {
+            uplink_packet_format_t rx_data;
+            icf_rx_dequeue(C, ESPS_GNC_SW_QIDX, &rx_data, sizeof(uplink_packet_format_t));
+        }
         FlightComputer_SimObject() : ins(),
                                      gps()
         {
@@ -180,6 +183,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             P1 (0.001, "scheduled") time->dm_time();
             P2 (0.05, "scheduled") transceiver.receive();
+            P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT1);
+            P2 (0.05, "scheduled") esps_uplink_data_receive(&icf_esps_ctrl);
 
             P2 (0.01, "scheduled") clear_flag();
 
