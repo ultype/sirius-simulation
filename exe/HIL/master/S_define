@@ -107,24 +107,7 @@ class Rocket_SimObject : public Trick::SimObject {
 
         };
 
-        void exec_receive(){
-            /* XXX */
-            if(((std::function<double()>)transceiver(IMPORT(ins, clear_gps_flag)))()){
-                gps_con.clear_gps_flag();
-            }
-            // if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
-            //     propulsion.set_no_thrust();
-            // }
-            // if(((std::function<double()>)transceiver(IMPORT(guidance, ltg_thrust)))()){
-            //     propulsion.set_ltg_thrust();
-            // }
-        };
-
         void link(){
-            tvc.grab_theta_a_cmd       = transceiver(IMPORT(control , get_theta_a_cmd));
-            tvc.grab_theta_b_cmd       = transceiver(IMPORT(control , get_theta_b_cmd));
-            tvc.grab_theta_c_cmd       = transceiver(IMPORT(control , get_theta_c_cmd));
-            tvc.grab_theta_d_cmd       = transceiver(IMPORT(control , get_theta_d_cmd));
 
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
@@ -294,13 +277,10 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") sdt->compute(0.005);
 
             P2 (0.05, "scheduled") transceiver.transmit();
-            P2 (0.05, "scheduled") transceiver.receive();
-            P2 (0.05, "scheduled") exec_receive();
 
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
 
-            // (10.0, "scheduled") gps_con.show();
             (0.001, "logging") env.update_diagnostic_attributes(0.001);
             (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
