@@ -185,15 +185,15 @@ class FlightComputer_SimObject : public Trick::SimObject {
             // ("default_data") guidance.default_data();
 
             ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
+            ("initialization") icf_ctrlblk_init(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
             ("initialization") setup_export();
             ("initialization") link();
             ("initialization") gps.initialize(0.05);
             ("initialization") control.initialize();
             ("initialization") ins.initialize();
-            ("initialization") icf_ctrlblk_init(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
 
             P1 (0.001, "scheduled") time->dm_time();
-
+            //  P2 (0.04, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT1);
             P2 (0.05, "scheduled") transceiver.receive();
 
             P2 (0.01, "scheduled") clear_flag();

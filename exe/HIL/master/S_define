@@ -243,7 +243,7 @@ class Rocket_SimObject : public Trick::SimObject {
             STORE_VEC3(uplink_data.gyro_WBICB, gyro->get_computed_WBIB());
             STORE_VEC3(uplink_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB());
 
-            icf_tx_enqueue(&icf_ctrl, FLIGHT_COMPUTER_SW_QIDX, &uplink_data, sizeof(uplink_packet_format_t));
+            icf_tx_enqueue(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX, &uplink_data, sizeof(uplink_packet_format_t));
         };
 
 
@@ -256,8 +256,8 @@ class Rocket_SimObject : public Trick::SimObject {
                 gps_con     (  ),
                 dynamics    (  )
             {
-            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
             ("initialization") link();
             ("initialization") setup_export();
             ("initialization") aerodynamics.initialize();
@@ -268,17 +268,18 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
 
+
             P1 (5, "scheduled") icf_heartbeat();
             P1 (0.050, "scheduled") uplink_packet_transfer();
             P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0);
-            P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, IMU01_SW_QIDX);
-            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, RATETBL_X_SW_QIDX);
-            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, RATETBL_Y_SW_QIDX);
-            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, RATETBL_Z_SW_QIDX);
-            P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, IMU02_SW_QIDX);
-            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, GPSR01_SW_QIDX);
-            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, GPSR02_SW_QIDX);
-            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, FLIGHT_COMPUTER_SW_QIDX);
+            P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU01_SW_QIDX);
+            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
+            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
+            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_Z_SW_QIDX);
+            P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU02_SW_QIDX);
+            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR01_SW_QIDX);
+            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR02_SW_QIDX);
+            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
 
 
 

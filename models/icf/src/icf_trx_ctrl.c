@@ -1,15 +1,15 @@
 #include "icf_trx_ctrl.h"
 
 static const struct icf_mapping g_icf_egse_maptbl[] = {
-    {TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
-    {IMU01_SW_QIDX,              HW_PORT1, ICF_DRIVERS_ID1},
-    {RATETBL_X_SW_QIDX,          HW_PORT2, ICF_DRIVERS_ID1},
-    {RATETBL_Y_SW_QIDX,          HW_PORT3, ICF_DRIVERS_ID1},
-    {RATETBL_Z_SW_QIDX,          HW_PORT4, ICF_DRIVERS_ID1},
-    {IMU02_SW_QIDX,              HW_PORT5, ICF_DRIVERS_ID1},
-    {GPSR01_SW_QIDX,             HW_PORT6, ICF_DRIVERS_ID1},
-    {GPSR02_SW_QIDX,             HW_PORT7, ICF_DRIVERS_ID1},
-    {FLIGHT_COMPUTER_SW_QIDX,    HW_PORT8, ICF_DRIVERS_ID2}
+    {EGSE_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
+    {EGSE_IMU01_SW_QIDX,              HW_PORT1, ICF_DRIVERS_ID1},
+    {EGSE_RATETBL_X_SW_QIDX,          HW_PORT2, ICF_DRIVERS_ID1},
+    {EGSE_RATETBL_Y_SW_QIDX,          HW_PORT3, ICF_DRIVERS_ID1},
+    {EGSE_RATETBL_Z_SW_QIDX,          HW_PORT4, ICF_DRIVERS_ID1},
+    {EGSE_IMU02_SW_QIDX,              HW_PORT5, ICF_DRIVERS_ID1},
+    {EGSE_GPSR01_SW_QIDX,             HW_PORT6, ICF_DRIVERS_ID1},
+    {EGSE_GPSR02_SW_QIDX,             HW_PORT7, ICF_DRIVERS_ID1},
+    {EGSE_FLIGHT_COMPUTER_SW_QIDX,    HW_PORT8, ICF_DRIVERS_ID2}
 };
 
 
@@ -26,35 +26,28 @@ static struct icf_ctrl_port g_egse_port[] = {
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
-    {TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[HW_PORT0]},
-    {IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT1]},
-    {RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT2]},
-    {RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT3]},
-    {RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT4]},
-    {IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT5]},
-    {GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT6]},
-    {GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT7]},
-    {FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[HW_PORT8]}
+    {EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[HW_PORT0]},
+    {EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT1]},
+    {EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT2]},
+    {EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT3]},
+    {EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT4]},
+    {EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT5]},
+    {EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT6]},
+    {EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT7]},
+    {EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[HW_PORT8]}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
-    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
-    {ESPS_GNC_CONTROL_SW_QIDX,        HW_PORT1, ICF_DRIVERS_ID2},
-    {ESPS_GNC_GPS_SW_QIDX,            HW_PORT1, ICF_DRIVERS_ID2},
-    {ESPS_GNC_INS_SW_QIDX,            HW_PORT1, ICF_DRIVERS_ID2}
+    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0}
 };
 
 
 static struct icf_ctrl_port g_esps_port[] = {
-    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT1, "esps_server", 8700,            CAN_DEVICE_TYPE,     NULL, NULL}
+    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,          NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]},
-    {ESPS_GNC_CONTROL_SW_QIDX,          ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]},
-    {ESPS_GNC_GPS_SW_QIDX,              ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]},
-    {ESPS_GNC_INS_SW_QIDX,              ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
+    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]}
 };
 
 
@@ -218,7 +211,7 @@ static int icf_dispatch_rx_frame(void *rxframe) {
         case FC2TVC_III_NO2:
         case FC2TVC_II_NO1:
         case FC2TVC_II_NO2:
-            qidx = TVC_SW_QIDX;
+            qidx = EGSE_TVC_SW_QIDX;
             break;
         case FC2VALVE_III_NO1:
         case FC2RCS_III:

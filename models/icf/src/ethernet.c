@@ -172,14 +172,20 @@ void ethernet_fd_set(void *priv_data) {
     struct ethernet_device_info_t *dev_info = priv_data;
     FD_SET(dev_info->netsock_fd, dev_info->master_set);
 }
+
 void ethernet_fd_zero(void *priv_data) {
     struct ethernet_device_info_t *dev_info = priv_data;
     FD_ZERO(dev_info->master_set);
 }
 
+int ethernet_accept(void *priv_data) {
+    struct ethernet_device_info_t *dev_info = priv_data;
+    return accept(dev_info->netsock_fd, NULL, NULL);
+}
+
 struct icf_driver_ops icf_driver_ethernet_ops = {
     .open_interface = ethernet_init,
-    .recv_data = NULL,
+    .recv_data = ethernet_data_recv,
     .send_data = ethernet_data_send,
 
     .header_set = NULL,
