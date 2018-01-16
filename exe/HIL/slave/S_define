@@ -104,7 +104,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             // this->ltg_thrust = 0;
         }
 
-        int tvc_cmd2egse(struct icf_ctrlblk_t* C) {
+        int downlink_packet_transfer(struct icf_ctrlblk_t* C) {
             struct can_frame tvc_no1_frame;
             struct can_frame tvc_no2_frame;
             double theta_a_deg, theta_b_deg, theta_c_deg, theta_d_deg;
@@ -188,7 +188,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             P2 (0.05, "scheduled") ins.update(0.05);
             P2 (0.05, "scheduled") control.control(0.05);
-            P2 (0.05, "scheduled") tvc_cmd2egse(&icf_esps_ctrl);
+            P2 (0.05, "scheduled") downlink_packet_transfer(&icf_esps_ctrl);
             ("shutdown") icf_ctrlblk_deinit(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
         }
 };
