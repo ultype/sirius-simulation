@@ -13,6 +13,8 @@ struct icf_driver_ops {
     int  (*fd_isset)(void *priv_data);
     void (*fd_set)(void *priv_data);
     void (*fd_zero)(void *priv_data);
+    int (*accept)(void *priv_data);
+    int (*is_server)(void *priv_data);
     int (*close_interface)(void **priv_data);
 };
 

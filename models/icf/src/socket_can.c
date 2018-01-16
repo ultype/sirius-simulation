@@ -201,5 +201,6 @@ struct icf_driver_ops icf_driver_socketcan_ops = {
     .fd_isset = socketcan_fd_isset,
     .fd_set = socketcan_fd_set,
     .fd_zero = socketcan_fd_zero,
+    .is_server = NULL,
     .close_interface = socket_can_deinit,
 };
