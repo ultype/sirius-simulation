@@ -21,6 +21,7 @@ LIBRARY DEPENDENCIES:
 ##include "stochastic.hh"
 ##include "matrix/utility.hh"
 ##include "global_constants.hh"
+##include "Dataflow_Binding.hh"
 ##include "transceiver.hh"
 ##include  "icf_trx_ctrl.h"
 
@@ -40,68 +41,42 @@ class FlightComputer_SimObject : public Trick::SimObject {
         GPS_FSW gps;
         struct icf_ctrlblk_t   icf_esps_ctrl;
 
+        refactor_dm_to_ins_t dm_ins_db;
+        refactor_ins_to_ctl_t ins_ctl_db;
+        refactor_ctl_to_tvc_t ctl_tvc_db;
+
+        GPS_LINK_decl();
+        INS_LINK_decl();
+        CONTROL_LINK_decl();
+
+        INS_SAVE_decl();
+        CONTROL_SAVE_decl();
+
+        //refactor_ctl_to_tvc_t do_downlink(){ return ctl_tvc_db; }
+
+        std::function<refactor_dm_to_ins_t()> grab_DM;
+        void load_input(){ dm_ins_db = grab_DM(); }
+
+        void setup_export(){
+            //transceiver.register_for_transmit(EXPORT(*this, do_downlink));
+
+            /* XXX */
+            //transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });
+        };
+
         void link(){
-            control.grab_dvbec = LINK(ins, get_dvbec);
-            control.grab_thtvdcx = LINK(ins, get_thtvdcx);
-            control.grab_thtbdcx = LINK(ins, get_thtbdcx);
-            control.grab_phibdcx = LINK(ins, get_phibdcx);
-            control.grab_psibdcx = LINK(ins, get_psibdcx);
-            control.grab_TBDQ = LINK(ins, get_TBDQ);
-            control.grab_TBD = LINK(ins, get_TBD);
-            control.grab_alphacx = LINK(ins, get_alphacx);
-            control.grab_TBICI = LINK(ins, get_TBICI);
-            control.grab_TBIC = LINK(ins, get_TBIC);
+            grab_DM = transceiver(IMPORT(*this, do_uplink));
 
-            gps.grab_SBIIC = LINK(ins, get_SBIIC);
-            gps.grab_VBIIC = LINK(ins, get_VBIIC);
-            gps.grab_WBICI = LINK(ins, get_WBICI);
-            gps.grab_SBEEC = LINK(ins, get_SBEEC);
-            gps.grab_VBEEC = LINK(ins, get_VBEEC);
-            gps.grab_TEIC = LINK(ins, get_TEIC);
+            GPSLinkInData(gps, dm_ins_db, ins);
+            INSLinkInData(ins, dm_ins_db, gps);
+            ControlLinkInData(control, ins_ctl_db);
 
-            ins.grab_SXH                    = LINK(gps           , get_SXH);
-            ins.grab_VXH                    = LINK(gps           , get_VXH);
-            
-
-            /* remote */
-            // control.grab_mprop              = transceiver(IMPORT(propulsion     , get_mprop));
-            // control.grab_dvbe               = transceiver(IMPORT(dynamics       , get_dvbe));
-            // control.grab_pdynmc             = transceiver(IMPORT(environment    , get_pdynmc));
-            // control.grab_qqcx               = transceiver(IMPORT(*gyro          , get_qqcx));
-            // control.grab_rrcx               = transceiver(IMPORT(*gryo          , get_rrcx));
-            control.grab_FSPCB              = transceiver(IMPORT(*accelerometer , get_computed_FSPB));
-            control.grab_computed_WBIB      = transceiver(IMPORT(*gyro          , get_computed_WBIB));
-            ins.grab_computed_WBIB          = transceiver(IMPORT(*gyro          , get_computed_WBIB));
-            ins.grab_error_of_computed_WBIB = transceiver(IMPORT(*gyro          , get_error_of_computed_WBIB));
-            ins.grab_computed_FSPB          = transceiver(IMPORT(*accelerometer , get_computed_FSPB));
-            ins.grab_error_of_computed_FSPB = transceiver(IMPORT(*accelerometer , get_error_of_computed_FSPB));
-            // ins.grab_SBII                   = transceiver(IMPORT(dynamics       , get_SBII));
-            // ins.grab_VBII                   = transceiver(IMPORT(dynamics       , get_VBII));
-            // ins.grab_dbi                    = transceiver(IMPORT(dynamics       , get_dbi));
-            // ins.grab_TBI                    = transceiver(IMPORT(dynamics       , get_TBI));
-            // ins.grab_SBEE                   = transceiver(IMPORT(dynamics       , get_SBEE));
-            // ins.grab_VBEE                   = transceiver(IMPORT(dynamics       , get_VBEE));
-            // ins.grab_phibdx                 = transceiver(IMPORT(dynamics       , get_phibdx));
-            // ins.grab_thtbdx                 = transceiver(IMPORT(dynamics       , get_thtbdx));
-            // ins.grab_psibdx                 = transceiver(IMPORT(dynamics       , get_psibdx));
-            ins.grab_gps_update             = transceiver(IMPORT(gps_con        , get_gps_update));
-            ins.grab_PHI                    = transceiver(IMPORT(*sdt           , get_PHI));
-            ins.grab_DELTA_VEL              = transceiver(IMPORT(*sdt           , get_DELTA_VEL));
-            ins.grab_PHI_HIGH               = transceiver(IMPORT(*sdt           , get_PHI_HIGH));
-            ins.grab_PHI_LOW                = transceiver(IMPORT(*sdt           , get_PHI_LOW));
-            // ins.grab_TEI                    = transceiver(IMPORT(env            , get_TEI));
-            gps.grab_transmit_data          = transceiver(IMPORT(gps_con        , get_transmit_data));
-            
             /* XXX */
             ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
-            // guidance.set_no_thrust  = [this](){ this->no_thrust = 1; };
-            // guidance.set_ltg_thrust = [this](){ this->ltg_thrust = 1; };
         };
 
         void clear_flag(){
             this->clear_gps = 0;
-            // this->no_thrust = 0;
-            // this->ltg_thrust = 0;
         }
 
         int downlink_packet_transfer(struct icf_ctrlblk_t* C) {
@@ -170,9 +145,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
         {
 
             ("default_data") clear_flag();
-
             ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
             ("initialization") icf_ctrlblk_init(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
+	        ("initialization") setup_export();
             ("initialization") link();
             ("initialization") gps.initialize(0.05);
             ("initialization") control.initialize();
@@ -180,6 +155,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             P1 (0.001, "scheduled") time->dm_time();
             P2 (0.05, "scheduled") transceiver.receive();
+            P2 (0.05, "scheduled") load_input();
 
             P2 (0.01, "scheduled") clear_flag();
 
@@ -187,7 +163,10 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") gps.measure(0.05);
 
             P2 (0.05, "scheduled") ins.update(0.05);
+            P2 (0.05, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (0.05, "scheduled") control.control(0.05);
+            P2 (0.05, "scheduled") Control_SaveOutData(control, ctl_tvc_db);
+            // P2 (0.05, "scheduled") transceiver.transmit();
             P2 (0.05, "scheduled") downlink_packet_transfer(&icf_esps_ctrl);
             ("shutdown") icf_ctrlblk_deinit(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
         }

@@ -48,6 +48,7 @@ LIBRARY DEPENDENCIES:
 ##include "matrix/utility.hh"
 
 ##include "transceiver.hh"
+##include "Dataflow_Binding.hh"
 
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"
@@ -70,44 +71,43 @@ class Rocket_SimObject : public Trick::SimObject {
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
 
-        Transceiver transceiver;
+        refactor_dm_to_ins_t dm_ins_db;
+        refactor_ctl_to_tvc_t ctl_tvc_db;
+        refactor_dm_to_ins_t do_uplink(){ return dm_ins_db; }
+        DM_SAVE_decl();
 
-        struct icf_ctrlblk_t   icf_ctrl;
-
-        void setup_export(){
-            // transceiver.register_for_transmit(EXPORT( propulsion    , get_mprop));
-            // transceiver.register_for_transmit(EXPORT( propulsion    , get_fmassr));
-            // transceiver.register_for_transmit(EXPORT( env           , get_pdynmc));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_SBII));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_VBII));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_dbi));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_dvbe));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_dvbi));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_thtvdx));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_SBEE));
-            // transceiver.register_for_transmit(EXPORT( dynamics        , get_VBEE));
-            // transceiver.register_for_transmit(EXPORT( dynamics    , get_TBI));
-            transceiver.register_for_transmit(EXPORT( *gyro         , get_computed_WBIB));
-            transceiver.register_for_transmit(EXPORT( *gyro         , get_error_of_computed_WBIB));
-            transceiver.register_for_transmit(EXPORT( *accelerometer, get_computed_FSPB));
-            transceiver.register_for_transmit(EXPORT( *accelerometer, get_error_of_computed_FSPB));
-            // transceiver.register_for_transmit(EXPORT( *gyro         , get_qqcx));
-            // transceiver.register_for_transmit(EXPORT( *gyro         , get_ppcx));
-            // transceiver.register_for_transmit(EXPORT( *gyro         , get_rrcx));
-            transceiver.register_for_transmit(EXPORT( gps_con       , get_transmit_data));
-            transceiver.register_for_transmit(EXPORT( gps_con       , get_gps_update));
-            // transceiver.register_for_transmit(EXPORT( dynamics    , get_phibdx));
-            // transceiver.register_for_transmit(EXPORT( dynamics    , get_thtbdx));
-            // transceiver.register_for_transmit(EXPORT( dynamics    , get_psibdx));
-            transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI));
-            transceiver.register_for_transmit(EXPORT( *sdt           , get_DELTA_VEL));
-            transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI_HIGH));
-            transceiver.register_for_transmit(EXPORT( *sdt           , get_PHI_LOW));
-            // transceiver.register_for_transmit(EXPORT( env           , get_TEI));
-
+        //std::function<refactor_ctl_to_tvc_t()> grab_FSW;
+        void load_input(){ 
+            ///ctl_tvc_db = grab_FSW(); 
         };
 
+
+        Transceiver transceiver;
+        void setup_export(){
+            transceiver.register_for_transmit(EXPORT( *this, do_uplink));
+        };
+
+        void exec_receive(){
+            /* XXX */
+            // if(((std::function<double()>)transceiver(IMPORT(ins, clear_gps_flag)))()){
+            //     gps_con.clear_gps_flag();
+            // }
+            // if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
+            //     propulsion.set_no_thrust();
+            // }
+            // if(((std::function<double()>)transceiver(IMPORT(guidance, ltg_thrust)))()){
+            //     propulsion.set_ltg_thrust();
+            // }
+        };
+        struct icf_ctrlblk_t   icf_ctrl;
+
         void link(){
+            //grab_FSW = transceiver(IMPORT(*this, do_downlink));
+
+            // tvc.grab_theta_a_cmd       = GRAB_VAR(ctl_tvc_db.theta_a_cmd);
+            // tvc.grab_theta_b_cmd       = GRAB_VAR(ctl_tvc_db.theta_b_cmd);
+            // tvc.grab_theta_c_cmd       = GRAB_VAR(ctl_tvc_db.theta_c_cmd);
+            // tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
 
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
@@ -215,16 +215,16 @@ class Rocket_SimObject : public Trick::SimObject {
             memcpy(&uplink_data.gps_con_transmit_data, trans_chan, sizeof(transmit_channel));
             uplink_data.gps_con_gps_update = gps_con.get_gps_update();
 
-            STORE_VEC3(uplink_data.accel_FSPCB, accelerometer->get_computed_FSPB())
-            STORE_VEC3(uplink_data.accel_EFSPB, accelerometer->get_error_of_computed_FSPB());
+            STORE_VEC(uplink_data.accel_FSPCB, accelerometer->get_computed_FSPB())
+            STORE_VEC(uplink_data.accel_EFSPB, accelerometer->get_error_of_computed_FSPB());
 
-            STORE_VEC3(uplink_data.sdt_phi, sdt->get_PHI());
-            STORE_VEC3(uplink_data.sdt_phi_high, sdt->get_PHI_HIGH());
-            STORE_VEC3(uplink_data.sdt_phi_low, sdt->get_PHI_LOW());
-            STORE_VEC3(uplink_data.sdt_delta_vel, sdt->get_DELTA_VEL());
+            STORE_VEC(uplink_data.sdt_phi, sdt->get_PHI());
+            STORE_VEC(uplink_data.sdt_phi_high, sdt->get_PHI_HIGH());
+            STORE_VEC(uplink_data.sdt_phi_low, sdt->get_PHI_LOW());
+            STORE_VEC(uplink_data.sdt_delta_vel, sdt->get_DELTA_VEL());
 
-            STORE_VEC3(uplink_data.gyro_WBICB, gyro->get_computed_WBIB());
-            STORE_VEC3(uplink_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB());
+            STORE_VEC(uplink_data.gyro_WBICB, gyro->get_computed_WBIB());
+            STORE_VEC(uplink_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB());
 
             icf_tx_enqueue(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX, &uplink_data, sizeof(uplink_packet_format_t));
         };
@@ -240,7 +240,6 @@ class Rocket_SimObject : public Trick::SimObject {
                 dynamics    (  )
             {
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
-            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
             ("initialization") link();
             ("initialization") setup_export();
             ("initialization") aerodynamics.initialize();
@@ -250,6 +249,8 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            
 
 
             P1 (5, "scheduled") icf_heartbeat();
@@ -276,8 +277,11 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") accelerometer->propagate_error(0.005, &icf_ctrl);
             P1 (0.005, "scheduled") sdt->compute(0.005);
 
+            P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.05, "scheduled") transceiver.transmit();
-
+	        //P2 (0.05, "scheduled") transceiver.receive();
+            //P2 (0.05, "scheduled") load_input();
+            //P2 (0.05, "scheduled") exec_receive();
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
 

@@ -14,15 +14,15 @@ static const struct icf_mapping g_icf_egse_maptbl[] = {
 
 
 static struct icf_ctrl_port g_egse_port[] = {
-    {1, HW_PORT0, "can0",        EMPTY_NETPORT, 16,   CAN_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT1, "/dev/ttyAP0", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT2, "/dev/ttyAP1", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT3, "/dev/ttyAP2", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT4, "/dev/ttyAP3", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {0, HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {0, HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT, 0,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {1, HW_PORT8, "127.0.0.1",   8700,          0,  ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {1, HW_PORT0, "can0",        EMPTY_NETPORT, 16,   CAN_DEVICE_TYPE,       NULL, NULL},
+    {1, HW_PORT1, "/dev/ttyAP0", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT2, "/dev/ttyAP1", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT3, "/dev/ttyAP2", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT4, "/dev/ttyAP3", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {0, HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {0, HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT, 0,    RS422_DEVICE_TYPE,     NULL, NULL},
+    {1, HW_PORT8, "127.0.0.1",   8700,          0,    ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
@@ -43,11 +43,11 @@ static const struct icf_mapping g_icf_esps_maptbl[] = {
 
 
 static struct icf_ctrl_port g_esps_port[] = {
-    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,               NULL, NULL}
+    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   16,   CAN_DEVICE_TYPE,               NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]}
+    {ESPS_TVC_SW_QIDX,   ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]}
 };
 
 
