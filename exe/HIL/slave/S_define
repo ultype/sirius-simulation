@@ -43,14 +43,14 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
         refactor_dm_to_ins_t dm_ins_db;
         refactor_ins_to_ctl_t ins_ctl_db;
-        refactor_ctl_to_tvc_t ctl_tvc_db;
+        //  refactor_ctl_to_tvc_t ctl_tvc_db;
 
         GPS_LINK_decl();
         INS_LINK_decl();
         CONTROL_LINK_decl();
 
         INS_SAVE_decl();
-        CONTROL_SAVE_decl();
+        // CONTROL_SAVE_decl();
 
         //refactor_ctl_to_tvc_t do_downlink(){ return ctl_tvc_db; }
 
@@ -165,7 +165,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") ins.update(0.05);
             P2 (0.05, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (0.05, "scheduled") control.control(0.05);
-            P2 (0.05, "scheduled") Control_SaveOutData(control, ctl_tvc_db);
+            //P2 (0.05, "scheduled") Control_SaveOutData(control, ctl_tvc_db);
             // P2 (0.05, "scheduled") transceiver.transmit();
             P2 (0.05, "scheduled") downlink_packet_transfer(&icf_esps_ctrl);
             ("shutdown") icf_ctrlblk_deinit(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
