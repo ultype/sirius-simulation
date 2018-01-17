@@ -72,42 +72,16 @@ class Rocket_SimObject : public Trick::SimObject {
         GPS_constellation gps_con;
 
         refactor_uplink_packet_t dm_ins_db;
-        refactor_downlink_packet_t ctl_tvc_db;
         refactor_uplink_packet_t do_uplink(){ return dm_ins_db; }
         DM_SAVE_decl();
-
-        //std::function<refactor_downlink_packet_t()> grab_FSW;
-        void load_input(){ 
-            ///ctl_tvc_db = grab_FSW(); 
-        };
-
+        struct icf_ctrlblk_t   icf_ctrl;
 
         Transceiver transceiver;
         void setup_export(){
             transceiver.register_for_transmit(EXPORT( *this, do_uplink));
         };
 
-        void exec_receive(){
-            /* XXX */
-            // if(((std::function<double()>)transceiver(IMPORT(ins, clear_gps_flag)))()){
-            //     gps_con.clear_gps_flag();
-            // }
-            // if(((std::function<double()>)transceiver(IMPORT(guidance, no_thrust)))()){
-            //     propulsion.set_no_thrust();
-            // }
-            // if(((std::function<double()>)transceiver(IMPORT(guidance, ltg_thrust)))()){
-            //     propulsion.set_ltg_thrust();
-            // }
-        };
-        struct icf_ctrlblk_t   icf_ctrl;
-
         void link(){
-            //grab_FSW = transceiver(IMPORT(*this, do_downlink));
-
-            // tvc.grab_theta_a_cmd       = GRAB_VAR(ctl_tvc_db.theta_a_cmd);
-            // tvc.grab_theta_b_cmd       = GRAB_VAR(ctl_tvc_db.theta_b_cmd);
-            // tvc.grab_theta_c_cmd       = GRAB_VAR(ctl_tvc_db.theta_c_cmd);
-            // tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
 
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
@@ -279,9 +253,6 @@ class Rocket_SimObject : public Trick::SimObject {
 
             P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.05, "scheduled") transceiver.transmit();
-	        //P2 (0.05, "scheduled") transceiver.receive();
-            //P2 (0.05, "scheduled") load_input();
-            //P2 (0.05, "scheduled") exec_receive();
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
 
