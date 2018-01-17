@@ -41,28 +41,17 @@ class FlightComputer_SimObject : public Trick::SimObject {
         GPS_FSW gps;
         struct icf_ctrlblk_t   icf_esps_ctrl;
 
-        refactor_dm_to_ins_t dm_ins_db;
+        refactor_uplink_packet_t dm_ins_db;
         refactor_ins_to_ctl_t ins_ctl_db;
-        //  refactor_ctl_to_tvc_t ctl_tvc_db;
 
         GPS_LINK_decl();
         INS_LINK_decl();
         CONTROL_LINK_decl();
 
         INS_SAVE_decl();
-        // CONTROL_SAVE_decl();
 
-        //refactor_ctl_to_tvc_t do_downlink(){ return ctl_tvc_db; }
-
-        std::function<refactor_dm_to_ins_t()> grab_DM;
+        std::function<refactor_uplink_packet_t()> grab_DM;
         void load_input(){ dm_ins_db = grab_DM(); }
-
-        void setup_export(){
-            //transceiver.register_for_transmit(EXPORT(*this, do_downlink));
-
-            /* XXX */
-            //transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });
-        };
 
         void link(){
             grab_DM = transceiver(IMPORT(*this, do_uplink));
@@ -147,7 +136,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("default_data") clear_flag();
             ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
             ("initialization") icf_ctrlblk_init(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
-	        ("initialization") setup_export();
             ("initialization") link();
             ("initialization") gps.initialize(0.05);
             ("initialization") control.initialize();
@@ -165,8 +153,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") ins.update(0.05);
             P2 (0.05, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (0.05, "scheduled") control.control(0.05);
-            //P2 (0.05, "scheduled") Control_SaveOutData(control, ctl_tvc_db);
-            // P2 (0.05, "scheduled") transceiver.transmit();
             P2 (0.05, "scheduled") downlink_packet_transfer(&icf_esps_ctrl);
             ("shutdown") icf_ctrlblk_deinit(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
         }

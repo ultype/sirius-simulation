@@ -30,8 +30,8 @@ class Transceiver {
     void register_for_transmit(std::string cid, std::string id, std::function<double()> in);
     void register_for_transmit(std::string cid, std::string id, std::function<arma::mat()> in);
     void register_for_transmit(std::string cid, std::string id, std::function<transmit_channel*()> in);
-    void register_for_transmit(std::string cid, std::string id, std::function<refactor_ctl_to_tvc_t()> in);
-    void register_for_transmit(std::string cid, std::string id, std::function<refactor_dm_to_ins_t()> in);
+    void register_for_transmit(std::string cid, std::string id, std::function<refactor_downlink_packet_t()> in);
+    void register_for_transmit(std::string cid, std::string id, std::function<refactor_uplink_packet_t()> in);
 
     void transmit();
     void receive();
@@ -41,8 +41,8 @@ class Transceiver {
     std::function<double()> get_double(std::string cid, std::string id);
     std::function<arma::mat()> get_mat(std::string cid, std::string id);
     std::function<transmit_channel*()> get_gpsr(std::string cid, std::string id);
-    std::function<refactor_ctl_to_tvc_t()> get_downlink(std::string cid, std::string id);
-    std::function<refactor_dm_to_ins_t()> get_uplink(std::string cid, std::string id);
+    std::function<refactor_downlink_packet_t()> get_downlink(std::string cid, std::string id);
+    std::function<refactor_uplink_packet_t()> get_uplink(std::string cid, std::string id);
 
  private:
     TCDevice dev;
@@ -51,14 +51,14 @@ class Transceiver {
     std::map<std::string, std::function<double()>> data_double_out;
     std::map<std::string, std::function<arma::mat()>> data_mat_out;
     std::map<std::string, std::function<transmit_channel*()>> data_gpsr_out;
-    std::map<std::string, std::function<refactor_ctl_to_tvc_t()>> data_downlink_out;
-    std::map<std::string, std::function<refactor_dm_to_ins_t()>> data_uplink_out;
+    std::map<std::string, std::function<refactor_downlink_packet_t()>> data_downlink_out;
+    std::map<std::string, std::function<refactor_uplink_packet_t()>> data_uplink_out;
 
     std::map<std::string, double> data_double_in;
     std::map<std::string, arma::mat> data_mat_in;
     std::map<std::string, transmit_channel*> data_gpsr_in;
-    std::map<std::string, refactor_ctl_to_tvc_t> data_downlink_in;
-    std::map<std::string, refactor_dm_to_ins_t> data_uplink_in;
+    std::map<std::string, refactor_downlink_packet_t> data_downlink_in;
+    std::map<std::string, refactor_uplink_packet_t> data_uplink_in;
 };
 
 class TransceiverProxy{
@@ -104,11 +104,11 @@ class TransceiverProxy{
         return transceiver->get_gpsr(cid, id);
     }
 
-    operator std::function<refactor_ctl_to_tvc_t()> () {
+    operator std::function<refactor_downlink_packet_t()> () {
         return transceiver->get_downlink(cid, id);
     }
 
-    operator std::function<refactor_dm_to_ins_t()> () {
+    operator std::function<refactor_uplink_packet_t()> () {
         return transceiver->get_uplink(cid, id);
     }
 #endif

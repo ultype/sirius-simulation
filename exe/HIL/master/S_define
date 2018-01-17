@@ -71,12 +71,12 @@ class Rocket_SimObject : public Trick::SimObject {
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
 
-        refactor_dm_to_ins_t dm_ins_db;
-        refactor_ctl_to_tvc_t ctl_tvc_db;
-        refactor_dm_to_ins_t do_uplink(){ return dm_ins_db; }
+        refactor_uplink_packet_t dm_ins_db;
+        refactor_downlink_packet_t ctl_tvc_db;
+        refactor_uplink_packet_t do_uplink(){ return dm_ins_db; }
         DM_SAVE_decl();
 
-        //std::function<refactor_ctl_to_tvc_t()> grab_FSW;
+        //std::function<refactor_downlink_packet_t()> grab_FSW;
         void load_input(){ 
             ///ctl_tvc_db = grab_FSW(); 
         };
