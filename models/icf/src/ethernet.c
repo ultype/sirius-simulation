@@ -204,7 +204,8 @@ int ethernet_accept(void *priv_data) {
     int newsock;
     newsock = accept(dev_info->netsock_fd, (struct sockaddr *)&dev_info->addr, sizeof(dev_info->addr));
     if (newsock < 0) {
-        fprintf(stderr, "error: failed to accept connection\n");
+        //  fprintf(stderr, "error: failed to accept connection\n");
+        return newsock;
     }
 
     if (newsock >= dev_info->nfds) 

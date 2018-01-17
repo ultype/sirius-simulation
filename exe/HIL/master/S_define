@@ -184,7 +184,7 @@ class Rocket_SimObject : public Trick::SimObject {
 
         };
 
-        void uplink_packet_transfer() {
+        void egse_uplink_packet_transfer() {
             transmit_channel *trans_chan = gps_con.get_transmit_data();
             memcpy(&uplink_data.gps_con_transmit_data, trans_chan, sizeof(transmit_channel));
             uplink_data.gps_con_gps_update = gps_con.get_gps_update();
@@ -228,7 +228,6 @@ class Rocket_SimObject : public Trick::SimObject {
 
 
             P1 (5, "scheduled") icf_heartbeat();
-            P1 (0.050, "scheduled") uplink_packet_transfer();
             P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0);
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
@@ -237,6 +236,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU02_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR01_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR02_SW_QIDX);
+            P1 (0.050, "scheduled") egse_uplink_packet_transfer();
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
 
 

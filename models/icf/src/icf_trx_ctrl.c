@@ -1,5 +1,4 @@
 #include "icf_trx_ctrl.h"
-
 static const struct icf_mapping g_icf_egse_maptbl[] = {
     {EGSE_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
     {EGSE_IMU01_SW_QIDX,              HW_PORT1, ICF_DRIVERS_ID1},
@@ -38,16 +37,19 @@ static struct icf_ctrl_queue g_egse_queue[] = {
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
-    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0}
+    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
+    {ESPS_GNC_SW_QIDX,                HW_PORT1, ICF_DRIVERS_ID2}
 };
 
 
 static struct icf_ctrl_port g_esps_port[] = {
-    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   16,   CAN_DEVICE_TYPE,               NULL, NULL}
+    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   16,       CAN_DEVICE_TYPE,      NULL, NULL},
+    {1, HW_PORT1, "esps_server", 8700,            512,      ETHERNET_DEVICE_TYPE, NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {ESPS_TVC_SW_QIDX,   ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]}
+    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]},
+    {ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
 };
 
 
@@ -130,6 +132,7 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
     struct icf_ctrl_port *port_blk_tbl_p = &g_egse_port;
     int port_blk_size = sizeof(g_egse_port);
 
+    C->system_type = system_type;
     if (system_type == ICF_SYSTEM_TYPE_ESPS) {
         queue_blk_tbl_p = &g_esps_queue;
         queue_blk_size = sizeof(g_esps_queue);
@@ -202,9 +205,15 @@ empty:
     return 0;
 }
 
-static int icf_dispatch_rx_frame(void *rxframe) {
+static int icf_dispatch_rx_frame(struct icf_ctrlblk_t* C, void *rxframe) {
     int qidx = 0;
     struct can_frame *pframe = NULL;
+
+    if (C->system_type == ICF_SYSTEM_TYPE_ESPS) {
+        qidx = ESPS_GNC_SW_QIDX;
+        hex_dump("dungru: esps_dispatch", rxframe, 24);
+        return qidx;
+    }
     pframe = (struct can_frame *)rxframe;
     switch (pframe->can_id) {
         case FC2TVC_III_NO1:
@@ -247,10 +256,12 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
     if (drv_ops->fd_isset(ctrlport->drv_priv_data)) {
 
         if (drv_ops->accept && drv_ops->is_server) {
-            if (drv_ops->is_server(ctrlport->drv_priv_data))
-                drv_ops->accept(ctrlport->drv_priv_data);
+            if (drv_ops->is_server(ctrlport->drv_priv_data)) {
+                if (drv_ops->accept(ctrlport->drv_priv_data) < 0)
+                    return 0;
+            }
         }
-#if 0
+#if 0 /* Todo for multiple tcp socket client */
         for (int fd = sock + 1; fd < nfds; ++fd) {
             if (FD_ISSET(fd, &readFDs)) handle(server, fd, &activeFDs, &addr);
         }
@@ -266,7 +277,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx) {
         }
         if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)rxcell->l2frame, rxcell->frame_full_size) > 0) {
             debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)rxcell->l2frame, rxcell->frame_full_size);
-            qidx = icf_dispatch_rx_frame(rxcell->l2frame);
+            qidx = icf_dispatch_rx_frame(C, rxcell->l2frame);
             if (qidx > EGSE_EMPTY_SW_QIDX) {
                 ctrlqueue = C->ctrlqueue[qidx];
                 FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
