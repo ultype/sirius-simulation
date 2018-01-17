@@ -38,19 +38,16 @@ static struct icf_ctrl_queue g_egse_queue[] = {
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
-    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
-    {ESPS_GNC_CONTROL_SW_QIDX,        HW_PORT1, ICF_DRIVERS_ID2},
+    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0}
 };
 
 
 static struct icf_ctrl_port g_esps_port[] = {
-    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,               NULL, NULL},
-    {1, HW_PORT1, "esps_server", 8700,            ETHERNET_DEVICE_TYPE,          NULL, NULL}
+    {1, HW_PORT0, "can1",        EMPTY_NETPORT,   CAN_DEVICE_TYPE,               NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]},
-    {ESPS_GNC_CONTROL_SW_QIDX,          ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
+    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]}
 };
 
 
