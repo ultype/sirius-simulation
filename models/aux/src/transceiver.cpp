@@ -59,13 +59,13 @@ void Transceiver::register_for_transmit(std::string cid, std::string id, std::fu
     data_gpsr_out[tid] = in;
 }
 
-void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<refactor_ctl_to_tvc_t()> in) {
+void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<refactor_downlink_packet_t()> in) {
     std::string tid = cid + "." + id;
     if (tid.length() > 127) throw std::out_of_range("ID too long");
     data_downlink_out[tid] = in;
 }
 
-void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<refactor_dm_to_ins_t()> in) {
+void Transceiver::register_for_transmit(std::string cid, std::string id, std::function<refactor_uplink_packet_t()> in) {
     std::string tid = cid + "." + id;
     if (tid.length() > 127) throw std::out_of_range("ID too long");
     data_uplink_out[tid] = in;
@@ -114,24 +114,24 @@ void Transceiver::transmit() {
 
     for (auto it = data_downlink_out.begin(); it != data_downlink_out.end(); ++it) {
         struct generic_header gh = { .type = DOWNLINK_STRUCT, .name_length = (unsigned int)it->first.length() };
-        refactor_ctl_to_tvc_t tmp;
+        refactor_downlink_packet_t tmp;
         char buf[256];
         snprintf(buf, sizeof(buf), "%s", it->first.c_str());
         tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
         tc_write(&dev, buf, gh.name_length);
         tmp = it->second();
-        tc_write(&dev, reinterpret_cast<char*>(&tmp), sizeof(refactor_ctl_to_tvc_t));
+        tc_write(&dev, reinterpret_cast<char*>(&tmp), sizeof(refactor_downlink_packet_t));
     }
 
     for (auto it = data_uplink_out.begin(); it != data_uplink_out.end(); ++it) {
         struct generic_header gh = { .type = UPLINK_STRUCT, .name_length = (unsigned int)it->first.length() };
-        refactor_dm_to_ins_t tmp;
+        refactor_uplink_packet_t tmp;
         char buf[256];
         snprintf(buf, sizeof(buf), "%s", it->first.c_str());
         tc_write(&dev, reinterpret_cast<char*>(&gh), sizeof(gh));
         tc_write(&dev, buf, gh.name_length);
         tmp = it->second();
-        tc_write(&dev, reinterpret_cast<char*>(&tmp), sizeof(refactor_dm_to_ins_t));
+        tc_write(&dev, reinterpret_cast<char*>(&tmp), sizeof(refactor_uplink_packet_t));
     }
 }
 
@@ -201,8 +201,8 @@ void Transceiver::receive() {
                     std::string name(buf);
                     delete[] buf;
 
-                    refactor_ctl_to_tvc_t in;
-                    tc_read(&dev, reinterpret_cast<char*>(&in), sizeof(refactor_ctl_to_tvc_t));
+                    refactor_downlink_packet_t in;
+                    tc_read(&dev, reinterpret_cast<char*>(&in), sizeof(refactor_downlink_packet_t));
                     data_downlink_in[name] = in;
                 }
                 break;
@@ -214,8 +214,8 @@ void Transceiver::receive() {
                     std::string name(buf);
                     delete[] buf;
 
-                    refactor_dm_to_ins_t in;
-                    tc_read(&dev, reinterpret_cast<char*>(&in), sizeof(refactor_dm_to_ins_t));
+                    refactor_uplink_packet_t in;
+                    tc_read(&dev, reinterpret_cast<char*>(&in), sizeof(refactor_uplink_packet_t));
                     data_uplink_in[name] = in;
                 }
                 break;
@@ -244,10 +244,10 @@ std::function<transmit_channel *()> Transceiver::get_gpsr(std::string cid, std::
     return [this, cid, id](){ return data_gpsr_in[cid + "." + id]; };
 }
 
-std::function<refactor_ctl_to_tvc_t()> Transceiver::get_downlink(std::string cid, std::string id) {
+std::function<refactor_downlink_packet_t()> Transceiver::get_downlink(std::string cid, std::string id) {
     return [this, cid, id](){ return data_downlink_in[cid + "." + id]; };
 }
 
-std::function<refactor_dm_to_ins_t()> Transceiver::get_uplink(std::string cid, std::string id) {
+std::function<refactor_uplink_packet_t()> Transceiver::get_uplink(std::string cid, std::string id) {
     return [this, cid, id](){ return data_uplink_in[cid + "." + id]; };
 }

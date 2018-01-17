@@ -41,9 +41,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
         GPS_FSW gps;
         struct icf_ctrlblk_t   icf_esps_ctrl;
 
-        refactor_dm_to_ins_t dm_ins_db;
+        refactor_uplink_packet_t dm_ins_db;
         refactor_ins_to_ctl_t ins_ctl_db;
-        refactor_ctl_to_tvc_t ctl_tvc_db;
+        refactor_downlink_packet_t ctl_tvc_db;
 
         GPS_LINK_decl();
         INS_LINK_decl();
@@ -52,9 +52,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
         INS_SAVE_decl();
         CONTROL_SAVE_decl();
 
-        //refactor_ctl_to_tvc_t do_downlink(){ return ctl_tvc_db; }
+        //refactor_downlink_packet_t do_downlink(){ return ctl_tvc_db; }
 
-        std::function<refactor_dm_to_ins_t()> grab_DM;
+        std::function<refactor_uplink_packet_t()> grab_DM;
         void load_input(){ dm_ins_db = grab_DM(); }
 
         void setup_export(){
