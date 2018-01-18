@@ -66,20 +66,15 @@ class Rocket_SimObject : public Trick::SimObject {
         sensor::Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
-        uplink_packet_format_t uplink_data;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
 
         refactor_uplink_packet_t dm_ins_db;
-        refactor_uplink_packet_t do_uplink(){ return dm_ins_db; }
         DM_SAVE_decl();
         struct icf_ctrlblk_t   icf_ctrl;
 
         Transceiver transceiver;
-        void setup_export(){
-            transceiver.register_for_transmit(EXPORT( *this, do_uplink));
-        };
 
         void link(){
 
@@ -186,23 +181,8 @@ class Rocket_SimObject : public Trick::SimObject {
 
         };
 
-        void egse_uplink_packet_transfer() {
-            transmit_channel *trans_chan = gps_con.get_transmit_data();
-            memcpy(&uplink_data.gps_con_transmit_data, trans_chan, sizeof(transmit_channel));
-            uplink_data.gps_con_gps_update = gps_con.get_gps_update();
-
-            STORE_VEC(uplink_data.accel_FSPCB, accelerometer->get_computed_FSPB())
-            STORE_VEC(uplink_data.accel_EFSPB, accelerometer->get_error_of_computed_FSPB());
-
-            STORE_VEC(uplink_data.sdt_phi, sdt->get_PHI());
-            STORE_VEC(uplink_data.sdt_phi_high, sdt->get_PHI_HIGH());
-            STORE_VEC(uplink_data.sdt_phi_low, sdt->get_PHI_LOW());
-            STORE_VEC(uplink_data.sdt_delta_vel, sdt->get_DELTA_VEL());
-
-            STORE_VEC(uplink_data.gyro_WBICB, gyro->get_computed_WBIB());
-            STORE_VEC(uplink_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB());
-
-            icf_tx_enqueue(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX, &uplink_data, sizeof(uplink_packet_format_t));
+        void egse_uplink_packet_enqueue(struct icf_ctrlblk_t *C) {
+            icf_tx_enqueue(C, EGSE_FLIGHT_COMPUTER_SW_QIDX, &dm_ins_db, sizeof(refactor_uplink_packet_t));
         };
 
 
@@ -217,7 +197,6 @@ class Rocket_SimObject : public Trick::SimObject {
             {
             ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
-            ("initialization") setup_export();
             ("initialization") aerodynamics.initialize();
             ("initialization") dynamics.initialize();
             ("initialization") env.initialize();
@@ -230,7 +209,8 @@ class Rocket_SimObject : public Trick::SimObject {
 
 
             P1 (5, "scheduled") icf_heartbeat();
-            P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0, 16);
+            P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0, sizeof(struct can_frame));
+
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
@@ -238,8 +218,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU02_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR01_SW_QIDX);
             P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR02_SW_QIDX);
-            P1 (0.050, "scheduled") egse_uplink_packet_transfer();
-            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
+
 
 
 
@@ -254,7 +233,9 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") sdt->compute(0.005);
 
             P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
-            P2 (0.05, "scheduled") transceiver.transmit();
+            P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
+            P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
+
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
 

@@ -278,10 +278,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
                 debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
             }
             break;
-        case ETHERNET_DEVICE_TYPE:        
-                    // if (drv_ops->accept(ctrlport->drv_priv_data) < 0) {
-                    //     break;
-                    // }
+        case ETHERNET_DEVICE_TYPE:
                     rxcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
                     if (rxcell == NULL) {
                         fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
@@ -299,11 +296,11 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
                             FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
                             rb_push(&ctrlqueue->data_ring, rxcell);
                         }
+                        debug_print("[%lf] RX Ethernet Received !!\n", get_curr_time());
                     } else {
                         icf_free_mem(rxcell->l2frame);
                         icf_free_mem(rxcell);
                     }
-                    debug_print("[%lf] RX Ethernet Received !!\n", get_curr_time());
             break;
         default:
             fprintf(stderr, "[icf_rx_ctrl_job] No such RX  device !!!\n");
