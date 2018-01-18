@@ -148,7 +148,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") transceiver.receive();
             P2 (0.05, "scheduled") load_input();
 
-            //P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT1);
+            //P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT1, sizeof(uplink_packet_format_t));
             //P2 (0.05, "scheduled") esps_uplink_data_receive(&icf_esps_ctrl);
 
             P2 (0.01, "scheduled") clear_flag();

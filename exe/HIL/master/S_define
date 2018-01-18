@@ -149,6 +149,8 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_WBIB           = LINK( dynamics, get_WBIB);
             forces.grab_ABII           = LINK( dynamics, get_ABII);
             forces.grab_xcg_0          = LINK( propulsion, get_xcg_0);
+            forces.grab_xcp            = LINK( aerodynamics, get_xcp);
+            forces.grab_xcg            = LINK( propulsion, get_xcg);
 
             gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
             gps_con.grab_TEI           = LINK( env, get_TEI);
@@ -228,7 +230,7 @@ class Rocket_SimObject : public Trick::SimObject {
 
 
             P1 (5, "scheduled") icf_heartbeat();
-            P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0);
+            P1 (0.005, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT0, 16);
             P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
             P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);

@@ -5,12 +5,12 @@
 struct ethernet_device_info_t {
     char ifname[IFNAMSIZ];
     int server_enable;
-    int netsock_fd;
-    fd_set *active_fdset;
-    fd_set *read_fdset;
-    int nfds;
     struct ifreq ifr;
-    struct sockaddr_in addr;
+    int server_fd;
+    int client_fd;
+    struct sockaddr_in server_addr;
+    struct sockaddr_in client_addr;
+    int client_addr_len;
     uint32_t header_size;
 };
 

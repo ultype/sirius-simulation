@@ -103,7 +103,6 @@ struct icf_ctrl_port {
     int hw_port;
     char ifname[IFNAMSIZ];
     int netport;
-    uint32_t rx_buff_size;
     uint8_t dev_type;
     void *drv_priv_data;
     struct icf_driver_ops *drv_priv_ops;
@@ -132,7 +131,7 @@ void icf_free_mem(void *ptr);
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type);
 int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C, int system_type);
 int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
-int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx);
+int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size);
 
 int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
 int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
