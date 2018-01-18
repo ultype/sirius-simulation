@@ -63,6 +63,7 @@ extern "C" int event_separation_1() {
     double spi            = 288.4111169;  // 288.4111169 290.0
     double fuel_flow_rate = 3.814;
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
+    rkt.forces.set_reference_point(-3.275);  // set reference point
 
     rkt.tvc.set_s3_tau1(20.0);
     rkt.tvc.set_s3_tau2(20.0);
@@ -152,8 +153,9 @@ extern "C" int run_me() {
     double fuel_flow_rate = 29.587;     //  fuel flow rate
     rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
 
-    rkt.propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
+    rkt.propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area 0.03329156 * 4.0
     rkt.propulsion.set_payload(100.0);  // payload mass
+    rkt.forces.set_reference_point(-8.436);  // set reference point
     /************************************************************************************************************************/
 
     /**************************************************Sensor****************************************************************/
