@@ -205,11 +205,11 @@ empty:
     return 0;
 }
 
-static int icf_dispatch_rx_frame(struct icf_ctrlblk_t* C, void *rxframe) {
+static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
     int qidx = 0;
     struct can_frame *pframe = NULL;
 
-    if (C->system_type == ICF_SYSTEM_TYPE_ESPS) {
+    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
         qidx = ESPS_GNC_SW_QIDX;
         //  hex_dump("dungru: esps_dispatch", rxframe, 24);
         return qidx;
@@ -236,12 +236,45 @@ static int icf_dispatch_rx_frame(struct icf_ctrlblk_t* C, void *rxframe) {
     return qidx;
 }
 
+static int icf_l2frame_receive_process(struct icf_ctrlblk_t* C, 
+                                       struct icf_driver_ops *drv_ops, 
+                                       struct icf_ctrl_port *ctrlport, 
+                                       int rx_buff_size) {
+    struct ringbuffer_cell_t *rxcell = NULL;
+    struct icf_ctrl_queue *ctrlqueue;
+    int qidx;
+    /*TODO malloc use the static memory*/
+    rxcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
+    if (rxcell == NULL) {
+        fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
+        goto empty;
+    }
+    rxcell->frame_full_size = rx_buff_size;
+    rxcell->l2frame = icf_alloc_mem(rxcell->frame_full_size);
+    if (rxcell->l2frame == NULL) {
+        fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
+        goto empty;
+    }
+    if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)rxcell->l2frame, rxcell->frame_full_size) < 0)
+        goto empty;
+    debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)rxcell->l2frame, rxcell->frame_full_size);
+    qidx = icf_dispatch_rx_frame(C->system_type, rxcell->l2frame);
+    if (qidx == EGSE_EMPTY_SW_QIDX)
+        goto empty;
+    ctrlqueue = C->ctrlqueue[qidx];
+    FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
+    rb_push(&ctrlqueue->data_ring, rxcell);
+    return ICF_STATUS_SUCCESS;
+empty:
+    icf_free_mem(rxcell->l2frame);
+    icf_free_mem(rxcell);
+    return ICF_STATUS_FAIL;
+}
+
 int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
     struct timeval tv;
     int ret;
     int qidx = 0;
-    struct ringbuffer_cell_t *rxcell = NULL;
-    struct icf_ctrl_queue *ctrlqueue;
     struct icf_ctrl_port *ctrlport = C->ctrlport[pidx];
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
     int sock, fd, nfds;
@@ -255,58 +288,21 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
             ret = drv_ops->select(ctrlport->drv_priv_data, &tv);
             if (ret < 0)
                 fprintf(stderr, "select error: %d\n", ret);
-            /*TODO malloc need use the static memory*/
             if (drv_ops->fd_isset(ctrlport->drv_priv_data)) {
-                rxcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
-                if (rxcell == NULL) {
-                    fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
-                }
-                rxcell->frame_full_size = rx_buff_size;
-                rxcell->l2frame = icf_alloc_mem(rxcell->frame_full_size);
-                if (rxcell->l2frame == NULL) {
-                    fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
-                }
-                if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)rxcell->l2frame, rxcell->frame_full_size) > 0) {
-                    debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)rxcell->l2frame, rxcell->frame_full_size);
-                    qidx = icf_dispatch_rx_frame(C, rxcell->l2frame);
-                    if (qidx > EGSE_EMPTY_SW_QIDX) {
-                        ctrlqueue = C->ctrlqueue[qidx];
-                        FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
-                        rb_push(&ctrlqueue->data_ring, rxcell);
-                    }
-                }
+                if (icf_l2frame_receive_process(C, drv_ops, ctrlport, rx_buff_size) < 0)
+                    break;
                 debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
             }
             break;
         case ETHERNET_DEVICE_TYPE:
-                    rxcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
-                    if (rxcell == NULL) {
-                        fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
-                    }
-                    rxcell->frame_full_size = rx_buff_size;
-                    rxcell->l2frame = icf_alloc_mem(rxcell->frame_full_size);
-                    if (rxcell->l2frame == NULL) {
-                        fprintf(stderr, "icf_rx_ctrl_job ring cell allocate fail!!\n");
-                    }
-                    if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)rxcell->l2frame, rxcell->frame_full_size) > 0) {
-                        debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)rxcell->l2frame, rxcell->frame_full_size);
-                        qidx = icf_dispatch_rx_frame(C, rxcell->l2frame);
-                        if (qidx > EGSE_EMPTY_SW_QIDX) {
-                            ctrlqueue = C->ctrlqueue[qidx];
-                            FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
-                            rb_push(&ctrlqueue->data_ring, rxcell);
-                        }
-                        debug_print("[%lf] RX Ethernet Received !!\n", get_curr_time());
-                    } else {
-                        icf_free_mem(rxcell->l2frame);
-                        icf_free_mem(rxcell);
-                    }
+                if (icf_l2frame_receive_process(C, drv_ops, ctrlport, rx_buff_size) < 0)
+                    break;
+                debug_print("[%lf] RX Ethernet Received !!\n", get_curr_time());
             break;
         default:
             fprintf(stderr, "[icf_rx_ctrl_job] No such RX  device !!!\n");
     }
-
-    return 0;
+    return ICF_STATUS_SUCCESS;
 }
 
 
@@ -332,7 +328,7 @@ int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t siz
     drv_ops->send_data(ctrlport->drv_priv_data, tx_buffer, frame_full_size);
     debug_hex_dump("icf_tx_direct", tx_buffer, frame_full_size);
     icf_free_mem(tx_buffer);
-    return 0;
+    return ICF_STATUS_SUCCESS;
 }
 
 int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size) {
@@ -365,7 +361,7 @@ int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t si
         rb_push(whichring, txcell);
     }
 
-    return 0;
+    return ICF_STATUS_SUCCESS;
 }
 
 int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
@@ -383,8 +379,7 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
         icf_free_mem(txcell->l2frame);
         icf_free_mem(txcell);
     }
-
-    return 0;
+    return ICF_STATUS_SUCCESS;
 }
 
 void icf_heartbeat(void) {
