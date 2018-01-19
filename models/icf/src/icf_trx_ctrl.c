@@ -236,10 +236,8 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
     return qidx;
 }
 
-static int icf_l2frame_receive_process(struct icf_ctrlblk_t* C, 
-                                       struct icf_driver_ops *drv_ops, 
-                                       struct icf_ctrl_port *ctrlport, 
-                                       int rx_buff_size) {
+static int icf_l2frame_receive_process(struct icf_ctrlblk_t* C, struct icf_driver_ops *drv_ops,
+                                       struct icf_ctrl_port *ctrlport, int rx_buff_size) {
     struct ringbuffer_cell_t *rxcell = NULL;
     struct icf_ctrl_queue *ctrlqueue;
     int qidx;
