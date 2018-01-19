@@ -22,7 +22,7 @@ builds['SIL'] = {
                     timeout(10) {  // execute at most 10 minutes
                         sh '''
                             cd exe/SIL/master
-                            ./test.sh
+                            ./SIL.sh
                         '''
                         archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
                                          fingerprint: true
