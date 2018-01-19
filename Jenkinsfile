@@ -8,20 +8,20 @@ node { // for loading the shared functions
     common = load 'common.groovy'
 }
 
-builds['PIL'] = {
+builds['SIL'] = {
     node {
         def workspace = pwd()
 
-        stage('PIL Checkout Source Code') {
+        stage('SIL Checkout Source Code') {
             common.checkoutSource()
         }
 
-        stage ('Test PIL') {
+        stage ('SIL Testing') {
             try {
                 retry(2) {  // retry at most 2 times
                     timeout(10) {  // execute at most 10 minutes
                         sh '''
-                            cd exe/PIL/master
+                            cd exe/SIL/master
                             ./test.sh
                         '''
                         archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
@@ -37,15 +37,15 @@ builds['PIL'] = {
     }
 }
 
-builds['Testing'] = {
+builds['lint'] = {
     node {
         def workspace = pwd()
 
-        stage('Testing Checkout Source Code') {
+        stage('Lint Checkout Source Code') {
             common.checkoutSource()
         }
 
-        stage ('Check Style') {
+        stage ('Code Style Checking') {
             try {
                 // "lint.sh" generates the xml files "C_style_report" and "Cpp_style_report"
                 sh '''
