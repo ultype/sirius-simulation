@@ -20,11 +20,11 @@ LIBRARY DEPENDENCIES:
 ##include "integrate.hh"
 ##include "stochastic.hh"
 ##include "matrix/utility.hh"
+##include "global_constants.hh"
 ##include "Dataflow_Binding.hh"
-
 ##include "transceiver.hh"
-
-
+##include  "icf_trx_ctrl.h"
+##include  "DM_FSW_Interface.hh"
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
 
@@ -39,6 +39,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         Transceiver transceiver;
 
         GPS_FSW gps;
+        struct icf_ctrlblk_t   icf_esps_ctrl;
 
         refactor_uplink_packet_t dm_ins_db;
         refactor_ins_to_ctl_t ins_ctl_db;
@@ -49,23 +50,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
         CONTROL_LINK_decl();
 
         INS_SAVE_decl();
-        CONTROL_SAVE_decl();
-
-        refactor_downlink_packet_t do_downlink(){ return ctl_tvc_db; }
-
-        std::function<refactor_uplink_packet_t()> grab_DM;
-        void load_input(){ dm_ins_db = grab_DM(); }
-
-        void setup_export(){
-            transceiver.register_for_transmit(EXPORT(*this, do_downlink));
-
-            /* XXX */
-            transceiver.register_for_transmit("ins", "clear_gps_flag", [this](){ return this->clear_gps; });
-        };
+        CONTROL_SAVE_decl()
 
         void link(){
-            grab_DM = transceiver(IMPORT(*this, do_uplink));
-
             GPSLinkInData(gps, dm_ins_db, ins);
             INSLinkInData(ins, dm_ins_db, gps);
             ControlLinkInData(control, ins_ctl_db);
@@ -78,25 +65,85 @@ class FlightComputer_SimObject : public Trick::SimObject {
             this->clear_gps = 0;
         }
 
+        int downlink_packet_transfer(struct icf_ctrlblk_t* C) {
+            struct can_frame tvc_no1_frame;
+            struct can_frame tvc_no2_frame;
+            double theta_a_deg, theta_b_deg, theta_c_deg, theta_d_deg;
+            double theta_a_rad, theta_b_rad, theta_c_rad, theta_d_rad;
+            int16_t theta_a_cnt, theta_b_cnt, theta_c_cnt, theta_d_cnt;
+            const double tvc_dsp_resolution = 0.01;
+            int ret = 0;
+
+            theta_a_rad = ctl_tvc_db.theta_a_cmd;
+            theta_b_rad = ctl_tvc_db.theta_b_cmd;
+            theta_c_rad = ctl_tvc_db.theta_c_cmd;
+            theta_d_rad = ctl_tvc_db.theta_d_cmd;
+
+            theta_a_deg = theta_a_rad * 180/PI;
+            theta_b_deg = theta_b_rad * 180/PI;
+            theta_c_deg = theta_c_rad * 180/PI;
+            theta_d_deg = theta_d_rad * 180/PI;
+            
+            theta_a_cnt = theta_a_deg/tvc_dsp_resolution;
+            theta_b_cnt = theta_b_deg/tvc_dsp_resolution;
+            theta_c_cnt = theta_c_deg/tvc_dsp_resolution;
+            theta_d_cnt = theta_d_deg/tvc_dsp_resolution;
+
+            //  fprintf(stderr, "%d %d %d %d\n", theta_a_cnt, theta_c_cnt, theta_b_cnt, theta_d_cnt);
+            //  fprintf(stderr, "%f %f %f %f\n", theta_a_rad, theta_c_rad, theta_b_rad, theta_d_rad);
+            /*Frame tvc no1*/
+            /* Target ID */
+            tvc_no1_frame.can_id  = FC2TVC_III_NO1;
+            tvc_no1_frame.can_dlc = 8;
+            /*  Indicator */
+            tvc_no1_frame.data[0] = 0x1;
+            /* Task Command */
+            tvc_no1_frame.data[1] = TVC_MOVEMENT_FAKE;
+            /* TVC no1 Pitch count => Y axis => theta_a*/
+            tvc_no1_frame.data[2] = (theta_a_cnt >> 8) & 0xFF;
+            tvc_no1_frame.data[3] = (theta_a_cnt & 0xFF);
+            /* TVC no1 Yaw count => Z axis => theta_c*/
+            tvc_no1_frame.data[4] = (theta_c_cnt >> 8) & 0xFF;
+            tvc_no1_frame.data[5] = (theta_c_cnt & 0xFF);
+
+            /*Frame tvc no2*/
+            /* Target ID */
+            tvc_no2_frame.can_id  = FC2TVC_III_NO2;
+            tvc_no2_frame.can_dlc = 8;
+            /*  Indicator */
+            tvc_no2_frame.data[0] = 0x1;
+            /* Task Command */
+            tvc_no2_frame.data[1] = TVC_MOVEMENT_FAKE;
+            /* TVC no2 Pitch count => Y axis => theta_b*/
+            tvc_no2_frame.data[2] = (theta_b_cnt >> 8) & 0xFF;
+            tvc_no2_frame.data[3] = (theta_b_cnt & 0xFF);
+            /* TVC no2 Yaw count => Z axis => theta_d*/
+            tvc_no2_frame.data[4] = (theta_d_cnt >> 8) & 0xFF;
+            tvc_no2_frame.data[5] = (theta_d_cnt & 0xFF);
+            icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no1_frame, sizeof(struct can_frame));
+            icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no2_frame, sizeof(struct can_frame));
+            return ret;
+        }
+
+        void load_input(struct icf_ctrlblk_t* C) {
+            if (icf_rx_dequeue(C, ESPS_GNC_SW_QIDX, &dm_ins_db, sizeof(refactor_uplink_packet_t)) > 0)
+                debug_hex_dump("esps", (uint8_t *)&dm_ins_db, sizeof(refactor_uplink_packet_t));
+        }
         FlightComputer_SimObject() : ins(),
                                      gps()
         {
 
             ("default_data") clear_flag();
-            // ("default_data") guidance.default_data();
-
             ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
-            ("initialization") setup_export();
+            ("initialization") icf_ctrlblk_init(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
             ("initialization") link();
             ("initialization") gps.initialize(0.05);
             ("initialization") control.initialize();
             ("initialization") ins.initialize();
 
             P1 (0.001, "scheduled") time->dm_time();
-
-            P2 (0.05, "scheduled") transceiver.receive();
-            P2 (0.05, "scheduled") load_input();
-
+            P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT1, sizeof(refactor_uplink_packet_t));
+            P2 (0.05, "scheduled") load_input(&icf_esps_ctrl);
             P2 (0.01, "scheduled") clear_flag();
 
             P2 (0.05, "scheduled") gps.filter_extrapolation(0.05);
@@ -106,9 +153,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (0.05, "scheduled") control.control(0.05);
             P2 (0.05, "scheduled") Control_SaveOutData(control, ctl_tvc_db);
-
-            P2 (0.05, "scheduled") transceiver.transmit();
-;
+            P2 (0.05, "scheduled") downlink_packet_transfer(&icf_esps_ctrl);
+            ("shutdown") icf_ctrlblk_deinit(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
         }
 };
 
