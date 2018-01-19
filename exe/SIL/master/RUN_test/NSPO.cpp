@@ -18,7 +18,7 @@ extern "C" void master_startup() {
         throw std::invalid_argument("Must set $WORKSPACE");
     }
 
-    new_slave->sim_path = std::string(std::getenv("WORKSPACE")) + "/exe/PIL/slave";
+    new_slave->sim_path = std::string(std::getenv("WORKSPACE")) + "/exe/SIL/slave";
     new_slave->S_main_name = "./S_main_Linux_5.4_x86_64.exe";
     new_slave->run_input_file = "RUN_test/NSPO.py";
     new_slave->sync_error_terminate = 1;
