@@ -24,7 +24,7 @@ builds['SIL'] = {
                             cd exe/SIL/master
                             ./SIL.sh
                         '''
-                        archiveArtifacts artifacts: 'exe/PIL/master/result.csv, exe/PIL/master/test_result',
+                        archiveArtifacts artifacts: 'exe/SIL/master/result.csv, exe/SIL/master/test_result',
                                          fingerprint: true
                     }
                 }
