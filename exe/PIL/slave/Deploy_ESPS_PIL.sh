@@ -9,14 +9,6 @@ else
     export WORKSPACE=`pwd`/../../../
 fi
 
-if [ -z $1 ]; then
-    echo "No arguments supplied"
-    ESPS_IP="192.168.0.9"
-else
-    ESPS_IP=$1
-fi
-echo "ESPS IP: "$ESPS_IP
-LOCAL_HOST_IP="127.0.0.1"
 ##### FUNCTION #####
 comment_the_Python_code() {
     pattern=$1
@@ -51,4 +43,4 @@ comment_the_C_code '("initialization") transceiver.initialize_connection' "$WORK
 
 ##### Generate the image#####
 trick-CP
-./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp
+./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
