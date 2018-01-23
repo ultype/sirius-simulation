@@ -69,7 +69,7 @@ extern "C" int event_separation_1() {
     rkt.tvc.set_s3_tau2(20.0);
     rkt.tvc.set_s3_tau3(20.0);
     rkt.tvc.set_s3_tau4(20.0);
-    rkt.tvc.set_s3_ratelim(16.0 * 2.0 * RAD);
+    rkt.tvc.set_s3_ratelim(16.0 * RAD);
     rkt.tvc.set_s3_tvclim(7 * RAD);
     rkt.tvc.set_S3_TVC();
 
@@ -111,9 +111,9 @@ extern "C" int run_me() {
     /****************************************************************************************************************/
 
     /****************************************SLV************************************************************************/
-    double lonx       = 120.893501;  //  Vehicle longitude - deg  module newton
-    double latx       = 22.138917;   //  Vehicle latitude  - deg  module newton
-    double alt        = 5.0;         //  Vehicle altitude  - m  module newton
+    double lonx       = 120.8901528;  //  Vehicle longitude - deg  module newton
+    double latx       = 22.26209722;   //  Vehicle latitude  - deg  module newton
+    double alt        = 6.0;         //  Vehicle altitude  - m  module newton
     rkt.dynamics.load_location(lonx, latx, alt);
 
     double con_ang = 0.0;
@@ -133,7 +133,7 @@ extern "C" int run_me() {
     rkt.dynamics.load_angular_velocity(0, 0, 0);
     /************************************aerodynamics*******************************************************/
     rkt.aerodynamics.load_aerotable("../../../auxiliary/Aero_0721_S2+S3.txt");
-    rkt.aerodynamics.set_refa(1.1309);       // Reference area for aero coefficients - m^2
+    rkt.aerodynamics.set_refa(1.130973);       // Reference area for aero coefficients - m^2
     rkt.aerodynamics.set_refd(1.2);     // Reference length for aero coefficients - m
     /********************************************************************************************************/
 
@@ -154,7 +154,7 @@ extern "C" int run_me() {
     rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
 
     rkt.propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area 0.03329156 * 4.0
-    rkt.propulsion.set_payload(100.0);  // payload mass
+    rkt.propulsion.set_payload(0.0);  // payload mass
     rkt.forces.set_reference_point(-8.436);  // set reference point
     /************************************************************************************************************************/
 
