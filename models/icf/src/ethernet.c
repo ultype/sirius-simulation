@@ -82,7 +82,7 @@ int create_server(struct ethernet_device_info_t *dev_info, char *ifname, int net
         fprintf(stderr, "[%s:%d] Socket create fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
         goto error;
     }
-    dev_info->client_fd = accept(dev_info->server_fd,(struct sockaddr*) &(dev_info->client_addr), &(dev_info->client_addr_len));
+    dev_info->client_fd = accept(dev_info->server_fd, (struct sockaddr*) &(dev_info->client_addr), &(dev_info->client_addr_len));
     if (dev_info->client_fd < 0) {
         fprintf(stderr, "create_server: Accept Fail ... %s:%d\n", ifname, net_port);
         goto error;
@@ -147,7 +147,7 @@ uint32_t ethernet_get_header_size(void *priv_data) {
 
 int ethernet_is_server(void *priv_data) {
     struct ethernet_device_info_t *dev_info = priv_data;
-   return dev_info->server_enable;
+    return dev_info->server_enable;
 }
 int ethernet_get_client_fd(void *priv_data) {
     struct ethernet_device_info_t *dev_info = priv_data;
@@ -156,7 +156,7 @@ int ethernet_get_client_fd(void *priv_data) {
 
 int ethernet_accept(void *priv_data) {
     struct ethernet_device_info_t *dev_info = priv_data;
-    dev_info->client_fd = accept(dev_info->server_fd,(struct sockaddr*) &(dev_info->client_addr), &(dev_info->client_addr_len));
+    dev_info->client_fd = accept(dev_info->server_fd, (struct sockaddr*) &(dev_info->client_addr), &(dev_info->client_addr_len));
     return dev_info->client_fd;
 }
 
