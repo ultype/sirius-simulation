@@ -110,7 +110,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             tvc_no2_frame.can_id  = FC2TVC_III_NO2;
             tvc_no2_frame.can_dlc = 8;
             /*  Indicator */
-            tvc_no2_frame.data[0] = 0x1;
+            tvc_no2_frame.data[0] = 0x2;
             /* Task Command */
             tvc_no2_frame.data[1] = TVC_MOVEMENT_FAKE;
             /* TVC no2 Pitch count => Y axis => theta_b*/
