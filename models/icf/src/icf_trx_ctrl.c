@@ -211,7 +211,7 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
 
     if (system_type == ICF_SYSTEM_TYPE_ESPS) {
         qidx = ESPS_GNC_SW_QIDX;
-        //  hex_dump("dungru: esps_dispatch", rxframe, 24);
+        debug_hex_dump("esps_dispatch", rxframe, 24);
         return qidx;
     }
     pframe = (struct can_frame *)rxframe;
