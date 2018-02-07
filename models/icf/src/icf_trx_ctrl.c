@@ -1,14 +1,14 @@
 #include "icf_trx_ctrl.h"
 static const struct icf_mapping g_icf_egse_maptbl[] = {
-    {EGSE_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
-    {EGSE_IMU01_SW_QIDX,              HW_PORT1, ICF_DRIVERS_ID1},
-    {EGSE_RATETBL_X_SW_QIDX,          HW_PORT2, ICF_DRIVERS_ID1},
-    {EGSE_RATETBL_Y_SW_QIDX,          HW_PORT3, ICF_DRIVERS_ID1},
-    {EGSE_RATETBL_Z_SW_QIDX,          HW_PORT4, ICF_DRIVERS_ID1},
-    {EGSE_IMU02_SW_QIDX,              HW_PORT5, ICF_DRIVERS_ID1},
-    {EGSE_GPSR01_SW_QIDX,             HW_PORT6, ICF_DRIVERS_ID1},
-    {EGSE_GPSR02_SW_QIDX,             HW_PORT7, ICF_DRIVERS_ID1},
-    {EGSE_FLIGHT_COMPUTER_SW_QIDX,    HW_PORT8, ICF_DRIVERS_ID2}
+    {HW_PORT0, EGSE_TVC_SW_QIDX,              ICF_DRIVERS_ID0},
+    {HW_PORT1, EGSE_IMU01_SW_QIDX,            ICF_DRIVERS_ID1},
+    {HW_PORT2, EGSE_RATETBL_X_SW_QIDX,        ICF_DRIVERS_ID1},
+    {HW_PORT3, EGSE_RATETBL_Y_SW_QIDX,        ICF_DRIVERS_ID1},
+    {HW_PORT4, EGSE_RATETBL_Z_SW_QIDX,        ICF_DRIVERS_ID1},
+    {HW_PORT5, EGSE_IMU02_SW_QIDX,            ICF_DRIVERS_ID1},
+    {HW_PORT6, EGSE_GPSR01_SW_QIDX,           ICF_DRIVERS_ID1},
+    {HW_PORT7, EGSE_GPSR02_SW_QIDX,           ICF_DRIVERS_ID1},
+    {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2}
 };
 
 
@@ -21,19 +21,19 @@ static struct icf_ctrl_port g_egse_port[] = {
     {0,        HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
     {0,        HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
     {HIL_INTF, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
-    {1,        HW_PORT8, "127.0.0.1",   8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {1,        HW_PORT8, "egse_server", 8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
-    {EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[HW_PORT0]},
-    {EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT1]},
-    {EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT2]},
-    {EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT3]},
-    {EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT4]},
-    {EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT5]},
-    {EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT6]},
-    {EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT7]},
-    {EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[HW_PORT8]}
+    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[HW_PORT0]},
+    {1, EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT1]},
+    {1, EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT2]},
+    {1, EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT3]},
+    {1, EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT4]},
+    {1, EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT5]},
+    {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT6]},
+    {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT7]},
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[HW_PORT8]}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
@@ -44,12 +44,12 @@ static const struct icf_mapping g_icf_esps_maptbl[] = {
 
 static struct icf_ctrl_port g_esps_port[] = {
     {1, HW_PORT0, "can1",        EMPTY_NETPORT,         CAN_DEVICE_TYPE,      NULL, NULL},
-    {1, HW_PORT1, "esps_server", 8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
+    {1, HW_PORT1, "127.0.0.1",   8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]},
-    {ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
+    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]},
+    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
 };
 
 
@@ -81,7 +81,7 @@ static int icf_pidx_to_drivers_id(int pidx, int system_type) {
         map_tbl_size = sizeof(g_icf_esps_maptbl);
     }
     while (idx < get_arr_num(map_tbl_size, sizeof(struct icf_mapping))) {
-        if (which_map_tbl[idx].hw_port == pidx)
+        if (which_map_tbl[idx].hw_port_idx == pidx)
             break;
         idx++;
     }
@@ -98,7 +98,7 @@ static int icf_pidx_to_qidx(int pidx, int system_type) {
         map_tbl_size = sizeof(g_icf_esps_maptbl);
     }
     while (idx < get_arr_num(map_tbl_size, sizeof(struct icf_mapping))) {
-        if (which_map_tbl[idx].hw_port == pidx)
+        if (which_map_tbl[idx].hw_port_idx == pidx)
             break;
         idx++;
     }
@@ -119,7 +119,7 @@ static int icf_qidx_to_pidx(int qidx, int system_type) {
             break;
         idx++;
     }
-    return which_map_tbl[idx].hw_port;
+    return which_map_tbl[idx].hw_port_idx;
 }
 
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
@@ -143,11 +143,11 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
     for (idx = 0; idx < get_arr_num(queue_blk_size, sizeof(struct icf_ctrl_queue)); idx++) {
         ctrlqueue = &queue_blk_tbl_p[idx];
         rb_init(&ctrlqueue->data_ring, NUM_OF_CELL);
-        C->ctrlqueue[idx] = ctrlqueue;
+        C->ctrlqueue[ctrlqueue->queue_idx] = ctrlqueue;
     }
     for (idx = 0; idx < get_arr_num(port_blk_size, sizeof(struct icf_ctrl_port)); idx++) {
         ctrlport = &port_blk_tbl_p[idx];
-        C->ctrlport[idx] = ctrlport;
+        C->ctrlport[ctrlport->hw_port_idx] = ctrlport;
         ctrlport->drv_priv_ops = icf_drivers[icf_pidx_to_drivers_id(idx, system_type)];
         drv_ops = ctrlport->drv_priv_ops;
         if (ctrlport->enable == 0)

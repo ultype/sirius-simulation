@@ -9,13 +9,6 @@ else
     export WORKSPACE=`pwd`/../../../
 fi
 
-if [ -z $1 ]; then
-    echo "No arguments supplied"
-    ESPS_IP="192.168.0.9"
-else
-    ESPS_IP=$1
-fi
-echo "ESPS IP: "$ESPS_IP
 ##### FUNCTION #####
 comment_the_C_code() {
     pattern=$1
@@ -46,7 +39,6 @@ comment_the_C_code "new_slave->run_input_file" "$WORKSPACE/exe/PIL/master/RUN_go
 comment_the_C_code "new_slave->sync_error_terminate" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
 comment_the_C_code "trick_master_slave" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
 comment_the_C_code '("initialization") transceiver.initialize_connection' "$WORKSPACE/exe/PIL/master/S_define"
-sed_ipaddr_subst $ESPS_IP "$WORKSPACE/models/icf/src/icf_trx_ctrl.c"
 
 ##### Generate the image#####
 trick-CP

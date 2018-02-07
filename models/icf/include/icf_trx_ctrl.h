@@ -103,15 +103,15 @@ typedef enum _ENUM_ICF_SYSTEM_TYPE {
 }ENUM_ICF_SYSTEM_TYPE;
 
 struct icf_mapping {
+    int hw_port_idx;
     int sw_queue;
-    int hw_port;
     int driver_id;
 };
 
 
 struct icf_ctrl_port {
-    int enable;
-    int hw_port;
+    uint8_t enable;
+    int hw_port_idx;
     char ifname[IFNAMSIZ];
     int netport;
     uint8_t dev_type;
@@ -120,6 +120,7 @@ struct icf_ctrl_port {
 };
 
 struct icf_ctrl_queue {
+    uint8_t enable;
     int queue_idx;
     uint8_t direction;
     struct icf_ctrl_port *port;
