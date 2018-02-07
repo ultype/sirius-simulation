@@ -11,7 +11,7 @@ fi
 
 if [ -z $1 ]; then
     echo "No arguments supplied"
-    EGSE_IP="192.168.0.9"
+    EGSE_IP="192.168.0.6"
 else
     EGSE_IP=$1
 fi
