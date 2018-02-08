@@ -55,7 +55,7 @@ static struct icf_ctrl_queue g_esps_queue[] = {
 static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
     struct icf_mapping *table = NULL;
 
-    switch(system_type) {
+    switch (system_type) {
         case ICF_SYSTEM_TYPE_EGSE:
             table = g_icf_egse_maptbl;
             *tbl_size = sizeof(g_icf_egse_maptbl);
@@ -74,7 +74,7 @@ static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
 static struct icf_ctrl_queue *icf_choose_sw_queue_tbl(int system_type, int *tbl_size) {
     struct icf_ctrl_queue *table = NULL;
 
-    switch(system_type) {
+    switch (system_type) {
         case ICF_SYSTEM_TYPE_EGSE:
             table = g_egse_queue;
             *tbl_size = sizeof(g_egse_queue);
@@ -93,7 +93,7 @@ static struct icf_ctrl_queue *icf_choose_sw_queue_tbl(int system_type, int *tbl_
 static struct icf_ctrl_port *icf_choose_hw_port_tbl(int system_type, int *tbl_size) {
     struct icf_ctrl_port *table = NULL;
 
-    switch(system_type) {
+    switch (system_type) {
         case ICF_SYSTEM_TYPE_EGSE:
             table = g_egse_port;
             *tbl_size = sizeof(g_egse_port);
