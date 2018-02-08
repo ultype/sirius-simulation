@@ -52,17 +52,69 @@ static struct icf_ctrl_queue g_esps_queue[] = {
     {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
 };
 
+static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
+    struct icf_mapping *table = NULL;
 
+    switch(system_type) {
+        case ICF_SYSTEM_TYPE_EGSE:
+            table = g_icf_egse_maptbl;
+            *tbl_size = sizeof(g_icf_egse_maptbl);
+            break;
+        case ICF_SYSTEM_TYPE_ESPS:
+            table = g_icf_esps_maptbl;
+            *tbl_size = sizeof(g_icf_esps_maptbl);
+            break;
+        default:
+            table = g_icf_egse_maptbl;
+            *tbl_size = sizeof(g_icf_egse_maptbl);
+    }
+    return table;
+}
+
+static struct icf_ctrl_queue *icf_choose_sw_queue_tbl(int system_type, int *tbl_size) {
+    struct icf_ctrl_queue *table = NULL;
+
+    switch(system_type) {
+        case ICF_SYSTEM_TYPE_EGSE:
+            table = g_egse_queue;
+            *tbl_size = sizeof(g_egse_queue);
+            break;
+        case ICF_SYSTEM_TYPE_ESPS:
+            table = g_esps_queue;
+            *tbl_size = sizeof(g_esps_queue);
+            break;
+        default:
+            table = g_egse_queue;
+            *tbl_size = sizeof(g_egse_queue);
+    }
+    return table;
+}
+
+static struct icf_ctrl_port *icf_choose_hw_port_tbl(int system_type, int *tbl_size) {
+    struct icf_ctrl_port *table = NULL;
+
+    switch(system_type) {
+        case ICF_SYSTEM_TYPE_EGSE:
+            table = g_egse_port;
+            *tbl_size = sizeof(g_egse_port);
+            break;
+        case ICF_SYSTEM_TYPE_ESPS:
+            table = g_esps_port;
+            *tbl_size = sizeof(g_esps_port);
+            break;
+        default:
+            table = g_egse_port;
+            *tbl_size = sizeof(g_egse_port);
+    }
+    return table;
+}
 
 static int icf_qidx_to_drivers_id(int qidx, int system_type) {
     int idx = 0;
-    struct icf_mapping *which_map_tbl = &g_icf_egse_maptbl;
-    int    map_tbl_size = sizeof(g_icf_egse_maptbl);
+    struct icf_mapping *which_map_tbl = NULL;
+    int    map_tbl_size;
 
-    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
-        which_map_tbl = g_icf_esps_maptbl;
-        map_tbl_size = sizeof(g_icf_esps_maptbl);
-    }
+    which_map_tbl = icf_choose_map_tbl(system_type, &map_tbl_size);
     while (idx < get_arr_num(map_tbl_size, sizeof(struct icf_mapping))) {
         if (which_map_tbl[idx].sw_queue == qidx)
             break;
@@ -73,13 +125,10 @@ static int icf_qidx_to_drivers_id(int qidx, int system_type) {
 
 static int icf_pidx_to_drivers_id(int pidx, int system_type) {
     int idx = 0;
-    struct icf_mapping *which_map_tbl = &g_icf_egse_maptbl;
-    int    map_tbl_size = sizeof(g_icf_egse_maptbl);
+    struct icf_mapping *which_map_tbl = NULL;
+    int    map_tbl_size;
 
-    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
-        which_map_tbl = g_icf_esps_maptbl;
-        map_tbl_size = sizeof(g_icf_esps_maptbl);
-    }
+    which_map_tbl = icf_choose_map_tbl(system_type, &map_tbl_size);
     while (idx < get_arr_num(map_tbl_size, sizeof(struct icf_mapping))) {
         if (which_map_tbl[idx].hw_port_idx == pidx)
             break;
@@ -90,13 +139,10 @@ static int icf_pidx_to_drivers_id(int pidx, int system_type) {
 
 static int icf_pidx_to_qidx(int pidx, int system_type) {
     int idx = 0;
-    struct icf_mapping *which_map_tbl = &g_icf_egse_maptbl;
-    int    map_tbl_size = sizeof(g_icf_egse_maptbl);
+    struct icf_mapping *which_map_tbl = NULL;
+    int    map_tbl_size;
 
-    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
-        which_map_tbl = g_icf_esps_maptbl;
-        map_tbl_size = sizeof(g_icf_esps_maptbl);
-    }
+    which_map_tbl = icf_choose_map_tbl(system_type, &map_tbl_size);
     while (idx < get_arr_num(map_tbl_size, sizeof(struct icf_mapping))) {
         if (which_map_tbl[idx].hw_port_idx == pidx)
             break;
@@ -107,13 +153,10 @@ static int icf_pidx_to_qidx(int pidx, int system_type) {
 
 static int icf_qidx_to_pidx(int qidx, int system_type) {
     int idx = 0;
-    struct icf_mapping *which_map_tbl = &g_icf_egse_maptbl;
-    int    map_tbl_size = sizeof(g_icf_egse_maptbl);
+    struct icf_mapping *which_map_tbl = NULL;
+    int    map_tbl_size;
 
-    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
-        which_map_tbl = g_icf_esps_maptbl;
-        map_tbl_size = sizeof(g_icf_esps_maptbl);
-    }
+    which_map_tbl = icf_choose_map_tbl(system_type, &map_tbl_size);
     while (idx < get_arr_num(map_tbl_size, sizeof(struct icf_mapping))) {
         if (which_map_tbl[idx].sw_queue == qidx)
             break;
@@ -127,26 +170,22 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
     struct icf_ctrl_port *ctrlport;
     struct icf_driver_ops *drv_ops;
     int idx;
-    struct icf_ctrl_queue *queue_blk_tbl_p = &g_egse_queue;
-    int queue_blk_size = sizeof(g_egse_queue);
-    struct icf_ctrl_port *port_blk_tbl_p = &g_egse_port;
-    int port_blk_size = sizeof(g_egse_port);
+    struct icf_ctrl_queue *which_que_tbl = NULL;
+    int que_tbl_size;
+    struct icf_ctrl_port *which_port_tbl = NULL;
+    int port_tbl_size;
 
     C->system_type = system_type;
-    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
-        queue_blk_tbl_p = &g_esps_queue;
-        queue_blk_size = sizeof(g_esps_queue);
-        port_blk_tbl_p = &g_esps_port;
-        port_blk_size = sizeof(g_esps_port);
-    }
+    which_que_tbl = icf_choose_sw_queue_tbl(C->system_type, &que_tbl_size);
+    which_port_tbl = icf_choose_hw_port_tbl(C->system_type, &port_tbl_size);
 
-    for (idx = 0; idx < get_arr_num(queue_blk_size, sizeof(struct icf_ctrl_queue)); idx++) {
-        ctrlqueue = &queue_blk_tbl_p[idx];
+    for (idx = 0; idx < get_arr_num(que_tbl_size, sizeof(struct icf_ctrl_queue)); idx++) {
+        ctrlqueue = &which_que_tbl[idx];
         rb_init(&ctrlqueue->data_ring, NUM_OF_CELL);
         C->ctrlqueue[ctrlqueue->queue_idx] = ctrlqueue;
     }
-    for (idx = 0; idx < get_arr_num(port_blk_size, sizeof(struct icf_ctrl_port)); idx++) {
-        ctrlport = &port_blk_tbl_p[idx];
+    for (idx = 0; idx < get_arr_num(port_tbl_size, sizeof(struct icf_ctrl_port)); idx++) {
+        ctrlport = &which_port_tbl[idx];
         C->ctrlport[ctrlport->hw_port_idx] = ctrlport;
         ctrlport->drv_priv_ops = icf_drivers[icf_pidx_to_drivers_id(idx, system_type)];
         drv_ops = ctrlport->drv_priv_ops;
@@ -163,25 +202,21 @@ int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C, int system_type) {
     struct icf_driver_ops *drv_ops;
     int idx;
 
-    struct icf_ctrl_queue *queue_blk_tbl_p = &g_egse_queue;
-    struct icf_ctrl_port *port_blk_tbl_p = &g_egse_port;
+    struct icf_ctrl_queue *which_que_tbl = NULL;
+    struct icf_ctrl_port *which_port_tbl = NULL;
+    int port_tbl_size;
+    int que_tbl_size;
 
-    int port_blk_size = sizeof(g_egse_port);
-    int queue_blk_size = sizeof(g_egse_queue);
+    which_que_tbl = icf_choose_sw_queue_tbl(C->system_type, &que_tbl_size);
+    which_port_tbl = icf_choose_hw_port_tbl(C->system_type, &port_tbl_size);
 
-    if (system_type == ICF_SYSTEM_TYPE_ESPS) {
-        queue_blk_tbl_p = &g_esps_queue;
-        queue_blk_size = sizeof(g_esps_queue);
-        port_blk_tbl_p = &g_esps_port;
-        port_blk_size = sizeof(g_esps_port);
-    }
-    for (idx = 0; idx < get_arr_num(queue_blk_size, sizeof(struct icf_ctrl_queue)); idx++) {
-        ctrlqueue = &queue_blk_tbl_p[idx];
+    for (idx = 0; idx < get_arr_num(que_tbl_size, sizeof(struct icf_ctrl_queue)); idx++) {
+        ctrlqueue = &which_que_tbl[idx];
         rb_deinit(&ctrlqueue->data_ring);
         C->ctrlqueue[idx] = NULL;
     }
-    for (idx = 0; idx < get_arr_num(port_blk_size, sizeof(struct icf_ctrl_port)); idx++) {
-        ctrlport = &port_blk_tbl_p[idx];
+    for (idx = 0; idx < get_arr_num(port_tbl_size, sizeof(struct icf_ctrl_port)); idx++) {
+        ctrlport = &which_port_tbl[idx];
         drv_ops = ctrlport->drv_priv_ops;
         if (ctrlport->enable == 0)
             continue;
