@@ -18,13 +18,6 @@ extern "C" void master_startup() {
     if (std::getenv("WORKSPACE") == NULL) {
         throw std::invalid_argument("Must set $WORKSPACE");
     }
-
-    new_slave->sim_path = std::string(std::getenv("WORKSPACE")) + "/exe/SIL/slave";
-    new_slave->S_main_name = "./S_main_Linux_5.4_x86_64.exe";
-    new_slave->run_input_file = "RUN_golden/golden.py";
-    new_slave->sync_error_terminate = 1;
-    trick_master_slave.master.add_slave(new_slave);
-    trick_master_slave.master.enable();
 }
 
 extern "C" int event_start() {

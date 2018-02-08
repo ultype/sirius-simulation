@@ -82,6 +82,7 @@ int create_server(struct ethernet_device_info_t *dev_info, char *ifname, int net
         fprintf(stderr, "[%s:%d] Socket create fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
         goto error;
     }
+    fprintf(stderr, "Wainting for the client ...\n");
     dev_info->client_fd = accept(dev_info->server_fd, (struct sockaddr*) &(dev_info->client_addr), &(dev_info->client_addr_len));
     if (dev_info->client_fd < 0) {
         fprintf(stderr, "create_server: Accept Fail ... %s:%d\n", ifname, net_port);

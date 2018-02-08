@@ -37,8 +37,8 @@ static struct icf_ctrl_queue g_egse_queue[] = {
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
-    {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
-    {ESPS_GNC_SW_QIDX,                HW_PORT8, ICF_DRIVERS_ID2}
+    {HW_PORT0, ESPS_TVC_SW_QIDX, ICF_DRIVERS_ID0},
+    {HW_PORT8, ESPS_GNC_SW_QIDX, ICF_DRIVERS_ID2}
 };
 
 
@@ -51,28 +51,30 @@ static struct icf_ctrl_queue g_esps_queue[] = {
     {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[0]},
     {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[1]}
 };
-/*  SIL Table  */
+
+/*  SIL EGSE Table  */
 static const struct icf_mapping g_icf_egse_sil_maptbl[] = {
-    {HW_PORT8, EGSE_TVC_SW_QIDX,              ICF_DRIVERS_ID2},
+    {HW_PORT8, EGSE_SIL_DOWNLINK_SW_QIDX,     ICF_DRIVERS_ID2},
     {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2}
 };
 
 static struct icf_ctrl_port g_egse_sil_port[] = {
-    {1,        HW_PORT8, "egse_server", 8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {1, HW_PORT8, "egse_server", 8700,  ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_sil_queue[] = {
-    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[0]},
-    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[0]}
+    {1, EGSE_SIL_DOWNLINK_SW_QIDX,     ICF_DIRECTION_RX, &g_egse_sil_port[0]},
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_sil_port[0]}
 };
 
+/*  SIL ESPS Table  */
 static const struct icf_mapping g_icf_esps_sil_maptbl[] = {
-    {ESPS_TVC_SW_QIDX,                HW_PORT8, ICF_DRIVERS_ID2},
-    {ESPS_GNC_SW_QIDX,                HW_PORT8, ICF_DRIVERS_ID2}
+    {HW_PORT8, ESPS_TVC_SW_QIDX, ICF_DRIVERS_ID2},
+    {HW_PORT8, ESPS_GNC_SW_QIDX, ICF_DRIVERS_ID2}
 };
 
 static struct icf_ctrl_port g_esps_sil_port[] = {
-    {1, HW_PORT8, "127.0.0.1",   8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
+    {1, HW_PORT8, "127.0.0.1",   8700,  ETHERNET_DEVICE_TYPE, NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_sil_queue[] = {
@@ -91,6 +93,14 @@ static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
         case ICF_SYSTEM_TYPE_ESPS:
             table = g_icf_esps_maptbl;
             *tbl_size = sizeof(g_icf_esps_maptbl);
+            break;
+        case ICF_SYSTEM_TYPE_SIL_EGSE:
+            table = g_icf_egse_sil_maptbl;
+            *tbl_size = sizeof(g_icf_egse_sil_maptbl);
+            break;
+        case ICF_SYSTEM_TYPE_SIL_ESPS:
+            table = g_icf_esps_sil_maptbl;
+            *tbl_size = sizeof(g_icf_esps_sil_maptbl);
             break;
         default:
             table = g_icf_egse_maptbl;
@@ -111,6 +121,14 @@ static struct icf_ctrl_queue *icf_choose_sw_queue_tbl(int system_type, int *tbl_
             table = g_esps_queue;
             *tbl_size = sizeof(g_esps_queue);
             break;
+        case ICF_SYSTEM_TYPE_SIL_EGSE:
+            table = g_egse_sil_queue;
+            *tbl_size = sizeof(g_egse_sil_queue);
+            break;
+        case ICF_SYSTEM_TYPE_SIL_ESPS:
+            table = g_esps_sil_queue;
+            *tbl_size = sizeof(g_esps_sil_queue);
+            break;
         default:
             table = g_egse_queue;
             *tbl_size = sizeof(g_egse_queue);
@@ -129,6 +147,14 @@ static struct icf_ctrl_port *icf_choose_hw_port_tbl(int system_type, int *tbl_si
         case ICF_SYSTEM_TYPE_ESPS:
             table = g_esps_port;
             *tbl_size = sizeof(g_esps_port);
+            break;
+        case ICF_SYSTEM_TYPE_SIL_EGSE:
+            table = g_egse_sil_port;
+            *tbl_size = sizeof(g_egse_sil_port);
+            break;
+        case ICF_SYSTEM_TYPE_SIL_ESPS:
+            table = g_esps_sil_port;
+            *tbl_size = sizeof(g_esps_sil_port);
             break;
         default:
             table = g_egse_port;
@@ -215,7 +241,7 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
     for (idx = 0; idx < get_arr_num(port_tbl_size, sizeof(struct icf_ctrl_port)); idx++) {
         ctrlport = &which_port_tbl[idx];
         C->ctrlport[ctrlport->hw_port_idx] = ctrlport;
-        ctrlport->drv_priv_ops = icf_drivers[icf_pidx_to_drivers_id(idx, system_type)];
+        ctrlport->drv_priv_ops = icf_drivers[icf_pidx_to_drivers_id(ctrlport->hw_port_idx, system_type)];
         drv_ops = ctrlport->drv_priv_ops;
         if (ctrlport->enable == 0)
             continue;
@@ -274,6 +300,18 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
 
     if (system_type == ICF_SYSTEM_TYPE_ESPS) {
         qidx = ESPS_GNC_SW_QIDX;
+        debug_hex_dump("esps_dispatch", rxframe, 24);
+        return qidx;
+    }
+
+    if (system_type == ICF_SYSTEM_TYPE_SIL_ESPS) {
+        qidx = ESPS_GNC_SW_QIDX;
+        debug_hex_dump("esps_dispatch", rxframe, 24);
+        return qidx;
+    }
+
+    if (system_type == ICF_SYSTEM_TYPE_SIL_EGSE) {
+        qidx = EGSE_SIL_DOWNLINK_SW_QIDX;
         debug_hex_dump("esps_dispatch", rxframe, 24);
         return qidx;
     }
