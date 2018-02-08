@@ -203,7 +203,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 gps_con     (  ),
                 dynamics    (  )
             {
-            ("initialization") transceiver.initialize_connection("ENVIRONMENT");
+
             ("initialization") link();
             ("initialization") aerodynamics.initialize();
             ("initialization") dynamics.initialize();

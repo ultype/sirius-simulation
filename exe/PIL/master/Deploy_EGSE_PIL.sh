@@ -32,14 +32,6 @@ sed_ipaddr_subst() {
     sed -i -e "s/\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\)/$ip/g" "$file_path"
 }
 
-#####  Remove the trick communication   #####
-comment_the_C_code "new_slave->sim_path" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
-comment_the_C_code "new_slave->S_main_name" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
-comment_the_C_code "new_slave->run_input_file" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
-comment_the_C_code "new_slave->sync_error_terminate" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
-comment_the_C_code "trick_master_slave" "$WORKSPACE/exe/PIL/master/RUN_golden/golden.cpp"
-comment_the_C_code '("initialization") transceiver.initialize_connection' "$WORKSPACE/exe/PIL/master/S_define"
-
 ##### Generate the image#####
 trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp

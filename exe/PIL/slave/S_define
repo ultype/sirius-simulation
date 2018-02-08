@@ -133,7 +133,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
         {
 
             ("default_data") clear_flag();
-            ("initialization") transceiver.initialize_connection("FLIGHT_COMPUTER");
             ("initialization") icf_ctrlblk_init(&icf_esps_ctrl, ICF_SYSTEM_TYPE_ESPS);
             ("initialization") link();
             ("initialization") gps.initialize(0.05);

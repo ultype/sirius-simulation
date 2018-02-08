@@ -50,10 +50,7 @@ sed_ipaddr_subst() {
     file_path=$2
     sed -i -e "s/\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\)/$ip/g" "$file_path"
 }
-#####  Remove the trick communication   #####
-comment_the_Python_code "new_connection = trick.MSSocket" "$WORKSPACE/exe/PIL/slave/RUN_golden/golden.py"
-comment_the_Python_code "trick_master_slave" "$WORKSPACE/exe/PIL/slave/RUN_golden/golden.py"
-comment_the_C_code '("initialization") transceiver.initialize_connection' "$WORKSPACE/exe/PIL/slave/S_define"
+#####  Set up communication IP   #####
 sed_ipaddr_subst $EGSE_IP "$WORKSPACE/models/icf/src/icf_trx_ctrl.c"
 ##### Generate the image#####
 trick-CP
