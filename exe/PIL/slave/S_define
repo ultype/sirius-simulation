@@ -141,7 +141,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("initialization") ins.initialize();
 
             P1 (0.001, "scheduled") time->dm_time();
-            P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT1, sizeof(refactor_uplink_packet_t));
+            P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT8, sizeof(refactor_uplink_packet_t));
             P2 (0.05, "scheduled") load_input(&icf_esps_ctrl);
             P2 (0.01, "scheduled") clear_flag();
 

@@ -99,7 +99,9 @@ typedef enum _ENUM_ICF_DRIVERS_ID {
 
 typedef enum _ENUM_ICF_SYSTEM_TYPE {
     ICF_SYSTEM_TYPE_EGSE = 0,
-    ICF_SYSTEM_TYPE_ESPS = 1
+    ICF_SYSTEM_TYPE_ESPS = 1,
+    ICF_SYSTEM_TYPE_SIL_EGSE = 2,
+    ICF_SYSTEM_TYPE_SIL_ESPS = 3,
 }ENUM_ICF_SYSTEM_TYPE;
 
 struct icf_mapping {

@@ -25,31 +25,59 @@ static struct icf_ctrl_port g_egse_port[] = {
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
-    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[HW_PORT0]},
-    {1, EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT1]},
-    {1, EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT2]},
-    {1, EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT3]},
-    {1, EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[HW_PORT4]},
-    {1, EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[HW_PORT5]},
-    {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT6]},
-    {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[HW_PORT7]},
-    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[HW_PORT8]}
+    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[0]},
+    {1, EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[1]},
+    {1, EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[2]},
+    {1, EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[3]},
+    {1, EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[4]},
+    {1, EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[5]},
+    {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[6]},
+    {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[7]},
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[8]}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
     {ESPS_TVC_SW_QIDX,                HW_PORT0, ICF_DRIVERS_ID0},
-    {ESPS_GNC_SW_QIDX,                HW_PORT1, ICF_DRIVERS_ID2}
+    {ESPS_GNC_SW_QIDX,                HW_PORT8, ICF_DRIVERS_ID2}
 };
 
 
 static struct icf_ctrl_port g_esps_port[] = {
     {1, HW_PORT0, "can1",        EMPTY_NETPORT,         CAN_DEVICE_TYPE,      NULL, NULL},
-    {1, HW_PORT1, "127.0.0.1",   8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
+    {1, HW_PORT8, "127.0.0.1",   8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[HW_PORT0]},
-    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[HW_PORT1]}
+    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[0]},
+    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[1]}
+};
+/*  SIL Table  */
+static const struct icf_mapping g_icf_egse_sil_maptbl[] = {
+    {HW_PORT8, EGSE_TVC_SW_QIDX,              ICF_DRIVERS_ID2},
+    {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2}
+};
+
+static struct icf_ctrl_port g_egse_sil_port[] = {
+    {1,        HW_PORT8, "egse_server", 8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL}
+};
+
+static struct icf_ctrl_queue g_egse_sil_queue[] = {
+    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[0]},
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[0]}
+};
+
+static const struct icf_mapping g_icf_esps_sil_maptbl[] = {
+    {ESPS_TVC_SW_QIDX,                HW_PORT8, ICF_DRIVERS_ID2},
+    {ESPS_GNC_SW_QIDX,                HW_PORT8, ICF_DRIVERS_ID2}
+};
+
+static struct icf_ctrl_port g_esps_sil_port[] = {
+    {1, HW_PORT8, "127.0.0.1",   8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
+};
+
+static struct icf_ctrl_queue g_esps_sil_queue[] = {
+    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_sil_port[0]},
+    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_sil_port[0]}
 };
 
 static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
