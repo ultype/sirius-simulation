@@ -215,7 +215,6 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
 
             P1 (5, "scheduled") icf_heartbeat();
-            P1 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P1 (int_step, "scheduled") time->dm_time();
             P1 (int_step, "scheduled") dynamics.propagate(int_step);
             P1 (int_step, "scheduled") env.propagate(int_step);
@@ -230,6 +229,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
 
+            P3 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
 
