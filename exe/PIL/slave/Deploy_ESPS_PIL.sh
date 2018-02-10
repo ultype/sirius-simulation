@@ -15,7 +15,15 @@ if [ -z $1 ]; then
 else
     EGSE_IP=$1
 fi
-echo "EGSE_IP: "$EGSE_IP
+
+if [[ $EGSE_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "EGSE_IP: "$EGSE_IP
+else
+  echo "Remote EGSE IP Input format fail exit..."
+  exit
+fi
+
+
 
 ##### FUNCTION #####
 comment_the_Python_code() {
