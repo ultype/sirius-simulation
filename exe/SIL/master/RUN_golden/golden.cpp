@@ -11,10 +11,6 @@
 #include "../Modified_data/gps.h"
 
 extern "C" void master_startup() {
-    Trick::MSSocket *new_connection = new Trick::MSSocket();
-    Trick::SlaveInfo *new_slave = new Trick::SlaveInfo();
-    new_slave->set_connection_type(new_connection);
-
     if (std::getenv("WORKSPACE") == NULL) {
         throw std::invalid_argument("Must set $WORKSPACE");
     }
