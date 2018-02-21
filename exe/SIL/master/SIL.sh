@@ -6,7 +6,8 @@ then
 else
     export WORKSPACE=`pwd`/../../../
 fi
-
+SIL_MASTER_PATH="$PWD"
+SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master/\ /g')
 cd ../slave
 trick-CP
 
@@ -18,9 +19,9 @@ sleep 3
 cd ../slave
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
 
-cd ../master
-python ../../../tools/generate_error.py ../../../public/golden.csv RUN_golden/log_rocket_csv.csv -l
-python ../../../tools/ci_test.py result.csv 1e-5 | tee test_result
+cd $SIL_MASTER_PATH
+python $SIRIUS_HOME_PATH/tools/generate_error.py $SIRIUS_HOME_PATH/public/golden.csv RUN_golden/log_rocket_csv.csv -l
+python $SIRIUS_HOME_PATH/tools/ci_test.py result.csv 1e-5 | tee test_result
 
 
 # Test the exit status of the command before pipe
