@@ -8,6 +8,7 @@ then
 else
     export WORKSPACE=`pwd`/../../../
 fi
+PIL_MASTER_PATH="$PWD"
 SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/PIL\/master//g')
 ##### FUNCTION #####
 comment_the_C_code() {
