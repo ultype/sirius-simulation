@@ -8,18 +8,15 @@ else
 fi
 SIL_MASTER_PATH="$PWD"
 SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master//g')
-cd ../slave
-trick-CP
 
-cd ../master
 trick-CP
-
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp &
-sleep 1
+
 cd ../slave
+trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
 
-cd $SIL_MASTER_PATH
+cd ../master
 python $SIRIUS_HOME_PATH/tools/generate_error.py $SIRIUS_HOME_PATH/public/golden.csv $SIL_MASTER_PATH/RUN_golden/log_rocket_csv.csv -l
 python $SIRIUS_HOME_PATH/tools/ci_test.py $SIL_MASTER_PATH/result.csv 1e-5 | tee test_result
 
