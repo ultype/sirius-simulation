@@ -14,6 +14,7 @@ cd ../master
 trick-CP
 
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp &
+sleep 3
 cd ../slave
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
 
