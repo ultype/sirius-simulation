@@ -22,7 +22,7 @@
 #define cpu2le32(x) SWAP32((x))
 
 #define errExit(msg)    do { perror(msg); \
-                             while (1) {}} while (0)
+                             abort();} while (0)
 
 #define debug_print(...) do { if (ICF_DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
