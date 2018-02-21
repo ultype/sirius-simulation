@@ -7,7 +7,7 @@ else
     export WORKSPACE=`pwd`/../../../
 fi
 SIL_MASTER_PATH="$PWD"
-SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master/\ /g')
+SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master//g')
 cd ../slave
 trick-CP
 

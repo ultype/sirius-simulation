@@ -8,7 +8,7 @@ then
 else
     export WORKSPACE=`pwd`/../../../
 fi
-SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/HIL\/master/\ /g')
+SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/HIL\/master//g')
 ##### FUNCTION #####
 comment_the_C_code() {
     pattern=$1

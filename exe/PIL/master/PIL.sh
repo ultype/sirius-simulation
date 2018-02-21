@@ -6,11 +6,8 @@ then
 else
     export WORKSPACE=`pwd`/../../../
 fi
-SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/PIL\/master/\ /g')
-cd ../slave
-trick-CP
+SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/PIL\/master//g')
 
-cd ../master
 trick-CP
 
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp
