@@ -11,9 +11,6 @@
 #include "../Modified_data/gps.h"
 
 extern "C" void master_startup() {
-    if (std::getenv("WORKSPACE") == NULL) {
-        throw std::invalid_argument("Must set $WORKSPACE");
-    }
 }
 
 extern "C" int event_start() {

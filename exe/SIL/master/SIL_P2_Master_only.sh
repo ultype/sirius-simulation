@@ -10,12 +10,6 @@ NC='\033[0m' # No Color
 SIL_MASTER_PATH="$PWD"
 SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master//g')
 set -e
-if env | grep -q ^WORKSPACE=
-then
-    echo finding slave from $WORKSPACE
-else
-    export WORKSPACE=`pwd`/../../../
-fi
 
 trick-CP
 echo -e "${ORANGE} [Sirius] Please trigger the FSW manually...${NC}"

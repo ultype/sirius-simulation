@@ -1,14 +1,7 @@
 #!/bin/bash
 set -e
-
+SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/PIL\/slave//g')
 ##### Variable #####
-if env | grep -q ^WORKSPACE=
-then
-    echo finding slave from $WORKSPACE
-else
-    export WORKSPACE=`pwd`/../../../
-fi
-
 if [ -z $1 ]; then
     echo "No arguments supplied"
     EGSE_IP="192.168.0.6"
@@ -59,7 +52,7 @@ sed_ipaddr_subst() {
     sed -i -e "s/\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\)/$ip/g" "$file_path"
 }
 #####  Set up communication IP   #####
-sed_ipaddr_subst $EGSE_IP "$WORKSPACE/models/icf/src/icf_trx_ctrl.c"
+sed_ipaddr_subst $EGSE_IP "$SIRIUS_HOME_PATH/models/icf/src/icf_trx_ctrl.c"
 ##### Generate the image#####
 trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
