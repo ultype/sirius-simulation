@@ -3,15 +3,15 @@
 # execfile("../../../public/Modified_data/ui.py")
 execfile("../../../public/Modified_data/golden.dr")
 ##########################################################
-new_connection = trick.MSSocket()
-new_slave = trick.SlaveInfo()
-new_slave.set_connection_type(new_connection)
-new_slave.sim_path = os.getenv("WORKSPACE") + "/exe/PIL/slave"
-new_slave.S_main_name = "./S_main_Linux_5.4_x86_64.exe"
-new_slave.run_input_file = "RUN_golden/golden.py"
-new_slave.sync_error_terminate = 1
-trick_master_slave.master.add_slave(new_slave)
-trick_master_slave.master.enable()
+# new_connection = trick.MSSocket()
+# new_slave = trick.SlaveInfo()
+# new_slave.set_connection_type(new_connection)
+# new_slave.sim_path = os.getenv("WORKSPACE") + "/exe/PIL/slave"
+# new_slave.S_main_name = "./S_main_Linux_5.4_x86_64.exe"
+# new_slave.run_input_file = "RUN_golden/golden.py"
+# new_slave.sync_error_terminate = 1
+# trick_master_slave.master.add_slave(new_slave)
+# trick_master_slave.master.enable()
 
 ##############################################################
 #Set simulation start time

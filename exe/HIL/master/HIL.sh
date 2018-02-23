@@ -2,12 +2,6 @@
 set -e
 
 ##### Variable #####
-if env | grep -q ^WORKSPACE=
-then
-    echo finding slave from $WORKSPACE
-else
-    export WORKSPACE=`pwd`/../../../
-fi
 HIL_MASTER_PATH="$PWD"
 SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/HIL\/master//g')
 ##### FUNCTION #####
