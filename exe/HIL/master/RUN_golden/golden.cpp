@@ -11,7 +11,6 @@
 #include "../Modified_data/gps.h"
 
 extern "C" void master_startup() {
-
 }
 
 extern "C" int event_start() {
