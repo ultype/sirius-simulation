@@ -482,11 +482,16 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
 }
 
 void icf_heartbeat(void) {
-    time_t date;
-    char date_buf[256];
-    date = time(NULL);
-    strftime(date_buf, (size_t) 30, "%Y/%m/%d,%H:%M:%S", localtime(&date));
-    fprintf(stderr, "[%s]\n", date_buf);
+    char date_buf[80];
+    char currentTime[84] = "";
+    static struct timespec ts;
+    uint32_t milli;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    ts.tv_sec = time(NULL);
+    milli = ts.tv_nsec / 1000000;
+    strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+    snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+    fprintf(stderr, "[%s]\n", currentTime);
 }
 
 void *icf_alloc_mem(size_t size) {
