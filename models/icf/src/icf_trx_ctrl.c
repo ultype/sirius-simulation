@@ -484,7 +484,7 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
 void icf_heartbeat(void) {
     time_t date;
     char date_buf[256];
-    date = time(NULL) ;
+    date = time(NULL);
     strftime(date_buf, (size_t) 30, "%Y/%m/%d,%H:%M:%S", localtime(&date));
     fprintf(stderr, "[%s]\n", date_buf);
 }
