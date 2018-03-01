@@ -116,3 +116,9 @@ int get_arr_num(int arrary_size, int element_size) {
     }
     return (arrary_size/element_size);
 }
+
+int data_int16_to_uint8_bigendian(uint8_t *dest, int16_t *src) {
+    dest[0] = (*src >> 8) & 0xFF;
+    dest[1] = (*src & 0xFF);
+    return 0;
+}
