@@ -93,10 +93,10 @@ class FlightComputer_SimObject : public Trick::SimObject {
             tvc_no1_frame.data[0] = 0x1;
             /* Task Command */
             tvc_no1_frame.data[1] = TVC_MOVEMENT_FAKE;
-            /* TVC no1 Pitch count => Y axis => theta_a*/
+            /* TVC no1 pos idx2 => theta_a*/
             data_int16_to_uint8_bigendian(&tvc_no1_frame.data[2],&theta_a_cnt);
-            /* TVC no1 Yaw count => Z axis => theta_c*/
-            data_int16_to_uint8_bigendian(&tvc_no1_frame.data[4],&theta_c_cnt);
+            /* TVC no1 pos idx4 => theta_b*/
+            data_int16_to_uint8_bigendian(&tvc_no1_frame.data[4],&theta_b_cnt);
 
             /*Frame tvc no2*/
             /* Target ID */
@@ -106,9 +106,9 @@ class FlightComputer_SimObject : public Trick::SimObject {
             tvc_no2_frame.data[0] = 0x2;
             /* Task Command */
             tvc_no2_frame.data[1] = TVC_MOVEMENT_FAKE;
-            /* TVC no2 Pitch count => Y axis => theta_b*/
-            data_int16_to_uint8_bigendian(&tvc_no2_frame.data[2],&theta_b_cnt);
-            /* TVC no2 Yaw count => Z axis => theta_d*/
+            /* TVC no2 pos idx2 => theta_c*/
+            data_int16_to_uint8_bigendian(&tvc_no2_frame.data[2],&theta_c_cnt);
+            /* TVC no2 pos idx4 => theta_d*/
             data_int16_to_uint8_bigendian(&tvc_no2_frame.data[4],&theta_d_cnt);
 
             icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no1_frame, sizeof(struct can_frame));
