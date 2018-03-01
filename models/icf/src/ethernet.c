@@ -97,6 +97,7 @@ error:
 
 int create_client(struct ethernet_device_info_t *dev_info, char *ifname, int net_port) {
     int err;
+    int retry_cnt = 0;
     dev_info->server_enable = 0;
     if ((dev_info->client_fd = socket(AF_INET , SOCK_STREAM , 0)) < 0) {
         errExit("Error while opening socket");
@@ -105,8 +106,16 @@ int create_client(struct ethernet_device_info_t *dev_info, char *ifname, int net
     dev_info->client_addr.sin_family = PF_INET;
     dev_info->client_addr.sin_addr.s_addr = inet_addr(ifname);
     dev_info->client_addr.sin_port = htons(net_port);
-
-    err = connect(dev_info->client_fd, (struct sockaddr *)&dev_info->client_addr, sizeof(dev_info->client_addr));
+    while (retry_cnt < 5) {
+        err = connect(dev_info->client_fd, (struct sockaddr *)&dev_info->client_addr, sizeof(dev_info->client_addr));
+        if (err == 0)
+            break;
+        if (err < 0) {
+            sleep(3);
+            retry_cnt++;
+            fprintf(stderr, "create_client: Connection error retry...%d\n", retry_cnt);
+        }
+    }
     if (err < 0) {
         fprintf(stderr, "create_client: Connection error !!\n");
     } else {
