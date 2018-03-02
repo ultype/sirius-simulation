@@ -56,3 +56,7 @@ googletest/
 .tags_sorted_by_file
 C_style_report
 Cpp_style_report
+
+test_result
+result.csv
+log_rocket_csv.csv
