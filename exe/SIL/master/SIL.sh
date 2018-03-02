@@ -8,7 +8,7 @@ trick-CP
 
 cd ../slave
 trick-CP
-./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
+./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp
 
 cd ../master
 python $SIRIUS_HOME_PATH/tools/generate_error.py $SIRIUS_HOME_PATH/public/golden.csv $SIL_MASTER_PATH/RUN_golden/log_rocket_csv.csv -l
