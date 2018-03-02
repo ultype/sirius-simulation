@@ -307,7 +307,7 @@ extern "C" int init_gps_fc_variable() {
 
 extern "C" int run_me() {
     record_gps_slave();
-    realtime();
+    //  realtime();
 
     unsigned int Year = 2017;
     unsigned int DOY = 81;

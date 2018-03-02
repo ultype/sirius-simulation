@@ -55,4 +55,4 @@ sed_ipaddr_subst() {
 sed_ipaddr_subst $EGSE_IP "$SIRIUS_HOME_PATH/models/icf/src/icf_trx_ctrl.c"
 ##### Generate the image#####
 trick-CP
-./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.py
+./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp

@@ -10,7 +10,6 @@ extern "C" void record_gps_slave() {
     drg->set_freq(Trick::DR_Always);
     drg->set_cycle(0.5);
     drg->set_single_prec_only(false);
-    drg->add_variable("rkt.time->gpstime.SOW");
     drg->add_variable("fc.time->gpstime.SOW");
     //  drg->add_variable("fc.gps.state_pos");
     //  drg->add_variable("fc.gps.state_vel");
