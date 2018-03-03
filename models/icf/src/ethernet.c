@@ -9,6 +9,7 @@ int ethernet_init(void **priv_data, char *ifname, int netport) {
         fprintf(stderr, "[%s:%d]Memory allocate fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
         goto error;
     }
+    strncpy(dev_info->ifname, ifname, IFNAMSIZ);
     if (strstr(ifname, "server")) {
         if (create_server(dev_info, ifname, netport) < 0)
             errExit("ethernet_init :Error create client");
@@ -31,7 +32,7 @@ error:
 int ethernet_deinit(void **priv_data) {
     struct ethernet_device_info_t *dev_info = *priv_data;
     close(dev_info->client_fd);
-    printf("Closing %s \n", dev_info->ifr.ifr_name);
+    fprintf(stderr, "Closing %s \n", dev_info->ifname);
     if (dev_info) {
         free(dev_info);
         dev_info = NULL;
