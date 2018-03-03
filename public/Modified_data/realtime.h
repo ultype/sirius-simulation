@@ -12,6 +12,7 @@ extern "C" void realtime() {
     exec_set_thread_priority(0, 1);
     exec_set_thread_cpu_affinity(0, 1);
     frame_log_on();
+    fprintf(stderr, "%s\n", real_time_clock_get_name());
 #if 0
     exec_set_freeze_command(1);
     exec_set_enable_freeze(1);
