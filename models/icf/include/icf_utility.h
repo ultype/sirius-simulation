@@ -78,7 +78,8 @@ uint32_t invert_crc32(uint32_t crc);
 uint32_t crc_checker(uint32_t rx_crc, const uint8_t *buf, uint32_t size);
 double get_curr_time(void);
 int get_arr_num(int arrary_size, int element_size);
-int data_int16_to_uint8_bigendian(uint8_t *dest, int16_t *src);
+int databuffer_cputobe16(uint8_t *dest, uint16_t *src);
+int databuffer_be16tocpu(uint16_t *dest, uint8_t *src);
 #ifdef __cplusplus
 }
 #endif

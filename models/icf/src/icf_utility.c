@@ -117,8 +117,16 @@ int get_arr_num(int arrary_size, int element_size) {
     return (arrary_size/element_size);
 }
 
-int data_int16_to_uint8_bigendian(uint8_t *dest, int16_t *src) {
-    dest[0] = (*src >> 8) & 0xFF;
-    dest[1] = (*src & 0xFF);
+int databuffer_cputobe16(uint8_t *dest, uint16_t *src) {
+    uint16_t be_value;
+    be_value = htobe16(*src);
+    memcpy(dest, &be_value, sizeof(uint16_t));
+    return 0;
+}
+
+int databuffer_be16tocpu(uint16_t *dest, uint8_t *src) {
+    uint16_t be_value;
+    memcpy(&be_value, src, sizeof(uint16_t));
+    *dest = be16toh(be_value);
     return 0;
 }

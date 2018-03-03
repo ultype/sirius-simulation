@@ -21,6 +21,6 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <sys/select.h>
-
+#include <endian.h>
 
 #endif  //  MODELS_ICF_INCLUDE_ICF_EXPORT_H_
