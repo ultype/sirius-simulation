@@ -11,20 +11,6 @@
 
 
 extern "C" void master_startup() {
-    // Trick::MSSocket *new_connection = new Trick::MSSocket();
-    // Trick::SlaveInfo *new_slave = new Trick::SlaveInfo();
-    // new_slave->set_connection_type(new_connection);
-
-    // if (std::getenv("WORKSPACE") == NULL) {
-    //     throw std::invalid_argument("Must set $WORKSPACE");
-    // }
-
-    // new_slave->sim_path = std::string(std::getenv("WORKSPACE")) + "/exe/SIL/slave";
-    // new_slave->S_main_name = "./S_main_Linux_5.4_x86_64.exe";
-    // new_slave->run_input_file = "RUN_test/Hapith-1.py";
-    // new_slave->sync_error_terminate = 1;
-    // trick_master_slave.master.add_slave(new_slave);
-    // trick_master_slave.master.enable();
 }
 
 extern "C" int event_start() {
@@ -89,6 +75,8 @@ extern "C" int run_me() {
 
 
     master_startup();
+    rkt.forces.set_Slosh_flag(0);
+    rkt.forces.set_DOF(6);
 
     /********************************Set simulation start time*****************************************************/
     uint32_t Year = 2017;
@@ -196,7 +184,7 @@ extern "C" int run_me() {
     jit_add_read(102.001, "event_separation_1");
     jit_add_read(107.001, "event_fairing_separation");
 
-    exec_set_terminate_time(200.0);
+    exec_set_terminate_time(90.0);
 
     return 0;
 }
