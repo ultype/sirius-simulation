@@ -1,0 +1,112 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = AsynchronousOneBufferedAI.exe AsynOneBufferedAI_TDtp.exe  \
+  AsynOneBufferedAI_TDtr.exe InstantAI.exe  \
+  StreamingAI.exe StreamingAI_TDtr.exe SynchronousOneBufferedAI.exe \
+  AsynchronousOneWaveformAO.exe StaticAO.exe StreamingAO.exe \
+  SynchronousOneWaveformAO.exe EventCounter.exe \
+  FrequencyMeasurement.exe PulseOutputwithTimerInterrupt.exe PulseWidthMeasurement.exe \
+  PWMOutput.exe DelayedPulseGeneration.exe DIInterrupt.exe \
+  StaticDI.exe DIPatternMatchInterrupt.exe DIStatusChangeInterrupt.exe StaticDO.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+AsynchronousOneBufferedAi.exe: AI_AsynchronousOneBufferedAi\AsynchronousOneBufferedAi.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+  
+AsynOneBufferedAI_TDtp.exe: AI_AsynOneBufferedAI_TDtp\AsynOneBufferedAI_TDtp.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+  
+AsynOneBufferedAI_TDtr.exe: AI_AsynOneBufferedAI_TDtr\AsynOneBufferedAI_TDtr.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+  
+InstantAI.exe: AI_InstantAI\InstantAI.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+StreamingAI.exe: AI_StreamingAI\StreamingAI.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+StreamingAI_TDtr.exe: AI_StreamingAI_TDtr\StreamingAI_TDtr.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+  
+SynchronousOneBufferedAI.exe: AI_SynchronousOneBufferedAI\SynchronousOneBufferedAI.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+AsynchronousOneWaveformAO.exe: AO_AsynchronousOneWaveformAO\AsynchronousOneWaveformAO.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+StaticAO.exe: AO_StaticAO\StaticAO.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+StreamingAO.exe: AO_StreamingAO\StreamingAO.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+SynchronousOneWaveformAO.exe: AO_SynchronousOneWaveformAO\SynchronousOneWaveformAO.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+EventCounter.exe: Counter_EventCounter\EventCounter.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+FrequencyMeasurement.exe: Counter_FrequencyMeasurement\FrequencyMeasurement.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+PulseOutputwithTimerInterrupt.exe: Counter_PulseOutputwithTimerInterrupt\PulseOutputwithTimerInterrupt.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+PulseWidthMeasurement.exe: Counter_PulseWidthMeasurement\PulseWidthMeasurement.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+PWMOutput.exe: Counter_PWMOutput\PWMOutput.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+DelayedPulseGeneration.exe: Counter_DelayedPulseGeneration\DelayedPulseGeneration.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+DIInterrupt.exe: DI_DIInterrupt\DIInterrupt.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+StaticDI.exe: DI_StaticDI\StaticDI.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+DIPatternMatchInterrupt.exe: DI_DIPatternMatchInterrupt\DIPatternMatchInterrupt.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+DIStatusChangeInterrupt.exe: DI_DIStatusChangeInterrupt\DIStatusChangeInterrupt.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+StaticDO.exe: DO_StaticDO\StaticDO.bpr
+  $(ROOT)\bin\bpr2mak $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+

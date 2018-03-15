@@ -1,0 +1,49 @@
+NAME
+       isa_tools - Add or remove isa device
+
+SYNOPSIS
+       ls [OPTION]... 
+
+DESCRIPTION
+       Mandatory arguments to long options are mandatory for short options too.
+
+       -a, --adddev
+              add isa device into driver list
+
+       -r, --rmdev
+              remove isa device from driver list
+
+       -p, --ioport 
+              io port address
+              If you want to know the situation of io port, you can use the command "cat /proc/ioports".
+
+       -q, --irq
+              isa interrupt level
+              If you want to know the situation of interrupt, you can use the command "cat /proc/interrupts".
+
+       -d, --dma
+              system dma number
+
+       -n, --driname
+              driver's name
+
+       -m, --devname
+              device's name
+
+       -h, --help
+              usage
+
+       -v, --version
+              version of this software
+
+
+Device name      io port range             irq range           dma range           driver name             device name
+
+PCM3718          match the switch       match the switch     match the switch       bio3718              pcm3718,pcm3718h
+                                             (2~7)               (1, 3)                                  pcm3718hg,pcm3718ho
+
+PCM3725          match the switch       match the switch          none              bio3725                   pcm3725
+                                             (2~7)                                           
+
+PCM3730          match the switch       match the switch          none              bio3730                   pcm3730
+                                             (2~7)               
