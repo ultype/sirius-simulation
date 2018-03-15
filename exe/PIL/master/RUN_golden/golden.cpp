@@ -76,6 +76,8 @@ extern "C" int run_me() {
 
 
     master_startup();
+    rkt.forces.set_Slosh_flag(0);
+    rkt.forces.set_DOF(6);
 
     /********************************Set simulation start time*****************************************************/
     uint32_t Year = 2017;
