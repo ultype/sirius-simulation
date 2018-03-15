@@ -36,6 +36,13 @@ $NoKeywords:  $
 ******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
 #include "../inc/compatibility.h"
 #include "../../../inc/bdaqctrl.h"
 using namespace Automation::BDaq;
@@ -45,6 +52,9 @@ using namespace Automation::BDaq;
 #define  deviceDescription  L"PCI-1737,BID#0"
 int32    startPort = 0;   
 int32    portCount = 1;   
+
+#define BDAQ_DIO_MAGIC  'd'
+#define GPIOEVENT_IOCTL  _IO(BDAQ_DIO_MAGIC, 15)
 
 inline void waitAnyKey()
 {
@@ -68,13 +78,18 @@ public:
 int main(int argc, char* argv[])
 {
    ErrorCode ret = Success;
+    char date_buf[80];
+    char currentTime[84] = "";
+    static struct timespec ts;
+    unsigned int milli;
    // Step 1: Create a 'InstantDiCtrl' for DI function.
    InstantDiCtrl * instantDiCtrl = AdxInstantDiCtrlCreate();
 
 	// Step 2: Set the notification event Handler by which we can known the state of operation effectively.
-	DiSnapHandler DiSnap;
+#if 0
+    DiSnapHandler DiSnap;
 	instantDiCtrl->addInterruptListener(DiSnap);
-
+#endif
    do
    {
       // Step 3: Select a device by device number or device description and specify the access mode.
@@ -105,7 +120,14 @@ int main(int argc, char* argv[])
       printf(" Snap has started, any key to quit !\n");
       do
       {
-         SLEEP(1);// do something yourself !
+         //  SLEEP(1);// do something yourself !
+        ioctl(3, GPIOEVENT_IOCTL, 0);
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        ts.tv_sec = time(NULL);
+        milli = ts.tv_nsec / 1000000;
+        strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+        snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+        fprintf(stderr, "[%s] ioctl received\n", currentTime);
       }while (!kbhit());
 
       // Step 7: Stop DIInterrupt

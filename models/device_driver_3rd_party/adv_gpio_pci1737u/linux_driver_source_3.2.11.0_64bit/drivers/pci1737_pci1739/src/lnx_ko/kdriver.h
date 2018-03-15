@@ -29,6 +29,22 @@
 #include <biokernbase.h>
 #include "kshared.h"
 
+#include <linux/module.h>
+#include <linux/irq.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/device.h>
+#include <linux/spinlock.h>
+#include <linux/wait.h>
+#include <linux/timer.h>
+#include <linux/gpio.h>
+#include <asm/uaccess.h>
+
+#define TISPACE_CUSTOMIZED 1
+#if (TISPACE_CUSTOMIZED == 1)
+extern struct task_struct *wait_task;
+#endif /* TISPACE_CUSTOMIZED */
+
 typedef struct daq_file_ctx {
    struct list_head   ctx_list;
    struct daq_device  *daq_dev;

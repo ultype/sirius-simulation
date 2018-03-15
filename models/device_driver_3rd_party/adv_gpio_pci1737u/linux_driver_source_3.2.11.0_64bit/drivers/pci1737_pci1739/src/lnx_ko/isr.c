@@ -45,7 +45,9 @@ void daq_dev_tasklet_func(unsigned long arg)
 
       if (!shared->IsEvtSignaled[KdxDiintChan16]) {
          shared->IsEvtSignaled[KdxDiintChan16] = 1;
+#if (TISPACE_CUSTOMIZED == 0)
          daq_device_signal_event(daq_dev, KdxDiintChan16);
+#endif  /* TISPACE_CUSTOMIZED */
       }
    }
 
@@ -78,9 +80,15 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
    spin_lock(&daq_dev->dev_lock);
    daq_dev->dev_int_state |= int_state;
    spin_unlock(&daq_dev->dev_lock);
-
+#if (TISPACE_CUSTOMIZED == 1)
+    if (wait_task != NULL) {
+        //  printk("<0>""[%d:%s] wake up process !!\n", __LINE__, __FUNCTION__);
+        local_irq_disable();
+        wake_up_process(wait_task);
+    }
+#else
    tasklet_schedule(&daq_dev->dev_tasklet);
-
+#endif /* TISPACE_CUSTOMIZED */
    // Clear interrupt
    AdxIoOutB(daq_dev->shared.IoBase, DR_INT_CS, int_state);
    daq_trace((KERN_INFO"device int: %d\n", int_state));

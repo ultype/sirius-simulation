@@ -417,6 +417,10 @@ typedef struct _DIO_START_DI_SNAP{
 // Output: <None>
 #define IOCTL_DIO_SET_DO_POWER_ON_STATE        _IO(BDAQ_DIO_MAGIC, 14)
 
+// Input:  uint8[], wait gpio event
+// Output: <None>
+#define IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT  _IO(BDAQ_DIO_MAGIC, 15)
+
 // Input:  pointer to structure DIO_SET_DOWTD_CFG.
 // Output: <None>
 #define WDT_SET_INTERVAL      0x1
