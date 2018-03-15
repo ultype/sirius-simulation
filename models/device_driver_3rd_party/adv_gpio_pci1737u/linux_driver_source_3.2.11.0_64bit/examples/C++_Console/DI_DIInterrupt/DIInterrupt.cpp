@@ -42,7 +42,7 @@ using namespace Automation::BDaq;
 //-----------------------------------------------------------------------------------
 // Configure the following three parameters before running the demo
 //-----------------------------------------------------------------------------------
-#define  deviceDescription  L"DemoDevice,BID#0"
+#define  deviceDescription  L"PCI-1737,BID#0"
 int32    startPort = 0;   
 int32    portCount = 1;   
 
@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
 			waitAnyKey();
 			return 0;
 		}
-      interruptChans->getItem(0).setEnabled(true);
-      printf(" DI channel %d is used to detect interrupt!\n\n", interruptChans->getItem(0).getChannel());
+      interruptChans->getItem(startPort).setEnabled(true);
+      printf(" DI channel %d is used to detect interrupt!\n\n", interruptChans->getItem(startPort).getChannel());
 
       // Step 5: Start DIInterrupt
       ret = instantDiCtrl->SnapStart();
