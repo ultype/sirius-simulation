@@ -1,14 +1,20 @@
 #ifndef __EXTERNAL_CLOCK_SOURCE_HH__
 #define __EXTERNAL_CLOCK_SOURCE_HH__
-
-#ifdef __linux
+/********************************* TRICK HEADER *******************************
+PURPOSE:
+      TRX Ctrl
+LIBRARY DEPENDENCY:
+      (
+        (ExternalSourceClock.cpp)
+      )
+PROGRAMMERS:
+      (((Dung-Ru Tsai) () () () ))
+*******************************************************************************/
 #include <time.h>
-#endif
 
 #include "trick/Clock.hh"
 
-namespace Trick {
-class ExternalSourceClock : public Clock {
+class ExternalSourceClock : public Trick::Clock {
  public:
         ExternalSourceClock();
         ~ExternalSourceClock();
@@ -17,12 +23,10 @@ class ExternalSourceClock : public Clock {
         virtual int clock_init();
 
         /** @copybrief Trick::Clock::wall_clock_time() */
-        virtual int64_t wall_clock_time();
+        virtual long long wall_clock_time();
 
         /** @copybrief Trick::Clock::clock_stop() */
         virtual int clock_stop();
 };
-
-}  // namespace Trick
 
 #endif /* __EXTERNAL_CLOCK_SOURCE_HH__ */

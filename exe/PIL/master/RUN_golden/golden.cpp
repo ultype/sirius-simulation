@@ -68,10 +68,16 @@ extern "C" int event_fairing_separation() {
     return 0;
 }
 
+extern "C" void external_clock_init(void) {
+            real_time_change_clock(&rkt.ext_clk);
+            fprintf(stderr, "%s\n", real_time_clock_get_name());
+}
+
 extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
+    //  external_clock_init();
     realtime();
 
 

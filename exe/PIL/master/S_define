@@ -52,7 +52,7 @@ LIBRARY DEPENDENCIES:
 
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"
-
+##include "ExternalSourceClock.hh"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -66,6 +66,7 @@ class Rocket_SimObject : public Trick::SimObject {
         sensor::Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
+        ExternalSourceClock ext_clk;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -202,7 +203,6 @@ class Rocket_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
         };
 
-
         Rocket_SimObject() 
             :   env         (  ) ,
                 propulsion  (  )      ,
@@ -210,9 +210,9 @@ class Rocket_SimObject : public Trick::SimObject {
                 tvc         (  ) ,
                 forces      ( propulsion   , tvc ) ,
                 gps_con     (  ),
-                dynamics    (  )
+                dynamics    (  ),
+                ext_clk     (  )
             {
-
             ("initialization") link();
             ("initialization") aerodynamics.initialize();
             ("initialization") dynamics.initialize();

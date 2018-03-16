@@ -1,4 +1,4 @@
-#include "trick/external_clock_source.hh"
+#include "ExternalSourceClock.hh"
 #include "trick/message_proto.h"
 #include "trick/message_type.h"
 
@@ -6,19 +6,20 @@
 @details
 -# Calls the base Clock constructor
 */
-Trick::ExternalSourceClock::ExternalSourceClock() { }
+ExternalSourceClock::ExternalSourceClock() : Clock(1000000, "ExternalSourceClock")
+{ }
 
 /**
 @details
 -# This function is empty
 */
-Trick::ExternalSourceClock::~ExternalSourceClock() { }
+ExternalSourceClock::~ExternalSourceClock() { }
 
 /**
 @details
 -# Set the global "the_clock" pointer to this instance
 */
-int Trick::ExternalSourceClock::clock_init() {
+int ExternalSourceClock::clock_init() {
     set_global_clock();
     return 0;
 }
@@ -28,6 +29,13 @@ int Trick::ExternalSourceClock::clock_init() {
 -# Call the system clock_gettime to get the current real time.
 -# Return the current real time as a count of microseconds
 */
-int64_t Trick::ExternalSourceClock::wall_clock_time() {
+long long ExternalSourceClock::wall_clock_time() {
 }
 
+/**
+@details
+-# This function is empty
+*/
+int ExternalSourceClock::clock_stop() {
+    return 0;
+}

@@ -7,9 +7,9 @@
 
 output=${1:-emacs}
 # Find the files with Emacs Regular Expression and exclude submodule directories
-C_files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\|device_driver_3rd_party\)/.*" -prune -o -iregex ".*\.\(h\|c\)" -print \
+C_files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\|device_driver_3rd_party\|clock_source_mgmt\)/.*" -prune -o -iregex ".*\.\(h\|c\)" -print \
 | grep -vE \QA_Tool)
-Cpp_files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\|device_driver_3rd_party\)/.*" -prune -o -iregex ".*\.\(hh\|cc\|cpp\)" -print \
+Cpp_files=$( find ./ -iregex "\./models/\(cad\|dm\|gnc\|math\|sensor\|device_driver_3rd_party\|clock_source_mgmt\)/.*" -prune -o -iregex ".*\.\(hh\|cc\|cpp\)" -print \
 | grep -vE \QA_Tool)
 
 # C files checking
