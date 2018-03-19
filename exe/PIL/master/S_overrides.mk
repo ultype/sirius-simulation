@@ -19,6 +19,6 @@ INCLUDES = -I${TRICK_HOME}/trick_models \
 TRICK_CFLAGS += --std=c++11 ${INCLUDES} -g -D_GNU_SOURCE -DCONFIG_PIL_ENABLE
 TRICK_CFLAGS += -Wall -Wmissing-prototypes -Wextra -Wshadow
 TRICK_CXXFLAGS += --std=c++11 ${INCLUDES} -g -DCONFIG_PIL_ENABLE
-TRICK_CXXFLAGS += -Wall -Wextra -Wshadow
-TRICK_USER_LINK_LIBS += -larmadillo -lboost_serialization
+TRICK_CXXFLAGS += -Wall -Wextra -Wshadow -Wno-narrowing
+TRICK_USER_LINK_LIBS += -larmadillo -lboost_serialization -lbiodaq
 MAKEFLAGS += -j16
