@@ -417,9 +417,16 @@ typedef struct _DIO_START_DI_SNAP{
 // Output: <None>
 #define IOCTL_DIO_SET_DO_POWER_ON_STATE        _IO(BDAQ_DIO_MAGIC, 14)
 
+struct ioctl_tispace_cmd {
+   long long time_tics;
+};
 // Input:  uint8[], wait gpio event
 // Output: <None>
 #define IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT  _IO(BDAQ_DIO_MAGIC, 15)
+
+// Input:  uint8[], GET_WALLCLOCK_TIME
+// Output: <None>
+#define IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS  _IOR(BDAQ_DIO_MAGIC, 16, struct ioctl_tispace_cmd)
 
 // Input:  pointer to structure DIO_SET_DOWTD_CFG.
 // Output: <None>

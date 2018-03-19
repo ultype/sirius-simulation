@@ -50,11 +50,17 @@ using namespace Automation::BDaq;
 // Configure the following three parameters before running the demo
 //-----------------------------------------------------------------------------------
 #define  deviceDescription  L"PCI-1737,BID#0"
-int32    startPort = 0;   
-int32    portCount = 1;   
+int32    startPort = 0;
+int32    portCount = 1;
+
+struct ioctl_tispace_cmd {
+   long long time_tics;
+};
 
 #define BDAQ_DIO_MAGIC  'd'
-#define GPIOEVENT_IOCTL  _IO(BDAQ_DIO_MAGIC, 15)
+#define IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT  _IO(BDAQ_DIO_MAGIC, 15)
+#define IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS  _IOR(BDAQ_DIO_MAGIC, 16, struct ioctl_tispace_cmd)
+
 
 inline void waitAnyKey()
 {
@@ -77,11 +83,12 @@ public:
 
 int main(int argc, char* argv[])
 {
-   ErrorCode ret = Success;
+    ErrorCode ret = Success;
     char date_buf[80];
     char currentTime[84] = "";
     static struct timespec ts;
     unsigned int milli;
+    struct ioctl_tispace_cmd wall_time;
    // Step 1: Create a 'InstantDiCtrl' for DI function.
    InstantDiCtrl * instantDiCtrl = AdxInstantDiCtrlCreate();
 
@@ -120,7 +127,12 @@ int main(int argc, char* argv[])
       printf(" Snap has started, any key to quit !\n");
       do
       {
-         //  SLEEP(1);// do something yourself !
+#if 1
+          SLEEP(1);// do something yourself !
+          ioctl(3, IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS, &wall_time);
+          fprintf(stderr, "[%lld us] ioctl received \n", wall_time.time_tics/1000);
+#endif
+#if 0
         ioctl(3, GPIOEVENT_IOCTL, 0);
         clock_gettime(CLOCK_MONOTONIC, &ts);
         ts.tv_sec = time(NULL);
@@ -128,6 +140,7 @@ int main(int argc, char* argv[])
         strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
         snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
         fprintf(stderr, "[%s] ioctl received\n", currentTime);
+#endif
       }while (!kbhit());
 
       // Step 7: Stop DIInterrupt

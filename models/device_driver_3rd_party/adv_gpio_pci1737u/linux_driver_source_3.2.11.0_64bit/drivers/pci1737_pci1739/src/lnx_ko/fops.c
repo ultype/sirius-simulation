@@ -7,11 +7,6 @@
 #include "kdriver.h"
 #include "hw.h"
 
-#if (TISPACE_CUSTOMIZED == 1)
-static atomic_t user_flag = ATOMIC_INIT(1);
-struct task_struct *wait_task = NULL;
-#endif /* TISPACE_CUSTOMIZED */
-
 static
 daq_file_ctx_t * daq_file_alloc_context(daq_device_t *daq_dev)
 {
@@ -379,19 +374,12 @@ long daq_file_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
       break;
 #if (TISPACE_CUSTOMIZED == 1)
    case IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT:
-    printk("<0>""[%d:%s] IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT\n", __LINE__, __FUNCTION__);
-    /* yield as possible */
-    while (!atomic_dec_and_test(&user_flag))
-        schedule();
-
-    wait_task = current;
-    set_current_state(TASK_UNINTERRUPTIBLE);
-    schedule();
-    __set_current_state(TASK_RUNNING);
-    local_irq_enable();
-    atomic_set(&user_flag, 1);
-#endif /* TISPACE_CUSTOMIZED */
+        ret = daq_ioctl_di_wait_gpio_int(daq_dev, arg);
       break;
+    case IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS:
+        ret = daq_ioctl_di_get_wallclock_time(daq_dev, arg);
+        break;
+#endif /* TISPACE_CUSTOMIZED */
    default:
       ret = -ENOTTY;
       break;

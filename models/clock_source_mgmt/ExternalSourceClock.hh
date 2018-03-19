@@ -11,7 +11,6 @@ PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
 *******************************************************************************/
 #include <time.h>
-
 #include "trick/Clock.hh"
 
 class ExternalSourceClock : public Trick::Clock {

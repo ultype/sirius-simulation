@@ -39,6 +39,7 @@
 #include <linux/timer.h>
 #include <linux/gpio.h>
 #include <asm/uaccess.h>
+#include <linux/ktime.h>
 
 #define TISPACE_CUSTOMIZED 1
 #if (TISPACE_CUSTOMIZED == 1)
@@ -66,7 +67,12 @@ typedef struct daq_device
 
    struct tasklet_struct dev_tasklet;
    __u32                 dev_int_state;
-
+#if (TISPACE_CUSTOMIZED == 1)
+   ktime_t curr_beg_pps_tics;
+   ktime_t curr_end_pps_tics;
+   ktime_t prev_end_pps_tics;
+   int first_pps;
+#endif /* TISPACE_CUSTOMIZED */
 } daq_device_t;
 
 /************************************************************************/
@@ -104,6 +110,8 @@ int daq_ioctl_diint_set_param(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_start_snap(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_stop_snap(daq_device_t *daq_dev, unsigned long arg);
 
+int daq_ioctl_di_wait_gpio_int(daq_device_t *daq_dev, unsigned long arg);
+int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg);
 //
 // isr.c
 //

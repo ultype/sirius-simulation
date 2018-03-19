@@ -7,7 +7,12 @@
 #include "kdriver.h"
 #include "hw.h"
 
-//
+#if (TISPACE_CUSTOMIZED == 1)
+static atomic_t user_flag = ATOMIC_INIT(1);
+struct task_struct *wait_task = NULL;
+#endif /* TISPACE_CUSTOMIZED */
+
+
 // DIO port Data register
 __u32 g_dio_port_offset[] = {
    DR_GRPx_PORTy(0, 0), DR_GRPx_PORTy(0, 1), DR_GRPx_PORTy(0, 2),
@@ -275,3 +280,30 @@ int daq_ioctl_di_stop_snap(daq_device_t *daq_dev, unsigned long arg)
    return 0;
 }
 
+int daq_ioctl_di_wait_gpio_int(daq_device_t *daq_dev, unsigned long arg)
+{
+    /* yield as possible */
+    while (!atomic_dec_and_test(&user_flag))
+        schedule();
+
+    wait_task = current;
+    set_current_state(TASK_UNINTERRUPTIBLE);
+    schedule();
+    __set_current_state(TASK_RUNNING);
+    local_irq_enable();
+    atomic_set(&user_flag, 1);
+
+   return 0;
+}
+
+int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg)
+{
+   struct ioctl_tispace_cmd cmd;
+   ktime_t current_time;
+   current_time = ktime_get();
+   cmd.time_tics = current_time.tv64 + ( daq_dev->prev_end_pps_tics.tv64 - daq_dev->curr_beg_pps_tics.tv64);
+   if (unlikely(copy_to_user((int __user *)arg, &cmd, sizeof(struct ioctl_tispace_cmd)))){
+      return -EFAULT;
+   }
+   return 0;
+}
