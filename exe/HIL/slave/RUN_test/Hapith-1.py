@@ -15,9 +15,9 @@ fc.time.load_start_time(Year, DOY, Hour, Min, Sec)
 #############################################################################
 
 ##############################INS############################################
-lonx       = 120.893501 # Vehicle longitude - deg  module newton
-latx       = 22.138917  # Vehicle latitude  - deg  module newton
-alt        = 5        # Vehicle altitude  - m  module newton
+lonx       = 120.8901528 # Vehicle longitude - deg  module newton
+latx       = 22.26209722  # Vehicle latitude  - deg  module newton
+alt        = 6.0        # Vehicle altitude  - m  module newton
 fc.ins.load_location(lonx, latx, alt)
 
 phibdx = 0.0      # Rolling  angle of veh wrt geod coord - deg  module kinematics

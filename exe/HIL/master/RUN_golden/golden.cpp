@@ -68,14 +68,22 @@ extern "C" int event_fairing_separation() {
     return 0;
 }
 
+extern "C" void external_clock_switch(void) {
+    real_time_change_clock(&rkt.ext_clk);
+    fprintf(stderr, "%s\n", real_time_clock_get_name());
+}
+
 extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
+    //  external_clock_switch();
     realtime();
 
 
     master_startup();
+    rkt.forces.set_Slosh_flag(0);
+    rkt.forces.set_DOF(6);
 
     /********************************Set simulation start time*****************************************************/
     uint32_t Year = 2017;
