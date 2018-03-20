@@ -1,5 +1,5 @@
-#ifndef EXE_PIL_SLAVE_MODIFIED_DATA_GPS_FC_H_
-#define EXE_PIL_SLAVE_MODIFIED_DATA_GPS_FC_H_
+#ifndef EXE_HIL_SLAVE_MODIFIED_DATA_GPS_FC_H_
+#define EXE_HIL_SLAVE_MODIFIED_DATA_GPS_FC_H_
 
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
@@ -145,4 +145,4 @@ extern "C" void record_gps_slave() {
     drg->enable();
 }
 
-#endif  // EXE_PIL_SLAVE_MODIFIED_DATA_GPS_FC_H_
+#endif  // EXE_HIL_SLAVE_MODIFIED_DATA_GPS_FC_H_
