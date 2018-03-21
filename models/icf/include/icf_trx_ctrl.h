@@ -21,7 +21,7 @@ PROGRAMMERS:
 #include "ringbuffer.h"
 #include "icf_drivers.h"
 #include "dsp_can_interfaces.h"
-
+#include "trick/exec_proto.h"
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 #define ICF_CTRLBLK_MAXPORT_NUMBER  16
 

@@ -19,5 +19,4 @@ extern "C" void realtime() {
     sim_control_panel_set_enabled(1);
 #endif
 }
-
 #endif  // PUBLIC_MODIFIED_DATA_REALTIME_H_

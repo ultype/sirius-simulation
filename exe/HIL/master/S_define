@@ -203,6 +203,20 @@ class Rocket_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
         };
 
+        void egse_200HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
+            uint32_t value= 0xFFFFFFFF;
+            icf_tx_direct(C, qidx, &value, 4);
+        };
+
+        void egse_1000HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
+            uint32_t value= 0xFFFFFFFF;
+            icf_tx_direct(C, qidx, &value, 4);
+        };
+
+        void egse_20HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
+            uint32_t value= 0xFFFFFFFF;
+            icf_tx_direct(C, qidx, &value, 4);
+        };
 
         Rocket_SimObject() 
             :   env         (  ) ,
@@ -223,8 +237,9 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            //  P1 (1,0, "scheduled") ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
             P1 (int_step, "scheduled") time->dm_time();
-	        P1 (int_step, "scheduled") env.propagate(int_step);
+            P1 (int_step, "scheduled") env.propagate(int_step);
             P1 (int_step, "scheduled") propulsion.propagate(int_step);
             P1 (int_step, "scheduled") aerodynamics.calculate_aero(int_step);
             P1 (0.05, "scheduled") gps_con.compute();
@@ -235,9 +250,10 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P2 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU01_SW_QIDX);
-            P2 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
 
+            P2 (0.5,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
+            P2 (0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
+            P2 (0.005, "scheduled") egse_20HZ_tx_test(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
 
             P3 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);

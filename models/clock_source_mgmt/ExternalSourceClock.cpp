@@ -2,6 +2,8 @@
 #include "trick/message_proto.h"
 #include "trick/message_type.h"
 
+#define EXT_CLOCK_TICS_PER_SEC 1000
+#define EXT_WALLCLOCK_TICS_RATIO (1000000000LL/EXT_CLOCK_TICS_PER_SEC)
 
 int32_t    startPort = 0;
 int32_t    portCount = 1;
@@ -9,7 +11,7 @@ int32_t    portCount = 1;
 @details
 -# Calls the base Clock constructor
 */
-ExternalSourceClock::ExternalSourceClock() : Clock(1000000, "ExternalSourceClock")
+ExternalSourceClock::ExternalSourceClock() : Clock(EXT_CLOCK_TICS_PER_SEC, "ExternalSourceClock")
 { }
 
 /**
@@ -66,7 +68,8 @@ long long ExternalSourceClock::wall_clock_time() {
         fprintf(stderr, "[%s:%d] ioctl error \n", __FUNCTION__, __LINE__);
     }
     //  fprintf(stderr, "[%lld us] wall_clock_time \n", wall_time.time_tics/1000);
-    return wall_time.time_tics/1000 ;
+    /* wall_time.time_tics = nanoseconds*/
+    return wall_time.time_tics/EXT_WALLCLOCK_TICS_RATIO;
 }
 
 /**

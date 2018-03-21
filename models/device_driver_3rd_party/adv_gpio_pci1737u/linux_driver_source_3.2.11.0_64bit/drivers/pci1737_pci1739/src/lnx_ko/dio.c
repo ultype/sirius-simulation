@@ -301,7 +301,7 @@ int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg)
    struct ioctl_tispace_cmd cmd;
    ktime_t current_time;
    current_time = ktime_get();
-   cmd.time_tics = current_time.tv64 + ( daq_dev->prev_end_pps_tics.tv64 - daq_dev->curr_beg_pps_tics.tv64);
+   cmd.time_tics = current_time.tv64 - (daq_dev->prev_end_pps_tics.tv64 - daq_dev->curr_beg_pps_tics.tv64);
    if (unlikely(copy_to_user((int __user *)arg, &cmd, sizeof(struct ioctl_tispace_cmd)))){
       return -EFAULT;
    }

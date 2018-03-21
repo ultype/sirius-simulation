@@ -77,9 +77,8 @@ extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
-    //  external_clock_switch();
+    external_clock_switch();
     realtime();
-
 
     master_startup();
     rkt.forces.set_Slosh_flag(0);
@@ -93,6 +92,7 @@ extern "C" int run_me() {
     uint32_t Sec = 0;
     rkt.time->load_start_time(Year, DOY, Hour, Min, Sec);
     /***************************************************************************************************************/
+    exec_set_time_tic_value(1000000);
     fprintf(stderr, "time_tic_value = %d tics per seconds\n", exec_get_time_tic_value());
     fprintf(stderr, "software_frame = %lf second per frame.\n", exec_get_software_frame());
     fprintf(stderr, "software_frame_tics = %lld tics per_frame\n", exec_get_software_frame_tics());

@@ -491,7 +491,7 @@ void icf_heartbeat(void) {
     milli = ts.tv_nsec / 1000000;
     strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
     snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
-    fprintf(stderr, "[%s]\n", currentTime);
+    fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
 }
 
 void *icf_alloc_mem(size_t size) {
