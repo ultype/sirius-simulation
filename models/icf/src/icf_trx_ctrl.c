@@ -361,7 +361,6 @@ static int icf_l2frame_receive_process(struct icf_ctrlblk_t* C, struct icf_drive
     if (qidx == EGSE_EMPTY_SW_QIDX)
         goto empty;
     ctrlqueue = C->ctrlqueue[qidx];
-    FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
     rb_push(&ctrlqueue->data_ring, rxcell);
     return ICF_STATUS_SUCCESS;
 empty:
@@ -471,7 +470,6 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
     whichring = &ctrlqueue->data_ring;
     txcell = (uint8_t *)rb_pop(whichring);
-    FTRACE_TIME_STAMP(ctrlqueue->queue_idx + 500);
     if (txcell) {
         drv_ops->send_data(ctrlport->drv_priv_data, txcell->l2frame, txcell->frame_full_size);
         debug_hex_dump("icf_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);

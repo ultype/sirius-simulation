@@ -210,16 +210,19 @@ class Rocket_SimObject : public Trick::SimObject {
         };
         void egse_200HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
             uint32_t value= 0xFFFFFFFF;
+            FTRACE_TIME_STAMP(510);
             icf_tx_direct(C, qidx, &value, 4);
         };
 
         void egse_1000HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
             uint32_t value= 0xFFFFFFFF;
+            FTRACE_TIME_STAMP(511);
             icf_tx_direct(C, qidx, &value, 4);
         };
 
         void egse_20HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
             uint32_t value= 0xFFFFFFFF;
+            FTRACE_TIME_STAMP(512);
             icf_tx_direct(C, qidx, &value, 4);
         };
 
@@ -256,9 +259,9 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
 
-            P2 (0.5,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
-            P2 (0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
-            P2 (0.005, "scheduled") egse_20HZ_tx_test(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
+            P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
+            P2 (0.001,0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
+            P2 (0.05,0.001, "scheduled") egse_20HZ_tx_test(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
 
             P3 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);

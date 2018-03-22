@@ -40,9 +40,12 @@ PLOT_CONFIG_INFO = [
     ["sys_enter: NR 502", "[HIL] Ratetable_X (SIM Time: 200 secs)", "Timeframe 1000 Hz"],
     ["sys_enter: NR 506", "[HIL] GPSR01 (SIM Time: 200 secs)", "Timeframe 20 Hz"],
     ["sys_enter: NR 508", "[HIL] Flight Computer (SIM Time: 200 secs)", "Timeframe 20 Hz"],
+    ["sys_enter: NR 510", "[HIL] RS422 200 (SIM Time: 200 secs)", "Timeframe 200 Hz"],
+    ["sys_enter: NR 511", "[HIL] RS422 1000 (SIM Time: 200 secs)", "Timeframe 1000 Hz"],
+    ["sys_enter: NR 512", "[HIL] RS422 20 (SIM Time: 200 secs)", "Timeframe 20 Hz"]
 ]
 if len(sys.argv) < 0:
-    print "Please imput the PLOT_CONFIG_INFO : 0~3"
+    print "Please imput the PLOT_CONFIG_INFO : 0~7"
     sys.exit(0)
 IDX = int(sys.argv[1])
 

@@ -68,11 +68,11 @@ typedef struct daq_device
    struct tasklet_struct dev_tasklet;
    __u32                 dev_int_state;
 #if (TISPACE_CUSTOMIZED == 1)
-   ktime_t curr_beg_pps_tics;
-   ktime_t curr_end_pps_tics;
-   ktime_t prev_end_pps_tics;
-   int pps_cnt;
-   atomic_t is_wallclock_arrive;
+    int pps_cnt;
+    atomic_t is_wallclock_arrive;
+    ktime_t curr_pps_tics;
+    ktime_t prev_pps_tics;
+    ktime_t curr_ideal_tics;
 #endif /* TISPACE_CUSTOMIZED */
 } daq_device_t;
 
