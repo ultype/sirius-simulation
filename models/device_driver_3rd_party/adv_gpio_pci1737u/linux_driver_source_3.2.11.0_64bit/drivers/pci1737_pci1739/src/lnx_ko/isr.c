@@ -80,11 +80,13 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
    daq_dev->dev_int_state |= int_state;
    spin_unlock(&daq_dev->dev_lock);
 #if (TISPACE_CUSTOMIZED == 1)
+    daq_dev->pps_cnt++;
     daq_dev->curr_beg_pps_tics = ktime_get();
-    daq_dev->prev_end_pps_tics = (daq_dev->first_pps != 0) ? daq_dev->curr_end_pps_tics : daq_dev->curr_beg_pps_tics;
-    daq_dev->first_pps++;
+    daq_dev->prev_end_pps_tics = (!atomic_dec_and_test(&daq_dev->is_wallclock_arrive)) ? daq_dev->curr_beg_pps_tics : daq_dev->curr_end_pps_tics;
     daq_dev->curr_end_pps_tics.tv64 = daq_dev->curr_beg_pps_tics.tv64 + 1000000000LL;
-    //  printk("<0>""%lld\n", daq_dev->curr_beg_pps_tics.tv64);
+    //  printk("<0>""isr %d pps curr beg %lld\n",daq_dev->pps_cnt ,daq_dev->curr_beg_pps_tics.tv64);
+    //  printk("<0>""isr %d pps prev end %lld\n",daq_dev->pps_cnt ,daq_dev->prev_end_pps_tics.tv64);
+
     if (wait_task != NULL) {
         //  printk("<0>""[%d:%s] wake up process !!\n", __LINE__, __FUNCTION__);
         local_irq_disable();

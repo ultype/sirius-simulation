@@ -71,7 +71,8 @@ typedef struct daq_device
    ktime_t curr_beg_pps_tics;
    ktime_t curr_end_pps_tics;
    ktime_t prev_end_pps_tics;
-   int first_pps;
+   int pps_cnt;
+   atomic_t is_wallclock_arrive;
 #endif /* TISPACE_CUSTOMIZED */
 } daq_device_t;
 
