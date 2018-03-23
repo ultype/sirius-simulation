@@ -331,7 +331,7 @@ extern "C" int run_me() {
     jit_add_read(100.001, "event_s3_control_on");
     jit_add_read(200.001, "event_control_off");
 
-    exec_set_terminate_time(90.0);
+    exec_set_terminate_time(100.0);
 
     return 0;
 }

@@ -101,7 +101,7 @@ extern "C" int run_me() {
     /****************************************SLV************************************************************************/
     double lonx       = 120.8901528;  //  Vehicle longitude - deg  module newton
     double latx       = 22.26209722;   //  Vehicle latitude  - deg  module newton
-    double alt        = 6.0;         //  Vehicle altitude  - m  module newton
+    double alt        = 5.0;         //  Vehicle altitude  - m  module newton
     rkt.dynamics.load_location(lonx, latx, alt);
 
     double con_ang = 0.0;
@@ -184,7 +184,7 @@ extern "C" int run_me() {
     jit_add_read(102.001, "event_separation_1");
     jit_add_read(107.001, "event_fairing_separation");
 
-    exec_set_terminate_time(90.0);
+    exec_set_terminate_time(100.0);
 
     return 0;
 }
