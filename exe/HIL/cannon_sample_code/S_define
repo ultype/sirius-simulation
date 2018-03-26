@@ -1,0 +1,61 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (This S_define works with the RUN_analytic input file)
+LIBRARY DEPENDENCIES:
+    (
+    )
+*************************************************************/
+
+#include "sim_objects/default_trick_sys.sm"
+##include "cannon.h"
+##include "cannon_analytic.h"
+##include "ExternalSourceClock.hh"
+##include <time.h>
+
+class CannonSimObject : public Trick::SimObject {
+
+    public:
+        CANNON cannon;
+        ExternalSourceClock ext_clk;
+
+        void cannon_heartbeat(void) {
+            char date_buf[80];
+            char currentTime[84] = "";
+            static struct timespec ts;
+            uint32_t milli;
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            ts.tv_sec = time(NULL);
+            milli = ts.tv_nsec / 1000000;
+            strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+            snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+            fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
+        };
+
+        void wait_for_1st_pps(void) {
+            fprintf(stderr, "Wainting for the 1st PPS...");
+            ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            fprintf(stderr, "Go !!\n");
+        };
+
+        void empty_job(void) {
+            syscall(510);
+        };
+
+
+
+        CannonSimObject() : ext_clk() 
+        {
+        	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
+            ("initialization") cannon_init( &cannon );
+            ("initialization") wait_for_1st_pps();
+
+
+            P1 (0.5, 2.001, "scheduled") empty_job();
+            P1 (0.001, "scheduled") cannon_analytic(&cannon);
+            P1 (1, "scheduled") cannon_heartbeat();
+
+            ("shutdown") cannon_shutdown(& cannon);
+        }
+} ;
+
+CannonSimObject dyn ;
