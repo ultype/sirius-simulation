@@ -154,8 +154,9 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_ang_slosh_psi = LINK( dynamics, get_ang_slosh_psi);
             forces.grab_dang_slosh_theta = LINK( dynamics, get_dang_slosh_theta);
             forces.grab_dang_slosh_psi = LINK( dynamics, get_dang_slosh_psi);
-            forces.grab_NEXT_ACC = LINK( dynamics, get_NEXT_ACC);
-            forces.grab_liftoff = LINK(dynamics, get_liftoff);
+            forces.grab_NEXT_ACC       = LINK( dynamics, get_NEXT_ACC);
+            forces.grab_liftoff        = LINK( dynamics, get_liftoff);
+            forces.grab_FSPB           = LINK( dynamics, get_FSPB);
 
             gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
             gps_con.grab_TEI           = LINK( env, get_TEI);
