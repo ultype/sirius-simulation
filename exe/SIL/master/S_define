@@ -49,7 +49,7 @@ LIBRARY DEPENDENCIES:
 
 ##include "transceiver.hh"
 ##include "Dataflow_Binding.hh"
-
+##include  "DM_FSW_Interface.hh"
 
 
 class Rocket_SimObject : public Trick::SimObject {
@@ -72,6 +72,7 @@ class Rocket_SimObject : public Trick::SimObject {
         refactor_downlink_packet_t ctl_tvc_db;
         DM_SAVE_decl();
         struct icf_ctrlblk_t   icf_ctrl;
+        uint64_t egse_mission_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
 
         Transceiver transceiver;
 
@@ -204,6 +205,14 @@ class Rocket_SimObject : public Trick::SimObject {
                 debug_hex_dump("egse", (uint8_t *)&ctl_tvc_db, sizeof(refactor_downlink_packet_t));
         }
 
+        void mission_event_handler_example(void) {
+            fprintf(stderr, "[%s:%d] mission_event_code: 0x%0X\n", __LINE__, __FUNCTION__, ctl_tvc_db.mission_event_code); 
+            if (egse_mission_handler_bitmap & (0x1U << ctl_tvc_db.mission_event_code)) {
+                egse_mission_handler_bitmap &= ~(0x1U << ctl_tvc_db.mission_event_code);
+                fprintf(stderr, "[%s:%d] 0x%0X\n", __LINE__, __FUNCTION__, egse_mission_handler_bitmap);
+            }
+        }
+
         Rocket_SimObject() 
             :   env         (  ) ,
                 propulsion  (  )      ,
@@ -238,6 +247,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
             P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT8, sizeof(refactor_downlink_packet_t));
             P2 (0.05, "scheduled") load_input(&icf_ctrl);
+            P2 (1, "scheduled") mission_event_handler_example();
 
             P3 (0.001, "scheduled") tvc.actuate(0.001, NULL);
             P3 (int_step, "scheduled") dynamics.propagate(int_step);

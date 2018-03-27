@@ -6,7 +6,7 @@
 #include "trick/external_application_c_intf.h"
 #include "../../../public/Modified_data/realtime.h"
 #include "../Modified_data/gps_fc.h"
-
+#include  "../../../models/gnc/include/DM_FSW_Interface.hh"
 /* Stage2 Control Variable Constant */
 const double S2_MDOT = 29.587;
 const double S2_FMASS0 = 2958.7;
@@ -84,16 +84,19 @@ const double S3_AOACMD = -0.0;
 
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_LIFTOFF;
     return 0;
 }
 
 extern "C" int event_control_rcs_on(void) {
     fc.control.set_S2_ROLL_CONTROL();
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CONTROL_RCS_ON;
     return 0;
 }
 
 extern "C" int event_control_on(void) {
     fc.control.set_S2_PITCH_DOWN();
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CONTROL_ON;
     return 0;
 }
 
@@ -106,11 +109,13 @@ extern "C" int event_s2_control_on(void) {
 
 extern "C" int event_aoac_on(void) {
     fc.control.set_S2_AOA();
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_AOAC_ON;
     return 0;
 }
 
 extern "C" int event_control_off(void) {
     fc.control.set_NO_CONTROL();
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CONTROL_OFF;
     return 0;
 }
 
@@ -159,6 +164,7 @@ extern "C" int event_s3_control_on(void) {
     fc.control.set_S3_AOA();
     fc.control.set_ierror_zero();
     fc.control.set_aoacmd(S3_aoacmd);
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_S3_CONTROL_ON;
     return 0;
 }
 

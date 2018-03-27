@@ -24,6 +24,7 @@ LIBRARY DEPENDENCIES:
 
 ##include "transceiver.hh"
 ##include  "icf_trx_ctrl.h"
+##include  "DM_FSW_Interface.hh"
 
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
