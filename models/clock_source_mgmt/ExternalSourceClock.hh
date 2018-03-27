@@ -18,7 +18,7 @@ PROGRAMMERS:
 using namespace Automation::BDaq;
 
 #define  deviceDescription  L"PCI-1737,BID#0"
-
+#define  EXT_CLK_IOCTL_FD_NUM (6)
 struct ioctl_tispace_cmd {
    long long time_tics;
 };
