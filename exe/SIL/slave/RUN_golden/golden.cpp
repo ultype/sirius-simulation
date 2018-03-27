@@ -84,19 +84,19 @@ const double S3_AOACMD = -0.0;
 
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_LIFTOFF;
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_LIFTOFF;
     return 0;
 }
 
 extern "C" int event_control_rcs_on(void) {
     fc.control.set_S2_ROLL_CONTROL();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CONTROL_RCS_ON;
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_RCS_ON;
     return 0;
 }
 
 extern "C" int event_control_on(void) {
     fc.control.set_S2_PITCH_DOWN();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CONTROL_ON;
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_ON;
     return 0;
 }
 
@@ -109,13 +109,13 @@ extern "C" int event_s2_control_on(void) {
 
 extern "C" int event_aoac_on(void) {
     fc.control.set_S2_AOA();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_AOAC_ON;
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_AOAC_ON;
     return 0;
 }
 
 extern "C" int event_control_off(void) {
     fc.control.set_NO_CONTROL();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CONTROL_OFF;
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_OFF;
     return 0;
 }
 
@@ -164,7 +164,7 @@ extern "C" int event_s3_control_on(void) {
     fc.control.set_S3_AOA();
     fc.control.set_ierror_zero();
     fc.control.set_aoacmd(S3_aoacmd);
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_S3_CONTROL_ON;
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_S3_CONTROL_ON;
     return 0;
 }
 
