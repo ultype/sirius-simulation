@@ -64,7 +64,7 @@ int ExternalSourceClock::clock_init() {
 */
 long long ExternalSourceClock::wall_clock_time() {
     struct ioctl_tispace_cmd wall_time;
-    if (ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS, &wall_time) < 0) {
+    if (ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS, &wall_time) < 0) {
         fprintf(stderr, "[%s:%d] ioctl error \n", __FUNCTION__, __LINE__);
     }
     //  fprintf(stderr, "[%lld us] wall_clock_time \n", wall_time.time_tics/1000);
