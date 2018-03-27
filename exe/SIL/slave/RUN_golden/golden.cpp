@@ -226,6 +226,7 @@ extern "C" int init_stage2_control(void) {
     fc.control.set_aoacmd(S2_aoacmd);
     fc.control.get_control_gain(S2_kpp, S2_kpi, S2_kpd, S2_kppp, S2_pN, S2_krp, S2_kri, S2_krd,
                                 S2_krpp, S2_rN, S2_kyp, S2_kyi, S2_kyd, S2_kypp, S2_yN, S2_kaoap, S2_kaoai, S2_kaoad, S2_kaoapp, S2_aoaN);
+    return 0;
 }
 
 extern "C" int init_ins_variable(void) {
