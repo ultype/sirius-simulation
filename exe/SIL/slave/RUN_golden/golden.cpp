@@ -90,13 +90,11 @@ extern "C" int event_liftoff(void) {
 
 extern "C" int event_control_rcs_on(void) {
     fc.control.set_S2_ROLL_CONTROL();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_RCS_ON;
     return 0;
 }
 
 extern "C" int event_control_on(void) {
     fc.control.set_S2_PITCH_DOWN();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_ON;
     return 0;
 }
 
@@ -109,7 +107,6 @@ extern "C" int event_s2_control_on(void) {
 
 extern "C" int event_aoac_on(void) {
     fc.control.set_S2_AOA();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_AOAC_ON;
     return 0;
 }
 

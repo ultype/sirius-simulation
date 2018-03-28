@@ -8,9 +8,12 @@
 #include "../../../public/Modified_data/golden.h"
 #include "../Modified_data/nspo.h"
 #include "../../../public/Modified_data/realtime.h"
+#include "../../../public/Modified_data/sirius_utility.h"
 #include "../Modified_data/gps.h"
+#include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" void master_startup() {
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << 0);
 }
 
 extern "C" int event_start() {
@@ -24,6 +27,10 @@ extern "C" int event_start() {
     double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
     double spi            = 291.6145604;     //  Specific impusle 291.6145604 274.8
     double fuel_flow_rate = 29.587;     //  fuel flow rate
+    if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_LIFTOFF, rkt.egse_mission_handler_bitmap, rkt.ctl_tvc_db.mission_event_code))
+        return 0;
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_LIFTOFF);
+    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.ctl_tvc_db.mission_event_code,exec_get_sim_time());
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
     rkt.tvc.set_S2_TVC();
     return 0;
@@ -181,10 +188,9 @@ extern "C" int run_me() {
 
 
     /* events */
-    jit_add_read(0.001, "event_start");
+    jit_add_event("event_start", "LIFTOFF", 0.001);
     jit_add_read(102.001, "event_separation_1");
     jit_add_read(107.001, "event_fairing_separation");
-
     exec_set_terminate_time(200.0);
 
     return 0;
