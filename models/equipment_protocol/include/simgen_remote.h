@@ -2,7 +2,7 @@
 #define MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_
 
 #include <stdint.h>
-
+#include "simgen_udp_rx_commands.h"
 #define SIMGEN_IP "140.110.227.10"
 #define SIMGEN_PORT 15650
 
