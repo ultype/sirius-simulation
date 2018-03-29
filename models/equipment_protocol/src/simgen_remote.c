@@ -23,6 +23,7 @@ char tn[512];
 char tcp_ack_buff[512];
 
 struct simgen_eqmt_info_t simgen_eqmt;
+struct simgen_remote_motion_mot_cmd_t motion_info;
 
 static const char  *g_motion_cmd_list[3] = {"MOT", "MOTB", "AIDING_OFFSET"}
 static const char nRU[] = "RU\n";
@@ -31,14 +32,49 @@ static const char nAR[] = "AR\n";
 static const char nSET_TIOP[] = "SET_TIOP,0,2,GATED,1PPS\n";
 static const char nEN[] = "-,EN,1\n";
 
+int simgen_default_remote_cmd_data(struct simgen_remote_mot_cmd_t *motion_info) {
+    motion_info->ts.day = 0; 
+    motion_info->ts.hour = 0;
+    motion_info->ts.minute = 0;
+    motion_info->ts.second = 0;
+    motion_info->ts.milli = 0;
+    motion_info->cmd_idx = REMOTE_MOTION_CMD_MOT;
+    motion_info->vehicle_id = 1;
+    motion_info->position_xyz[0] =  4288466.6747904532;
+    motion_info->position_xyz[1] = -2873655.5571095324; 
+    motion_info->position_xyz[2] = -4871760.5248780008;
+    motion_info->velocity_xyz[0] = 3148.5166339857; 
+    motion_info->velocity_xyz[1] = -4356.3915379860;
+    motion_info->velocity_xyz[2] = 5341.2059223289;
+    motion_info->acceleration_xyz[0] = -5.3838731211; 
+    motion_info->acceleration_xyz[1] = 2.7228053242;
+    motion_info->acceleration_xyz[2] = 5.4345273734;
+    motion_info->jerk_xyz[0] = 0.0;
+    motion_info->jerk_xyz[1] = 0.0;
+    motion_info->jerk_xyz[2] = 0.0;
+    motion_info->heading = 2.9412651848; 
+    motion_info->elevation = 0.0027315089;
+    motion_info->bank = 3.1411685628;
+    motion_info->angular_velocity[0] = 0.0043633231; 
+    motion_info->angular_velocity[1] = 0.0043637185;
+    motion_info->angular_velocity[2] = 0.0043629277;
+    motion_info->angular_acceleration[0] = 0; 
+    motion_info->angular_acceleration[1] = 0; 
+    motion_info->angular_acceleration[2] = 0;
+    motion_info->angular_jerk[0] = 0; 
+    motion_info->angular_jerk[1] = 0; 
+    motion_info->angular_jerk[2] = 0;
+    return 0;
 
-int simgen_motion_remote_cmd_gen(void *data, char *outbuff) {
-    struct simgen_remote_motion_cmd_t *motion_info = (struct simgen_remote_motion_cmd_t *)data;
+}
+
+int simgen_remote_mot_cmd_gen(void *data, char *outbuff) {
+    struct simgen_remote_mot_cmd_t *motion_info = (struct simgen_remote_mot_cmd_t *)data;
     char veh_mot_str[32];
     strncpy(veh_mot_str, VEH_MOT(1), 32);
     sprintf(outbuff, "%1d %2d:%2d:%2d.%3d,\
         %s,%s,\
-        %20.10f, %20.10f, %20.10f,\
+        %20.10f,%20.10f,%20.10f,\
         %20.10f,%20.10f,%20.10f,\
         %20.10f,%20.10f,%20.10f,\
         %20.10f,%20.10f,%20.10f,\
@@ -174,6 +210,7 @@ int udp_cmd_sendto(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload, uint3
 int simgen_init(void) {
     int ret;
     char *tcp_cmd
+    char mot_t0[512];
     
     /* Create UDP socket */
     if (simgen_create_udp_cmd_channel(&simgen_eqmt, SIMGEN_IP, SIMGEN_PORT) < 0) {
@@ -196,6 +233,8 @@ int simgen_init(void) {
     }
 #endif
     /* Send t0 mot by TCP*/
+    simgen_default_remote_cmd_data(&motion_info);
+    simgen_remote_mot_cmd_gen(&motion_info, &mot_t0);
     tcp_cmd = t0;
     if (ClientTCPWrite(SimGen_tcp_channel, tcp_cmd, strlen(tcp_cmd), 1000) < 0) {
         return 0;

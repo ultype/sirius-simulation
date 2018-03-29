@@ -34,7 +34,7 @@ struct simgen_remote_timestamp_t {
     uint32_t milli;
 }
 
-struct simgen_remote_motion_mot_cmd_t {
+struct simgen_remote_mot_cmd_t {
     struct simgen_remote_timestamp_t ts;
     uint8_t cmd_idx;
     uint8_t vehicle_id;
