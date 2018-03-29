@@ -12,8 +12,8 @@ typedef enum _SIMGEN_UDP_CMD_TYPE_ENUM {
 } SIMGEN_UDP_CMD_TYPE_ENUM;
 
 typedef enum _SIMGEN_TIME_ACTION_ENUM {
-    action_immediately_enum = 0,
-    action_at_timestamp_enum = 1
+    ACTION_IMMEDIATELY_ENUM = 0,
+    ACTION_AT_TIMESTAMP_ENUM = 1
 }SIMGEN_TIME_ACTION_ENUM;
 
 struct mot_data_t {
@@ -45,24 +45,6 @@ struct motb_data_t {
     double angular_jerk_radsps_xyz_        [ 3 ];
 };
 
-struct mod_data_t { 
-    // Starts from 1
-    unsigned int    antenna_id_;
-
-    enum SigType         signal_type_;
-    unsigned int    svid_or_channel_no_;
-    unsigned int    multipath_index_;
-    enum Mode            mode_;
-    enum Applicability   all_channels_;
-
-    enum Frequency       frequency_;
-    enum Applicability   all_frequencies_;
-
-    double          signal_level_;
-    double          carrier_offset_;
-    double          code_offset_;
-};
-
 struct simgen_udp_command_t {
     SIMGEN_UDP_CMD_TYPE_ENUM    type_;
     SIMGEN_TIME_ACTION_ENUM     time_action_;
@@ -74,7 +56,6 @@ struct simgen_udp_command_t {
     union {
         struct mot_data_t    mot_;
         struct motb_data_t   motb_;
-        struct mod_data_t    mod_;
     } motion_data;
     int latency_wrt_tov_and_current_tir_ms_;
 };
