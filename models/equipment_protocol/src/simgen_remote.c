@@ -30,8 +30,10 @@ static const char nTR[] = "TR, 0\n";
 static const char nAR[] = "AR\n";
 static const char nSET_TIOP[] = "SET_TIOP,0,2,GATED,1PPS\n";
 static const char nEN[] = "-,EN,1\n";
+
+
 int simgen_motion_remote_cmd_gen(void *data, char *outbuff) {
-    struct simgen_remote_motion_cmd_t *motion_info = data;
+    struct simgen_remote_motion_cmd_t *motion_info = (struct simgen_remote_motion_cmd_t *)data;
     char veh_mot_str[32];
     strncpy(veh_mot_str, VEH_MOT(1), 32);
     sprintf(outbuff, "%1d %2d:%2d:%2d.%3d,\
@@ -174,15 +176,25 @@ int simgen_init(void) {
     char *tcp_cmd
     
     /* Create UDP socket */
+    if (simgen_create_udp_cmd_channel(&simgen_eqmt, SIMGEN_IP, SIMGEN_PORT) < 0) {
+        fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
+        return EXIT_FAILURE;
+    }
+#if 0
     if ((ret = CreateUDP_Channel(UDP_ANY_LOCAL_PORT, &SimGen_udp_channel)) != 0) {
         return 0;
     }
-
+#endif
     /* Create TCP Socket */
+    if (simgen_create_remote_cmd_channel(&simgen_eqmt, SIMGEN_IP, SIMGEN_PORT) < 0) {
+        fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
+        return EXIT_FAILURE;
+    }
+#if 0
     if ((ret = ConnectToTCPServer(&SimGen_tcp_channel, SIMGEN_PORT, SIMGEN_IP, NULL, NULL, 5000)) != 0) {
         return 0;
     }
-
+#endif
     /* Send t0 mot by TCP*/
     tcp_cmd = t0;
     if (ClientTCPWrite(SimGen_tcp_channel, tcp_cmd, strlen(tcp_cmd), 1000) < 0) {
