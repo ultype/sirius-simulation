@@ -129,10 +129,18 @@ int ethernet_data_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     uint32_t offset = 0;
     int32_t rdlen = 0;
     struct ethernet_device_info_t *dev_info = priv_data;
-    do {
-        rdlen = recv(dev_info->client_fd, rx_buff + offset, buff_size - offset, 0);
+
+    while (offset < buff_size) {
+        if ((rdlen = recv(dev_info->client_fd, rx_buff + offset, buff_size - offset, 0)) < 0) {
+            if (errno == EINTR)
+                rdlen = 0;
+            else
+                return -1;
+        } else if (rdlen == 0) {
+            break;
+        }
         offset += rdlen;
-    } while (offset < buff_size && rdlen > 0);
+    }
     return offset;
 }
 
@@ -141,10 +149,11 @@ int ethernet_data_send(void *priv_data, uint8_t *payload, uint32_t frame_len) {
     int32_t wdlen = 0;
     struct ethernet_device_info_t *dev_info = priv_data;
     while (offset < frame_len) {
-        wdlen = send(dev_info->client_fd, payload + offset, frame_len - offset, 0);
-        if (wdlen < 0) {
-            //  fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
-            break;
+        if ((wdlen = send(dev_info->client_fd, payload + offset, frame_len - offset, 0)) < 0) {
+            if (wdlen < 0 && errno == EINTR)
+                wdlen = 0;
+            else
+                return -1;
         }
         offset += wdlen;
     }
