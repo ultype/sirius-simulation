@@ -213,7 +213,7 @@ static int udp_cmd_sendto(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload
     return offset;
 }
 
-int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, const char *tx_cmd, char *rx_buff) {
+static int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, const char *tx_cmd, char *rx_buff) {
     int ret;
     printf("SimGen cmd send: %s", tx_cmd);
     if ((ret = recv(eqmt_info->remote_cmd_channel_fd, (uint8_t *)rx_buff, 512, 0)) < 0) {
@@ -221,7 +221,6 @@ int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, const char
         return EXIT_FAILURE;
     }
     rx_buff[ret] = '\0';
-    sleep(1);
     printf("SimGen cmd resp: %s \n\n", rx_buff);
     return 0;
 }
