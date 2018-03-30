@@ -8,7 +8,7 @@
 extern "C" void record_gps() {
     Trick::DRAscii *drg = new Trick::DRAscii("gps");
     drg->set_freq(Trick::DR_Always);
-    drg->set_cycle(0.05);
+    drg->set_cycle(0.01);
     drg->set_single_prec_only(false);
     drg->add_variable("rkt.time->gpstime.SOW");
     // drg->add_variable("rkt.gps_con.gdop");
@@ -142,7 +142,7 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.env.atmosphere->g");
     // drg->add_variable("rkt.env.atmosphere->tmb");
     // drg->add_variable("rkt.env.atmosphere->expv");
-    // drg->add_variable("rkt.propulsion.thrust");
+    drg->add_variable("rkt.propulsion.thrust");
     drg->add_variable("rkt.propulsion.fuel_mass");
     // drg->add_variable("rkt.tvc.s2_act1_y1");
     // drg->add_variable("rkt.tvc.lx");

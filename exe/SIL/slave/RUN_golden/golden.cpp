@@ -116,6 +116,11 @@ extern "C" int event_control_off(void) {
     return 0;
 }
 
+extern "C" int event_fairing_jettison(void) {
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_FAIRING_JETTSION;
+    return 0;
+}
+
 extern "C" int event_s3_control_on(void) {
     double S3_mdot = S3_MDOT;
     double S3_fmass0 = S3_FMASS0;
@@ -334,6 +339,7 @@ extern "C" int run_me() {
     //  jit_add_read(15.001, "event_s2_control_on");
     jit_add_read(82.001, "event_aoac_on");
     jit_add_read(100.001, "event_s3_control_on");
+    jit_add_read(107.001, "event_fairing_jettison");
     jit_add_read(200.001, "event_control_off");
 
     exec_set_terminate_time(200.0);
