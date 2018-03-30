@@ -1,9 +1,5 @@
 #include "simgen_remote.h"
 
-char   cmd_mot_t0[512];
-struct simgen_eqmt_info_t simgen_eqmt;
-struct simgen_motion_data_t motion_info;
-
 static const char  *g_remote_motion_cmd_list[3] = {"MOT", "MOTB", "AIDING_OFFSET"};
 static const char cmd_RU[] = "RU\n";
 static const char cmd_TR[] = "TR, 0\n";
@@ -11,7 +7,7 @@ static const char cmd_AR[] = "AR\n";
 static const char cmd_SET_TIOP[] = "SET_TIOP,0,2,GATED,1PPS\n";
 static const char cmd_EN[] = "-,EN,1\n";
 
-int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
+static int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
     motion_info->ts.day = 0; 
     motion_info->ts.hour = 0;
     motion_info->ts.minute = 0;
@@ -31,9 +27,9 @@ int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
     motion_info->jerk_xyz[0] = 0.0;
     motion_info->jerk_xyz[1] = 0.0;
     motion_info->jerk_xyz[2] = 0.0;
-    motion_info->heading = 2.9412651848; 
-    motion_info->elevation = 0.0027315089;
-    motion_info->bank = 3.1411685628;
+    motion_info->heb[0] = 2.9412651848; 
+    motion_info->heb[1] = 0.0027315089;
+    motion_info->heb[2] = 3.1411685628;
     motion_info->angular_velocity[0] = 0.0043633231; 
     motion_info->angular_velocity[1] = 0.0043637185;
     motion_info->angular_velocity[2] = 0.0043629277;
@@ -47,7 +43,7 @@ int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
 
 }
 
-int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
+static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     char veh_mot_str[32];
     strncpy(veh_mot_str, VEH_MOT(1), 32);
@@ -74,17 +70,16 @@ int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
     return 0;
 }
 
-int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) {
+static int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) {
 
-    int ret;
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
-    udp_cmd->type = UDP_CMD_MOT;
-    udp_cmd->time_action = ACTION_AT_TIMESTAMP_ENUM;
+    udp_cmd->type_ = UDP_CMD_MOT;
+    udp_cmd->time_action_ = ACTION_AT_TIMESTAMP_ENUM;
     udp_cmd->time_of_validity_ms_ = ((motion_info->ts.hour * 60 + motion_info->ts.minute) * 60) * 1000 +
                                       motion_info->ts.second * 1000 + motion_info->ts.milli;
 
     udp_cmd->vehicle_id_ = motion_info->vehicle_id;
-    udp_cmd->latency_wrt_tov_and_current_tir_ms = 0;
+    udp_cmd->latency_wrt_tov_and_current_tir_ms_ = 0;
 
     memcpy(&udp_cmd->data.mot_.position_ecef_xyz_, &motion_info->position_xyz, sizeof(motion_info->position_xyz));
     memcpy(&udp_cmd->data.mot_.velocity_mps_xyz_, &motion_info->velocity_xyz, sizeof(motion_info->velocity_xyz));
@@ -98,7 +93,7 @@ int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) 
     return 0;
 }
 
-int simgen_create_remote_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, char *ifname, int net_port) {
+static int simgen_create_remote_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, char *ifname, int net_port) {
     int err;
     int retry_cnt = 0;
     if ((eqmt_info->remote_cmd_channel_fd = socket(AF_INET , SOCK_STREAM , 0)) < 0) {
@@ -123,7 +118,7 @@ int simgen_create_remote_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, char 
             fprintf(stderr, "create_remote_cmd_channel: Connection error retry...%d\n", retry_cnt);
         }
     }
-    if (err < 0) {
+    if (err < 0)
         goto REMOTE_FAIL;
     fprintf(stderr, "create_remote_cmd_channel: Connection %s:%d\n", ifname, net_port);
     return EXIT_SUCCESS;
@@ -132,7 +127,7 @@ REMOTE_FAIL:
     return EXIT_FAILURE;
 }
 
-int simgen_create_udp_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, char *ifname, int net_port) {
+static int simgen_create_udp_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, char *ifname, int net_port) {
     int err;
     int retry_cnt = 0;
     if ((eqmt_info->udp_cmd_channel_fd = socket(AF_INET , SOCK_DGRAM , 0)) < 0) {
@@ -157,7 +152,7 @@ int simgen_create_udp_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, char *if
             fprintf(stderr, "create_remote_cmd_channel: Connection error retry...%d\n", retry_cnt);
         }
     }
-    if (err < 0) {
+    if (err < 0)
         goto REMOTE_FAIL;
     fprintf(stderr, "create_remote_cmd_channel: Connection %s:%d\n", ifname, net_port);
     return EXIT_SUCCESS;
@@ -167,51 +162,61 @@ REMOTE_FAIL:
 }
 
 
-int remote_cmd_recv(struct simgen_eqmt_info_t *eqmt_info, uint8_t *rx_buff, uint32_t buff_size) {
+static int remote_cmd_recv(struct simgen_eqmt_info_t *eqmt_info, uint8_t *rx_buff, uint32_t buff_size) {
     uint32_t offset = 0;
     int32_t rdlen = 0;
-    struct ethernet_device_info_t *dev_info = priv_data;
-    do {
-        rdlen = recv(eqmt_info->remote_cmd_channel_fd, rx_buff + offset, buff_size - offset, 0);
+    while (offset < buff_size) {
+        if ((rdlen = recv(eqmt_info->remote_cmd_channel_fd, rx_buff + offset, buff_size - offset, 0)) < 0) {
+            if (errno == EINTR)
+                rdlen = 0;
+            else
+                return -1;
+        } else if(rdlen == 0) {
+            break;
+        }
         offset += rdlen;
-    } while (offset < buff_size && rdlen > 0);
+    }
     return offset;
 }
 
-int remote_cmd_send(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload, uint32_t frame_len) {
+static int remote_cmd_send(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload, uint32_t frame_len) {
     uint32_t offset = 0;
     int32_t wdlen = 0;
     while (offset < frame_len) {
-        wdlen = send(eqmt_info->remote_cmd_channel_fd, payload + offset, frame_len - offset, 0);
-        if (wdlen < 0) {
-            //  fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
-            break;
+        if ((wdlen = send(eqmt_info->remote_cmd_channel_fd, payload + offset, frame_len - offset, 0)) < 0) {
+            if (wdlen < 0 && errno == EINTR)
+                wdlen = 0;
+            else
+                return -1;
         }
         offset += wdlen;
     }
     return offset;
 }
 
-int udp_cmd_sendto(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload, uint32_t frame_len) {
+static int udp_cmd_sendto(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload, uint32_t frame_len) {
     uint32_t offset = 0;
     int32_t wdlen = 0;
     while (offset < frame_len) {
-        wdlen = sendto(eqmt_info->udp_cmd_channel_fd, payload + offset, frame_len - offset,
-                       0, (struct sockaddr *)&eqmt_info->udp_cmd_addr, sizeof(eqmt_info->udp_cmd_addr));
-        if (wdlen < 0) {
-            //  fprintf(stderr, "[%s:%d] send error: %d\n", __FUNCTION__, __LINE__, wdlen);
-            break;
+        if ((wdlen = sendto(eqmt_info->udp_cmd_channel_fd, payload + offset, frame_len - offset,
+             0, (struct sockaddr *)&eqmt_info->udp_cmd_addr, sizeof(eqmt_info->udp_cmd_addr))) < 0) {
+            if (wdlen < 0 && errno == EINTR)
+                wdlen = 0;
+            else
+                return -1;
         }
         offset += wdlen;
     }
     return offset;
 }
 
-int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
+int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     int ret;
     uint8_t *cmd_payload;
     uint32_t cmd_len;
+    char   cmd_mot_t0[512];
     uint8_t cmd_resp[512];
+    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
     
     /* Create UDP socket */
     if (simgen_create_udp_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
@@ -226,9 +231,9 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
     }
 
     /* Send t0 mot by TCP*/
-    simgen_default_remote_data(&motion_info);
-    simgen_remote_motion_cmd_gen(&motion_info, &cmd_mot_t0);
-    cmd_payload = (uint_8_t *)cmd_mot_t0;
+    simgen_default_remote_data(motion_info);
+    simgen_remote_motion_cmd_gen(motion_info, cmd_mot_t0);
+    cmd_payload = (uint8_t *)cmd_mot_t0;
     cmd_len = strlen(cmd_mot_t0);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
@@ -245,7 +250,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
     /* Send t1 mot */
 
     /*Send TR command by TCP */
-    cmd_payload = (uint_8_t *)cmd_TR;
+    cmd_payload = (uint8_t *)cmd_TR;
     cmd_len = strlen(cmd_TR);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
@@ -260,7 +265,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
     printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
 
     /* Send SET_TIOP commnad by TCP*/
-    cmd_payload = (uint_8_t *)cmd_SET_TIOP;
+    cmd_payload = (uint8_t *)cmd_SET_TIOP;
     cmd_len = strlen(cmd_SET_TIOP);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
@@ -275,7 +280,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
     printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
 
     /* Send AR commnad by TCP*/
-    cmd_payload = (uint_8_t *)cmd_AR;
+    cmd_payload = (uint8_t *)cmd_AR;
     cmd_len = strlen(cmd_AR);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
@@ -290,7 +295,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
     printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
 
     /* Send RU commnad by TCP*/
-    cmd_payload = (uint_8_t *)cmd_RU;
+    cmd_payload = (uint8_t *)cmd_RU;
     cmd_len = strlen(cmd_RU);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
@@ -307,23 +312,12 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info) {
     return EXIT_SUCCESS;
 }
 
-int simgen_motion_data_send(struct simgen_eqmt_info_t *eqmt_info, void *data) {
+int simgen_motion_data_sendto(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     struct simgen_udp_command_t udp_cmd;
     uint32_t send_size = sizeof(struct simgen_udp_command_t);
     simgen_udp_motion_cmd_gen(data, &udp_cmd);
-    if (udp_cmd_sendto(eqmt_info, &udp_cmd, sizeof(struct simgen_udp_command_t)) < send_size) {
+    if (udp_cmd_sendto(eqmt_info, (uint8_t *)&udp_cmd, sizeof(struct simgen_udp_command_t)) < send_size) {
         fprintf(stderr, "[%s:%d] Motion data send error !!!\n" , __FUNCTION__, __LINE__);
     }
     return EXIT_SUCCESS;
-}
-
-int main(int argc, char const *argv[])
-{
-    struct simgen_motion_data_t user_data;
-    simgen_equipment_init(&simgen_eqmt);
-    while (1) {
-        sleep(3);
-        simgen_motion_data_send(&simgen_eqmt, &user_data);
-    }
-    return 0;
 }

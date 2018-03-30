@@ -56,19 +56,8 @@ struct simgen_udp_command_t {
     union {
         struct mot_data_t    mot_;
         struct motb_data_t   motb_;
-    } motion_data;
+    } data;
     int latency_wrt_tov_and_current_tir_ms_;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Export Function*/
-
-#ifdef __cplusplus
-}
-#endif
-
 
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_UDP_CMD_H_

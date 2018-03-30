@@ -7,6 +7,10 @@
 #include <sys/socket.h>
 #include "simgen_udp_cmd.h"
 #include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <errno.h>
 //#define SIMGEN_IP "140.110.227.10"
 #define SIMGEN_IP "127.0.0.1"
 #define SIMGEN_PORT 15650
@@ -51,15 +55,8 @@ struct simgen_motion_data_t {
     double angular_jerk[3];         // uint: rad/s^3
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-/* Export Function*/
-
-#ifdef __cplusplus
-}
-#endif
-
+int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
+int simgen_motion_data_sendto(struct simgen_eqmt_info_t *eqmt_info, void *data);
 
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_
