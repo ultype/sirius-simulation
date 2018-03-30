@@ -154,10 +154,10 @@ static int simgen_create_udp_cmd_channel(struct simgen_eqmt_info_t *eqmt_info, c
     }
     if (err < 0)
         goto REMOTE_FAIL;
-    fprintf(stderr, "create_remote_cmd_channel: Connection %s:%d\n", ifname, net_port);
+    fprintf(stderr, "simgen_create_udp_cmd_channel: Connection %s:%d\n", ifname, net_port);
     return EXIT_SUCCESS;
 REMOTE_FAIL:
-    fprintf(stderr, "create_remote_cmd_channel: Connection error !!\n");
+    fprintf(stderr, "simgen_create_udp_cmd_channel: Connection error !!\n");
     return EXIT_FAILURE;
 }
 
