@@ -1,5 +1,8 @@
 #include "simgen_remote.h"
 
+
+char   cmd_mot_t0[1024];
+char   cmd_resp[1024];
 static const char  *g_remote_motion_cmd_list[3] = {"MOT", "MOTB", "AIDING_OFFSET"};
 static const char cmd_RU[] = "RU\n";
 static const char cmd_TR[] = "TR, 0\n";
@@ -210,22 +213,34 @@ static int udp_cmd_sendto(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload
     return offset;
 }
 
-int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
+int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, const char *tx_cmd, char *rx_buff) {
     int ret;
+    printf("SimGen cmd send: %s", tx_cmd);
+    if ((ret = recv(eqmt_info->remote_cmd_channel_fd, (uint8_t *)rx_buff, 512, 0)) < 0) {
+        fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
+        return EXIT_FAILURE;
+    }
+    rx_buff[ret] = '\0';
+    sleep(1);
+    printf("SimGen cmd resp: %s \n\n", rx_buff);
+    return 0;
+}
+
+int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     uint8_t *cmd_payload;
     uint32_t cmd_len;
-    char   cmd_mot_t0[512];
-    uint8_t cmd_resp[512];
+
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
     
-    /* Create UDP socket */
-    if (simgen_create_udp_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
+    /* Create TCP Socket */
+    fprintf(stderr, "Connect to TCP Server....\n");
+    if (simgen_create_remote_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
         fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
-    /* Create TCP Socket */
-    if (simgen_create_remote_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
+    /* Create UDP socket */
+    fprintf(stderr, "Connect to UDP Server....\n");
+    if (simgen_create_udp_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
         fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
@@ -239,13 +254,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
-    if ((ret = remote_cmd_recv(eqmt_info, cmd_resp, 512) < 0)) {
-        fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
-        return EXIT_FAILURE;
-    }
-    cmd_resp[ret] = '\0';
-    printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_mot_t0, cmd_resp);
 
     /* Send t1 mot */
 
@@ -257,12 +266,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         return EXIT_FAILURE;
     }
 
-    if ((ret = remote_cmd_recv(eqmt_info, cmd_resp, 512) < 0)) {
-        fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
-        return EXIT_FAILURE;
-    }
-    cmd_resp[ret] = '\0';
-    printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_TR, cmd_resp);
 
     /* Send SET_TIOP commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_SET_TIOP;
@@ -271,13 +275,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
-    if ((ret = remote_cmd_recv(eqmt_info, cmd_resp, 512) < 0)) {
-        fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
-        return EXIT_FAILURE;
-    }
-    cmd_resp[ret] = '\0';
-    printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_SET_TIOP, cmd_resp);
 
     /* Send AR commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_AR;
@@ -286,13 +284,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
-    if ((ret = remote_cmd_recv(eqmt_info, cmd_resp, 512) < 0)) {
-        fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
-        return EXIT_FAILURE;
-    }
-    cmd_resp[ret] = '\0';
-    printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_AR, cmd_resp);
 
     /* Send RU commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_RU;
@@ -301,14 +293,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
-    if ((ret = remote_cmd_recv(eqmt_info, cmd_resp, 512) < 0)) {
-        fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
-        return EXIT_FAILURE;
-    }
-    cmd_resp[ret] = '\0';
-    printf("SimGen cmd response of %s cmd \n%s \n", cmd_payload, cmd_resp);
-
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_RU, cmd_resp);
     return EXIT_SUCCESS;
 }
 

@@ -7,31 +7,36 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h> // for close
+#include <time.h>
 #define SERV_PORT 15650
 
 #define MAXNAME 1024
-
-static int udp_cmd_recvfrom(int client_fd , uint8_t *payload, uint32_t frame_len, struct sockaddr *src_addr, socklen_t *addrlen) {
-    uint32_t offset = 0;
-    int32_t wdlen = 0;
-    while (offset < frame_len) {
-        if ((wdlen = recvfrom(client_fd, payload + offset, frame_len - offset, 0, src_addr, addrlen)) < 0) {
-            if (wdlen < 0 && errno == EINTR)
-                wdlen = 0;
-            else
-                return -1;
+void hex_dump(char *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen) {
+    uint8_t *pt;
+    uint32_t x;
+    pt = pSrcBufVA;
+    printf("%s: %p, len = %d\n\r", str, pSrcBufVA, SrcBufLen);
+    for (x = 0; x < SrcBufLen; x++) {
+        if (x % 16 == 0) {
+            printf("0x%04x : ", x);
         }
-        offset += wdlen;
+        printf("%02x ", ((uint8_t)pt[x]));
+        if (x % 16 == 15) { printf("\n\r"); }
     }
-    return offset;
+    printf("\n\r");
 }
+
 int main(int argc, char const *argv[]) {
     int udp_serv_fd;   /* file description into transport */
     int length; /* length of address structure      */
     int nbytes; /* the number of read **/
-    char buf[BUFSIZ];
+    char buf[MAXNAME];
     struct sockaddr_in udpaddr; /* address of this service */
     struct sockaddr_in udp_client_addr; /* address of client    */
+    char date_buf[80];
+    char currentTime[84] = "";
+    static struct timespec ts;
+    uint32_t milli;
     /*
      *      Get a socket into UDP/IP
      */
@@ -62,16 +67,16 @@ int main(int argc, char const *argv[]) {
     printf("UDP Server is ready to receive !!\n");
     printf("Can strike Cntrl-c to stop Server >>\n");
     while (1) {
-        if ((nbytes = udp_cmd_recvfrom(udp_serv_fd, (uint8_t *)&buf, MAXNAME, (struct sockaddr*)&udp_client_addr, (socklen_t *)&length)) < 0) {
-            perror ("could not read datagram!!");
-            continue;
+        if ((nbytes = (recvfrom(udp_serv_fd, buf, MAXNAME, 0, (struct sockaddr*)&udp_client_addr, (socklen_t *)&length))) > 0) {
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            ts.tv_sec = time(NULL);
+            milli = ts.tv_nsec / 1000000;
+            strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+            snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+            printf("[%s]Received data form %s : %d\n", currentTime, inet_ntoa(udp_client_addr.sin_addr), htons(udp_client_addr.sin_port));
+            //  hex_dump("UDP DUMP", (uint8_t *)&buf, nbytes);
         }
 
-
-        printf("Received data form %s : %d\n", inet_ntoa(udp_client_addr.sin_addr), htons(udp_client_addr.sin_port));
-        printf("%s\n", buf);
-
-        printf("Can Strike Crtl-c to stop Server >>\n");
     }
     close(udp_serv_fd);
     return 0;
