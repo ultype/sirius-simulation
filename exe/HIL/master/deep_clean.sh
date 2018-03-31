@@ -26,6 +26,6 @@ rm models/icf/QA_Tool/ftrace_script/plot_data_input.txt
 rm models/icf/QA_Tool/EGSE_System_Profiling_Server/readRS422
 rm models/icf/QA_Tool/EGSE_System_Profiling_Server/server-client/server
 
-sed -i -e "s/\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\)/127.0.0.1/g" $WORKSPACE/models/icf/src/icf_trx_ctrl.c
+sed -i -e "s/\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\)/127.0.0.1/g" $WORKSPACE/models/icf/include/icf_trx_ctrl.h
 
 set +x

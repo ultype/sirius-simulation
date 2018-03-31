@@ -10,7 +10,7 @@ int ethernet_init(void **priv_data, char *ifname, int netport) {
         goto error;
     }
     strncpy(dev_info->ifname, ifname, IFNAMSIZ);
-    if (strstr(ifname, "server")) {
+    if (strstr(ifname, "_server")) {
         if (create_server(dev_info, ifname, netport) < 0)
             errExit("ethernet_init :Error create client");
     } else {

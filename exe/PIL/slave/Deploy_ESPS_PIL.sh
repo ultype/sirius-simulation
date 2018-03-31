@@ -52,7 +52,7 @@ sed_ipaddr_subst() {
     sed -i -e "s/\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\)/$ip/g" "$file_path"
 }
 #####  Set up communication IP   #####
-sed_ipaddr_subst $EGSE_IP "$SIRIUS_HOME_PATH/models/icf/src/icf_trx_ctrl.c"
+sed_ipaddr_subst $EGSE_IP "$SIRIUS_HOME_PATH/models/icf/include/icf_trx_ctrl.h"
 ##### Generate the image#####
 trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp

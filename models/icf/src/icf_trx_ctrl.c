@@ -44,7 +44,7 @@ static const struct icf_mapping g_icf_esps_maptbl[] = {
 
 static struct icf_ctrl_port g_esps_port[] = {
     {1, HW_PORT0, "can1",        EMPTY_NETPORT,         CAN_DEVICE_TYPE,      NULL, NULL},
-    {1, HW_PORT8, "127.0.0.1",   8700,                  ETHERNET_DEVICE_TYPE, NULL, NULL}
+    {1, HW_PORT8, ICF_EGSE_CONNECT_IP,   8700,          ETHERNET_DEVICE_TYPE, NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
@@ -74,7 +74,7 @@ static const struct icf_mapping g_icf_esps_sil_maptbl[] = {
 };
 
 static struct icf_ctrl_port g_esps_sil_port[] = {
-    {1, HW_PORT8, "127.0.0.1",   8700,  ETHERNET_DEVICE_TYPE, NULL, NULL}
+    {1, HW_PORT8, ICF_EGSE_CONNECT_IP,   8700,  ETHERNET_DEVICE_TYPE, NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_esps_sil_queue[] = {

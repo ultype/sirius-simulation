@@ -24,7 +24,7 @@ PROGRAMMERS:
 #include "trick/exec_proto.h"
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 #define ICF_CTRLBLK_MAXPORT_NUMBER  16
-
+#define ICF_EGSE_CONNECT_IP "127.0.0.1"
 #ifdef CONFIG_HIL_ENABLE
 #define HIL_INTF 1
 #else
