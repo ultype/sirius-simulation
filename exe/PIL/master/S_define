@@ -74,7 +74,8 @@ class Rocket_SimObject : public Trick::SimObject {
         refactor_uplink_packet_t dm_ins_db;
         DM_SAVE_decl();
         struct icf_ctrlblk_t   icf_ctrl;
-
+        uint64_t egse_mission_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
+        uint64_t mission_event_code_record = 0;
         Transceiver transceiver;
 
         void link(){
@@ -202,6 +203,16 @@ class Rocket_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
             /* TVC_No2 Command*/
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+            /* Mission Event*/
+            icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+        };
+
+        void mission_event_code_handler(struct icf_ctrlblk_t *C) {
+            struct can_frame receive_event;
+            if (icf_rx_dequeue(C, EGSE_RX_MISSION_EVENT_QIDX, &receive_event, sizeof(struct can_frame)) > 0) {
+                mission_event_code_record = receive_event.data[0];
+                //  fprintf(stderr, "[sim:%f] mission_event_code_record : %d\n", receive_event.data[0], exec_get_sim_time());
+            }
         };
 
         Rocket_SimObject() 
@@ -236,7 +247,8 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
 
-            P3 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P3 (0.001, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P3 (0.001, "scheduled") mission_event_code_handler(&icf_ctrl);
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (int_step, "scheduled") dynamics.propagate(int_step);
 

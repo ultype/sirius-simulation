@@ -8,7 +8,8 @@ static const struct icf_mapping g_icf_egse_maptbl[] = {
     {HW_PORT5, EGSE_IMU02_SW_QIDX,            ICF_DRIVERS_ID1},
     {HW_PORT6, EGSE_GPSR01_SW_QIDX,           ICF_DRIVERS_ID1},
     {HW_PORT7, EGSE_GPSR02_SW_QIDX,           ICF_DRIVERS_ID1},
-    {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2}
+    {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2},
+    {HW_PORT0, EGSE_RX_MISSION_EVENT_QIDX  ,  ICF_DRIVERS_ID0}
 };
 
 
@@ -33,12 +34,14 @@ static struct icf_ctrl_queue g_egse_queue[] = {
     {1, EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[5]},
     {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[6]},
     {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[7]},
-    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[8]}
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[8]},
+    {1, EGSE_RX_MISSION_EVENT_QIDX,    ICF_DIRECTION_RX, &g_egse_port[0]}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
-    {HW_PORT0, ESPS_TVC_SW_QIDX, ICF_DRIVERS_ID0},
-    {HW_PORT8, ESPS_GNC_SW_QIDX, ICF_DRIVERS_ID2}
+    {HW_PORT0, ESPS_TVC_SW_QIDX,          ICF_DRIVERS_ID0},
+    {HW_PORT8, ESPS_GNC_SW_QIDX,          ICF_DRIVERS_ID2},
+    {HW_PORT0, ESPS_TX_MISSION_CODE_QIDX, ICF_DRIVERS_ID0}
 };
 
 
@@ -49,7 +52,8 @@ static struct icf_ctrl_port g_esps_port[] = {
 
 static struct icf_ctrl_queue g_esps_queue[] = {
     {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[0]},
-    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[1]}
+    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[1]},
+    {1, ESPS_TX_MISSION_CODE_QIDX,         ICF_DIRECTION_TX, &g_esps_port[0]}
 };
 
 /*  SIL EGSE Table  */
@@ -329,6 +333,9 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
         case FC2VALVE_II_NO1:
         case FC2ORDNANCE_SEPARATION_II:
             qidx = EGSE_EMPTY_SW_QIDX;
+            break;
+        case 0x555:
+            qidx = EGSE_RX_MISSION_EVENT_QIDX;
             break;
         default:
             fprintf(stderr, "[%s] Unknown CAN command. ID = 0x%x\n", __FUNCTION__, pframe->can_id);
