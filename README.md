@@ -45,9 +45,9 @@ Execuate the HIL Master
     ./Deploy_EGSE_HIL.sh
 ```
 
-Clean the folder
+Clean HIL/PIL/SIL image, object files, .csv, log
 ```
-   ./deep_clean.sh
+   ./deep_clean_exe.sh
 ```
 # Tests
 
