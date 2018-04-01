@@ -50,7 +50,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         CONTROL_LINK_decl();
 
         INS_SAVE_decl();
-        CONTROL_SAVE_decl()
+        CONTROL_SAVE_decl();
 
         void link(){
             GPSLinkInData(gps, dm_ins_db, ins);
@@ -68,6 +68,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         int downlink_packet_transfer(struct icf_ctrlblk_t* C) {
             struct can_frame tvc_no1_frame;
             struct can_frame tvc_no2_frame;
+            struct can_frame event_frame;
             double theta_a_rad, theta_b_rad, theta_c_rad, theta_d_rad;
             int16_t theta_a_cnt, theta_b_cnt, theta_c_cnt, theta_d_cnt;
             int ret = 0;
@@ -111,8 +112,13 @@ class FlightComputer_SimObject : public Trick::SimObject {
             /* TVC no2 pos idx4 => theta_d*/
             databuffer_cputobe16(&tvc_no2_frame.data[4], (uint16_t *)&theta_d_cnt);
 
+            /* Event_frame */
+            event_frame.can_id = 0x555;
+            event_frame.can_dlc = 8;
+            event_frame.data[0] = ctl_tvc_db.mission_event_code;
             icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no1_frame, sizeof(struct can_frame));
             icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no2_frame, sizeof(struct can_frame));
+            icf_tx_direct(C, ESPS_TX_MISSION_CODE_QIDX, (uint8_t *)&event_frame, sizeof(struct can_frame));
             return ret;
         }
 

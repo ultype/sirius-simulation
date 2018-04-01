@@ -8,9 +8,12 @@
 #include "../../../public/Modified_data/golden.h"
 #include "../Modified_data/nspo.h"
 #include "../../../public/Modified_data/realtime.h"
+#include "../../../public/Modified_data/sirius_utility.h"
 #include "../Modified_data/gps.h"
+#include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" void master_startup() {
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << 0);
 }
 
 extern "C" int event_start() {
@@ -24,20 +27,16 @@ extern "C" int event_start() {
     double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
     double spi            = 291.6145604;     //  Specific impusle 291.6145604 274.8
     double fuel_flow_rate = 29.587;     //  fuel flow rate
+    if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_LIFTOFF, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+        return 0;
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_LIFTOFF);
+    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
     rkt.tvc.set_S2_TVC();
     return 0;
 }
 
 extern "C" int event_separation_1() {
-    rkt.aerodynamics.set_refa(0.7542);
-    rkt.aerodynamics.set_refd(0.98);
-    rkt.aerodynamics.load_aerotable("../../../auxiliary/Aero_0721_S3.txt");
-
-    rkt.propulsion.set_aexit(0);
-    rkt.propulsion.set_vmass0(721.4);
-    rkt.propulsion.set_fmass0(381.4);
-
     double xcg_0          = 2.5808;
     double xcg_1          = 2.5371;
     double moi_roll_0     = 65.3;
@@ -48,7 +47,22 @@ extern "C" int event_separation_1() {
     double moi_yaw_1    = 419.0;
     double spi            = 288.4111169;  // 288.4111169 290.0
     double fuel_flow_rate = 3.814;
-    rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
+
+     if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_S3_CONTROL_ON, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+        return 0;
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_S3_CONTROL_ON);
+    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+
+    rkt.aerodynamics.set_refa(0.7542);
+    rkt.aerodynamics.set_refd(0.98);
+    rkt.aerodynamics.load_aerotable("../../../auxiliary/Aero_0721_S3.txt");
+
+    rkt.propulsion.set_aexit(0);
+    rkt.propulsion.set_vmass0(721.4);
+    rkt.propulsion.set_fmass0(381.4);
+    rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
+    rkt.propulsion.set_no_thrust();
+
     rkt.forces.set_reference_point(-3.275);  // set reference point
 
     rkt.tvc.set_s3_tau1(20.0);
@@ -62,9 +76,17 @@ extern "C" int event_separation_1() {
     return 0;
 }
 
-extern "C" int event_fairing_separation() {
-    rkt.propulsion.set_vmass0(691.4);
+extern "C" int event_S3_ignition() {
+    rkt.propulsion.engine_ignition();
+    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", MISSION_EVENT_CODE_S3_IGNITION, exec_get_sim_time());
+}
 
+extern "C" int event_fairing_separation() {
+    if (!IS_MISSION_ARRIVED(MISSION_EVENT_FAIRING_JETTSION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+        return 0;
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_FAIRING_JETTSION);
+    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+    rkt.propulsion.set_vmass0(691.4);
     return 0;
 }
 
@@ -79,6 +101,7 @@ extern "C" int run_me() {
     record_golden();
     external_clock_switch();
     realtime();
+
 
     master_startup();
     rkt.forces.set_Slosh_flag(0);
@@ -190,10 +213,11 @@ extern "C" int run_me() {
 
 
     /* events */
-    jit_add_read(0.001, "event_start");
-    jit_add_read(102.001, "event_separation_1");
-    jit_add_read(107.001, "event_fairing_separation");
-
+    jit_add_event("event_start", "LIFTOFF", 0.001);
+    jit_add_event("event_separation_1", "S3", 0.001);
+    jit_add_read(101.051, "event_S3_ignition");
+    // jit_add_read(107.001, "event_fairing_separation");
+    jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.001);
     exec_set_terminate_time(200.0);
 
     return 0;

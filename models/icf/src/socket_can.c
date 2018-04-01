@@ -25,6 +25,7 @@ int socket_can_init(void **priv_data, char *ifname, int netport) {
     dev_info->header_size = 0;
     strncpy(dev_info->ifr.ifr_name, ifname, sizeof(dev_info->ifr.ifr_name));
     if (ioctl(dev_info->can_fd, SIOCGIFINDEX, &dev_info->ifr) < 0) {
+        fprintf(stderr, "open port %s error\n", ifname);
         errExit("interface not exist !!");
     }
     dev_info->addr.can_family  = PF_CAN;
