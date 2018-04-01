@@ -18,4 +18,12 @@ find $TARGET_DIR -type f -name "log_rocket_csv.csv" -exec rm -rf {} \;
 find $TARGET_DIR -type f -name "log_rocket_csv.header" -exec rm -rf {} \;
 find $TARGET_DIR -type f -name "result.csv" -exec rm -rf {} \;
 find $TARGET_DIR -type f -name "test_result" -exec rm -rf {} \;
+find $TARGET_DIR -type f -name "log_frame_trickjobs.header" -exec rm -rf {} \; 
+find $TARGET_DIR -type f -name "log_frame.trk" -exec rm -rf {} \;                   
+find $TARGET_DIR -type f -name "log_frame_userjobs_main.trk" -exec rm -rf {} \;  
+find $TARGET_DIR -type f -name "log_timeline_init.csv" -exec rm -rf {} \;
+find $TARGET_DIR -type f -name "log_frame.header" -exec rm -rf {} \;  
+find $TARGET_DIR -type f -name "log_frame_trickjobs.trk" -exec rm -rf {} \;     
+find $TARGET_DIR -type f -name "log_frame_userjobs_main.header" -exec rm -rf {} \; 
+find $TARGET_DIR -type f -name "log_timeline.csv" -exec rm -rf {} \;
 set +x

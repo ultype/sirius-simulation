@@ -2,7 +2,7 @@
 
 MASTER_PATH="$PWD"
 SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master//g')
-$SIRIUS_HOME_PATH/exe/xil_common/script/color_text.sh
+source $SIRIUS_HOME_PATH/exe/xil_common/script/color_text.sh
 set -e
 
 trick-CP
