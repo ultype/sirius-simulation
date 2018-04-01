@@ -21,53 +21,47 @@ Issue the following commands after cloning
 
 # Type of Simulation
 These simulation as different S_defines resides in exe/ directory.
- - single-node
  - SIL : Software in the loop
  - PIL : Processor in the loop
+ - HIL : Hardware in the loop
 
-# Building
-Execute in shell at root of simulation you want to run
-```
-    trick-CP
-```
-
-# Running
+# Building + Running
 ## Golden Model
-Execute in shell at repo root
+Execuate the SIL Mater+Slave
 ```
-    ./S_main_<platform>.exe RUN_test/golden/golden-<date>.py
+    cd exe/SIL/master
+    ./SIL.sh
 ```
-The input file will have date prefix, only the latest is guarantee to execute.
 
-Result will be stored in RUN_test/golden Directory
-
-## Monte Carol
-Execute in shell at repo root
+Execuate the PIL Master
 ```
-    ./S_main_<platform>.exe RUN_test/monte/monte.py
+    cd exe/PIL/master
+    ./Deploy_EGSE_PIL.sh
 ```
-Result will be stored in RUN_test/monte Directory
 
+Execuate the HIL Master
+```
+    cd exe/HIL/master
+    ./Deploy_EGSE_HIL.sh
+```
+
+Clean the folder
+```
+   ./deep_clean.sh
+```
 # Tests
 
 ## Automative testing
 A auto-testing is preset and should be run every time change is applied.
 To run, at simulation root, issue:
 ```
-    ./test.sh
+    ./SIL.sh
 ```
 which will build, execute and compare against golden data.
 Result will be displayed on screen.
 
 The testing is based on average result relative error against golden data < 1E-5
 
-## Golden Model
-Build and Run Golden Model
-Use the comparison tool to compare the result
-```
-    python2.7 tool/generate_error.py RUN_test/golden-<data>.csv RUN_test/test.csv
-```
-Examine the resulting file result.csv, which contains the % error between each data points. It should display all zeros.
 
 # Documents
 ## Dependencies
