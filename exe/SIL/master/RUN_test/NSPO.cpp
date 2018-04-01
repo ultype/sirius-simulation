@@ -5,9 +5,9 @@
 #include "trick/CheckPointRestart_c_intf.hh"
 #include "trick/external_application_c_intf.h"
 
-#include "../Modified_data/nspo.h"
-#include "../../../public/Modified_data/realtime.h"
-#include "../Modified_data/gps.h"
+#include "../../../xil_common/Modified_data/nspo.h"
+#include "../../../xil_common/include/realtime.h"
+#include "../../../xil_common/Modified_data/gps.h"
 
 extern "C" void master_startup() {
     // Trick::MSSocket *new_connection = new Trick::MSSocket();

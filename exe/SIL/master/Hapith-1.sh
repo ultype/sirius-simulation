@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-SIL_MASTER_PATH="$PWD"
 SIRIUS_HOME_PATH=$(pwd | sed 's/\/exe\/SIL\/master//g')
 
 trick-CP

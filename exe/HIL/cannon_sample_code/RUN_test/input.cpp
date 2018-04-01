@@ -4,7 +4,7 @@
 #include "trick/CheckPointRestart_c_intf.hh"
 #include "trick/external_application_c_intf.h"
 
-#include "../../../public/Modified_data/realtime.h"
+#include "../../../xil_common/include/realtime.h"
 
 
 extern "C" void external_clock_switch(void) {

@@ -5,11 +5,11 @@
 #include "trick/CheckPointRestart_c_intf.hh"
 #include "trick/external_application_c_intf.h"
 
-#include "../../../public/Modified_data/golden.h"
-#include "../Modified_data/nspo.h"
-#include "../../../public/Modified_data/realtime.h"
-#include "../../../public/Modified_data/sirius_utility.h"
-#include "../Modified_data/gps.h"
+#include "../../../xil_common/Modified_data/golden.h"
+#include "../../../xil_common/Modified_data/nspo.h"
+#include "../../../xil_common/Modified_data/gps.h"
+#include "../../../xil_common/include/realtime.h"
+#include "../../../xil_common/include/sirius_utility.h"
 #include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" void master_startup() {
