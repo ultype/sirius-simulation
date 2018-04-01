@@ -1,5 +1,5 @@
-#ifndef EXE_SIL_MASTER_MODIFIED_DATA_NSPO_H_
-#define EXE_SIL_MASTER_MODIFIED_DATA_NSPO_H_
+#ifndef EXE_XIL_COMMON_MODIFIED_DATA_NSPO_H_
+#define EXE_XIL_COMMON_MODIFIED_DATA_NSPO_H_
 
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
@@ -33,4 +33,4 @@ extern "C" void record_nspo() {
     drg->enable();
 }
 
-#endif  // EXE_SIL_MASTER_MODIFIED_DATA_NSPO_H_
+#endif  // EXE_XIL_COMMON_MODIFIED_DATA_NSPO_H_

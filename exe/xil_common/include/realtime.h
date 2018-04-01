@@ -1,5 +1,5 @@
-#ifndef PUBLIC_MODIFIED_DATA_REALTIME_H_
-#define PUBLIC_MODIFIED_DATA_REALTIME_H_
+#ifndef EXE_XIL_COMMON_INCLUDE_REALTIME_H_
+#define EXE_XIL_COMMON_INCLUDE_REALTIME_H_
 
 #include "trick/realtimesync_proto.h"
 #include "trick/framelog_proto.h"
@@ -19,4 +19,4 @@ extern "C" void realtime() {
     sim_control_panel_set_enabled(1);
 #endif
 }
-#endif  // PUBLIC_MODIFIED_DATA_REALTIME_H_
+#endif  // EXE_XIL_COMMON_INCLUDE_REALTIME_H_

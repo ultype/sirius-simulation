@@ -1,5 +1,5 @@
-#ifndef PUBLIC_MODIFIED_DATA_GOLDEN_H_
-#define PUBLIC_MODIFIED_DATA_GOLDEN_H_
+#ifndef EXE_XIL_COMMON_MODIFIED_DATA_GOLDEN_H_
+#define EXE_XIL_COMMON_MODIFIED_DATA_GOLDEN_H_
 
 #include "trick/DRAscii.hh"
 #include "trick/DataRecordGroup.hh"
@@ -25,4 +25,4 @@ extern "C" void record_golden() {
     drg->enable();
 }
 
-#endif  // PUBLIC_MODIFIED_DATA_GOLDEN_H_
+#endif  // EXE_XIL_COMMON_MODIFIED_DATA_GOLDEN_H_
