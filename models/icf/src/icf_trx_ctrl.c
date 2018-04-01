@@ -26,16 +26,16 @@ static struct icf_ctrl_port g_egse_port[] = {
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
-    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, &g_egse_port[0]},
-    {1, EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[1]},
-    {1, EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[2]},
-    {1, EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[3]},
-    {1, EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, &g_egse_port[4]},
-    {1, EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, &g_egse_port[5]},
-    {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[6]},
-    {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, &g_egse_port[7]},
-    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_port[8]},
-    {1, EGSE_RX_MISSION_EVENT_QIDX,    ICF_DIRECTION_RX, &g_egse_port[0]}
+    {1, EGSE_TVC_SW_QIDX,              ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_IMU01_SW_QIDX,            ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_RATETBL_X_SW_QIDX,        ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_RATETBL_Y_SW_QIDX,        ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_RATETBL_Z_SW_QIDX,        ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_IMU02_SW_QIDX,            ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_RX_MISSION_EVENT_QIDX,    ICF_DIRECTION_RX, NULL, {}}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
@@ -51,9 +51,9 @@ static struct icf_ctrl_port g_esps_port[] = {
 };
 
 static struct icf_ctrl_queue g_esps_queue[] = {
-    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_port[0]},
-    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_port[1]},
-    {1, ESPS_TX_MISSION_CODE_QIDX,         ICF_DIRECTION_TX, &g_esps_port[0]}
+    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, NULL, {}},
+    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, NULL, {}},
+    {1, ESPS_TX_MISSION_CODE_QIDX,         ICF_DIRECTION_TX, NULL, {}}
 };
 
 /*  SIL EGSE Table  */
@@ -67,8 +67,8 @@ static struct icf_ctrl_port g_egse_sil_port[] = {
 };
 
 static struct icf_ctrl_queue g_egse_sil_queue[] = {
-    {1, EGSE_SIL_DOWNLINK_SW_QIDX,     ICF_DIRECTION_RX, &g_egse_sil_port[0]},
-    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, &g_egse_sil_port[0]}
+    {1, EGSE_SIL_DOWNLINK_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, NULL, {}}
 };
 
 /*  SIL ESPS Table  */
@@ -82,8 +82,8 @@ static struct icf_ctrl_port g_esps_sil_port[] = {
 };
 
 static struct icf_ctrl_queue g_esps_sil_queue[] = {
-    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, &g_esps_sil_port[0]},
-    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, &g_esps_sil_port[0]}
+    {1, ESPS_TVC_SW_QIDX,                  ICF_DIRECTION_TX, NULL, {}},
+    {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, NULL, {}}
 };
 
 static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
@@ -223,6 +223,20 @@ static int icf_qidx_to_pidx(int qidx, int system_type) {
     return which_map_tbl[idx].hw_port_idx;
 }
 
+static int icf_pidx_to_tblidx(int pidx, int system_type) {
+    int idx = 0;
+    struct icf_ctrl_port *which_port_tbl = NULL;
+    int port_tbl_size;
+
+    which_port_tbl = icf_choose_hw_port_tbl(system_type, &port_tbl_size);
+    while (idx < get_arr_num(port_tbl_size, sizeof(struct icf_ctrl_port))) {
+        if (which_port_tbl[idx].hw_port_idx == pidx)
+            break;
+        idx++;
+    }
+    return idx;
+}
+
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
     struct icf_ctrl_queue *ctrlqueue;
     struct icf_ctrl_port *ctrlport;
@@ -232,6 +246,7 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
     int que_tbl_size;
     struct icf_ctrl_port *which_port_tbl = NULL;
     int port_tbl_size;
+    int hw_port;
 
     C->system_type = system_type;
     which_que_tbl = icf_choose_sw_queue_tbl(C->system_type, &que_tbl_size);
@@ -239,6 +254,8 @@ int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type) {
 
     for (idx = 0; idx < get_arr_num(que_tbl_size, sizeof(struct icf_ctrl_queue)); idx++) {
         ctrlqueue = &which_que_tbl[idx];
+        hw_port = icf_qidx_to_pidx(ctrlqueue->queue_idx, C->system_type);
+        ctrlqueue->port = &which_port_tbl[icf_pidx_to_tblidx(hw_port, C->system_type)];
         rb_init(&ctrlqueue->data_ring, NUM_OF_CELL);
         C->ctrlqueue[ctrlqueue->queue_idx] = ctrlqueue;
     }
