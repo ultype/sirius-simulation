@@ -1,7 +1,27 @@
 #ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
 #define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
 #include "sirius_utility.h"
-
+const double LONX           = 120.893501;  //  Vehicle longitude - deg  module newton
+const double LATX           = 22.138917;   //  Vehicle latitude  - deg  module newton
+const double ALT            = 5.0;         //  Vehicle altitude  - m  module newton
+const double CON_ANG        = 0.0;
+const double CON_W          = 50.0;
+const double PHIBDX         = 0.0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
+const double THTBDX         = 90.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+const double PSIBDX         = 90.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
+const double ALPHA0X        = 0;    // Initial angle-of-attack   - deg  module newton
+const double BETA0X         = 0;    // Initial sideslip angle    - deg  module newton
+const double DVBE           = 0;    // Vehicle geographic speed  - m/s  module newton
+const double XCG_0          = 6.4138;    //  vehicle initial xcg
+const double XCG_1          = 4.7888;     //  vehicle final xcg
+const double MOI_ROLL_0     = 517.8;    //  vehicle initial moi in roll direction
+const double MOI_ROLL_1     = 180.9;     //  vehicle final moi in roll direction
+const double MOI_PITCH_0    = 32525.4;  //  vehicle initial transverse moi
+const double MOI_PITCH_1    = 19377.7;   //  vehicle final transverse moi
+const double MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi
+const double MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi
+const double SPI            = 291.6145604;     //  Specific impusle
+const double FUEL_FLOW_RATE = 29.587;     //  fuel flow rate
 extern "C" void master_startup() {
     rkt.egse_mission_handler_bitmap &= ~(0x1U << 0);
 }

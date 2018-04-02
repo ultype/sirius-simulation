@@ -7,10 +7,10 @@
 
 #include "../../../xil_common/Modified_data/golden.h"
 #include "../../../xil_common/Modified_data/nspo.h"
-#include "../../../xil_common/include/realtime.h"
-#include "../../../xil_common/include/sirius_utility.h"
-#include "../../../xil_common/include/mission_event_handler.h"
 #include "../../../xil_common/Modified_data/gps.h"
+#include "../../../xil_common/include/realtime.h"
+#include "../../../xil_common/include/mission_event_handler.h"
+#include "../../../xil_common/include/sirius_utility.h"
 #include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" int run_me() {
@@ -50,23 +50,23 @@ extern "C" int run_me() {
     /****************************************************************************************************************/
 
     /****************************************SLV************************************************************************/
-    double lonx       = 120.893501;  //  Vehicle longitude - deg  module newton
-    double latx       = 22.138917;   //  Vehicle latitude  - deg  module newton
-    double alt        = 5.0;         //  Vehicle altitude  - m  module newton
+    double lonx       = LONX;  //  Vehicle longitude - deg  module newton
+    double latx       = LATX;   //  Vehicle latitude  - deg  module newton
+    double alt        = ALT;         //  Vehicle altitude  - m  module newton
     rkt.dynamics.load_location(lonx, latx, alt);
 
-    double con_ang = 0.0;
-    double con_w = 50.0;
+    double con_ang = CON_ANG;
+    double con_w = CON_W;
     rkt.dynamics.load_coning_var(con_ang, con_w);
 
-    double phibdx = 0.0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
-    double thtbdx = 90.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
-    double psibdx = 90.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
+    double phibdx = PHIBDX;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
+    double thtbdx = THTBDX;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+    double psibdx = PSIBDX;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     rkt.dynamics.load_angle(psibdx, phibdx, thtbdx);
 
-    double alpha0x    = 0;    // Initial angle-of-attack   - deg  module newton
-    double beta0x     = 0;    // Initial sideslip angle    - deg  module newton
-    double dvbe       = 0;    // Vehicle geographic speed  - m/s  module newton
+    double alpha0x    = ALPHA0X;   // Initial angle-of-attack   - deg  module newton
+    double beta0x     = BETA0X;   // Initial sideslip angle    - deg  module newton
+    double dvbe       = DVBE;   // Vehicle geographic speed  - m/s  module newton
     rkt.dynamics.load_geodetic_velocity(alpha0x, beta0x, dvbe);
 
     rkt.dynamics.load_angular_velocity(0, 0, 0);
@@ -80,16 +80,16 @@ extern "C" int run_me() {
     rkt.propulsion.set_vmass0(4473.5);       // vehicle initial mass
     rkt.propulsion.set_fmass0(2958.7);      // vehicle initail fuel mass
 
-    double xcg_0          = 6.4138;    //  vehicle initial xcg
-    double xcg_1          = 4.7888;     //  vehicle final xcg
-    double moi_roll_0     = 517.8;    //  vehicle initial moi in roll direction
-    double moi_roll_1     = 180.9;     //  vehicle final moi in roll direction
-    double moi_pitch_0    = 32525.4;  //  vehicle initial transverse moi
-    double moi_pitch_1    = 19377.7;   //  vehicle final transverse moi
-    double moi_yaw_0    = 32519.8;  //  vehicle initial transverse moi
-    double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
-    double spi            = 291.6145604;     //  Specific impusle
-    double fuel_flow_rate = 29.587;     //  fuel flow rate
+    double xcg_0          = XCG_0;    //  vehicle initial xcg
+    double xcg_1          = XCG_1;     //  vehicle final xcg
+    double moi_roll_0     = MOI_ROLL_0;    //  vehicle initial moi in roll direction
+    double moi_roll_1     = MOI_ROLL_1;     //  vehicle final moi in roll direction
+    double moi_pitch_0    = MOI_PITCH_0;  //  vehicle initial transverse moi
+    double moi_pitch_1    = MOI_PITCH_1;   //  vehicle final transverse moi
+    double moi_yaw_0    = MOI_YAW_0;  //  vehicle initial transverse moi
+    double moi_yaw_1    = MOI_YAW_1;   //  vehicle final transverse moi
+    double spi            = SPI;     //  Specific impusle
+    double fuel_flow_rate = FUEL_FLOW_RATE;     //  fuel flow rate
     rkt.propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
 
     rkt.propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area

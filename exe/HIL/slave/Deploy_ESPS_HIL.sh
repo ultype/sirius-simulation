@@ -22,4 +22,4 @@ source $SIRIUS_HOME_PATH/exe/xil_common/script/text_process_func.sh
 sed_ipaddr_subst $EGSE_IP "$SIRIUS_HOME_PATH/models/icf/include/icf_trx_ctrl.h"
 ##### Generate the image#####
 trick-CP
-./S_main_Linux_5.4_x86_64.exe RUN_golden/golden.cpp
+./S_main_Linux_5.4_x86_64.exe RUN_golden/golden_fc.cpp
