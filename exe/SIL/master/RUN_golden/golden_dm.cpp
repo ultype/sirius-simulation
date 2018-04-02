@@ -35,7 +35,7 @@ extern "C" int run_me() {
     /* events */
     jit_add_event("event_start", "LIFTOFF", 0.001);
     jit_add_event("event_separation_1", "S3", 0.001);
-    jit_add_read(101.051, "event_S3_ignition");
+    jit_add_read(101.001, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
     jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.001);
     exec_set_terminate_time(200.0);

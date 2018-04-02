@@ -26,7 +26,8 @@ extern "C" int run_me() {
     jit_add_read(12.001, "event_control_on");
     //  jit_add_read(15.001, "event_s2_control_on");
     jit_add_read(82.001, "event_aoac_on");
-    jit_add_read(100.001, "event_s3_control_on");
+    jit_add_read(100.001, "event_s3_seperation");
+    jit_add_read(101.001, "event_s3_control_on");
     jit_add_read(107.001, "event_fairing_jettison");
     jit_add_read(200.001, "event_control_off");
 

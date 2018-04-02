@@ -56,9 +56,9 @@ extern "C" int event_separation_1() {
     double spi            = 288.4111169;  // 288.4111169 290.0
     double fuel_flow_rate = 3.814;
 
-     if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_S3_CONTROL_ON, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+     if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_S3_SEPERATION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
         return 0;
-    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_S3_CONTROL_ON);
+    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_S3_SEPERATION);
     fprintf(stderr, "[event_separation_1:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
 
     rkt.aerodynamics.set_refa(0.7542);

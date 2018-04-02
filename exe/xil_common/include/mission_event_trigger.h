@@ -117,6 +117,11 @@ extern "C" int event_fairing_jettison(void) {
 }
 
 extern "C" int event_s3_control_on(void) {
+    fc.control.set_S3_AOA();
+    return 0;
+}
+
+extern "C" int event_s3_seperation(void) {
     double S3_mdot = S3_MDOT;
     double S3_fmass0 = S3_FMASS0;
     double S3_xcg_1 = S3_XCG_1;
@@ -158,10 +163,9 @@ extern "C" int event_s3_control_on(void) {
     fc.control.get_control_gain(S3_kpp, S3_kpi, S3_kpd, S3_kppp, S3_pN, S3_krp, S3_kri, S3_krd, S3_krpp, S3_rN, S3_kyp, S3_kyi,
                                 S3_kyd, S3_kypp, S3_yN, S3_kaoap, S3_kaoai, S3_kaoad, S3_kaoapp, S3_aoaN);
     fc.control.set_attcmd(S3_rollcmd, S3_pitchcmd, S3_yawcmd);
-    fc.control.set_S3_AOA();
-    fc.control.set_ierror_zero();
     fc.control.set_aoacmd(S3_aoacmd);
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_S3_CONTROL_ON;
+    fc.control.set_ierror_zero();
+    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_S3_SEPERATION;
     return 0;
 }
 
