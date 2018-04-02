@@ -40,7 +40,7 @@ extern "C" int event_start() {
     if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_LIFTOFF, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
         return 0;
     rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_LIFTOFF);
-    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+    PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
     rkt.tvc.set_S2_TVC();
     return 0;
@@ -61,7 +61,7 @@ extern "C" int event_separation_1() {
      if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_S3_SEPERATION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
         return 0;
     rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_S3_SEPERATION);
-    fprintf(stderr, "[event_separation_1:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+    PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
 
     rkt.aerodynamics.set_refa(0.7542);
     rkt.aerodynamics.set_refd(0.98);
@@ -88,14 +88,13 @@ extern "C" int event_separation_1() {
 
 extern "C" int event_S3_ignition() {
     rkt.propulsion.engine_ignition();
-    fprintf(stderr, "[event_S3_ignition:%f] mission_event_code = %d\n", MISSION_EVENT_CODE_S3_IGNITION, exec_get_sim_time());
 }
 
 extern "C" int event_fairing_separation() {
     if (!IS_MISSION_ARRIVED(MISSION_EVENT_FAIRING_JETTSION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
         return 0;
     rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_FAIRING_JETTSION);
-    fprintf(stderr, "[event_fairing_separation:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+    PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
     rkt.propulsion.set_vmass0(691.4);
     return 0;
 }

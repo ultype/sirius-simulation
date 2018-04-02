@@ -82,7 +82,7 @@ const double S3_AOACMD = -0.0;
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
     fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_LIFTOFF;
-    fprintf(stderr, "[slave:%s:%f] MISSION_EVENT_CODE_LIFTOFF %d\n", __FUNCTION__, exec_get_sim_time(), fc.ctl_tvc_db.mission_event_code);
+    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_CODE_LIFTOFF", fc.ctl_tvc_db.mission_event_code);
     return 0;
 }
 
@@ -111,13 +111,13 @@ extern "C" int event_aoac_on(void) {
 extern "C" int event_control_off(void) {
     fc.control.set_NO_CONTROL();
     fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_OFF;
-    fprintf(stderr, "[slave:%s:%f] MISSION_EVENT_CODE_CONTROL_OFF %d\n", __FUNCTION__, exec_get_sim_time(), fc.ctl_tvc_db.mission_event_code);
+    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_CODE_CONTROL_OFF", fc.ctl_tvc_db.mission_event_code);
     return 0;
 }
 
 extern "C" int event_fairing_jettison(void) {
     fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_FAIRING_JETTSION;
-    fprintf(stderr, "[slave:%s:%f] MISSION_EVENT_FAIRING_JETTSION %d\n", __FUNCTION__, exec_get_sim_time(), fc.ctl_tvc_db.mission_event_code);
+    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_FAIRING_JETTSION", fc.ctl_tvc_db.mission_event_code);
     return 0;
 }
 
@@ -171,7 +171,7 @@ extern "C" int event_s3_seperation(void) {
     fc.control.set_aoacmd(S3_aoacmd);
     fc.control.set_ierror_zero();
     fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_S3_SEPERATION;
-    fprintf(stderr, "[slave:%s:%f] MISSION_EVENT_CODE_S3_SEPERATION %d\n", __FUNCTION__, exec_get_sim_time(), fc.ctl_tvc_db.mission_event_code);
+    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_FAIRING_JETTSION", fc.ctl_tvc_db.mission_event_code);
     return 0;
 }
 
