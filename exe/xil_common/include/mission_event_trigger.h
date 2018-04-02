@@ -1,7 +1,7 @@
 #ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
 #define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
 #include "sirius_utility.h"
-
+extern FlightComputer_SimObject fc;
 /* Stage2 Control Variable Constant */
 const double S2_MDOT = 29.587;
 const double S2_FMASS0 = 2958.7;
@@ -165,7 +165,7 @@ extern "C" int event_s3_control_on(void) {
     return 0;
 }
 
-extern "C" int init_stage2_control(void) {
+extern "C" int slave_init_stage2_control(FlightComputer_SimObject *fc) {
     /* Control variable Stage2 */
     double S2_mdot = S2_MDOT;
     double S2_fmass0 = S2_FMASS0;
@@ -203,37 +203,37 @@ extern "C" int init_stage2_control(void) {
     double S2_yawcmd = S2_YAWCMD;
     double S2_aoacmd = S2_AOACMD;
 
-    fc.control.set_controller_var(S2_mdot, S2_fmass0, S2_xcg_1, S2_xcg_0, S2_isp);
-    fc.control.set_IBBB0(S2_moi_roll_0, S2_moi_pitch_0, S2_moi_yaw_0);
-    fc.control.set_IBBB1(S2_moi_roll_1, S2_moi_pitch_1, S2_moi_yaw_1);
-    //  fc.control.set_kpp(S2_kpp)
-    //  fc.control.set_kpi(S2_kpi)
-    //  fc.control.set_kppp(S2_kppp)
-    //  fc.control.set_krp(S2_krp)
-    //  fc.control.set_kri(S2_kri)
-    //  fc.control.set_krpp(S2_krpp)
-    //  fc.control.set_kyp(S2_kyp)
-    //  fc.control.set_kyi(S2_kyi)
-    //  fc.control.set_kypp(S2_kypp)
-    //  fc.control.set_kaoap(S2_kaoap)
-    //  fc.control.set_kaoai(S2_kaoai)
-    //  fc.control.set_kaoad(S2_kaoad)
-    //  fc.control.set_kaoapp(S2_kaoapp)
-    fc.control.set_attcmd(S2_rollcmd, S2_pitchcmd, S2_yawcmd);
-    fc.control.set_aoacmd(S2_aoacmd);
-    fc.control.get_control_gain(S2_kpp, S2_kpi, S2_kpd, S2_kppp, S2_pN, S2_krp, S2_kri, S2_krd,
+    fc->control.set_controller_var(S2_mdot, S2_fmass0, S2_xcg_1, S2_xcg_0, S2_isp);
+    fc->control.set_IBBB0(S2_moi_roll_0, S2_moi_pitch_0, S2_moi_yaw_0);
+    fc->control.set_IBBB1(S2_moi_roll_1, S2_moi_pitch_1, S2_moi_yaw_1);
+    //  fc->control.set_kpp(S2_kpp)
+    //  fc->control.set_kpi(S2_kpi)
+    //  fc->control.set_kppp(S2_kppp)
+    //  fc->control.set_krp(S2_krp)
+    //  fc->control.set_kri(S2_kri)
+    //  fc->control.set_krpp(S2_krpp)
+    //  fc->control.set_kyp(S2_kyp)
+    //  fc->control.set_kyi(S2_kyi)
+    //  fc->control.set_kypp(S2_kypp)
+    //  fc->control.set_kaoap(S2_kaoap)
+    //  fc->control.set_kaoai(S2_kaoai)
+    //  fc->control.set_kaoad(S2_kaoad)
+    //  fc->control.set_kaoapp(S2_kaoapp)
+    fc->control.set_attcmd(S2_rollcmd, S2_pitchcmd, S2_yawcmd);
+    fc->control.set_aoacmd(S2_aoacmd);
+    fc->control.get_control_gain(S2_kpp, S2_kpi, S2_kpd, S2_kppp, S2_pN, S2_krp, S2_kri, S2_krd,
                                 S2_krpp, S2_rN, S2_kyp, S2_kyi, S2_kyd, S2_kypp, S2_yN, S2_kaoap, S2_kaoai, S2_kaoad, S2_kaoapp, S2_aoaN);
     return 0;
 }
 
-extern "C" int init_ins_variable(void) {
+extern "C" int slave_init_ins_variable(FlightComputer_SimObject *fc) {
     //  Vehicle longitude - deg  module newton
     double lonx = 120.893501;
     //  Vehicle latitude  - deg  module newton
     double latx = 22.138917;
     // Vehicle altitude  - m  module newton
     double alt = 5;
-    fc.ins.load_location(lonx, latx, alt);
+    fc->ins.load_location(lonx, latx, alt);
 
     //  Rolling  angle of veh wrt geod coord - deg  module kinematics
     double phibdx = 0.0;
@@ -241,43 +241,43 @@ extern "C" int init_ins_variable(void) {
     double thtbdx = 90.0;
     //  Yawing   angle of veh wrt geod coord - deg  module kinematics
     double psibdx = 90.0;
-    fc.ins.load_angle(psibdx, phibdx, thtbdx);
+    fc->ins.load_angle(psibdx, phibdx, thtbdx);
     //  Initial angle-of-attack   - deg  module newton
     double alpha0x = 0;
     //  Initial sideslip angle    - deg  module newton
     double beta0x = 0;
     //  Vehicle geographic speed  - m/s  module newton
     double dvbe = 0;
-    fc.ins.load_geodetic_velocity(alpha0x, beta0x, dvbe);
-    fc.ins.set_ideal();
-    //  fc.ins.set_non_ideal();
+    fc->ins.load_geodetic_velocity(alpha0x, beta0x, dvbe);
+    fc->ins.set_ideal();
+    //  fc->ins.set_non_ideal();
     uint32_t gpsupdate  = 0;
-    fc.ins.set_gps_correction(gpsupdate);
+    fc->ins.set_gps_correction(gpsupdate);
     return 0;
 }
 
-extern "C" int init_gps_fc_variable() {
+extern "C" int slave_init_gps_fc_variable(FlightComputer_SimObject *fc) {
     /* GPS */
     double pr_bias_default[4] = {0, 0, 0, 0};
     double pr_noise_default[4] = {0.25, 0.25, 0.25, 0.25};
     double dr_noise_default[4] = {0.03, 0.03, 0.03, 0.03};
     //  User clock frequency error - m/s MARKOV  module gps
-    fc.gps.ucfreq_noise      = 0.1;
+    fc->gps.ucfreq_noise      = 0.1;
     // User clock bias error - m GAUSS  module gps
-    fc.gps.ucbias_error      = 0;
+    fc->gps.ucbias_error      = 0;
     // Pseudo-range bias - m GAUSS  module gps
-    memcpy(fc.gps.PR_BIAS, pr_bias_default, sizeof(pr_bias_default));
+    memcpy(fc->gps.PR_BIAS, pr_bias_default, sizeof(pr_bias_default));
     //  Pseudo-range noise - m MARKOV  module gps
-    memcpy(fc.gps.PR_NOISE, pr_noise_default, sizeof(pr_noise_default));
+    memcpy(fc->gps.PR_NOISE, pr_noise_default, sizeof(pr_noise_default));
     //  Delta-range noise - m/s MARKOV  module gps
-    memcpy(fc.gps.DR_NOISE, dr_noise_default, sizeof(dr_noise_default));
+    memcpy(fc->gps.DR_NOISE, dr_noise_default, sizeof(dr_noise_default));
     //  Factor to modifiy initial P-matrix P(1+factp)=module gps
     double gpsr_factp       = 0;
     //  Init 1sig clock bias error of state cov matrix - m=module gps
     double gpsr_pclockb     = 3;
     //  Init 1sig clock freq error of state cov matrix - m/s=module gps
     double gpsr_pclockf     = 1;
-    fc.gps.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf);
+    fc->gps.setup_state_covariance_matrix(gpsr_factp, gpsr_pclockb, gpsr_pclockf);
 
     //  Factor to modifiy the Q-matrix Q(1+factq)=module gps
     double gpsr_factq       = 0;
@@ -285,26 +285,36 @@ extern "C" int init_gps_fc_variable() {
     double gpsr_qclockb     = 0.5;
     //  1sig clock freq error of process cov matrix - m/s=module gps
     double gpsr_qclockf     = 0.1;
-    fc.gps.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf);
+    fc->gps.setup_error_covariance_matrix(gpsr_factq, gpsr_qclockb, gpsr_qclockf);
 
     //  User clock correlation time constant - s=module gps
     double gpsr_uctime_cor = 100;
-    fc.gps.setup_fundamental_dynamic_matrix(gpsr_uctime_cor);
+    fc->gps.setup_fundamental_dynamic_matrix(gpsr_uctime_cor);
 
     //  Init 1sig pos values of state cov matrix - m=module gps
-    fc.gps.ppos        = 5;
+    fc->gps.ppos        = 5;
     //  Init 1sig vel values of state cov matrix - m/s=module gps
-    fc.gps.pvel        = 0.2;
+    fc->gps.pvel        = 0.2;
     //  1sig pos values of process cov matrix - m=module gps
-    fc.gps.qpos        = 0.1;
+    fc->gps.qpos        = 0.1;
     //  1sig vel values of process cov matrix - m/s=module gps
-    fc.gps.qvel        = 0.01;
+    fc->gps.qvel        = 0.01;
     //  1sig pos value of meas cov matrix - m=module gps
-    fc.gps.rpos        = 1;
+    fc->gps.rpos        = 1;
     //  1sig vel value of meas cov matrix - m/s=module gps
-    fc.gps.rvel        = 0.1;
+    fc->gps.rvel        = 0.1;
     //  Factor to modifiy the R-matrix R(1+factr)=module gps
-    fc.gps.factr       = 0;
+    fc->gps.factr       = 0;
+    return 0;
+}
+
+extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
+    unsigned int Year = 2017;
+    unsigned int DOY = 81;
+    unsigned int Hour = 2;
+    unsigned int Min = 0;
+    unsigned int Sec = 0;
+    fc->time->load_start_time(Year, DOY, Hour, Min, Sec);
     return 0;
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_

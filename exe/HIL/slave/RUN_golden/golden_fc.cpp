@@ -13,20 +13,13 @@
 extern "C" int run_me() {
     record_gps_slave();
     //  realtime();
-
-    unsigned int Year = 2017;
-    unsigned int DOY = 81;
-    unsigned int Hour = 2;
-    unsigned int Min = 0;
-    unsigned int Sec = 0;
-    fc.time->load_start_time(Year, DOY, Hour, Min, Sec);
-
+    slave_init_time(&fc);
     /* INS */
-    init_ins_variable();
+    slave_init_ins_variable(&fc);
     /* GPS */
-    init_gps_fc_variable();
+    slave_init_gps_fc_variable(&fc);
 
-    init_stage2_control();
+    slave_init_stage2_control(&fc);
 
     /* events */
     jit_add_read(0.001, "event_liftoff");

@@ -1,6 +1,7 @@
 #ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
 #define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
 #include "sirius_utility.h"
+extern Rocket_SimObject rkt;
 const double LONX           = 120.893501;  //  Vehicle longitude - deg  module newton
 const double LATX           = 22.138917;   //  Vehicle latitude  - deg  module newton
 const double ALT            = 5.0;         //  Vehicle altitude  - m  module newton
@@ -22,9 +23,6 @@ const double MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi
 const double MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi
 const double SPI            = 291.6145604;     //  Specific impusle
 const double FUEL_FLOW_RATE = 29.587;     //  fuel flow rate
-extern "C" void master_startup() {
-    rkt.egse_mission_handler_bitmap &= ~(0x1U << 0);
-}
 
 extern "C" int event_start() {
     double xcg_0          = 6.4138;    //  vehicle initial xcg
@@ -61,7 +59,7 @@ extern "C" int event_separation_1() {
      if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_S3_CONTROL_ON, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
         return 0;
     rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_S3_CONTROL_ON);
-    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+    fprintf(stderr, "[event_separation_1:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
 
     rkt.aerodynamics.set_refa(0.7542);
     rkt.aerodynamics.set_refd(0.98);
@@ -88,15 +86,137 @@ extern "C" int event_separation_1() {
 
 extern "C" int event_S3_ignition() {
     rkt.propulsion.engine_ignition();
-    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", MISSION_EVENT_CODE_S3_IGNITION, exec_get_sim_time());
+    fprintf(stderr, "[event_S3_ignition:%f] mission_event_code = %d\n", MISSION_EVENT_CODE_S3_IGNITION, exec_get_sim_time());
 }
 
 extern "C" int event_fairing_separation() {
     if (!IS_MISSION_ARRIVED(MISSION_EVENT_FAIRING_JETTSION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
         return 0;
     rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_FAIRING_JETTSION);
-    fprintf(stderr, "[Event_start:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
+    fprintf(stderr, "[event_fairing_separation:%f] mission_event_code = %d\n", rkt.mission_event_code_record, exec_get_sim_time());
     rkt.propulsion.set_vmass0(691.4);
     return 0;
 }
+
+extern "C" void master_startup(Rocket_SimObject *rkt) {
+    rkt->egse_mission_handler_bitmap &= ~(0x1U << 0);
+}
+
+extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
+    rkt->forces.set_Slosh_flag(0);
+    rkt->forces.set_DOF(6);
+}
+
+extern "C" void master_init_time(Rocket_SimObject *rkt) {
+    /********************************Set simulation start time*****************************************************/
+    uint32_t Year = 2017;
+    uint32_t DOY = 81;
+    uint32_t Hour = 2;
+    uint32_t Min = 0;
+    uint32_t Sec = 0;
+    rkt->time->load_start_time(Year, DOY, Hour, Min, Sec);
+}
+
+extern "C" void master_init_environment(Rocket_SimObject *rkt) {
+    /***************************************environment*************************************************************/
+    rkt->env.dm_RNP();
+    // rkt->env.atmosphere_use_weather_deck("../../../auxiliary/weather_table.txt");
+    // rkt->env.atmosphere_use_public();
+    rkt->env.atmosphere_use_nasa();
+    rkt->env.set_no_wind();
+    rkt->env.set_no_wind_turbulunce();
+    // rkt->env.set_constant_wind(3.0, 0.0, 1.0, 0.0);
+    // rkt->env.set_wind_turbulunce(0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    rkt->gps_con.readfile("../../../auxiliary/brdc0810.17n");
+}
+
+extern "C" void master_init_slv(Rocket_SimObject *rkt) {
+    /****************************************SLV************************************************************************/
+    double lonx       = LONX;  //  Vehicle longitude - deg  module newton
+    double latx       = LATX;   //  Vehicle latitude  - deg  module newton
+    double alt        = ALT;         //  Vehicle altitude  - m  module newton
+    rkt->dynamics.load_location(lonx, latx, alt);
+
+    double con_ang = CON_ANG;
+    double con_w = CON_W;
+    rkt->dynamics.load_coning_var(con_ang, con_w);
+
+    double phibdx = PHIBDX;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
+    double thtbdx = THTBDX;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+    double psibdx = PSIBDX;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
+    rkt->dynamics.load_angle(psibdx, phibdx, thtbdx);
+
+    double alpha0x    = ALPHA0X;   // Initial angle-of-attack   - deg  module newton
+    double beta0x     = BETA0X;   // Initial sideslip angle    - deg  module newton
+    double dvbe       = DVBE;   // Vehicle geographic speed  - m/s  module newton
+    rkt->dynamics.load_geodetic_velocity(alpha0x, beta0x, dvbe);
+    rkt->dynamics.load_angular_velocity(0, 0, 0);
+}
+
+extern "C" void master_init_aerodynamics(Rocket_SimObject *rkt) {
+    /************************************aerodynamics*******************************************************/
+    rkt->aerodynamics.load_aerotable("../../../auxiliary/Aero_0721_S2+S3.txt");
+    rkt->aerodynamics.set_refa(1.1309);       // Reference area for aero coefficients - m^2
+    rkt->aerodynamics.set_refd(1.2);     // Reference length for aero coefficients - m
+    /********************************************************************************************************/
+}
+
+extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
+    /******************************propulsion & mass property***************************************************************************/
+    rkt->propulsion.set_vmass0(4473.5);       // vehicle initial mass
+    rkt->propulsion.set_fmass0(2958.7);      // vehicle initail fuel mass
+
+    double xcg_0          = XCG_0;    //  vehicle initial xcg
+    double xcg_1          = XCG_1;     //  vehicle final xcg
+    double moi_roll_0     = MOI_ROLL_0;    //  vehicle initial moi in roll direction
+    double moi_roll_1     = MOI_ROLL_1;     //  vehicle final moi in roll direction
+    double moi_pitch_0    = MOI_PITCH_0;  //  vehicle initial transverse moi
+    double moi_pitch_1    = MOI_PITCH_1;   //  vehicle final transverse moi
+    double moi_yaw_0    = MOI_YAW_0;  //  vehicle initial transverse moi
+    double moi_yaw_1    = MOI_YAW_1;   //  vehicle final transverse moi
+    double spi            = SPI;     //  Specific impusle
+    double fuel_flow_rate = FUEL_FLOW_RATE;     //  fuel flow rate
+    rkt->propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
+
+    rkt->propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
+    rkt->propulsion.set_payload(100.0);  // payload mass
+    rkt->forces.set_reference_point(-8.436);  // set reference point
+}
+
+extern "C" void master_init_sensors(Rocket_SimObject *rkt) {
+    /**************************************************Sensor****************************************************************/
+    // Accelerometer
+    double EMISA[3];      // gauss(0, 1.1e-4)
+    double ESCALA[3];      // gauss(0, 2.e-5)
+    double EBIASA[3];      // gauss(0, 1.e-6)
+    // rkt->accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt->newton);
+    // Create a Ideal Accelerometer
+    rkt->accelerometer = new sensor::AccelerometerIdeal();
+
+    // gyro
+    double EMISG[3];      // gauss(0, 1.1e-4)
+    double ESCALG[3];      // gauss(0, 2.e-5)
+    double EBIASG[3];      // gauss(0, 1.e-6)
+    // rkt->gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt->newton, rkt->euler, rkt->kinematics);
+
+    // Create a Ideal Gyro
+    rkt->gyro = new sensor::GyroIdeal();
+
+    // rkt->sdt = new SDT_NONIDEAL();
+    rkt->sdt = new SDT_ideal();
+}
+
+extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
+    /****************************************************TVC*************************************************************************/
+    rkt->tvc.set_s2_tau1(20.0);
+    rkt->tvc.set_s2_tau2(20.0);
+    rkt->tvc.set_s2_tau3(20.0);
+    rkt->tvc.set_s2_tau4(20.0);
+
+    rkt->tvc.set_s2_ratelim(16.0 * RAD);
+    rkt->tvc.set_s2_tvclim(7.0 * RAD);
+}
+
+
+
 #endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
