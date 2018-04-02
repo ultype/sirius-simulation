@@ -1,6 +1,8 @@
 #ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
 #define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
 #include "sirius_utility.h"
+#include "trick/exec_proto.h"
+#include "trick/jit_input_file_proto.hh"
 extern Rocket_SimObject rkt;
 const double LONX           = 120.893501;  //  Vehicle longitude - deg  module newton
 const double LATX           = 22.138917;   //  Vehicle latitude  - deg  module newton
@@ -217,6 +219,14 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     rkt->tvc.set_s2_tvclim(7.0 * RAD);
 }
 
-
+extern "C" void mission_event_handler_configuration(void) {
+    /* events */
+    jit_add_event("event_start", "LIFTOFF", 0.001);
+    jit_add_event("event_separation_1", "S3", 0.001);
+    jit_add_read(101.001, "event_S3_ignition");
+    // jit_add_read(107.001, "event_fairing_separation");
+    jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.001);
+    exec_set_terminate_time(200.0);
+}
 
 #endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_

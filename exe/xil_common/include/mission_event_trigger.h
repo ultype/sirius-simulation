@@ -1,6 +1,8 @@
 #ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
 #define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
 #include "sirius_utility.h"
+#include "trick/exec_proto.h"
+#include "trick/jit_input_file_proto.hh"
 extern FlightComputer_SimObject fc;
 /* Stage2 Control Variable Constant */
 const double S2_MDOT = 29.587;
@@ -320,5 +322,20 @@ extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
     unsigned int Sec = 0;
     fc->time->load_start_time(Year, DOY, Hour, Min, Sec);
     return 0;
+}
+
+extern "C" void mission_event_trigger_configuration(void) {
+    /* events */
+    jit_add_read(0.001, "event_liftoff");
+    jit_add_read(0.001, "event_control_rcs_on");
+    jit_add_read(12.001, "event_control_on");
+    //  jit_add_read(15.001, "event_s2_control_on");
+    jit_add_read(82.001, "event_aoac_on");
+    jit_add_read(100.001, "event_s3_seperation");
+    jit_add_read(101.001, "event_s3_control_on");
+    jit_add_read(107.001, "event_fairing_jettison");
+    jit_add_read(200.001, "event_control_off");
+
+    exec_set_terminate_time(200.0);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_

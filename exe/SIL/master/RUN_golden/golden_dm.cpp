@@ -13,11 +13,11 @@
 #include "../../../xil_common/include/sirius_utility.h"
 #include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
-
 extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
+    // external_clock_switch(&rkt.ext_clk);
     // realtime();
     master_startup(&rkt);
     fprintf(stderr, "time_tic_value = %d tics per seconds\n", exec_get_time_tic_value());
@@ -31,14 +31,6 @@ extern "C" int run_me() {
     master_init_propulsion(&rkt);
     master_init_sensors(&rkt);
     master_init_tvc(&rkt);
-
-    /* events */
-    jit_add_event("event_start", "LIFTOFF", 0.001);
-    jit_add_event("event_separation_1", "S3", 0.001);
-    jit_add_read(101.001, "event_S3_ignition");
-    // jit_add_read(107.001, "event_fairing_separation");
-    jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.001);
-    exec_set_terminate_time(200.0);
-
+    mission_event_handler_configuration();
     return 0;
 }
