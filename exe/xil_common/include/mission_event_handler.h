@@ -180,7 +180,7 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
 
     rkt->propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
-    rkt->propulsion.set_payload(100.0);  // payload mass
+    rkt->propulsion.set_payload(0.0);  // payload mass
     rkt->forces.set_reference_point(-8.436);  // set reference point
 }
 
@@ -222,7 +222,7 @@ extern "C" void mission_event_handler_configuration(void) {
     /* events */
     jit_add_event("event_start", "LIFTOFF", 0.001);
     jit_add_event("event_separation_1", "S3", 0.001);
-    jit_add_read(101.001, "event_S3_ignition");
+    jit_add_read(102.051, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
     jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.001);
     exec_set_terminate_time(200.0);

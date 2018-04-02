@@ -21,6 +21,5 @@ extern "C" int run_me() {
     slave_init_stage2_control(&fc);
     /* events */
     mission_event_trigger_configuration();
-
     return 0;
 }
