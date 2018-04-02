@@ -13,10 +13,17 @@ extern "C" void realtime() {
     exec_set_thread_cpu_affinity(0, 1);
     frame_log_on();
     fprintf(stderr, "%s\n", real_time_clock_get_name());
-#if 0
+}
+
+extern "C" void freeze_cmd(void) {
     exec_set_freeze_command(1);
     exec_set_enable_freeze(1);
     sim_control_panel_set_enabled(1);
-#endif
 }
+
+extern "C" void external_clock_switch(Trick::Clock * in_clock) {
+    real_time_change_clock(in_clock);
+    fprintf(stderr, "%s\n", real_time_clock_get_name());
+}
+
 #endif  // EXE_XIL_COMMON_INCLUDE_REALTIME_H_

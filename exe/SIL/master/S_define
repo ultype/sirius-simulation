@@ -73,6 +73,7 @@ class Rocket_SimObject : public Trick::SimObject {
         DM_SAVE_decl();
         struct icf_ctrlblk_t   icf_ctrl;
         uint64_t egse_mission_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
+        uint64_t mission_event_code_record = 0;
 
         Transceiver transceiver;
 
@@ -201,8 +202,10 @@ class Rocket_SimObject : public Trick::SimObject {
         };
 
         void load_input(struct icf_ctrlblk_t* C) {
-            if (icf_rx_dequeue(C, EGSE_SIL_DOWNLINK_SW_QIDX, &ctl_tvc_db, sizeof(refactor_downlink_packet_t)) > 0)
+            if (icf_rx_dequeue(C, EGSE_SIL_DOWNLINK_SW_QIDX, &ctl_tvc_db, sizeof(refactor_downlink_packet_t)) > 0) {
                 debug_hex_dump("egse", (uint8_t *)&ctl_tvc_db, sizeof(refactor_downlink_packet_t));
+                mission_event_code_record = ctl_tvc_db.mission_event_code;
+            }
         }
 
         Rocket_SimObject() 
