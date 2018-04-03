@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <errno.h>
 //#define SIMGEN_IP "140.110.227.10"
-#define SIMGEN_IP "127.0.0.1"
+#define SIMGEN_IP "192.168.0.4"
 #define SIMGEN_PORT 15650
 
 #define VEH_MOT(id) "v"#id"_m1"
@@ -35,8 +35,7 @@ struct simgen_timestamp_t {
     uint8_t day;
     uint8_t hour;
     uint8_t minute;
-    uint8_t second;
-    uint32_t milli;
+    double second;
 };
 
 struct simgen_motion_data_t {
@@ -58,5 +57,6 @@ struct simgen_motion_data_t {
 
 int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
 int simgen_motion_data_sendto(struct simgen_eqmt_info_t *eqmt_info, void *data);
+int simgen_default_remote_data(struct simgen_motion_data_t *motion_info);
 
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_

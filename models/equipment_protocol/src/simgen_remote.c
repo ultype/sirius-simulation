@@ -10,12 +10,11 @@ static const char cmd_AR[] = "AR\n";
 static const char cmd_SET_TIOP[] = "SET_TIOP,0,2,GATED,1PPS\n";
 static const char cmd_EN[] = "-,EN,1\n";
 
-static int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
+int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
     motion_info->ts.day = 0; 
     motion_info->ts.hour = 0;
     motion_info->ts.minute = 0;
-    motion_info->ts.second = 0;
-    motion_info->ts.milli = 0;
+    motion_info->ts.second = 0.0;
     motion_info->cmd_idx = REMOTE_MOTION_CMD_MOT;
     motion_info->vehicle_id = 1;
     motion_info->position_xyz[0] =  4288466.6747904532;
@@ -50,17 +49,16 @@ static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     char veh_mot_str[32];
     strncpy(veh_mot_str, VEH_MOT(1), 32);
-    sprintf(cmdbuff, "%1d %2d:%2d:%2d.%3d,\
-        %s,%s,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f,\
-        %20.10f,%20.10f,%20.10f\n",
-        motion_info->ts.day, motion_info->ts.hour, motion_info->ts.minute, motion_info->ts.second, motion_info->ts.milli,
+    sprintf(cmdbuff, "%1d %02d:%02d:%07.3f,%s,%s,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f,\
+            %20.10f,%20.10f,%20.10f\n",
+        motion_info->ts.day, motion_info->ts.hour, motion_info->ts.minute, motion_info->ts.second,
         g_remote_motion_cmd_list[motion_info->cmd_idx], veh_mot_str,
         motion_info->position_xyz[0], motion_info->position_xyz[1], motion_info->position_xyz[2],
         motion_info->velocity_xyz[0], motion_info->velocity_xyz[1], motion_info->velocity_xyz[2],
@@ -78,8 +76,7 @@ static int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *ud
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     udp_cmd->type_ = UDP_CMD_MOT;
     udp_cmd->time_action_ = ACTION_AT_TIMESTAMP_ENUM;
-    udp_cmd->time_of_validity_ms_ = ((motion_info->ts.hour * 60 + motion_info->ts.minute) * 60) * 1000 +
-                                      motion_info->ts.second * 1000 + motion_info->ts.milli;
+    udp_cmd->time_of_validity_ms_ = ((motion_info->ts.hour * 60 + motion_info->ts.minute) * 60) * 1000 + motion_info->ts.second;
 
     udp_cmd->vehicle_id_ = motion_info->vehicle_id;
     udp_cmd->latency_wrt_tov_and_current_tir_ms_ = 0;
@@ -221,7 +218,7 @@ static int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, con
         return EXIT_FAILURE;
     }
     rx_buff[ret] = '\0';
-    printf("SimGen cmd resp: %s \n\n", rx_buff);
+    printf("SimGen cmd resp:\n %s \n\n", rx_buff);
     return 0;
 }
 
@@ -230,22 +227,19 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     uint32_t cmd_len;
 
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
-    
-    /* Create TCP Socket */
-    fprintf(stderr, "Connect to TCP Server....\n");
-    if (simgen_create_remote_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
-        fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
-        return EXIT_FAILURE;
-    }
     /* Create UDP socket */
     fprintf(stderr, "Connect to UDP Server....\n");
     if (simgen_create_udp_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
         fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
+    /* Create TCP Socket */
+    fprintf(stderr, "Connect to TCP Server....\n");
+    if (simgen_create_remote_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
+        fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
+        return EXIT_FAILURE;
+    }
     /* Send t0 mot by TCP*/
-    simgen_default_remote_data(motion_info);
     simgen_remote_motion_cmd_gen(motion_info, cmd_mot_t0);
     cmd_payload = (uint8_t *)cmd_mot_t0;
     cmd_len = strlen(cmd_mot_t0);
@@ -264,9 +258,8 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
-
     simgen_remote_wait_cmd_resp(eqmt_info, cmd_TR, cmd_resp);
-
+#if 0
     /* Send SET_TIOP commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_SET_TIOP;
     cmd_len = strlen(cmd_SET_TIOP);
@@ -275,7 +268,7 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         return EXIT_FAILURE;
     }
     simgen_remote_wait_cmd_resp(eqmt_info, cmd_SET_TIOP, cmd_resp);
-
+#endif
     /* Send AR commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_AR;
     cmd_len = strlen(cmd_AR);

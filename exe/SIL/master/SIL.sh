@@ -9,7 +9,7 @@ cd $S_DEFINE_PATH
 trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden_dm.cpp &
 
-cd ../slave
+cd $SIRIUS_HOME_PATH/exe/SIL/slave
 trick-CP
 ./S_main_Linux_5.4_x86_64.exe RUN_golden/golden_fc.cpp
 
