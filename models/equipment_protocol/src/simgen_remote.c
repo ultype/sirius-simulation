@@ -222,11 +222,7 @@ static int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, con
     return 0;
 }
 
-int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
-    uint8_t *cmd_payload;
-    uint32_t cmd_len;
-
-    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
+int simgen_equipment_channel_init(struct simgen_eqmt_info_t *eqmt_info) {
     /* Create UDP socket */
     fprintf(stderr, "Connect to UDP Server....\n");
     if (simgen_create_udp_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
@@ -239,6 +235,15 @@ int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
+    return EXIT_SUCCESS;
+}
+
+int simgen_equipment_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
+    uint8_t *cmd_payload;
+    uint32_t cmd_len;
+
+    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
+
     /* Send t0 mot by TCP*/
     simgen_remote_motion_cmd_gen(motion_info, cmd_mot_t0);
     cmd_payload = (uint8_t *)cmd_mot_t0;

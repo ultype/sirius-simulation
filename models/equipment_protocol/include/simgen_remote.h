@@ -11,10 +11,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
-//#define SIMGEN_IP "140.110.227.10"
-#define SIMGEN_IP "192.168.0.4"
+#define SIMGEN_IP "127.0.0.1"
+//#define SIMGEN_IP "192.168.0.4"
 #define SIMGEN_PORT 15650
-
 #define VEH_MOT(id) "v"#id"_m1"
 
 typedef enum _REMOTE_MOTION_CMD_ENUM {
@@ -55,8 +54,9 @@ struct simgen_motion_data_t {
 };
 
 
-int simgen_equipment_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
+int simgen_equipment_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
 int simgen_motion_data_sendto(struct simgen_eqmt_info_t *eqmt_info, void *data);
 int simgen_default_remote_data(struct simgen_motion_data_t *motion_info);
+int simgen_equipment_channel_init(struct simgen_eqmt_info_t *eqmt_info);
 
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_
