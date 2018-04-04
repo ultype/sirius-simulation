@@ -274,7 +274,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.05,0.001, "scheduled") egse_20HZ_tx_test(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
 
             P3 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
-	    P3 (0.001, "scheduled") mission_event_code_handler(&icf_ctrl);
+            P3 (0.001, "scheduled") mission_event_code_handler(&icf_ctrl);
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
             P3 (int_step, "scheduled") dynamics.propagate(int_step);
 
