@@ -9,7 +9,8 @@ static const struct icf_mapping g_icf_egse_maptbl[] = {
     {HW_PORT6, EGSE_GPSR01_SW_QIDX,           ICF_DRIVERS_ID1},
     {HW_PORT7, EGSE_GPSR02_SW_QIDX,           ICF_DRIVERS_ID1},
     {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2},
-    {HW_PORT0, EGSE_RX_MISSION_EVENT_QIDX  ,  ICF_DRIVERS_ID0}
+    {HW_PORT0, EGSE_RX_MISSION_EVENT_QIDX  ,  ICF_DRIVERS_ID0},
+    {HW_PORT9, EGSE_TX_GPSRF_EMU_QIDX      ,  ICF_DRIVERS_ID3}
 };
 
 
@@ -22,7 +23,8 @@ static struct icf_ctrl_port g_egse_port[] = {
     {0,        HW_PORT5, "/dev/ttyAP4", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
     {0,        HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
     {HIL_INTF, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
-    {1,        HW_PORT8, "egse_server", 8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {1,        HW_PORT8, "egse_server", 8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL},
+    {HIL_INTF, HW_PORT9, "127.0.0.1",   15650,            ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
@@ -35,7 +37,8 @@ static struct icf_ctrl_queue g_egse_queue[] = {
     {1, EGSE_GPSR01_SW_QIDX,           ICF_DIRECTION_TX, NULL, {}},
     {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, NULL, {}},
     {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, NULL, {}},
-    {1, EGSE_RX_MISSION_EVENT_QIDX,    ICF_DIRECTION_RX, NULL, {}}
+    {1, EGSE_RX_MISSION_EVENT_QIDX,    ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DIRECTION_TX, NULL, {}}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
