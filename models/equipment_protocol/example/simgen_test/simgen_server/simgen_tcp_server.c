@@ -76,7 +76,7 @@ int main(int argc, char const *argv[]) {
      * and response a message
      */
     length = sizeof(tcp_client_addr);
-    tcp_client_fd = accept(tcp_serv_fd, (struct sockaddr*)&(tcpaddr), (socklen_t *)&length);
+    tcp_client_fd = accept(tcp_serv_fd, (struct sockaddr*)&(tcp_client_addr), (socklen_t *)&length);
     if (tcp_client_fd < 0) {
         fprintf(stderr, "create_server: Accept Fail ... :%d\n", SERV_PORT);
         goto EXIT_SERVER;

@@ -47,7 +47,6 @@ static int ethernet_create_socket_server(struct ethernet_device_info_t *dev_info
     if ((dev_info->server_fd = socket(AF_INET , SOCK_STREAM , 0)) < 0) {
         errExit("Error while opening socket");
     }
-    dev_info->client_addr_len = sizeof(dev_info->client_addr);
     memset(&dev_info->server_addr, 0, sizeof(dev_info->server_addr));
     dev_info->server_addr.sin_family = AF_INET;
     dev_info->server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -83,6 +82,7 @@ int create_server(struct ethernet_device_info_t *dev_info, char *ifname, int net
         fprintf(stderr, "[%s:%d] Socket create fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
         goto error;
     }
+    dev_info->client_addr_len = sizeof(dev_info->client_addr);
     fprintf(stderr, "Wainting for the client ...\n");
     dev_info->client_fd = accept(dev_info->server_fd, (struct sockaddr*) &(dev_info->client_addr), &(dev_info->client_addr_len));
     if (dev_info->client_fd < 0) {
