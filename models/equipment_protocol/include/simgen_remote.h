@@ -1,6 +1,15 @@
 #ifndef MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_
 #define MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_
-
+/********************************* TRICK HEADER *******************************
+PURPOSE:
+      simgen remote
+LIBRARY DEPENDENCY:
+      (
+        (../src/simgen_remote.c)
+      )
+PROGRAMMERS:
+      (((Dung-Ru Tsai) () () () ))
+*******************************************************************************/
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,13 +31,6 @@ typedef enum _REMOTE_MOTION_CMD_ENUM {
     REMOTE_MOTION_CMD_AIDING_OFFSET,
     REMOTE_MOTION_CMD_MAX_NUM
 } REMOTE_MOTION_CMD_ENUM;
-
-struct simgen_eqmt_info_t {
-    int remote_cmd_channel_fd;
-    int udp_cmd_channel_fd;
-    struct sockaddr_in remote_cmd_addr;
-    struct sockaddr_in udp_cmd_addr;
-};
 
 struct simgen_timestamp_t {
     uint8_t day;
@@ -53,10 +55,21 @@ struct simgen_motion_data_t {
     double angular_jerk[3];         // uint: rad/s^3
 };
 
+struct simgen_eqmt_info_t {
+    int remote_cmd_channel_fd;
+    int udp_cmd_channel_fd;
+    struct sockaddr_in remote_cmd_addr;
+    struct sockaddr_in udp_cmd_addr;
+    struct simgen_motion_data_t motion_data;
+};
 
-int simgen_equipment_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
-int simgen_motion_data_sendto(struct simgen_eqmt_info_t *eqmt_info, void *data);
+#ifdef __cplusplus
+extern "C" {
+#endif
+int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
+int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd);
 int simgen_default_remote_data(struct simgen_motion_data_t *motion_info);
-int simgen_equipment_channel_init(struct simgen_eqmt_info_t *eqmt_info);
-
+#ifdef __cplusplus
+}
+#endif
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_REMOTE_H_

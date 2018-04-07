@@ -53,6 +53,7 @@ LIBRARY DEPENDENCIES:
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"
 ##include "ExternalSourceClock.hh"
+##include "simgen_remote.h"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -67,6 +68,7 @@ class Rocket_SimObject : public Trick::SimObject {
         SDT *sdt;
         TVC tvc;
         ExternalSourceClock ext_clk;
+        struct simgen_eqmt_info_t simgen_dev;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -218,6 +220,14 @@ class Rocket_SimObject : public Trick::SimObject {
             ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
             fprintf(stderr, "Go !!\n");
         };
+
+        void send_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
+            struct simgen_udp_command_t udp_cmd;
+            uint32_t send_size = sizeof(struct simgen_udp_command_t);
+            simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
+            icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
+        };
+
         void egse_200HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
             uint32_t value= 0xFFFFFFFF;
             FTRACE_TIME_STAMP(510);
@@ -255,6 +265,8 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            ("initialization") simgen_default_remote_data(&simgen_dev.motion_data);
+            ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
             ("initialization") wait_for_1st_pps();
             P1 (int_step, "scheduled") time->dm_time();
             P1 (int_step, "scheduled") env.propagate(int_step);
@@ -268,6 +280,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
+            P2 (1,     "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
 
             P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P2 (0.001,0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);

@@ -1,4 +1,5 @@
 #include "icf_trx_ctrl.h"
+#include "simgen_remote.h"
 static const struct icf_mapping g_icf_egse_maptbl[] = {
     {HW_PORT0, EGSE_TVC_SW_QIDX,              ICF_DRIVERS_ID0},
     {HW_PORT1, EGSE_IMU01_SW_QIDX,            ICF_DRIVERS_ID1},
@@ -24,7 +25,7 @@ static struct icf_ctrl_port g_egse_port[] = {
     {0,        HW_PORT6, "/dev/ttyAP5", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
     {HIL_INTF, HW_PORT7, "/dev/ttyAP6", EMPTY_NETPORT,    RS422_DEVICE_TYPE,     NULL, NULL},
     {1,        HW_PORT8, "egse_server", 8700,             ETHERNET_DEVICE_TYPE,  NULL, NULL},
-    {HIL_INTF, HW_PORT9, "127.0.0.1",   15650,            ETHERNET_DEVICE_TYPE,  NULL, NULL}
+    {HIL_INTF, HW_PORT9, SIMGEN_IP,     SIMGEN_PORT,      ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
 
 static struct icf_ctrl_queue g_egse_queue[] = {
