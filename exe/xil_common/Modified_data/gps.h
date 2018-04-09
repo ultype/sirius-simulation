@@ -58,8 +58,8 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.env._TEI[2][0]");
     // drg->add_variable("rkt.env._TEI[2][1]");
     // drg->add_variable("rkt.env._TEI[2][2]");
-    // drg->add_variable("rkt.dynamics.lonx");
-    // drg->add_variable("rkt.dynamics.latx");
+    drg->add_variable("rkt.dynamics.lonx");
+    drg->add_variable("rkt.dynamics.latx");
     drg->add_variable("rkt.accelerometer->_FSPCB[0]");
     drg->add_variable("rkt.accelerometer->_FSPCB[1]");
     drg->add_variable("rkt.accelerometer->_FSPCB[2]");
@@ -93,9 +93,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.propulsion.thrust");
     drg->add_variable("rkt.propulsion.vmass");
     drg->add_variable("rkt.dynamics.alt");
-    // drg->add_variable("rkt.dynamics.psibdx");
+    drg->add_variable("rkt.dynamics.psibdx");
     drg->add_variable("rkt.dynamics.thtbdx");
-    // drg->add_variable("rkt.dynamics.phibdx");
+    drg->add_variable("rkt.dynamics.phibdx");
     // drg->add_variable("rkt.dynamics.alphax");
     // drg->add_variable("rkt.env.vmach");
     // drg->add_variable("rkt.kinematics.alppx");
@@ -197,8 +197,8 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.forces._f_slosh[5]");
     // drg->add_variable("rkt.forces._f_slosh[6]");
     // drg->add_variable("rkt.forces._f_slosh[7]");
-    // drg->add_variable("rkt.dynamics.ang_slosh_theta");
-    // drg->add_variable("rkt.dynamics.ang_slosh_psi");
+    drg->add_variable("rkt.dynamics.ang_slosh_theta");
+    drg->add_variable("rkt.dynamics.ang_slosh_psi");
     // drg->add_variable("rkt.forces.h");
     drg->add_variable("rkt.gyro->_WBICB[0]");
     drg->add_variable("rkt.gyro->_WBICB[1]");

@@ -76,9 +76,9 @@ extern "C" void record_gps_slave() {
     //  drg->add_variable("fc.control._CMDG[0]");
     //  drg->add_variable("fc.control._CMDG[1]");
     //  drg->add_variable("fc.control._CMDG[2]");
-    //  drg->add_variable("fc.control._euler[0]");
-    //  drg->add_variable("fc.control._euler[1]");
-    //  drg->add_variable("fc.control._euler[2]");
+     drg->add_variable("fc.control._euler[0]");
+     drg->add_variable("fc.control._euler[1]");
+     drg->add_variable("fc.control._euler[2]");
     //  drg->add_variable("fc.control._delta_euler[0]");
     //  drg->add_variable("fc.control._delta_euler[1]");
     //  drg->add_variable("fc.control._delta_euler[2]");
