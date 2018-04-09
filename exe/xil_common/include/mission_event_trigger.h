@@ -171,7 +171,7 @@ extern "C" int event_s3_seperation(void) {
     fc.control.set_aoacmd(S3_aoacmd);
     fc.control.set_ierror_zero();
     fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_S3_SEPERATION;
-    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_FAIRING_JETTSION", fc.ctl_tvc_db.mission_event_code);
+    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_CODE_S3_SEPERATION", fc.ctl_tvc_db.mission_event_code);
     return 0;
 }
 

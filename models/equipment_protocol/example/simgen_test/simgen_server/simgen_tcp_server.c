@@ -34,7 +34,6 @@ int tcp_data_recv(int client_fd, uint8_t *rx_buff, uint32_t buff_size) {
 int main(int argc, char const *argv[]) {
     int tcp_serv_fd;   /* file description into transport */
     int tcp_client_fd;   /* file description into transport */
-    int nbytes;
     int length; /* length of address structure      */
     char buf[MAXNAME];
     int optval = 1; /* prevent from address being taken */

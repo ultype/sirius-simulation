@@ -221,11 +221,40 @@ class Rocket_SimObject : public Trick::SimObject {
             fprintf(stderr, "Go !!\n");
         };
 
+        void load_data_from_dm_to_simgen(struct simgen_motion_data_t *motion_info) {
+            motion_info->position_xyz[0] = dynamics.get_double_SBEE()[0];
+            motion_info->position_xyz[1] =  dynamics.get_double_SBEE()[1];
+            motion_info->position_xyz[2] = dynamics.get_double_SBEE()[2];
+            motion_info->velocity_xyz[0] = dynamics.get_double_VBEE()[0];
+            motion_info->velocity_xyz[1] = dynamics.get_double_VBEE()[1];
+            motion_info->velocity_xyz[2] = dynamics.get_double_VBEE()[2];
+            motion_info->acceleration_xyz[0] = dynamics.get_double_ABEE()[0];
+            motion_info->acceleration_xyz[1] = dynamics.get_double_ABEE()[1];
+            motion_info->acceleration_xyz[2] = dynamics.get_double_ABEE()[2];
+            motion_info->jerk_xyz[0] = dynamics.get_double_JBEE()[0];
+            motion_info->jerk_xyz[1] = dynamics.get_double_JBEE()[1];
+            motion_info->jerk_xyz[2] = dynamics.get_double_JBEE()[2];
+            motion_info->heb[0] = dynamics.get_double_psibd();
+            motion_info->heb[1] = dynamics.get_double_thtbd();
+            motion_info->heb[2] = dynamics.get_double_phibd();
+            motion_info->angular_velocity[0] = dynamics.get_double_WBEB()[0];
+            motion_info->angular_velocity[1] = dynamics.get_double_WBEB()[1];
+            motion_info->angular_velocity[2] = dynamics.get_double_WBEB()[2];
+        };
+
+        void set_default_simgen_motdata(struct simgen_motion_data_t *motion_info) {
+            simgen_default_remote_data(motion_info);
+            load_data_from_dm_to_simgen(motion_info);
+        };
+
         void send_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
             struct simgen_udp_command_t udp_cmd;
             uint32_t send_size = sizeof(struct simgen_udp_command_t);
-            simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
-            icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
+            simgen_dev->motion_data.sim_time.second = exec_get_sim_time();
+            load_data_from_dm_to_simgen(&simgen_dev->motion_data);
+            simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
+            //  simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
+            //  icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
         };
 
         void egse_200HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
@@ -265,7 +294,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
-            ("initialization") simgen_default_remote_data(&simgen_dev.motion_data);
+            ("initialization") set_default_simgen_motdata(&simgen_dev.motion_data);
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
             ("initialization") wait_for_1st_pps();
             P1 (int_step, "scheduled") time->dm_time();
@@ -280,7 +309,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P2 (1,     "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
+            P2 (0.050, "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
 
             P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P2 (0.001,0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);

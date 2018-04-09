@@ -40,7 +40,10 @@ struct simgen_timestamp_t {
 };
 
 struct simgen_motion_data_t {
-    struct simgen_timestamp_t ts;
+    union {
+        struct simgen_timestamp_t ts;
+        double second;
+    } sim_time;
     uint8_t cmd_idx;
     uint8_t vehicle_id;
     double position_xyz[3];         // uint: metres
@@ -69,6 +72,7 @@ extern "C" {
 int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
 int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd);
 int simgen_default_remote_data(struct simgen_motion_data_t *motion_info);
+int simgen_remote_tn_motion_send(struct simgen_eqmt_info_t *eqmt_info, void *data);
 #ifdef __cplusplus
 }
 #endif

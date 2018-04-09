@@ -13,7 +13,8 @@ static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
     char veh_mot_str[32];
     int offset;
     strncpy(veh_mot_str, VEH_MOT(1), 32);
-    sprintf(cmdbuff, "%1d %02d:%02d:%07.3f,", motion_info->ts.day, motion_info->ts.hour, motion_info->ts.minute, motion_info->ts.second);
+    //  sprintf(cmdbuff, "%1d %02d:%02d:%07.3f,", motion_info->sim_time.ts.day, motion_info->sim_time.ts.hour, motion_info->sim_time.ts.minute, motion_info->sim_time.ts.second);
+    sprintf(cmdbuff, "%07.3f,", motion_info->sim_time.second);
     offset = strlen(cmdbuff);
 
     sprintf(cmdbuff + offset, "%s,%s,", g_remote_motion_cmd_list[motion_info->cmd_idx], veh_mot_str);
@@ -110,15 +111,17 @@ static int remote_cmd_send(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payloa
     return offset;
 }
 
-static int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, const char *tx_cmd, char *rx_buff) {
+static int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, const char *tx_cmd, char *rx_buff, uint8_t show) {
     int ret;
-    printf("SimGen cmd send: %s", tx_cmd);
+    if (show)
+        printf("SimGen tcp cmd send: %s", tx_cmd);
     if ((ret = recv(eqmt_info->remote_cmd_channel_fd, (uint8_t *)rx_buff, 512, 0)) < 0) {
         fprintf(stderr, "[%s:%d] Error cmd response !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
     rx_buff[ret] = '\0';
-    printf("SimGen cmd resp:\n %s \n\n", rx_buff);
+    if (show)
+        printf("SimGen tcp cmd resp:\n %s \n\n", rx_buff);
     return 0;
 }
 
@@ -145,7 +148,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         goto CMD_INIT_FAIL;
     }
-    simgen_remote_wait_cmd_resp(eqmt_info, cmd_mot_t0, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_mot_t0, cmd_resp, 1);
     if (cmd_mot_t0 != NULL) {
         free(cmd_mot_t0);
         cmd_mot_t0 = NULL;
@@ -159,7 +162,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         goto CMD_INIT_FAIL;
     }
-    simgen_remote_wait_cmd_resp(eqmt_info, cmd_TR, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_TR, cmd_resp, 1);
 #if 0
     /* Send SET_TIOP commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_SET_TIOP;
@@ -168,7 +171,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         goto CMD_INIT_FAIL;
     }
-    simgen_remote_wait_cmd_resp(eqmt_info, cmd_SET_TIOP, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_SET_TIOP, cmd_resp, 1);
 #endif
     /* Send AR commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_AR;
@@ -177,7 +180,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         goto CMD_INIT_FAIL;
     }
-    simgen_remote_wait_cmd_resp(eqmt_info, cmd_AR, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_AR, cmd_resp, 1);
 
     /* Send RU commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_RU;
@@ -186,7 +189,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
         goto CMD_INIT_FAIL;
     }
-    simgen_remote_wait_cmd_resp(eqmt_info, cmd_RU, cmd_resp);
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_RU, cmd_resp, 1);
     return EXIT_SUCCESS;
 CMD_INIT_FAIL:
     if (cmd_mot_t0 != NULL) {
@@ -196,12 +199,42 @@ CMD_INIT_FAIL:
     return EXIT_FAILURE;
 }
 
+int simgen_remote_tn_motion_send(struct simgen_eqmt_info_t *eqmt_info, void *data) {
+    uint8_t *cmd_payload = NULL;
+    char *cmd_mot_tn = NULL;
+    uint32_t cmd_len;
+
+    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
+    /* Send tn mot by TCP*/
+    cmd_mot_tn = (char *)malloc(1024);
+    if (cmd_mot_tn == NULL)
+        goto CMD_Tn_FAIL;
+    simgen_remote_motion_cmd_gen(motion_info, cmd_mot_tn);
+    cmd_payload = (uint8_t *)cmd_mot_tn;
+    cmd_len = strlen(cmd_mot_tn);
+    if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
+        fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
+        goto CMD_Tn_FAIL;
+    }
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_mot_tn, cmd_resp, 0);
+    if (cmd_mot_tn != NULL) {
+        free(cmd_mot_tn);
+        cmd_mot_tn = NULL;
+    }
+CMD_Tn_FAIL:
+    if (cmd_mot_tn != NULL) {
+        free(cmd_mot_tn);
+        cmd_mot_tn = NULL;
+    }
+    return EXIT_FAILURE;
+}
+
 int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) {
 
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     udp_cmd->type_ = UDP_CMD_MOT;
     udp_cmd->time_action_ = ACTION_AT_TIMESTAMP_ENUM;
-    udp_cmd->time_of_validity_ms_ = ((motion_info->ts.hour * 60 + motion_info->ts.minute) * 60) * 1000 + motion_info->ts.second;
+    udp_cmd->time_of_validity_ms_ = (uint32_t) (motion_info->sim_time.second * 1000);
 
     udp_cmd->vehicle_id_ = motion_info->vehicle_id;
     udp_cmd->latency_wrt_tov_and_current_tir_ms_ = 0;
@@ -214,41 +247,42 @@ int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) 
     memcpy(&udp_cmd->data.mot_.angular_velocity_radps_xyz_, &motion_info->angular_velocity, sizeof(motion_info->angular_velocity));
     memcpy(&udp_cmd->data.mot_.angular_acceleration_radps_xyz_, &motion_info->angular_acceleration, sizeof(motion_info->angular_acceleration));
     memcpy(&udp_cmd->data.mot_.angular_jerk_radsps_xyz_, &motion_info->angular_jerk, sizeof(motion_info->angular_jerk));
-
+    //  fprintf(stderr, "[%s:%d] time_of_validity_ms_: %d ms\n", __FUNCTION__, __LINE__, udp_cmd->time_of_validity_ms_);
     return 0;
 }
 
 int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
-    motion_info->ts.day = 0;
-    motion_info->ts.hour = 0;
-    motion_info->ts.minute = 0;
-    motion_info->ts.second = 0.0;
+    // motion_info->sim_time.ts.day = 0;
+    // motion_info->sim_time.ts.hour = 0;
+    // motion_info->sim_time.ts.minute = 0;
+    // motion_info->sim_time.ts.second = 0.0;
+    motion_info->sim_time.second = 0.0;
     motion_info->cmd_idx = REMOTE_MOTION_CMD_MOT;
     motion_info->vehicle_id = 1;
-    motion_info->position_xyz[0] =  4288466.6747904532;
-    motion_info->position_xyz[1] = -2873655.5571095324;
-    motion_info->position_xyz[2] = -4871760.5248780008;
-    motion_info->velocity_xyz[0] = 3148.5166339857;
-    motion_info->velocity_xyz[1] = -4356.3915379860;
-    motion_info->velocity_xyz[2] = 5341.2059223289;
-    motion_info->acceleration_xyz[0] = -5.3838731211;
-    motion_info->acceleration_xyz[1] = 2.7228053242;
-    motion_info->acceleration_xyz[2] = 5.4345273734;
+    motion_info->position_xyz[0] =  0.0;
+    motion_info->position_xyz[1] =  0.0;
+    motion_info->position_xyz[2] = 0.0;
+    motion_info->velocity_xyz[0] = 0.0;
+    motion_info->velocity_xyz[1] = 0.0;
+    motion_info->velocity_xyz[2] = 0.0;
+    motion_info->acceleration_xyz[0] = 0.0;
+    motion_info->acceleration_xyz[1] = 0.0;
+    motion_info->acceleration_xyz[2] = 0.0;
     motion_info->jerk_xyz[0] = 0.0;
     motion_info->jerk_xyz[1] = 0.0;
     motion_info->jerk_xyz[2] = 0.0;
-    motion_info->heb[0] = 2.9412651848;
-    motion_info->heb[1] = 0.0027315089;
-    motion_info->heb[2] = 3.1411685628;
-    motion_info->angular_velocity[0] = 0.0043633231;
-    motion_info->angular_velocity[1] = 0.0043637185;
-    motion_info->angular_velocity[2] = 0.0043629277;
-    motion_info->angular_acceleration[0] = 0;
-    motion_info->angular_acceleration[1] = 0;
-    motion_info->angular_acceleration[2] = 0;
-    motion_info->angular_jerk[0] = 0;
-    motion_info->angular_jerk[1] = 0;
-    motion_info->angular_jerk[2] = 0;
+    motion_info->heb[0] = 0.0;
+    motion_info->heb[1] = 0.0;
+    motion_info->heb[2] = 0.0;
+    motion_info->angular_velocity[0] = 0.0;
+    motion_info->angular_velocity[1] = 0.0;
+    motion_info->angular_velocity[2] = 0.0;
+    motion_info->angular_acceleration[0] = 0.0;
+    motion_info->angular_acceleration[1] = 0.0;
+    motion_info->angular_acceleration[2] = 0.0;
+    motion_info->angular_jerk[0] = 0.0;
+    motion_info->angular_jerk[1] = 0.0;
+    motion_info->angular_jerk[2] = 0.0;
     return 0;
 
 }
