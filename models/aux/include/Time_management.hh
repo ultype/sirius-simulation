@@ -20,6 +20,12 @@ class time_management {
     TRICK_INTERFACE(time_management);
 
  public:
+    uint32_t tm_gps_start_time_year;
+    uint32_t tm_gps_start_time_month;
+    uint32_t tm_gps_start_time_day;
+    uint32_t tm_gps_start_time_hour;
+    uint32_t tm_gps_start_time_minute;
+    double tm_gps_start_time_second;
     static time_management* get_instance() {
         static time_management time;
 

@@ -7,6 +7,10 @@ static const char cmd_TR[] = "TR, 0\n";
 static const char cmd_AR[] = "AR\n";
 static const char cmd_SET_TIOP[] = "SET_TIOP,0,2,GATED,1PPS\n";
 static const char cmd_EN[] = "-,EN,1\n";
+static const char cmd_START_TIME[] = "START_TIME,22-MAR-2017 02:00:18, 01:00:00\n";
+
+static const char *MONTH_TBL[13] = {"", "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                                    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
 static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
@@ -42,6 +46,36 @@ static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
     offset = strlen(cmdbuff);
 
     sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f\n", motion_info->angular_jerk[0], motion_info->angular_jerk[1], motion_info->angular_jerk[2]);
+    return 0;
+}
+
+static int simgen_remote_gps_start_time_cmd_gen(void *data, char *cmdbuff) {
+    struct simgen_gps_start_time_t *start_time = (struct simgen_gps_start_time_t *)data;
+    int offset;
+
+    sprintf(cmdbuff, "START_TIME,");
+    offset = strlen(cmdbuff);
+
+    sprintf(cmdbuff, "%02d-", start_time->day);
+    offset = strlen(cmdbuff);
+
+    sprintf(cmdbuff, "%s-", MONTH_TBL[start_time->month]);
+    offset = strlen(cmdbuff);
+
+    sprintf(cmdbuff, "%d ", start_time->year);
+    offset = strlen(cmdbuff);
+
+    sprintf(cmdbuff, "%02d:", start_time->hour);
+    offset = strlen(cmdbuff);
+
+    sprintf(cmdbuff, "%02d:", start_time->minute);
+    offset = strlen(cmdbuff);
+
+    sprintf(cmdbuff, "%02d,", start_time->second);
+    offset = strlen(cmdbuff);
+    /* Duration */
+    sprintf(cmdbuff, "01:00:00");
+
     return 0;
 }
 
@@ -128,6 +162,7 @@ static int simgen_remote_wait_cmd_resp(struct simgen_eqmt_info_t *eqmt_info, con
 int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     uint8_t *cmd_payload = NULL;
     char *cmd_mot_t0 = NULL;
+    char *cmd_start_time = NULL;
     uint32_t cmd_len;
 
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
@@ -137,6 +172,24 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         fprintf(stderr, "[%s:%d] Fail !!\n", __FUNCTION__, __LINE__);
         return EXIT_FAILURE;
     }
+
+    /*Send START_TIME command by TCP */
+    cmd_start_time = (char *)malloc(64);
+    if (cmd_start_time == NULL)
+        goto CMD_INIT_FAIL;
+    simgen_remote_gps_start_time_cmd_gen(&eqmt_info->gps_start_time, cmd_start_time);
+    cmd_payload = (uint8_t *)cmd_start_time;
+    cmd_len = strlen(cmd_start_time);
+    if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
+        fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
+        goto CMD_INIT_FAIL;
+    }
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_start_time, cmd_resp, 1);
+    if (cmd_start_time != NULL) {
+        free(cmd_start_time);
+        cmd_start_time = NULL;
+    }
+
     /* Send t0 mot by TCP*/
     cmd_mot_t0 = (char *)malloc(1024);
     if (cmd_mot_t0 == NULL)
@@ -196,6 +249,10 @@ CMD_INIT_FAIL:
         free(cmd_mot_t0);
         cmd_mot_t0 = NULL;
     }
+    if (cmd_start_time != NULL) {
+        free(cmd_start_time);
+        cmd_start_time = NULL;
+    }
     return EXIT_FAILURE;
 }
 
@@ -227,6 +284,18 @@ CMD_Tn_FAIL:
         cmd_mot_tn = NULL;
     }
     return EXIT_FAILURE;
+}
+
+void simgen_remote_end_scenario_now(struct simgen_eqmt_info_t *eqmt_info) {
+    uint8_t *cmd_payload = NULL;
+    uint32_t cmd_len;
+    /* Send EN commnad by TCP*/
+    cmd_payload = (uint8_t *)cmd_EN;
+    cmd_len = strlen(cmd_EN);
+    if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
+        fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
+    }
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_EN, cmd_resp, 1);
 }
 
 int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) {

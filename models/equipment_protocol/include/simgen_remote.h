@@ -39,6 +39,17 @@ struct simgen_timestamp_t {
     double second;
 };
 
+struct simgen_gps_start_time_t {
+    /* Date */
+    uint32_t year;
+    uint8_t month;
+    uint8_t day;
+    /* time */
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+};
+
 struct simgen_motion_data_t {
     union {
         struct simgen_timestamp_t ts;
@@ -64,6 +75,7 @@ struct simgen_eqmt_info_t {
     struct sockaddr_in remote_cmd_addr;
     struct sockaddr_in udp_cmd_addr;
     struct simgen_motion_data_t motion_data;
+    struct simgen_gps_start_time_t gps_start_time;
 };
 
 #ifdef __cplusplus
@@ -73,6 +85,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data);
 int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd);
 int simgen_default_remote_data(struct simgen_motion_data_t *motion_info);
 int simgen_remote_tn_motion_send(struct simgen_eqmt_info_t *eqmt_info, void *data);
+void simgen_remote_end_scenario_now(struct simgen_eqmt_info_t *eqmt_info);
 #ifdef __cplusplus
 }
 #endif

@@ -242,9 +242,19 @@ class Rocket_SimObject : public Trick::SimObject {
             motion_info->angular_velocity[2] = dynamics.get_double_WBEB()[2];
         };
 
-        void set_default_simgen_motdata(struct simgen_motion_data_t *motion_info) {
-            simgen_default_remote_data(motion_info);
-            load_data_from_dm_to_simgen(motion_info);
+        void load_data_from_time_to_simgen(struct simgen_gps_start_time_t *start_time) {
+            start_time->year = time->tm_gps_start_time_year;
+            start_time->month = time->tm_gps_start_time_month;
+            start_time->day = time->tm_gps_start_time_day;
+            start_time->hour = time->tm_gps_start_time_hour;
+            start_time->minute = time->tm_gps_start_time_minute;
+            start_time->second = (uint8_t) time->tm_gps_start_time_second;
+        };
+
+        void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
+            simgen_default_remote_data(&simgen_dev->motion_data);
+            load_data_from_dm_to_simgen(&simgen_dev->motion_data);
+            load_data_from_time_to_simgen(&simgen_dev->gps_start_time);
         };
 
         void send_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
@@ -294,7 +304,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
-            ("initialization") set_default_simgen_motdata(&simgen_dev.motion_data);
+            ("initialization") set_default_simgen_motdata(&simgen_dev);
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
             ("initialization") wait_for_1st_pps();
             P1 (int_step, "scheduled") time->dm_time();
@@ -323,6 +333,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.001, "logging") env.update_diagnostic_attributes(0.001);
             (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
             (5, "scheduled") icf_heartbeat();
+            ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
 
         }
