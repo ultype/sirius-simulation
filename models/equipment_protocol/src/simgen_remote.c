@@ -51,30 +51,30 @@ static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
 
 static int simgen_remote_gps_start_time_cmd_gen(void *data, char *cmdbuff) {
     struct simgen_gps_start_time_t *start_time = (struct simgen_gps_start_time_t *)data;
-    int offset;
+    int offset = 0;
 
     sprintf(cmdbuff, "START_TIME,");
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff, "%02d-", start_time->day);
+    sprintf(cmdbuff + offset, "%02d-", start_time->day);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff, "%s-", MONTH_TBL[start_time->month]);
+    sprintf(cmdbuff + offset, "%s-", MONTH_TBL[start_time->month]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff, "%d ", start_time->year);
+    sprintf(cmdbuff + offset, "%d ", start_time->year);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff, "%02d:", start_time->hour);
+    sprintf(cmdbuff + offset, "%02d:", start_time->hour);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff, "%02d:", start_time->minute);
+    sprintf(cmdbuff + offset, "%02d:", start_time->minute);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff, "%02d,", start_time->second);
+    sprintf(cmdbuff + offset, "%02d,", start_time->second);
     offset = strlen(cmdbuff);
     /* Duration */
-    sprintf(cmdbuff, "01:00:00");
+    sprintf(cmdbuff + offset, "01:00:00\n");
 
     return 0;
 }
