@@ -21,7 +21,7 @@ PROGRAMMERS:
 #include <unistd.h>
 #include <errno.h>
 #define SIMGEN_IP "127.0.0.1"
-//#define SIMGEN_IP "192.168.0.4"
+//#define SIMGEN_IP "192.168.0.8"
 #define SIMGEN_PORT 15650
 #define VEH_MOT(id) "v"#id"_m1"
 
