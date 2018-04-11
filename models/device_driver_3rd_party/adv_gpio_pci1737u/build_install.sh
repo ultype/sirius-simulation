@@ -5,6 +5,8 @@
 SCRIPT_PATH=$PWD
 DRVER_SOURCE=linux_driver_source_3.2.11.0_64bit
 PRODUCT=pci1737_pci1739
+#PRODUCT=pci1730_pcm3730i
+#HARDWARE_CARDS=bio1730
 HARDWARE_CARDS=bio1737
 BLACKLIST=$(grep "blacklist adv_pci_dio" /etc/modprobe.d/blacklist.conf)
 AUTOLOAD_DRIVERLIST=$(grep "biokernbase" /etc/modules)

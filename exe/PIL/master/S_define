@@ -190,8 +190,8 @@ class Rocket_SimObject : public Trick::SimObject {
             gyro->grab_FSPB            = LINK( dynamics, get_FSPB);
 
             propulsion.grab_press      = LINK( env, get_press);
-
-
+            propulsion.grab_SLOSH_CG   = LINK( forces, get_SLOSH_CG);
+            propulsion.grab_slosh_mass = LINK( forces, get_slosh_mass);
         };
 
         void egse_uplink_packet_enqueue(struct icf_ctrlblk_t *C) {

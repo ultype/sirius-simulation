@@ -110,9 +110,10 @@ int daq_ioctl_do_read_port(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_diint_set_param(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_start_snap(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_stop_snap(daq_device_t *daq_dev, unsigned long arg);
-
+#if (TISPACE_CUSTOMIZED == 1)
 int daq_ioctl_di_wait_gpio_int(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg);
+#endif /* TISPACE_CUSTOMIZED */
 //
 // isr.c
 //

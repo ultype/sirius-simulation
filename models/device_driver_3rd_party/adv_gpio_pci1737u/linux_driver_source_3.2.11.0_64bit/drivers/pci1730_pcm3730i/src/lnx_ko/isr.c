@@ -35,7 +35,9 @@ void daq_dio_tasklet_func(unsigned long arg)
           // signal the event if needed.
           if (!shared->IsEvtSignaled[src_idx + KdxDiBegin]) {
              shared->IsEvtSignaled[src_idx + KdxDiBegin] = 1;
-             daq_device_signal_event(daq_dev, src_idx + KdxDiBegin);
+#if (TISPACE_CUSTOMIZED == 0)
+         daq_device_signal_event(daq_dev, KdxDiintChan16);
+#endif  /* TISPACE_CUSTOMIZED */
           }
       }
    }
@@ -54,7 +56,26 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
    spin_lock(&daq_dev->dev_lock);
    shared->DiIntState |= int_state;
    spin_unlock(&daq_dev->dev_lock);
+#if (TISPACE_CUSTOMIZED == 1)
+    ktime_t isr_curr_tics = ktime_get();
+    daq_dev->pps_cnt++;
+    if (daq_dev->pps_cnt == 1) {
+        daq_dev->prev_pps_tics = isr_curr_tics;
+        daq_dev->curr_pps_tics = isr_curr_tics;
+        daq_dev->curr_ideal_tics = isr_curr_tics;
+    } else {
+        daq_dev->prev_pps_tics = daq_dev->curr_pps_tics;
+        daq_dev->curr_pps_tics = isr_curr_tics;
+        daq_dev->curr_ideal_tics += 1000000000LL;
+    }
+    //  printk("<0>""isr %d pps curr  %lld\n",daq_dev->pps_cnt ,daq_dev->curr_pps_tics.tv64);
 
+    if (wait_task != NULL) {
+        //  printk("<0>""[%d:%s] wake up process !!\n", __LINE__, __FUNCTION__);
+        local_irq_disable();
+        wake_up_process(wait_task);
+    }
+#endif /* TISPACE_CUSTOMIZED */
    tasklet_schedule(&daq_dev->dio_tasklet);
 
    // Clear interrupt

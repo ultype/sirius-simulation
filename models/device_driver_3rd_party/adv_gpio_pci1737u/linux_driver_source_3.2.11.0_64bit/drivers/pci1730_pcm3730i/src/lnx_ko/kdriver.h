@@ -30,7 +30,10 @@
 #include <plx905x.h>
 #include <i82c54.h>
 #include "kshared.h"
-
+#define TISPACE_CUSTOMIZED 1
+#if (TISPACE_CUSTOMIZED == 1)
+extern struct task_struct *wait_task;
+#endif /* TISPACE_CUSTOMIZED */
 typedef struct daq_file_ctx{
    struct list_head   ctx_list;
    struct daq_device  *daq_dev;
@@ -50,6 +53,13 @@ typedef struct daq_device
    struct list_head      file_ctx_list;
    daq_file_ctx_t        *file_ctx_pool;
    int                   file_ctx_pool_size;
+#if (TISPACE_CUSTOMIZED == 1)
+    int pps_cnt;
+    atomic_t is_wallclock_arrive;
+    ktime_t curr_pps_tics;
+    ktime_t prev_pps_tics;
+    ktime_t curr_ideal_tics;
+#endif /* TISPACE_CUSTOMIZED */
 }daq_device_t;
 
 /************************************************************************/
@@ -81,6 +91,10 @@ int daq_ioctl_diint_set_param(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_start_snap(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_di_stop_snap(daq_device_t *daq_dev, unsigned long arg);
 int daq_ioctl_do_write_bit(daq_device_t *daq_dev, unsigned long arg);
+#if (TISPACE_CUSTOMIZED == 1)
+int daq_ioctl_di_wait_gpio_int(daq_device_t *daq_dev, unsigned long arg);
+int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg);
+#endif /* TISPACE_CUSTOMIZED */
 //
 // isr.c
 //

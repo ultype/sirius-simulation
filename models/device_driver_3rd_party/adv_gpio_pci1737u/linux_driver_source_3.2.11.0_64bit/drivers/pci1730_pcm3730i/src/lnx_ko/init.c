@@ -112,7 +112,9 @@ int __devinit daq_device_probe(struct pci_dev *dev, const struct pci_device_id *
    } else {
       daq_dev->file_ctx_pool = NULL;
    }
-
+#if (TISPACE_CUSTOMIZED == 1)
+     atomic_set(&daq_dev->is_wallclock_arrive, 0);
+#endif /* TISPACE_CUSTOMIZED */
    // get device information
    shared->BoardId = AdxIoInB(shared->IoBase, DR_BID) & 0xf;
 

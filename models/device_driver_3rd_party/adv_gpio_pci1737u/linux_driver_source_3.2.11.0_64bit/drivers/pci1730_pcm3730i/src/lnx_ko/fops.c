@@ -369,6 +369,14 @@ long daq_file_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
    case IOCTL_DIO_WRITE_DO_BIT:
       ret = daq_ioctl_do_write_bit(daq_dev, arg);
       break;
+#if (TISPACE_CUSTOMIZED == 1)
+   case IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT:
+        ret = daq_ioctl_di_wait_gpio_int(daq_dev, arg);
+      break;
+    case IOCTL_DIO_TISPACE_CUSTOMIZED_GET_WALLCLOCK_TIME_NS:
+        ret = daq_ioctl_di_get_wallclock_time(daq_dev, arg);
+        break;
+#endif /* TISPACE_CUSTOMIZED */
    default:
       ret = -ENOTTY;
       break;

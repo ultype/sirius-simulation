@@ -192,6 +192,8 @@ class Rocket_SimObject : public Trick::SimObject {
             gyro->grab_FSPB            = LINK( dynamics, get_FSPB);
 
             propulsion.grab_press      = LINK( env, get_press);
+            propulsion.grab_SLOSH_CG   = LINK( forces, get_SLOSH_CG);
+            propulsion.grab_slosh_mass = LINK( forces, get_slosh_mass);
 
 
         };
@@ -320,11 +322,11 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
             P2 (0.050, "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
-
+#if HIL_RS422_INTF
             P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P2 (0.001,0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
             P2 (0.05,0.001, "scheduled") egse_20HZ_tx_test(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
-
+#endif /* HIL_RS422_INTF */
             P3 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P3 (0.001, "scheduled") mission_event_code_handler(&icf_ctrl);
             P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);

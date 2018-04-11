@@ -27,8 +27,10 @@ PROGRAMMERS:
 #define ICF_EGSE_CONNECT_IP "127.0.0.1"
 #ifdef CONFIG_HIL_ENABLE
 #define HIL_INTF 1
+#define HIL_RS422_INTF 0
 #else
 #define HIL_INTF 0
+#define HIL_RS422_INTF 0
 #endif  //  CONFIG_HIL_ENABLE
 
 typedef enum _ENUM_ICF_STATUS {
