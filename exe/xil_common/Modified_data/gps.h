@@ -105,9 +105,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.env.wind->_VAED[0]");
     // drg->add_variable("rkt.env.wind->_VAED[1]");
     // drg->add_variable("rkt.env.wind->_VAED[2]");
-    drg->add_variable("rkt.dynamics._VBAB[0]");
-    drg->add_variable("rkt.dynamics._VBAB[1]");
-    drg->add_variable("rkt.dynamics._VBAB[2]");
+    // drg->add_variable("rkt.dynamics._VBAB[0]");
+    // drg->add_variable("rkt.dynamics._VBAB[1]");
+    // drg->add_variable("rkt.dynamics._VBAB[2]");
     // drg->add_variable("rkt.dynamics.lonx");
     // drg->add_variable("rkt.dynamics.latx");
     // drg->add_variable("rkt.aerodynamics.cn");
@@ -123,7 +123,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.aerodynamics.xcp");
     // drg->add_variable("rkt.aerodynamics.clm");
     // drg->add_variable("rkt.aerodynamics.cln");
-    // drg->add_variable("rkt.propulsion.xcg");
+    drg->add_variable("rkt.propulsion._xcg[0]");
+    drg->add_variable("rkt.propulsion._xcg[1]");
+    drg->add_variable("rkt.propulsion._xcg[2]");
     // drg->add_variable("rkt.propulsion.vmass");
     // drg->add_variable("rkt.propulsion.fmasse");
     // drg->add_variable("rkt.propulsion.fmass0");
@@ -209,13 +211,16 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.forces._FMB[0]");
     // drg->add_variable("rkt.forces._FMB[1]");
     // drg->add_variable("rkt.forces._FMB[2]");
-    drg->add_variable("rkt.forces._Q_Aero[0]");
-    drg->add_variable("rkt.forces._Q_Aero[1]");
-    drg->add_variable("rkt.forces._Q_Aero[2]");
-    drg->add_variable("rkt.forces._Q_Aero[3]");
-    drg->add_variable("rkt.forces._Q_Aero[4]");
-    drg->add_variable("rkt.forces._Q_Aero[5]");
+    // drg->add_variable("rkt.forces._Q_Aero[0]");
+    // drg->add_variable("rkt.forces._Q_Aero[1]");
+    // drg->add_variable("rkt.forces._Q_Aero[2]");
+    // drg->add_variable("rkt.forces._Q_Aero[3]");
+    // drg->add_variable("rkt.forces._Q_Aero[4]");
+    // drg->add_variable("rkt.forces._Q_Aero[5]");
     // drg->add_variable("rkt.env.pdynmc");
+    drg->add_variable("rkt.forces._SLOSH_CG[0]");
+    drg->add_variable("rkt.forces._SLOSH_CG[1]");
+    drg->add_variable("rkt.forces._SLOSH_CG[2]");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
 }

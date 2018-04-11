@@ -106,7 +106,8 @@ extern "C" void master_startup(Rocket_SimObject *rkt) {
 extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
     rkt->forces.set_Slosh_flag(0);
     rkt->forces.set_DOF(6);
-    rkt->forces.set_damping_ratio(0.01);
+    rkt->forces.set_damping_ratio(0.005);
+    rkt->propulsion.set_CG_OFFSET(0);
 }
 
 extern "C" void master_init_time(Rocket_SimObject *rkt) {
