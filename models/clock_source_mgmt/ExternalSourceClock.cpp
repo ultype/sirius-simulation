@@ -1,7 +1,7 @@
 #include "ExternalSourceClock.hh"
 #include "trick/message_proto.h"
 #include "trick/message_type.h"
-
+#include <errno.h>
 #define EXT_CLOCK_TICS_PER_SEC 1000
 #define EXT_WALLCLOCK_TICS_RATIO (1000000000LL/EXT_CLOCK_TICS_PER_SEC)
 
@@ -35,24 +35,30 @@ int ExternalSourceClock::clock_init() {
     // fully control the device, including configuring, sampling, etc.
     DeviceInformation devInfo(deviceDescription);
     ret = instantDiCtrl->setSelectedDevice(devInfo);
-
+    if (ret < 0) {
+        fprintf(stderr, " SelectedDevice error: %s!\n", strerror(errno));
+        abort();
+    }
     // Step 4: Set necessary parameters for DI operation,
     // Note: some of operation of this step is optional(you can do these settings via "Device Configuration" dialog).
     ICollection<DiintChannel>* interruptChans = instantDiCtrl->getDiintChannels();
     // In this demo, we are using the first available one.
-    if (interruptChans == NULL)
-    {
-        printf(" The device doesn't support DI interrupt!\n");
-        return 0;
+    if (interruptChans == NULL) {
+        fprintf(stderr, " The device doesn't support DI interrupt! ioctl error: %s!\n", strerror(errno));
+        abort();
     }
     interruptChans->getItem(startPort).setEnabled(true);
-    printf(" DI channel %d is used to detect interrupt!\n\n", interruptChans->getItem(startPort).getChannel());
+    fprintf(stderr, " DI channel %d is used to detect interrupt!\n\n", interruptChans->getItem(startPort).getChannel());
 
     // Step 5: Start DIInterrupt
     ret = instantDiCtrl->SnapStart();
 
     // Step 6: Do anything you are interesting while the device is working.
-    printf(" Snap has started, any key to quit !\n");
+    if (ret < 0) {
+        fprintf(stderr, "[%s:%d] %s \n", __FUNCTION__, __LINE__, strerror(errno));
+        abort();
+    }
+    fprintf(stderr, "[%s] DI Interrupt init is OK!\n", __FUNCTION__);
     set_global_clock();
     return 0;
 }
