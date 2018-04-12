@@ -321,7 +321,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P2 (0.050, "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
+            P2 (0.010, "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
 #if HIL_RS422_INTF
             P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P2 (0.001,0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
