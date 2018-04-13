@@ -91,7 +91,10 @@ int main(int argc, char* argv[])
     struct ioctl_tispace_cmd wall_time;
    // Step 1: Create a 'InstantDiCtrl' for DI function.
    InstantDiCtrl * instantDiCtrl = AdxInstantDiCtrlCreate();
-
+   if (instantDiCtrl == NULL) {
+        fprintf(stderr, "[%s:%d] instantDiCtrl create: %s\n", __FUNCTION__, __LINE__, strerror(errno));
+        return 0;
+   }
 	// Step 2: Set the notification event Handler by which we can known the state of operation effectively.
 #if 0
     DiSnapHandler DiSnap;
@@ -124,7 +127,13 @@ int main(int argc, char* argv[])
       CHK_RESULT(ret);
 
       // Step 6: Do anything you are interesting while the device is working.
-      printf(" Snap has started, any key to quit !\n");
+        printf(" Snap has started, any key to quit !\n");
+        fprintf(stderr, "Wainting for the 1st PPS...");
+        if(ioctl(3, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0) < 0){
+            fprintf(stderr, "[%s:%d] IOCTL error: %s\n", __FUNCTION__, __LINE__, strerror(errno));
+            return 0;
+        }
+        fprintf(stderr, "Go !!\n");
       do
       {
 #if 1
@@ -133,7 +142,6 @@ int main(int argc, char* argv[])
           fprintf(stderr, "[%lld us] ioctl received \n", wall_time.time_tics/1000);
 #endif
 #if 0
-        ioctl(3, GPIOEVENT_IOCTL, 0);
         clock_gettime(CLOCK_MONOTONIC, &ts);
         ts.tv_sec = time(NULL);
         milli = ts.tv_nsec / 1000000;

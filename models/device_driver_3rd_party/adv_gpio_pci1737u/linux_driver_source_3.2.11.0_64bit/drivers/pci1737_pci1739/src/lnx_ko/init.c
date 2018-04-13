@@ -112,7 +112,7 @@ int __devinit daq_device_probe(struct pci_dev *dev, const struct pci_device_id *
    ret = request_irq(shared->Irq, (daq_irq_handler_t)daq_irq_handler, IRQF_SHARED, DRIVER_NAME, daq_dev);
    CHK_RESULT(ret == 0, ret, err_irq);
 
-
+   daq_dev->pps_cnt = 0;
    spin_lock_init(&daq_dev->dev_lock);
    tasklet_init(&daq_dev->dev_tasklet, daq_dev_tasklet_func, (unsigned long)daq_dev);
    INIT_LIST_HEAD(&daq_dev->file_ctx_list);
