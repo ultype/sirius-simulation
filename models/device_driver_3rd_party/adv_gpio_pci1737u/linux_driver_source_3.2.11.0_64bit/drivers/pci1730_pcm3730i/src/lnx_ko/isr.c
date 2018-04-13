@@ -68,8 +68,7 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
         daq_dev->curr_pps_tics = isr_curr_tics;
         daq_dev->curr_ideal_tics += 1000000000LL;
     }
-    //  printk("<0>""isr %d pps curr  %lld\n",daq_dev->pps_cnt ,daq_dev->curr_pps_tics.tv64);
-
+    printk("<0>""isr %d pps tics: %lld\n",daq_dev->pps_cnt ,daq_dev->curr_pps_tics.tv64);
     if (wait_task != NULL) {
         //  printk("<0>""[%d:%s] wake up process !!\n", __LINE__, __FUNCTION__);
         local_irq_disable();

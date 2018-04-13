@@ -28,11 +28,6 @@ cd $SCRIPT_PATH/$DRVER_SOURCE/drivers/$PRODUCT/src/lnx_ko
 cp $SCRIPT_PATH/$DRVER_SOURCE/drivers/lib/Module.symvers $SCRIPT_PATH/$DRVER_SOURCE/drivers/$PRODUCT/src/lnx_ko
 make
 sudo make install
-# Copy bio1737.ko  biokernbase.ko to /lib/modules
-# sudo mkdir -p /lib/modules/$(uname -r)/biodaq
-# cd $SCRIPT_PATH/$DRVER_SOURCE/drivers/bin
-# sudo cp *.ko /lib/modules/$(uname -r)/biodaq
-# sudo depmod
 # Auto load the drver
 if [ -z "$AUTOLOAD_DRIVERLIST" ]; then
     sudo echo "loop" | sudo tee -a /etc/modules

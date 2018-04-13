@@ -132,7 +132,7 @@ int main(int argc, char const *argv[]) {
 
                     do {
                         memset(buf, 0, MAXNAME);
-                        nbytes = err = recv(i, (uint8_t *)&buf, MAXNAME, 0);
+                        err = recv(i, (uint8_t *)&buf, MAXNAME, 0);
                         if (err < 0) {
                             if (errno != EWOULDBLOCK) {
                                 perror("  recv() failed");
