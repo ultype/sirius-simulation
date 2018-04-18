@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#pragma pack(push,8)
 typedef enum _SIMGEN_UDP_CMD_TYPE_ENUM {
     UDP_CMD_MOT = 0,
     UDP_CMD_MOTB,
@@ -59,5 +59,5 @@ struct simgen_udp_command_t {
     } data;
     int latency_wrt_tov_and_current_tir_ms_;
 };
-
+#pragma pack(pop)
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_SIMGEN_UDP_CMD_H_
