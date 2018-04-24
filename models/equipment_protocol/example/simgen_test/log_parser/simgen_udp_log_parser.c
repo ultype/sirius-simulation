@@ -15,7 +15,7 @@ int main(int argc, char const *argv[]) {
 
         return EXIT_FAILURE;
     }
-    if ((output_text = fopen("UDP_mot.txt", "w+")) == NULL) {
+    if ((output_text = fopen("UDP_mot.csv", "w+")) == NULL) {
         fclose(input_binary);
         return EXIT_FAILURE;
     }
@@ -25,15 +25,12 @@ int main(int argc, char const *argv[]) {
 
         if (udp_cmd.time_of_validity_ms_ == 0) {
             iter = 0 ;
-            fprintf(output_text, "***New Run***\n");
+            fprintf(output_text,"Iteration, Tx_time_ms, sim_time_ms, latency\n");
         }
-        if (iter >= 2)
-            tx_time = (iter - 2) * CYCLE_TIME;
-        else
-            tx_time = 0;
+        tx_time = iter * CYCLE_TIME;
 
-        fprintf(output_text,"%4d: tx_time_ms = %10.3f  sim_time_ms = %6d    latency = %d\n", iter,
-                tx_time, udp_cmd.time_of_validity_ms_, udp_cmd.latency_wrt_tov_and_current_tir_ms_);
+        fprintf(output_text,"%4d, %10.3f, %6d, %d\n", iter, tx_time, udp_cmd.time_of_validity_ms_,
+                udp_cmd.latency_wrt_tov_and_current_tir_ms_);
     }
     fclose(input_binary);
     fclose(output_text);
