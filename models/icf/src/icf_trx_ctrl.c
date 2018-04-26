@@ -490,6 +490,23 @@ int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t si
     return ICF_STATUS_SUCCESS;
 }
 
+int icf_tx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload) {
+    struct ringbuffer_cell_t *txcell = NULL;
+    struct ringbuffer_t *whichring = NULL;
+    struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
+    struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
+    struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
+    whichring = &ctrlqueue->data_ring;
+    txcell = (uint8_t *)rb_pop(whichring);
+    if (txcell) {
+        memcpy(payload, txcell->l2frame, txcell->frame_full_size);
+        debug_hex_dump("icf_tx_dequeue", txcell->l2frame, txcell->frame_full_size);
+        icf_free_mem(txcell->l2frame);
+        icf_free_mem(txcell);
+    }
+    return ICF_STATUS_SUCCESS;
+}
+
 int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     struct ringbuffer_cell_t *txcell = NULL;
     struct ringbuffer_t *whichring = NULL;

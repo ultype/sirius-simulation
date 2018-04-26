@@ -184,7 +184,8 @@ class Rocket_SimObject : public Trick::SimObject {
             dynamics.grab_ddrhoC_1     = LINK( forces, get_ddrhoC_1);
             dynamics.collect_forces_and_propagate = LINK( forces, collect_forces_and_propagate);
             dynamics.grab_ddang_slosh_theta = LINK( forces, get_ddang_slosh_theta);
-            dynamics.grab_ddang_slosh_psi = LINK( forces, get_ddang_slosh_psi);
+            dynamics.grab_ddang_slosh_psi = LINK( forces, get_ddang_slosh_psi); 
+            dynamics.dm_icf_info_hook = &icf_ctrl;
 
             accelerometer->grab_FSPB   = LINK( dynamics, get_FSPB);
 
@@ -223,28 +224,7 @@ class Rocket_SimObject : public Trick::SimObject {
             fprintf(stderr, "Go !!\n");
         };
 
-        void load_data_from_dm_to_simgen(struct simgen_motion_data_t *motion_info) {
-            motion_info->position_xyz[0] = dynamics.get_double_SBEE()[0];
-            motion_info->position_xyz[1] =  dynamics.get_double_SBEE()[1];
-            motion_info->position_xyz[2] = dynamics.get_double_SBEE()[2];
-            motion_info->velocity_xyz[0] = dynamics.get_double_VBEE()[0];
-            motion_info->velocity_xyz[1] = dynamics.get_double_VBEE()[1];
-            motion_info->velocity_xyz[2] = dynamics.get_double_VBEE()[2];
-            motion_info->acceleration_xyz[0] = dynamics.get_double_ABEE()[0];
-            motion_info->acceleration_xyz[1] = dynamics.get_double_ABEE()[1];
-            motion_info->acceleration_xyz[2] = dynamics.get_double_ABEE()[2];
-            motion_info->jerk_xyz[0] = dynamics.get_double_JBEE()[0];
-            motion_info->jerk_xyz[1] = dynamics.get_double_JBEE()[1];
-            motion_info->jerk_xyz[2] = dynamics.get_double_JBEE()[2];
-            motion_info->heb[0] = dynamics.get_double_psibd();
-            motion_info->heb[1] = dynamics.get_double_thtbd();
-            motion_info->heb[2] = dynamics.get_double_phibd();
-            motion_info->angular_velocity[0] = dynamics.get_double_WBEB()[0];
-            motion_info->angular_velocity[1] = dynamics.get_double_WBEB()[1];
-            motion_info->angular_velocity[2] = dynamics.get_double_WBEB()[2];
-        };
-
-        void load_data_from_time_to_simgen(struct simgen_gps_start_time_t *start_time) {
+        void set_motion_start_time(struct simgen_gps_start_time_t *start_time) {
             start_time->year = time->tm_gps_start_time_year;
             start_time->month = time->tm_gps_start_time_month;
             start_time->day = time->tm_gps_start_time_day;
@@ -255,15 +235,13 @@ class Rocket_SimObject : public Trick::SimObject {
 
         void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
             simgen_default_remote_data(&simgen_dev->motion_data);
-            load_data_from_dm_to_simgen(&simgen_dev->motion_data);
-            load_data_from_time_to_simgen(&simgen_dev->gps_start_time);
+            set_motion_start_time(&simgen_dev->gps_start_time);
         };
 
         void send_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
             struct simgen_udp_command_t udp_cmd;
             uint32_t send_size = sizeof(struct simgen_udp_command_t);
-            simgen_dev->motion_data.sim_time.second = exec_get_sim_time();
-            load_data_from_dm_to_simgen(&simgen_dev->motion_data);
+            icf_tx_dequeue(C, EGSE_TX_GPSRF_EMU_QIDX, &simgen_dev->motion_data);
             simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
             //  simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
             //  icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
@@ -321,6 +299,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
+            P2 (0.010, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl);
             P2 (0.010, "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
 #if HIL_RS422_INTF
             P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);

@@ -156,6 +156,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size);
 
 int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
 int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
+int icf_tx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload);
 int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx);
 void icf_heartbeat(void);
 
