@@ -10,15 +10,17 @@ LIBRARY DEPENDENCIES:
 ##include "cannon.h"
 ##include "cannon_analytic.h"
 ##include "ExternalSourceClock.hh"
+##include "simgen_remote.h"
 ##include <time.h>
 
 class CannonSimObject : public Trick::SimObject {
 
     public:
         CANNON cannon;
+        struct simgen_eqmt_info_t simgen_dev;
         ExternalSourceClock ext_clk;
 
-        void cannon_heartbeat(void) {
+        void trick_heartbeat(void) {
             char date_buf[80];
             char currentTime[84] = "";
             static struct timespec ts;
@@ -31,30 +33,45 @@ class CannonSimObject : public Trick::SimObject {
             fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
         };
 
+        void set_motion_start_time(struct simgen_gps_start_time_t *start_time) {
+            start_time->year = 2017;
+            start_time->month = 3;
+            start_time->day = 22;
+            start_time->hour = 2;
+            start_time->minute = 0;
+            start_time->second = 18;
+        };
+
+        void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
+            simgen_default_remote_data(&simgen_dev->motion_data);
+            set_motion_start_time(&simgen_dev->gps_start_time);
+        };
+
+        void send_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
+            struct simgen_udp_command_t udp_cmd;
+            uint32_t send_size = sizeof(struct simgen_udp_command_t);
+            simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
+            //  simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
+            //  icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
+        };
+
         void wait_for_1st_pps(void) {
             fprintf(stderr, "Wainting for the 1st PPS...");
             ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
             fprintf(stderr, "Go !!\n");
         };
 
-        void empty_job(void) {
-            syscall(510);
-        };
-
-
-
         CannonSimObject() : ext_clk() 
         {
         	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
-            ("initialization") cannon_init( &cannon );
+            ("initialization") set_default_simgen_motdata(&simgen_dev);
+            ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
             ("initialization") wait_for_1st_pps();
 
+            P1 (5, "scheduled") trick_heartbeat();
+            //  P2 (0.010, "scheduled") send_simgen_motdata(&simgen_dev);
 
-            P1 (0.5, 2.001, "scheduled") empty_job();
-            P1 (0.001, "scheduled") cannon_analytic(&cannon);
-            P1 (1, "scheduled") cannon_heartbeat();
-
-            ("shutdown") cannon_shutdown(& cannon);
+            ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
         }
 } ;
 

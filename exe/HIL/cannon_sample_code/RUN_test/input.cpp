@@ -6,16 +6,10 @@
 
 #include "../../../xil_common/include/realtime.h"
 
-
-extern "C" void external_clock_switch(void) {
-    real_time_change_clock(&dyn.ext_clk);
-    fprintf(stderr, "%s\n", real_time_clock_get_name());
-}
-
 extern "C" int run_me() {
-    external_clock_switch();
+    external_clock_switch(&dyn.ext_clk);
     realtime();
-    exec_set_terminate_time(40.0);
+    exec_set_terminate_time(200.0);
 
     return 0;
 }
