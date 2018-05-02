@@ -234,7 +234,16 @@ class Rocket_SimObject : public Trick::SimObject {
         };
 
         void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
-            simgen_default_remote_data(&simgen_dev->motion_data);
+            struct simgen_motion_data_t *motion_data = &simgen_dev->motion_data;
+            simgen_default_remote_data(motion_data);
+            memcpy(&motion_data->position_xyz, dynamics.get_double_SBEE(), sizeof(double) * 3);
+            memcpy(&motion_data->velocity_xyz, dynamics.get_double_VBEE(), sizeof(double) * 3);
+            memcpy(&motion_data->acceleration_xyz, dynamics.get_double_ABEE(), sizeof(double) * 3);
+            memcpy(&motion_data->jerk_xyz, dynamics.get_double_JBEE(), sizeof(double) * 3);
+            motion_data->heb[0] = dynamics.get_double_psibd();
+            motion_data->heb[1] = dynamics.get_double_thtbd();
+            motion_data->heb[2] = dynamics.get_double_phibd();
+            memcpy(&motion_data->angular_velocity, dynamics.get_double_WBEB(), sizeof(double) * 3);
             set_motion_start_time(&simgen_dev->gps_start_time);
         };
 
