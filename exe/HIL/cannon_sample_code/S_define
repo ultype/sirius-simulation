@@ -43,8 +43,15 @@ class CannonSimObject : public Trick::SimObject {
         };
 
         void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
-            simgen_default_remote_data(&simgen_dev->motion_data);
+            struct simgen_motion_data_t *motion_data = &simgen_dev->motion_data;
+            simgen_default_remote_data(motion_data);
             set_motion_start_time(&simgen_dev->gps_start_time);
+            motion_data->position_xyz[0] = -3034818.2746660495;
+            motion_data->position_xyz[1] = 5072117.3653596658;
+            motion_data->position_xyz[2] = 2388670.1371833533;
+            motion_data->heb[0] = 1.5707963268;
+            motion_data->heb[1] = 1.5707963268;
+            motion_data->heb[2] = 0.0;
         };
 
         void send_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
