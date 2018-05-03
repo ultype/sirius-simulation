@@ -19,6 +19,7 @@ class CannonSimObject : public Trick::SimObject {
         CANNON cannon;
         struct simgen_eqmt_info_t simgen_dev;
         ExternalSourceClock ext_clk;
+        FILE *nspo_stream;
 
         void trick_heartbeat(void) {
             char date_buf[80];
@@ -57,6 +58,7 @@ class CannonSimObject : public Trick::SimObject {
         void send_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
             struct simgen_udp_command_t udp_cmd;
             uint32_t send_size = sizeof(struct simgen_udp_command_t);
+            /* TODO: Load mtion data from .csv*/
             simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
             //  simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
             //  icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
@@ -72,8 +74,9 @@ class CannonSimObject : public Trick::SimObject {
         {
         	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
             ("initialization") set_default_simgen_motdata(&simgen_dev);
+            ("initialization") simgen_init_input_file(&nspo_stream);
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
-            ("initialization") wait_for_1st_pps();
+            //  ("initialization") wait_for_1st_pps();
 
             P1 (5, "scheduled") trick_heartbeat();
             //  P2 (0.010, "scheduled") send_simgen_motdata(&simgen_dev);

@@ -355,3 +355,19 @@ int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
     return 0;
 
 }
+
+int simgen_init_input_file(FILE **stream) {
+    char line[1024];
+    *stream = fopen("log_nspo.csv", "r");
+    if (*stream == NULL) {
+        fprintf(stderr, "File not exists !!!\n");
+        retrun EXIT_FAILURE;
+    }
+    fgets(line, 1024, *stream);
+    printf(" %s\n", line);
+    return EXIT_SUCCESS;
+}
+
+int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, char *csv_line) {
+    return EXIT_SUCCESS;
+}
