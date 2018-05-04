@@ -87,6 +87,7 @@ int simgen_default_remote_data(struct simgen_motion_data_t *motion_info);
 int simgen_remote_tn_motion_send(struct simgen_eqmt_info_t *eqmt_info, void *data);
 void simgen_remote_end_scenario_now(struct simgen_eqmt_info_t *eqmt_info);
 int simgen_init_input_file(FILE **stream);
+int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *stream);
 #ifdef __cplusplus
 }
 #endif

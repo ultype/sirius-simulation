@@ -368,6 +368,86 @@ int simgen_init_input_file(FILE **stream) {
     return EXIT_SUCCESS;
 }
 
-int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, char *csv_line) {
+int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *stream) {
+    const char delimiter[2] = ",";
+    char *token;
+    char line[1024];
+    int idx = 0;
+    fgets(line, 1024, stream);
+    /* get the first token */
+    token = strtok(line, delimiter);
+    /* walk through other tokens */
+    while(token != NULL) {
+#if 0
+    switch(idx) {
+        case 0:
+            motion_data->sim_time.second = atof(token);
+            break;
+        case 1:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 2:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 3:
+            motion_data->sim_time.second = atof(token);
+            break;
+        case 4:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 5:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 6:
+            motion_data->sim_time.second = atof(token);
+            break;
+        case 7:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 8:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 0:
+            motion_data->sim_time.second = atof(token);
+            break;
+        case 1:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 2:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 3:
+            motion_data->sim_time.second = atof(token);
+            break;
+        case 4:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 5:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 6:
+            motion_data->sim_time.second = atof(token);
+            break;
+        case 7:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+        case 8:
+            motion_data->position_xyz[0] = atof(token);
+            break;
+    }
+    motion_data->position_xyz[3];         // uint: metres
+    motion_data->velocity_xyz[3];         // uint: m/s
+    motion_data->acceleration_xyz[3];     // uint: m/s^2
+    motion_data->jerk_xyz[3];             // uint: m/s^3
+    motion_data->heb[3];                  // heading: uint range +/- pi
+                                    // elevation: uint range +/- pi/2
+                                    // bank: uint range +/- pi
+    motion_data->angular_velocity[3];     // uint: rad/s
+    motion_data->angular_acceleration[3]; // uint: rad/s^2
+    motion_data->angular_jerk[3];         // uint: rad/s^3
+#endif
+        printf( " %f\n", motion_data->sim_time.second);
+        token = strtok(NULL, delimiter);
+    }
     return EXIT_SUCCESS;
 }
