@@ -1,8 +1,7 @@
 #!/bin/bash
 # $ sudo vim /etc/modprobe.d/blacklist.conf
 # Add the following at the end of file
-
-SCRIPT_PATH=$PWD
+SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DRVER_SOURCE=linux_driver_source_3.2.11.0_64bit
 PRODUCT=pci1737_pci1739
 #PRODUCT=pci1730_pcm3730i
