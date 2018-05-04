@@ -361,7 +361,7 @@ int simgen_init_input_file(FILE **stream) {
     *stream = fopen("log_nspo.csv", "r");
     if (*stream == NULL) {
         fprintf(stderr, "File not exists !!!\n");
-        retrun EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
     fgets(line, 1024, *stream);
     printf(" %s\n", line);
