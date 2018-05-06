@@ -14,6 +14,7 @@
 #include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" int run_me() {
+    rkt.simgen_dev.udp_motion_enable = 0;
     record_nspo();
     record_gps();
     record_golden();

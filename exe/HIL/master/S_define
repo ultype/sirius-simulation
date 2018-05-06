@@ -247,13 +247,16 @@ class Rocket_SimObject : public Trick::SimObject {
             set_motion_start_time(&simgen_dev->gps_start_time);
         };
 
-        void send_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
+        void transfer_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
             struct simgen_udp_command_t udp_cmd;
             uint32_t send_size = sizeof(struct simgen_udp_command_t);
             icf_tx_dequeue(C, EGSE_TX_GPSRF_EMU_QIDX, &simgen_dev->motion_data);
-            simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
-            //  simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
-            //  icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
+            if (simgen_dev->udp_motion_enable & 0x1) {
+                simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
+                icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
+            } else {
+                simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
+            }
         };
 
         void egse_200HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
@@ -309,7 +312,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
             P2 (0.010, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl);
-            P2 (0.010, "scheduled") send_simgen_motdata(&icf_ctrl, &simgen_dev);
+            P2 (0.010, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 #if HIL_RS422_INTF
             P2 (0.005,0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P2 (0.001,0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);

@@ -9,7 +9,8 @@
 extern "C" int run_me() {
     external_clock_switch(&dyn.ext_clk);
     realtime();
+    dyn.simgen_time_jump_per_cycle = 1;
+    dyn.simgen_dev.udp_motion_enable = 0;
     exec_set_terminate_time(200.0);
-
     return 0;
 }

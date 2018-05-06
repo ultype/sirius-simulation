@@ -76,6 +76,7 @@ struct simgen_eqmt_info_t {
     struct sockaddr_in udp_cmd_addr;
     struct simgen_motion_data_t motion_data;
     struct simgen_gps_start_time_t gps_start_time;
+    uint8_t udp_motion_enable;
 };
 
 #ifdef __cplusplus
@@ -88,6 +89,8 @@ int simgen_remote_tn_motion_send(struct simgen_eqmt_info_t *eqmt_info, void *dat
 void simgen_remote_end_scenario_now(struct simgen_eqmt_info_t *eqmt_info);
 int simgen_init_input_file(FILE **stream);
 int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *stream);
+int simgen_equipment_udp_channel_init(struct simgen_eqmt_info_t *eqmt_info, char *ifname);
+int simgen_motion_tn_udp_send(struct simgen_eqmt_info_t *eqmt_info, void *data);
 #ifdef __cplusplus
 }
 #endif

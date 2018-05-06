@@ -376,78 +376,112 @@ int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *st
     fgets(line, 1024, stream);
     /* get the first token */
     token = strtok(line, delimiter);
-    /* walk through other tokens */
-    while(token != NULL) {
-#if 0
-    switch(idx) {
-        case 0:
-            motion_data->sim_time.second = atof(token);
-            break;
-        case 1:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 2:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 3:
-            motion_data->sim_time.second = atof(token);
-            break;
-        case 4:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 5:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 6:
-            motion_data->sim_time.second = atof(token);
-            break;
-        case 7:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 8:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 0:
-            motion_data->sim_time.second = atof(token);
-            break;
-        case 1:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 2:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 3:
-            motion_data->sim_time.second = atof(token);
-            break;
-        case 4:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 5:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 6:
-            motion_data->sim_time.second = atof(token);
-            break;
-        case 7:
-            motion_data->position_xyz[0] = atof(token);
-            break;
-        case 8:
-            motion_data->position_xyz[0] = atof(token);
-            break;
+    motion_data->sim_time.second = atof(token);
+    /* SOW by pass */
+    token = strtok(NULL, delimiter);
+    /* Position */
+    token = strtok(NULL, delimiter);
+    motion_data->position_xyz[0] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->position_xyz[1] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->position_xyz[2] = atof(token);
+    /* velocity */
+    token = strtok(NULL, delimiter);
+    motion_data->velocity_xyz[0] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->velocity_xyz[1] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->velocity_xyz[2] = atof(token);
+    /* acceleration */
+    token = strtok(NULL, delimiter);
+    motion_data->acceleration_xyz[0] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->acceleration_xyz[1] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->acceleration_xyz[2] = atof(token);
+    /* JERK */
+    token = strtok(NULL, delimiter);
+    motion_data->jerk_xyz[0] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->jerk_xyz[1] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->jerk_xyz[2] = atof(token);
+    /* heb */
+    token = strtok(NULL, delimiter);
+    motion_data->heb[0] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->heb[1] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->heb[2] = atof(token);
+    /* angular_velocity */
+    token = strtok(NULL, delimiter);
+    motion_data->angular_velocity[0] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->angular_velocity[1] = atof(token);
+    token = strtok(NULL, delimiter);
+    motion_data->angular_velocity[2] = atof(token);
+    return EXIT_SUCCESS;
+}
+
+static int simgen_udp_cmd_sendto(struct simgen_eqmt_info_t *eqmt_info, uint8_t *payload, uint32_t frame_len) {
+    uint32_t offset = 0;
+    int32_t wdlen = 0;
+    while (offset < frame_len) {
+        if ((wdlen = sendto(eqmt_info->udp_cmd_channel_fd, payload + offset, frame_len - offset,
+             0, (struct sockaddr *)&eqmt_info->udp_cmd_addr, sizeof(eqmt_info->udp_cmd_addr))) < 0) {
+            if (wdlen < 0 && errno == EINTR)
+                wdlen = 0;
+            else
+                return -1;
+        }
+        offset += wdlen;
     }
-    motion_data->position_xyz[3];         // uint: metres
-    motion_data->velocity_xyz[3];         // uint: m/s
-    motion_data->acceleration_xyz[3];     // uint: m/s^2
-    motion_data->jerk_xyz[3];             // uint: m/s^3
-    motion_data->heb[3];                  // heading: uint range +/- pi
-                                    // elevation: uint range +/- pi/2
-                                    // bank: uint range +/- pi
-    motion_data->angular_velocity[3];     // uint: rad/s
-    motion_data->angular_acceleration[3]; // uint: rad/s^2
-    motion_data->angular_jerk[3];         // uint: rad/s^3
-#endif
-        printf( " %f\n", motion_data->sim_time.second);
-        token = strtok(NULL, delimiter);
+    return offset;
+}
+
+int simgen_motion_tn_udp_send(struct simgen_eqmt_info_t *eqmt_info, void *data) {
+    struct simgen_udp_command_t udp_cmd;
+    uint32_t send_size = sizeof(struct simgen_udp_command_t);
+    simgen_udp_motion_cmd_gen(data, &udp_cmd);
+    if (simgen_udp_cmd_sendto(eqmt_info, (uint8_t *)&udp_cmd, sizeof(struct simgen_udp_command_t)) < send_size) {
+        fprintf(stderr, "[%s:%d] Motion data send error !!!\n" , __FUNCTION__, __LINE__);
     }
     return EXIT_SUCCESS;
+}
+
+int simgen_equipment_udp_channel_init(struct simgen_eqmt_info_t *eqmt_info, char *ifname) {
+    /* Create UDP socket */
+    int err;
+    int retry_cnt = 0;
+    fprintf(stderr, "Connect to simgen UDP Server....\n");
+    if ((eqmt_info->udp_cmd_channel_fd = socket(AF_INET , SOCK_DGRAM , 0)) < 0) {
+        perror("Error while opening remote_cmd_channel");
+        err = eqmt_info->udp_cmd_channel_fd;
+        goto REMOTE_FAIL;
+    }
+    eqmt_info->udp_cmd_addr.sin_family = AF_INET;
+    eqmt_info->udp_cmd_addr.sin_port = htons(SIMGEN_PORT);
+    if (inet_pton(AF_INET, ifname, &eqmt_info->udp_cmd_addr.sin_addr.s_addr) == 0) {
+        fprintf(stderr, "Invalid IP adress\n");
+        goto REMOTE_FAIL;
+    }
+    while (retry_cnt < 5) {
+        err = connect(eqmt_info->udp_cmd_channel_fd, (struct sockaddr *)&eqmt_info->udp_cmd_addr,
+                      sizeof(eqmt_info->udp_cmd_addr));
+        if (err == 0)
+            break;
+        if (err < 0) {
+            sleep(3);
+            retry_cnt++;
+            fprintf(stderr, "create_remote_cmd_channel: Connection error retry...%d\n", retry_cnt);
+        }
+    }
+    if (err < 0)
+        goto REMOTE_FAIL;
+    fprintf(stderr, "simgen_create_udp_cmd_channel: Connection %s:%d\n", ifname, SIMGEN_PORT);
+    return EXIT_SUCCESS;
+REMOTE_FAIL:
+    fprintf(stderr, "simgen_create_udp_cmd_channel: Connection error !!\n");
+    return EXIT_FAILURE;
 }
