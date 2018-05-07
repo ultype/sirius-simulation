@@ -6,7 +6,7 @@
 #include "trick/exec_proto.h"
 extern "C" void realtime() {
     real_time_enable();
-    exec_set_software_frame(0.001);
+    exec_set_software_frame(0.005);
     //  trick_real_time.itimer.enable();
     exec_set_lock_memory(1);
     exec_set_thread_priority(0, 1);
