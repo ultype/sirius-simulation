@@ -368,12 +368,18 @@ int simgen_init_input_file(FILE **stream) {
     return EXIT_SUCCESS;
 }
 
-int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *stream) {
+int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *stream, int execution) {
     const char delimiter[2] = ",";
     char *token;
     char line[1024];
     int idx = 0;
-    fgets(line, 1024, stream);
+    if(fgets(line, 1024, stream) == NULL) {
+        return EXIT_SUCCESS;
+    }
+
+    if (execution > 1) {
+        return EXIT_SUCCESS;
+    }
     /* get the first token */
     token = strtok(line, delimiter);
     motion_data->sim_time.second = atof(token);
@@ -484,4 +490,18 @@ int simgen_equipment_udp_channel_init(struct simgen_eqmt_info_t *eqmt_info, char
 REMOTE_FAIL:
     fprintf(stderr, "simgen_create_udp_cmd_channel: Connection error !!\n");
     return EXIT_FAILURE;
+}
+
+int simgen_remote_cmd_channel_deinit(struct simgen_eqmt_info_t *eqmt_info) {
+    if (eqmt_info->remote_cmd_channel_fd > 0) {
+        close(eqmt_info->remote_cmd_channel_fd);
+    }
+    return 0;
+}
+
+int simgen_udp_channel_deinit(struct simgen_eqmt_info_t *eqmt_info) {
+    if (eqmt_info->udp_cmd_channel_fd > 0) {
+        close(eqmt_info->udp_cmd_channel_fd);
+    }
+    return 0;
 }

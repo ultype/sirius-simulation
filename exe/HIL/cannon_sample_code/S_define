@@ -61,9 +61,8 @@ class CannonSimObject : public Trick::SimObject {
             uint32_t send_size = sizeof(struct simgen_udp_command_t);
             int idx;
             for (idx = 0; idx < ratio; ++idx) {
-                simgen_convert_csv_to_mot(&simgen_dev->motion_data, nspo_stream);
+                simgen_convert_csv_to_mot(&simgen_dev->motion_data, nspo_stream, ratio - idx);
             }
-            //  simgen_convert_csv_to_mot(&simgen_dev->motion_data, nspo_stream);
             if(simgen_dev->udp_motion_enable & 0x1) {
                 simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
                 simgen_motion_tn_udp_send(simgen_dev, &simgen_dev->motion_data);
@@ -85,12 +84,14 @@ class CannonSimObject : public Trick::SimObject {
             ("initialization") simgen_init_input_file(&nspo_stream);
             ("initialization") simgen_equipment_udp_channel_init(&simgen_dev, SIMGEN_IP);
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
-            //  ("initialization") wait_for_1st_pps();
+            ("initialization") wait_for_1st_pps();
 
             P1 (5, "scheduled") trick_heartbeat();
-            P2 (1, "scheduled") transfer_simgen_motdata(&simgen_dev, simgen_time_jump_per_cycle);
+            P2 (0.010, "scheduled") transfer_simgen_motdata(&simgen_dev, simgen_time_jump_per_cycle);
 
             ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
+            ("shutdown") simgen_remote_cmd_channel_deinit(&simgen_dev);
+            ("shutdown") simgen_udp_channel_deinit(&simgen_dev);
         }
 } ;
 
