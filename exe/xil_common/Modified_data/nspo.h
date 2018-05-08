@@ -8,7 +8,7 @@
 extern "C" void record_nspo() {
     Trick::DRAscii *drg = new Trick::DRAscii("nspo");
     drg->set_freq(Trick::DR_Always);
-    drg->set_cycle(0.001);
+    drg->set_cycle(0.005);
     drg->set_single_prec_only(false);
     drg->add_variable("rkt.time->gpstime.SOW");
     drg->add_variable("rkt.dynamics._SBEE[0]");
