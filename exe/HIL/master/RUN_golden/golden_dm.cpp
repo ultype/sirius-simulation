@@ -14,7 +14,7 @@
 #include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" int run_me() {
-    rkt.simgen_dev.udp_motion_enable = 0;
+    rkt.simgen_dev.udp_motion_enable = 1;
     record_nspo();
     record_gps();
     record_golden();
@@ -32,6 +32,6 @@ extern "C" int run_me() {
     master_init_propulsion(&rkt);
     master_init_sensors(&rkt);
     master_init_tvc(&rkt);
-    mission_event_handler_configuration();
+    mission_event_handler_configuration(&rkt);
     return 0;
 }

@@ -221,13 +221,13 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     rkt->tvc.set_s2_tvclim(7.0 * RAD);
 }
 
-extern "C" void mission_event_handler_configuration(void) {
+extern "C" void mission_event_handler_configuration(Rocket_SimObject *rkt) {
     /* events */
-    jit_add_event("event_start", "LIFTOFF", 0.005);
-    jit_add_event("event_separation_1", "S3", 0.005);
+    jit_add_event("event_start", "LIFTOFF", rkt->int_step);
+    jit_add_event("event_separation_1", "S3", rkt->int_step);
     jit_add_read(102.055, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
-    jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.005);
+    jit_add_event("event_fairing_separation", "FAIRING_JETTSION", rkt->int_step);
     exec_set_terminate_time(200.000);
 }
 

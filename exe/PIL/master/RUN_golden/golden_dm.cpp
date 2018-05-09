@@ -31,6 +31,6 @@ extern "C" int run_me() {
     master_init_propulsion(&rkt);
     master_init_sensors(&rkt);
     master_init_tvc(&rkt);
-    mission_event_handler_configuration();
+    mission_event_handler_configuration(&rkt);
     return 0;
 }
