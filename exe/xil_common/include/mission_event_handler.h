@@ -223,7 +223,7 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
 
 extern "C" void mission_event_handler_configuration(Rocket_SimObject *rkt) {
     /* events */
-    double stand_still_time = 180.0;
+    double stand_still_time = 0.0;
     jit_add_event("event_start", "LIFTOFF", rkt->int_step);
     jit_add_event("event_separation_1", "S3", rkt->int_step);
     jit_add_read(102.051 + stand_still_time, "event_S3_ignition");
