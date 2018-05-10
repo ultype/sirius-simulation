@@ -216,7 +216,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         goto CMD_INIT_FAIL;
     }
     simgen_remote_wait_cmd_resp(eqmt_info, cmd_TR, cmd_resp, 1);
-
+#if 0  /* GSS9000 Does not need TIOP command */
     /* Send SET_TIOP commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_SET_TIOP;
     cmd_len = strlen(cmd_SET_TIOP);
@@ -225,7 +225,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         goto CMD_INIT_FAIL;
     }
     simgen_remote_wait_cmd_resp(eqmt_info, cmd_SET_TIOP, cmd_resp, 1);
-
+#endif
     /* Send AR commnad by TCP*/
     cmd_payload = (uint8_t *)cmd_AR;
     cmd_len = strlen(cmd_AR);

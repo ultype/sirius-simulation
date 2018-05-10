@@ -55,6 +55,7 @@ LIBRARY DEPENDENCIES:
 class Rocket_SimObject : public Trick::SimObject {
     public:
         double int_step = 0.001;
+        double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
         Environment env;
         Forces forces;

@@ -29,7 +29,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
     public:
 
         double ltg_thrust, no_thrust, clear_gps;
-
+        double stand_still_time = 0.0;
         INS ins;
 
         Control control;

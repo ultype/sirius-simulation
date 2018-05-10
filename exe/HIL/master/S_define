@@ -57,7 +57,8 @@ LIBRARY DEPENDENCIES:
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
-        double int_step = 0.004;
+        double int_step = 0.005;
+        double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
         Environment env;
         Forces forces;
@@ -318,8 +319,9 @@ class Rocket_SimObject : public Trick::SimObject {
             P4 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P4 (0.010, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl);
-            P4 (0.010, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
+            //  P4 (0.005, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl);
+            P4 (0.005, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl);
+            P4 (0.005, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 #if HIL_RS422_INTF
             P4 (0.005, 0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
             P4 (0.001, 0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
