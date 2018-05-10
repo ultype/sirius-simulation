@@ -87,7 +87,7 @@ class CannonSimObject : public Trick::SimObject {
             ("initialization") wait_for_1st_pps();
 
             P1 (5, "scheduled") trick_heartbeat();
-            P2 (0.005, "scheduled") transfer_simgen_motdata(&simgen_dev, simgen_time_jump_per_cycle);
+            P2 (0.004, "scheduled") transfer_simgen_motdata(&simgen_dev, simgen_time_jump_per_cycle);
 
             ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
             ("shutdown") simgen_remote_cmd_channel_deinit(&simgen_dev);
