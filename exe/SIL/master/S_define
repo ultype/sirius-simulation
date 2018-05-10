@@ -245,10 +245,10 @@ class Rocket_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") load_input(&icf_ctrl);
 
 
-            P3 (0.001, "scheduled") tvc.actuate(0.001, NULL);
+            P3 (int_step, "scheduled") tvc.actuate(int_step, NULL);
             P3 (int_step, "scheduled") dynamics.propagate(int_step);
-            (0.001, "logging") env.update_diagnostic_attributes(0.001);
-            (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
+            (int_step, "logging") env.update_diagnostic_attributes(int_step);
+            (int_step, "logging") dynamics.update_diagnostic_attributes(int_step);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
 

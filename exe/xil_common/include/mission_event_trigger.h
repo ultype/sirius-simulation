@@ -330,16 +330,17 @@ extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
 
 extern "C" void mission_event_trigger_configuration(void) {
     /* events */
-    jit_add_read(0.005, "event_liftoff");
-    jit_add_read(0.005, "event_control_rcs_on");
-    jit_add_read(12.005, "event_control_on");
+    double stand_still_time = 0.0;
+    jit_add_read(0.001 + stand_still_time, "event_liftoff");
+    jit_add_read(0.001 + stand_still_time, "event_control_rcs_on");
+    jit_add_read(12.001 + stand_still_time, "event_control_on");
     //  jit_add_read(15.001, "event_s2_control_on");
-    jit_add_read(82.005, "event_aoac_on");
-    jit_add_read(100.005, "event_s3_seperation");
-    jit_add_read(102.055, "event_s3_control_on");
-    jit_add_read(107.005, "event_fairing_jettison");
-    jit_add_read(200.005, "event_control_off");
+    jit_add_read(82.001 + stand_still_time, "event_aoac_on");
+    jit_add_read(100.001 + stand_still_time, "event_s3_seperation");
+    jit_add_read(102.051 + stand_still_time, "event_s3_control_on");
+    jit_add_read(107.001 + stand_still_time, "event_fairing_jettison");
+    jit_add_read(200.001 + stand_still_time, "event_control_off");
 
-    exec_set_terminate_time(200.000);
+    exec_set_terminate_time(200.001 + stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
