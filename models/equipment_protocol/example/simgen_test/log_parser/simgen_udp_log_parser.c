@@ -79,9 +79,11 @@ int rocket_dynamic_nspo_log_parser(FILE *input_binary, double target_value) {
         fclose(input_binary);
         return EXIT_FAILURE;
     }
+    fprintf(output_text,"sim time (sec),GPS_SOW_TIME (sec), SBEE_X, SBEE_Y, SBEE_Z, VBEE_X, VBEE_Y, VBEE_Z\n");
     while(fgets(line, 1024, input_binary) != NULL) {
         char* tmp = strdup(line);
         strcpy(field_content, getcolumn(tmp, 2));
+        free(tmp);
         start_gps_time = atof(field_content);
         if (fabs(start_gps_time - target_value) < 1e-4) {
             printf("[%s:%d] %s\n", __FUNCTION__, __LINE__, line);
@@ -103,7 +105,7 @@ int rocket_dynamic_nspo_log_parser(FILE *input_binary, double target_value) {
 
 int main(int argc, char  * const argv[]) {
     /* parse UDP binary log file */
-    FILE *input_binary;
+    FILE *input_binary = NULL;
     char file_name[1024] = {};
     char ch;
     int parsing_mode = 0;
@@ -117,6 +119,10 @@ int main(int argc, char  * const argv[]) {
                 }
                 printf("-f %s\r\n", optarg);
                 strcpy(file_name, optarg);
+                if ((input_binary = fopen(file_name, "rb")) == NULL) {
+                    fprintf(stderr, "[ERROR] The file name does not exist\n");
+                    goto EXIT;
+                }
                 break;
             case 'l':
                 printf("-l simgen latency parser\n");
@@ -141,10 +147,6 @@ int main(int argc, char  * const argv[]) {
         }
 
     }
-    if ((input_binary = fopen(file_name, "rb")) == NULL) {
-        fprintf(stderr, "[ERROR] The file name does not exist\n");
-        return EXIT_FAILURE;
-    }
     switch (parsing_mode) {
         case LOG_PARSER_SIMGEN_LATENCY:
             simgen_udp_latency_log_parser(input_binary);
@@ -160,6 +162,7 @@ int main(int argc, char  * const argv[]) {
             goto EXIT;
     }
 EXIT:
-    fclose(input_binary);
+    if (input_binary)
+        fclose(input_binary);
     return 0;
 }
