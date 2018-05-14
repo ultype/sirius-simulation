@@ -19,11 +19,11 @@ def counting_actual_size(file, output):
     return body_size
 
 ### CONSTANT ###
-IRQ_NUM_PER_RX_CAN_PACKET = 7
-SYSCALL_NUM_PER_ROUND_TRIP = 7
-SERIAL_PORT_START_TX_CNT = 172
+SAMPLE_HZ = "20 "
+GRAPH_TITLE = "RS422 "
 file_input = open("logg.txt","r")
 file_out = open("output.txt","w+")
+
 #plot_file = open("plot_data_input.txt", "w+")
 logger_size = counting_actual_size(file_input, file_out)
 file_input.close()
@@ -35,14 +35,9 @@ with open("output.txt", "r") as file_out:
 
 #### GNU PLOT Setting: User defined #### 
 PLOT_CONFIG_INFO = [
-    ["sys_enter: NR 500", "[HIL] RX CAN (SIM Time: 200 secs)", "Timeframe 100 Hz"],
-    ["sys_enter: NR 501", "[HIL] IMU01 (SIM Time: 200 secs)",  "Timeframe 200 Hz"],
-    ["sys_enter: NR 502", "[HIL] Ratetable_X (SIM Time: 200 secs)", "Timeframe 1000 Hz"],
-    ["sys_enter: NR 506", "[HIL] GPSR01 (SIM Time: 200 secs)", "Timeframe 20 Hz"],
-    ["sys_enter: NR 508", "[HIL] Flight Computer (SIM Time: 200 secs)", "Timeframe 20 Hz"],
-    ["sys_enter: NR 510", "[HIL] RS422 200 (SIM Time: 200 secs)", "Timeframe 200 Hz"],
-    ["sys_enter: NR 511", "[HIL] RS422 1000 (SIM Time: 200 secs)", "Timeframe 1000 Hz"],
-    ["sys_enter: NR 512", "[HIL] RS422 20 (SIM Time: 200 secs)", "Timeframe 20 Hz"]
+    ["Search Keywords",   "Title ", "x label, y label", "parsing_mode"],
+    ["sys_enter: NR 510", "[HIL] " + GRAPH_TITLE + SAMPLE_HZ + "Hz (SIM Time: 200 secs)", "Timeframe " + SAMPLE_HZ + " Hz", "Schedule Period (ms)", "SCHEDULE"], # 1
+    ["daq_irq_handler", "[HIL] The Jitter of GPIO interrupt " + SAMPLE_HZ + "Hz(SIM Time: 200 secs)", "Timeframe 1 Hz", "Jitter(ms)", "JITTER"] # 2
 ]
 if len(sys.argv) < 0:
     print "Please imput the PLOT_CONFIG_INFO : 0~7"
@@ -52,8 +47,9 @@ IDX = int(sys.argv[1])
 search_string = PLOT_CONFIG_INFO[IDX][0]
 gtitle= PLOT_CONFIG_INFO[IDX][1]
 xlabel = PLOT_CONFIG_INFO[IDX][2]
-ylabel = "Schedule Period (ms)"
+ylabel = PLOT_CONFIG_INFO[IDX][3]
 photo_name = gtitle +".png"
+parsing_mode = PLOT_CONFIG_INFO[IDX][4]
 ################################
 trip_time_ms_list = []
 abnormal_cnt = 0
@@ -61,14 +57,31 @@ irq_count = 0
 start_time = 0
 end_time = 0
 
-for idx, element in enumerate(data):
-    if element.find(search_string) > 0:
-        temp_list = re.findall("\d+\.\d+", data[idx])
-        end_time = float(temp_list[0])
-        if start_time != 0:
-            duration = (end_time - start_time) * 1000
-            trip_time_ms_list.append(duration)
-        start_time = end_time
+if parsing_mode == "SCHEDULE":
+    for idx, element in enumerate(data):
+        if element.find(search_string) > 0:
+            temp_list = re.findall("\d+\.\d+", data[idx])
+            end_time = float(temp_list[0])
+            if start_time != 0:
+                duration = (end_time - start_time) * 1000
+                trip_time_ms_list.append(duration)
+            start_time = end_time
+
+if parsing_mode == "JITTER":
+    PASER_START_IDX = 0
+    for idx, element in enumerate(data):
+      if idx < PASER_START_IDX:
+          continue
+      if element.find(search_string) > 0:
+          temp_list = re.findall("\d+\.\d+", data[idx - PASER_START_IDX])
+          start_time = float(temp_list[0])
+          temp_list = re.findall("\d+\.\d+", data[idx+1])
+          end_time = float(temp_list[0])
+          duration = (end_time - start_time) * 1000
+          if duration > 3:
+              abnormal_cnt += 1;
+              print "[%d]output.txt Line: %d, time duration:%f" % (abnormal_cnt, idx+1, duration)
+          trip_time_ms_list.append(duration)
 
 # for idx, element in enumerate(data):
 #   if element.find("irq_handler_entry: irq=16 name=pcan") > 0:
@@ -85,21 +98,6 @@ for idx, element in enumerate(data):
 #               print "[%d]output.txt Line: %d, time duration:%f" % (abnormal_cnt, idx+1, duration)
 #           trip_time_ms_list.append(duration)
 #           irq_count = 0
-
-# PASER_START_IDX = 2
-# for idx, element in enumerate(data):
-#   if idx < PASER_START_IDX:
-#       continue
-#   if element.find("sys_enter: NR 511") > 0:
-#       temp_list = re.findall("\d+\.\d+", data[idx - PASER_START_IDX])
-#       start_time = float(temp_list[0])
-#       temp_list = re.findall("\d+\.\d+", data[idx])
-#       end_time = float(temp_list[0])
-#       duration = (end_time - start_time) * 1000
-#       if duration > 3:
-#           abnormal_cnt += 1;
-#           print "[%d]output.txt Line: %d, time duration:%f" % (abnormal_cnt, idx+1, duration)
-#       trip_time_ms_list.append(duration)
 
 print("|Round trip count | %d |" % (len(trip_time_ms_list)))
 print("|Avg| %f ms |" % (sum(trip_time_ms_list)/len(trip_time_ms_list)))
