@@ -17,7 +17,7 @@ iter_idx = 0
 for dm_row, gpsr_row in itertools.izip(dm_arr, gpsr_arr):
     iter_idx += 1
     sim_data_list = []
-    if iter_idx <= 1800:
+    if iter_idx <= 1:
         continue
     sim_data_list.append(float(dm_row[0]))
     sim_data_list.append(float(dm_row[1]))
