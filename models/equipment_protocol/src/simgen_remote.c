@@ -8,7 +8,7 @@ static const char cmd_AR[] = "AR\n";
 static const char cmd_SET_TIOP[] = "SET_TIOP,0,2,GATED,1PPS\n";
 static const char cmd_EN[] = "-,EN,1\n";
 static const char cmd_START_TIME[] = "START_TIME,22-MAR-2017 02:00:18, 01:00:00\n";
-
+static const char cmd_SCENARIO_ITERATION_RATE[] = "SCENARIO_ITERATION_RATE\n";
 static const char *MONTH_TBL[13] = {"", "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
                                     "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
@@ -189,6 +189,15 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
         free(cmd_start_time);
         cmd_start_time = NULL;
     }
+
+    /* Send SCENARIO_ITERATION_RATE commnad by TCP*/
+    cmd_payload = (uint8_t *)cmd_SCENARIO_ITERATION_RATE;
+    cmd_len = strlen(cmd_SCENARIO_ITERATION_RATE);
+    if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
+        fprintf(stderr, "[%s:%d] Error cmd send !!\n", __FUNCTION__, __LINE__);
+        goto CMD_INIT_FAIL;
+    }
+    simgen_remote_wait_cmd_resp(eqmt_info, cmd_SCENARIO_ITERATION_RATE, cmd_resp, 1);
 
     /* Send t0 mot by TCP*/
     cmd_mot_t0 = (char *)malloc(1024);
