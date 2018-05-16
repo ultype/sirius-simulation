@@ -33,9 +33,6 @@ int gps_recevier_log_parser(FILE *input_binary) {
     while(fgets(line, 1024, input_binary) != NULL) {
         if(strstr(line,"$POS,") == NULL)
             continue;
-        if (line[strlen(line) - 1] == '\n' ||  line[strlen(line) - 2] == '\r') {
-            line[strlen(line) - 2] = line[strlen(line) - 1] = '\0';
-        }
         token = strchr(line, delimiter);
         if (iter % 1 == 0)
             fprintf(output_text,"%s", token + 1);
