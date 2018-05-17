@@ -3,7 +3,6 @@ import csv
 import itertools
 import sys
 import re
-import numpy
 
 s_nav_log_input_file_name = sys.argv[1]
 print s_nav_log_input_file_name

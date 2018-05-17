@@ -3,8 +3,6 @@ import csv
 import itertools
 import sys
 import re
-import numpy
-
 
 input_gpsr_s_nav_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
 input_dm_nspo_fileobj = open('log_nspo_1khz_stand_still.csv', 'rbU')
