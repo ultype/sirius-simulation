@@ -26,3 +26,4 @@ for item in sim_data_list:
 
 s_nav_file_src.close()
 output_s_nav_file.close()
+print "gpsr_s_nav_tlm.csv"

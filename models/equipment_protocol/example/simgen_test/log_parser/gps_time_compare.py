@@ -6,8 +6,8 @@ import re
 import numpy
 
 
-input_gpsr_s_nav_fileobj = open('gpsr_s_nav_tlm.csv', 'rU')
-input_dm_nspo_fileobj = open('log_nspo_1khz_stand_still.csv', 'rU')
+input_gpsr_s_nav_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
+input_dm_nspo_fileobj = open('log_nspo_1khz_stand_still.csv', 'rbU')
 output_time_compare_fileobj = open('refine_log_nspo.csv', 'w')
 csvCursor = csv.writer(output_time_compare_fileobj)
 
@@ -27,7 +27,9 @@ for gpsr_elem in enumerate(gpsr_s_nav_arr):
             continue;
         if abs(float(gpsr_elem[1][0]) - float(dm_elem[1][1])) < 1e-4:
             csvCursor.writerow(dm_elem[1])
+            print dm_elem[1]
             break
 
 input_dm_nspo_fileobj.close()
 input_gpsr_s_nav_fileobj.close()
+print "refine_log_nspo.csv"
