@@ -16,7 +16,7 @@ gpsr_arr = csv.reader(csv_gpsr_fileobj)
 csvHeader = ['sim_time (sec)', 
              'DM_gps_sow (sec)', 'DM_SBEE_X ', 'DM_SBEE_Y ', 'DM_SBEE_Z ', 'DM_VBEE_X ', 'DM_VBEE_Y ', 'DM_VBEE_Z ',
              'GPSR_gps_sow (sec)', 'GPSR_SBEE_X ', 'GPSR_SBEE_Y ', 'GPSR_SBEE_Z ', 'GPSR_VBEE_X ', 'GPSR_VBEE_Y ', 'GPSR_VBEE_Z ',
-             'SBEE_ERR_X', 'SBEE_ERR_Y', 'SBEE_ERR_Z', 'SBEE_ERR_X', 'SBEE_ERR_Y', 'SBEE_ERR_Z']
+             'ERROR_POS_X', 'ERROR_POS_Y', 'ERROR_POS_Z', 'ERROR_VEL_X', 'ERROR_VEL_Y', 'ERROR_VEL_Z']
 csvCursor.writerow(csvHeader)
 
 sim_data_list = []
