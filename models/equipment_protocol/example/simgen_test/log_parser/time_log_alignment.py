@@ -31,4 +31,4 @@ for gpsr_elem in enumerate(gpsr_s_nav_arr):
 input_dm_nspo_fileobj.close()
 input_gpsr_s_nav_fileobj.close()
 print "refine_log_nspo.csv\n"
-print "Next step ./error_result_of_simgen.py"
+print "Next step ./combine_result_dm_and_gpsr_log.py"
