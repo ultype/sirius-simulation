@@ -15,7 +15,8 @@ with open(s_nav_log_input_file_name, 'rU') as s_nav_file_src:
     s_nav_input_log = s_nav_file_src.readlines()
 sim_data_list = []
 for element in enumerate(s_nav_input_log):
-    if element[1].find(search_string) > -1:
+    if (search_string in element[1]) == True:
+        print element[1]
         line = element[1].replace(search_string, "")
         sim_data_list.append(line)
 
