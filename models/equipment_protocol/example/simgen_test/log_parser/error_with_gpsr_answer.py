@@ -61,6 +61,7 @@ for answer_row, target_row,  egse_1khz_row in itertools.izip(answer_arr, target_
     sim_data_list.append(gpsr_speed_err * 100)
 # EGSE_1KHZ_benchmark
     sim_data_list.append(" ")
+    # egse_1khz Answer Error: 1khz_gpsr_log_answer - egse_1khz_gpsr
     egse_1khz_length = math.sqrt(float(egse_1khz_row[2])**2 + float(egse_1khz_row[3])**2  + float(egse_1khz_row[4])**2)
     egse_1khz_length_err = float(answer_row[15]) - egse_1khz_length
     sim_data_list.append(egse_1khz_length_err)
@@ -73,7 +74,6 @@ for answer_row, target_row,  egse_1khz_row in itertools.izip(answer_arr, target_
     if iter_idx >= start_flight_idx:
         mean_length_square = mean_length_square + (gpsr_length_err)**2
         mean_speed_square = mean_speed_square + (gpsr_speed_err)**2
-    # Original 1khz Answer Error: 1khz_gpsr_log_answer - egse_1khz_gpsr
         original_mean_length_sq = original_mean_length_sq + egse_1khz_length_err**2
         original_mean_speed_sq = original_mean_speed_sq + egse_1khz_speed_err**2
 
