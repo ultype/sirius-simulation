@@ -47,16 +47,16 @@ for answer_row, target_row in itertools.izip(answer_arr, target_arr):
 # GPSR ERROR for each axis: answer_gpsr_s_nav - target_gpsr_s_nav
     for x in xrange(0,6):    
         sim_data_list.append(float(answer_row[x+2]) - float(target_row[x+9]))
-    if start_flight_idx >= 300:
-    # GPSR Length ERROR: answer_gpsr_s_nav - target_gpsr_s_nav
-        gpsr_length_err = float(answer_row[15]) - float(target_row[15])
-        sim_data_list.append(gpsr_length_err)
+# GPSR Length ERROR: answer_gpsr_s_nav - target_gpsr_s_nav
+    gpsr_length_err = float(answer_row[15]) - float(target_row[15])
+    sim_data_list.append(gpsr_length_err)
+# GPSR SPEED ERROR cm/s: answer_gpsr_s_nav - target_gpsr_s_nav
+    gpsr_speed_err = float(answer_row[16]) - float(target_row[16])
+    sim_data_list.append(gpsr_speed_err * 100)
+    csvCursor.writerow(sim_data_list)
+    if iter_idx >= start_flight_idx:
         mean_length_square = mean_length_square + (gpsr_length_err)**2
-    # GPSR SPEED ERROR cm/s: answer_gpsr_s_nav - target_gpsr_s_nav
-        gpsr_speed_err = float(answer_row[16]) - float(target_row[16])
-        sim_data_list.append(gpsr_speed_err * 100)
         mean_speed_square = mean_speed_square + (gpsr_speed_err)**2
-        csvCursor.writerow(sim_data_list)
 
 
 rms_length = get_root_mean_square(mean_length_square, iter_idx - start_flight_idx)
