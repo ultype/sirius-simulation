@@ -27,22 +27,28 @@ PROGRAMMERS:
 #define ICF_EGSE_CONNECT_IP "127.0.0.1"
 
 #if defined(CONFIG_HIL_ENABLE)
-#define CAN_INTF_PORT        1
-#define RS422_INTF_PORT      0
-#define ETH_FC_INTF_PORT     1
-#define ETH_SIMGEN_INTF_PORT 1
+#define CAN_PORT_EN             1
+#define RS422_IMU_PORT_EN       0
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      0
+#define ETH_FC_PORT_EN          1
+#define ETH_SIMGEN_PORT_EN      1
 
 #elif defined(CONFIG_SAMPLE_SDT_ENABLE)
-#define CAN_INTF_PORT        0
-#define RS422_INTF_PORT      1
-#define ETH_FC_INTF_PORT     0
-#define ETH_SIMGEN_INTF_PORT 0
+#define CAN_PORT_EN             0
+#define RS422_IMU_PORT_EN       1
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      1
+#define ETH_FC_PORT_EN          0
+#define ETH_SIMGEN_PORT_EN      0
 
 #else  //  Other
-#define CAN_INTF_PORT        1
-#define RS422_INTF_PORT      0
-#define ETH_FC_INTF_PORT     1
-#define ETH_SIMGEN_INTF_PORT 0
+#define CAN_PORT_EN             1
+#define RS422_IMU_PORT_EN       0
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      0
+#define ETH_FC_PORT_EN          1
+#define ETH_SIMGEN_PORT_EN      0
 
 #endif  //  CONFIG_HIL_ENABLE
 
