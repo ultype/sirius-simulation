@@ -31,16 +31,19 @@ PROGRAMMERS:
 #define RS422_INTF_PORT      0
 #define ETH_FC_INTF_PORT     1
 #define ETH_SIMGEN_INTF_PORT 1
+
 #elif defined(CONFIG_SAMPLE_SDT_ENABLE)
 #define CAN_INTF_PORT        0
 #define RS422_INTF_PORT      1
 #define ETH_FC_INTF_PORT     0
 #define ETH_SIMGEN_INTF_PORT 0
+
 #else  //  Other
 #define CAN_INTF_PORT        1
 #define RS422_INTF_PORT      0
 #define ETH_FC_INTF_PORT     1
 #define ETH_SIMGEN_INTF_PORT 0
+
 #endif  //  CONFIG_HIL_ENABLE
 
 typedef enum _ENUM_ICF_STATUS {
