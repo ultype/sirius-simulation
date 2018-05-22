@@ -7,16 +7,13 @@ LIBRARY DEPENDENCIES:
 *************************************************************/
 
 #include "sim_objects/default_trick_sys.sm"
-##include "cannon.h"
-##include "cannon_analytic.h"
 ##include "ExternalSourceClock.hh"
 ##include "simgen_remote.h"
 ##include <time.h>
 
-class CannonSimObject : public Trick::SimObject {
+class SimgenSimObject : public Trick::SimObject {
 
     public:
-        CANNON cannon;
         struct simgen_eqmt_info_t simgen_dev;
         ExternalSourceClock ext_clk;
         FILE *nspo_stream;
@@ -77,7 +74,7 @@ class CannonSimObject : public Trick::SimObject {
             fprintf(stderr, "Go !!\n");
         };
 
-        CannonSimObject() : ext_clk() 
+        SimgenSimObject() : ext_clk() 
         {
         	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
             ("initialization") set_default_simgen_motdata(&simgen_dev);
@@ -95,4 +92,4 @@ class CannonSimObject : public Trick::SimObject {
         }
 } ;
 
-CannonSimObject dyn ;
+SimgenSimObject dyn ;

@@ -1,13 +1,11 @@
 
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CANNON_HOME = $(patsubst %/exe/HIL/cannon_sample_code/S_overrides.mk, %, $(MKFILE_PATH))
+CANNON_HOME = $(patsubst %/exe/HIL/sdt_sample_code/S_overrides.mk, %, $(MKFILE_PATH))
 
 $(info MKFILE_PATH = $(MKFILE_PATH))
 $(info CANNON_HOME = $(CANNON_HOME))
 
-INCLUDES = -I${CANNON_HOME}/models/cannon/include \
-		   -I${CANNON_HOME}/models/clock_source_mgmt \
-		   -I$(CANNON_HOME)/models/equipment_protocol/include
+INCLUDES = -I${CANNON_HOME}/models/clock_source_mgmt
 
 TRICK_CFLAGS += ${INCLUDES} -g -D_GNU_SOURCE
 TRICK_CFLAGS += -Wall -Wmissing-prototypes -Wextra -Wshadow
