@@ -8,11 +8,11 @@ LIBRARY DEPENDENCIES:
 
 #include "sim_objects/default_trick_sys.sm"
 ##include "ExternalSourceClock.hh"
-
+##include  "icf_trx_ctrl.h"
 class SDTSimObject : public Trick::SimObject {
 
     public:
-
+        struct icf_ctrlblk_t   icf_ctrl;
         void trick_heartbeat(void) {
             char date_buf[80];
             char currentTime[84] = "";
@@ -36,6 +36,9 @@ class SDTSimObject : public Trick::SimObject {
         {
         	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
             P1 (5, "scheduled") trick_heartbeat();
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+
+            ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;
 

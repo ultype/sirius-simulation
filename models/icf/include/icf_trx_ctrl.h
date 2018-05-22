@@ -25,12 +25,22 @@ PROGRAMMERS:
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 #define ICF_CTRLBLK_MAXPORT_NUMBER  16
 #define ICF_EGSE_CONNECT_IP "127.0.0.1"
-#ifdef CONFIG_HIL_ENABLE
-#define HIL_INTF 1
-#define HIL_RS422_INTF 0
-#else
-#define HIL_INTF 0
-#define HIL_RS422_INTF 0
+
+#if defined(CONFIG_HIL_ENABLE)
+#define CAN_INTF_PORT        1
+#define RS422_INTF_PORT      0
+#define ETH_FC_INTF_PORT     1
+#define ETH_SIMGEN_INTF_PORT 1
+#elif defined(CONFIG_SAMPLE_SDT_ENABLE)
+#define CAN_INTF_PORT        0
+#define RS422_INTF_PORT      1
+#define ETH_FC_INTF_PORT     0
+#define ETH_SIMGEN_INTF_PORT 0
+#else //  Other
+#define CAN_INTF_PORT        1
+#define RS422_INTF_PORT      0
+#define ETH_FC_INTF_PORT     1
+#define ETH_SIMGEN_INTF_PORT 1
 #endif  //  CONFIG_HIL_ENABLE
 
 typedef enum _ENUM_ICF_STATUS {
