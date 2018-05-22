@@ -3,9 +3,7 @@ PURPOSE: (Send data by RS422 serial port.)
 *************************************************************************/
 #include "rs422_serialport.h"
 
-#define CONFIG_EGSE_CRC_HEADER_ENABLE 1
-
-int rs422_serialport_init(void **priv_data, char *ifname, int netport) {
+int rs422_serialport_init(void **priv_data, char *ifname, int is_header_en) {
     struct rs422_device_info_t *dev_info = NULL;
     int  status = 0;
     dev_info = malloc(sizeof(struct rs422_device_info_t));
@@ -18,7 +16,7 @@ int rs422_serialport_init(void **priv_data, char *ifname, int netport) {
     dev_info->frame.crc = 0;
     dev_info->frame.payload_len = 0;
     dev_info->frame.seq_no = 0;
-    dev_info->header_size = CONFIG_EGSE_CRC_HEADER_ENABLE ? sizeof(struct rs422_frame_header_t) : 0;
+    dev_info->header_size = is_header_en ? sizeof(struct rs422_frame_header_t) : 0;
     dev_info->rs422_fd  = open_port(dev_info->portname);
     printf("%s\n", dev_info->portname);
     if (dev_info->rs422_fd  < 0) {

@@ -100,6 +100,8 @@ typedef enum _ENUM_ICF_HW_PORT {
 
 typedef enum _ENUM_ICF_NETPORT {
     EMPTY_NETPORT = -1,
+    RS422_HEADER_NONE = 0,
+    RS422_HEADER_CRC = 1,
     NUM_OF_NETPORT
 }ENUM_ICF_NETPORT;
 
