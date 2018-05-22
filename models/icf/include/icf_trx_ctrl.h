@@ -36,7 +36,7 @@ PROGRAMMERS:
 #define RS422_INTF_PORT      1
 #define ETH_FC_INTF_PORT     0
 #define ETH_SIMGEN_INTF_PORT 0
-#else //  Other
+#else  //  Other
 #define CAN_INTF_PORT        1
 #define RS422_INTF_PORT      0
 #define ETH_FC_INTF_PORT     1
