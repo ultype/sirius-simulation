@@ -54,6 +54,8 @@ LIBRARY DEPENDENCIES:
 ##include  "DM_FSW_Interface.hh"
 ##include "ExternalSourceClock.hh"
 ##include "simgen_remote.h"
+##include "sdt_gpsr.h"
+##include "gpsr_s_nav_tlm.h"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -70,6 +72,7 @@ class Rocket_SimObject : public Trick::SimObject {
         TVC tvc;
         ExternalSourceClock ext_clk;
         struct simgen_eqmt_info_t simgen_dev;
+        struct gpsr_s_nav_tlm_frame_t tlm_frame;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -284,23 +287,24 @@ class Rocket_SimObject : public Trick::SimObject {
             }
         };
 
-        void egse_200HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
-            uint32_t value= 0xFFFFFFFF;
-            FTRACE_TIME_STAMP(510);
-            icf_tx_direct(C, qidx, &value, 4);
-        };
-
-        void egse_1000HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
-            uint32_t value= 0xFFFFFFFF;
-            FTRACE_TIME_STAMP(511);
-            icf_tx_direct(C, qidx, &value, 4);
-        };
-
-        void egse_20HZ_tx_test(struct icf_ctrlblk_t *C, int qidx) {
-            uint32_t value= 0xFFFFFFFF;
-            FTRACE_TIME_STAMP(512);
-            icf_tx_direct(C, qidx, &value, 4);
-        };
+        void gather_sdt_gpsr_motion_info(struct icf_ctrlblk_t* C, void *data_frame) {
+            struct sdt_gpsr_motion_data_t mot_data;
+            struct gpsr_s_nav_tlm_frame_t *tmp_frame = (struct gpsr_s_nav_tlm_frame_t *)data_frame;
+            int send_size = sizeof(struct gpsr_s_nav_tlm_frame_t);
+            mot_data.gps_week_num = 0x12;
+            mot_data.gps_time = 0x76;
+            mot_data.validity = 0x1111;
+            mot_data.posx = -3034818.2746660495;
+            mot_data.posy = 5072117.3653596658;
+            mot_data.posz = 2388670.1371833533;
+            mot_data.velx = 0;
+            mot_data.vely = 0;
+            mot_data.velz = 0;
+            mot_data.visibility_satellites_map = 0x911;
+            sdt_gpsr_convert_motion_data_to_tlm((void *)&mot_data, tmp_frame);
+            icf_tx_direct(C, EGSE_GPSR01_SW_QIDX, tmp_frame, send_size);
+            //  icf_tx_direct(C, EGSE_GPSR02_SW_QIDX, tlm_frame, send_size);
+        }
 
         Rocket_SimObject() 
             :   env         (  ) ,
@@ -346,11 +350,8 @@ class Rocket_SimObject : public Trick::SimObject {
             //  P4 (int_step, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl);
             P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl);
             P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
-#if HIL_RS422_INTF
-            P4 (0.005, 0.001,"scheduled") egse_200HZ_tx_test(&icf_ctrl, EGSE_IMU01_SW_QIDX);
-            P4 (0.001, 0.001, "scheduled") egse_1000HZ_tx_test(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
-            P4 (0.05, 0.001, "scheduled") egse_20HZ_tx_test(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
-#endif /* HIL_RS422_INTF */
+
+            P4 (1,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, (void *)&tlm_frame);
 
 
             (int_step, "logging") env.update_diagnostic_attributes(int_step);
