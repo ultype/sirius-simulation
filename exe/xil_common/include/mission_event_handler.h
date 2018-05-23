@@ -25,6 +25,50 @@ const double MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi
 const double MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi
 const double SPI            = 291.6145604;     //  Specific impusle
 const double FUEL_FLOW_RATE = 29.587;     //  fuel flow rate
+/****************Engine coefficients*********************/
+const double S2_E1_MASS_0   = 117.13;
+const double S2_E1_MASS_1   = 27.42;
+const double S2_E1_ROLL_0   = 1.43;
+const double S2_E1_ROLL_1   = 0.41;
+const double S2_E1_PITCH_0  = 70.88;
+const double S2_E1_PITCH_1  = 23.72;
+const double S2_E1_YAW_0    = 70.88;
+const double S2_E1_YAW_1    = 23.72;
+const double S2_E1_XCG_0    = 0.67362;
+const double S2_E1_XCG_1    = 0.77217;
+/********************************************************/
+const double S2_E2_MASS_0   = 117.13;
+const double S2_E2_MASS_1   = 27.42;
+const double S2_E2_ROLL_0   = 1.43;
+const double S2_E2_ROLL_1   = 0.41;
+const double S2_E2_PITCH_0  = 70.88;
+const double S2_E2_PITCH_1  = 23.72;
+const double S2_E2_YAW_0    = 70.88;
+const double S2_E2_YAW_1    = 23.72;
+const double S2_E2_XCG_0    = 0.67362;
+const double S2_E2_XCG_1    = 0.77217;
+/********************************************************/
+const double S2_E3_MASS_0   = 117.13;
+const double S2_E3_MASS_1   = 27.42;
+const double S2_E3_ROLL_0   = 1.43;
+const double S2_E3_ROLL_1   = 0.41;
+const double S2_E3_PITCH_0  = 70.88;
+const double S2_E3_PITCH_1  = 23.72;
+const double S2_E3_YAW_0    = 70.88;
+const double S2_E3_YAW_1    = 23.72;
+const double S2_E3_XCG_0    = 0.67362;
+const double S2_E3_XCG_1    = 0.77217;
+/********************************************************/
+const double S2_E4_MASS_0   = 117.13;
+const double S2_E4_MASS_1   = 27.42;
+const double S2_E4_ROLL_0   = 1.43;
+const double S2_E4_ROLL_1   = 0.41;
+const double S2_E4_PITCH_0  = 70.88;
+const double S2_E4_PITCH_1  = 23.72;
+const double S2_E4_YAW_0    = 70.88;
+const double S2_E4_YAW_1    = 23.72;
+const double S2_E4_XCG_0    = 0.67362;
+const double S2_E4_XCG_1    = 0.77217;
 
 extern "C" int event_start() {
     double xcg_0          = 6.4138;    //  vehicle initial xcg
@@ -43,6 +87,19 @@ extern "C" int event_start() {
     PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
     rkt.tvc.set_S2_TVC();
+
+    rkt.propulsion.set_S2_E1_VARIABLE(S2_E1_XCG_0, S2_E1_XCG_1, S2_E1_ROLL_0, S2_E1_ROLL_1, S2_E1_PITCH_0, S2_E1_PITCH_1
+        , S2_E1_YAW_0, S2_E1_YAW_1, S2_E1_MASS_0, S2_E1_MASS_1);
+    rkt.propulsion.set_S2_E2_VARIABLE(S2_E2_XCG_0, S2_E2_XCG_1, S2_E2_ROLL_0, S2_E2_ROLL_1, S2_E2_PITCH_0, S2_E2_PITCH_1
+        , S2_E2_YAW_0, S2_E2_YAW_1, S2_E2_MASS_0, S2_E2_MASS_1);
+    rkt.propulsion.set_S2_E3_VARIABLE(S2_E3_XCG_0, S2_E3_XCG_1, S2_E3_ROLL_0, S2_E3_ROLL_1, S2_E3_PITCH_0, S2_E3_PITCH_1
+        , S2_E3_YAW_0, S2_E3_YAW_1, S2_E3_MASS_0, S2_E3_MASS_1);
+    rkt.propulsion.set_S2_E4_VARIABLE(S2_E4_XCG_0, S2_E4_XCG_1, S2_E4_ROLL_0, S2_E4_ROLL_1, S2_E4_PITCH_0, S2_E4_PITCH_1
+        , S2_E4_YAW_0, S2_E4_YAW_1, S2_E4_MASS_0, S2_E4_MASS_1);
+    rkt.forces.set_e1_d(0.0, 0.0, -0.69);
+    rkt.forces.set_e2_d(0.0, 0.69, 0.0);
+    rkt.forces.set_e3_d(0.0, 0.0, 0.69);
+    rkt.forces.set_e4_d(0.0, -0.69, 0.0);
     return 0;
 }
 
@@ -108,7 +165,9 @@ extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
     rkt->forces.set_DOF(6);
     rkt->forces.set_damping_ratio(0.005);
     rkt->propulsion.set_CG_OFFSET(0);
-    // rkt->propulsion.set_TWD(0);
+    rkt->propulsion.set_TWD(0);
+    rkt->forces.set_TWD_flag(0);
+    rkt->forces.set_aero_flag(1);
 }
 
 extern "C" void master_init_time(Rocket_SimObject *rkt) {
