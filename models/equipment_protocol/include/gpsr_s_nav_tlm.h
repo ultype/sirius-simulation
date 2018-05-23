@@ -46,7 +46,7 @@ struct gpsr_s_nav_tlm_frame_t {
             uint8_t boot_config_status:2;
             uint8_t selected_image_status:2;
         };
-    } boot_status;
+    } boot_status_;
     uint16_t delta_t_ls;
     uint16_t wn_lsf;
     uint8_t dn;
