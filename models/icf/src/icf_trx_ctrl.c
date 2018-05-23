@@ -22,8 +22,8 @@ static struct icf_ctrl_port g_egse_port[] = {
     {RS422_RATETBL_PORT_EN, HW_PORT3, "/dev/ttyAP2", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_RATETBL_PORT_EN, HW_PORT4, "/dev/ttyAP3", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_IMU_PORT_EN,     HW_PORT5, "/dev/ttyAP4", RS422_HEADER_CRC,  RS422_DEVICE_TYPE,     NULL, NULL},
-    {RS422_GPSR_PORT_EN,    HW_PORT6, "/dev/ttyAP5", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
-    {RS422_GPSR_PORT_EN,    HW_PORT7, "/dev/ttyAP6", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
+    {RS422_GPSR_PORT_EN,    HW_PORT6, "/dev/ttyAP5", RS422_HEADER_CRC,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {RS422_GPSR_PORT_EN,    HW_PORT7, "/dev/ttyAP6", RS422_HEADER_CRC,  RS422_DEVICE_TYPE,     NULL, NULL},
     {ETH_FC_PORT_EN,        HW_PORT8, "egse_server", 8700,              ETHERNET_DEVICE_TYPE,  NULL, NULL},
     {ETH_SIMGEN_PORT_EN,    HW_PORT9, SIMGEN_IP,     SIMGEN_PORT,       ETHERNET_DEVICE_TYPE,  NULL, NULL}
 };
@@ -461,32 +461,22 @@ int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t si
     uint8_t *tx_buffer = NULL;
     struct ringbuffer_t *whichring = NULL;
     struct ringbuffer_cell_t *txcell;
-    uint32_t frame_full_size;
     uint32_t offset = 0;
     struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
     struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
 
     whichring = &ctrlqueue->data_ring;
-    frame_full_size = size;
-    if (drv_ops->get_header_size) {
-        frame_full_size += drv_ops->get_header_size(ctrlport->drv_priv_data);
-    }
-    tx_buffer = icf_alloc_mem(frame_full_size);
+    tx_buffer = icf_alloc_mem(size);
 
-    if (drv_ops->get_header_size(ctrlport->drv_priv_data)) {
-        drv_ops->header_set(ctrlport->drv_priv_data, (uint8_t *) payload, size);
-        offset += drv_ops->header_copy(ctrlport->drv_priv_data, tx_buffer);
-    }
-    memcpy(tx_buffer + offset, (uint8_t *) payload, size);
+    memcpy(tx_buffer, (uint8_t *) payload, size);
 
     if (whichring) {
         txcell = icf_alloc_mem(sizeof(struct ringbuffer_cell_t));
-        txcell->frame_full_size = frame_full_size;
+        txcell->frame_full_size = size;
         txcell->l2frame = tx_buffer;
         rb_push(whichring, txcell);
     }
-
     return ICF_STATUS_SUCCESS;
 }
 
@@ -508,18 +498,33 @@ int icf_tx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload) {
 }
 
 int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
+    uint8_t *tx_buffer = NULL;
     struct ringbuffer_cell_t *txcell = NULL;
     struct ringbuffer_t *whichring = NULL;
     struct icf_ctrl_queue *ctrlqueue = C->ctrlqueue[qidx];
     struct icf_ctrl_port *ctrlport = C->ctrlqueue[qidx]->port;
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
+    uint32_t out_frame_size;
+    uint32_t offset = 0;
     whichring = &ctrlqueue->data_ring;
     txcell = (uint8_t *)rb_pop(whichring);
     if (txcell) {
-        drv_ops->send_data(ctrlport->drv_priv_data, txcell->l2frame, txcell->frame_full_size);
-        debug_hex_dump("icf_tx_ctrl_job", txcell->l2frame, txcell->frame_full_size);
+        out_frame_size = txcell->frame_full_size;
+        if (drv_ops->get_header_size) {
+            out_frame_size += drv_ops->get_header_size(ctrlport->drv_priv_data);
+        }
+        tx_buffer = icf_alloc_mem(out_frame_size);
+
+        if (drv_ops->get_header_size(ctrlport->drv_priv_data)) {
+            drv_ops->header_set(ctrlport->drv_priv_data, (uint8_t *) txcell->l2frame, txcell->frame_full_size);
+            offset += drv_ops->header_copy(ctrlport->drv_priv_data, tx_buffer);
+        }
+        memcpy(tx_buffer + offset, (uint8_t *) txcell->l2frame, txcell->frame_full_size);
         icf_free_mem(txcell->l2frame);
         icf_free_mem(txcell);
+        drv_ops->send_data(ctrlport->drv_priv_data, tx_buffer, out_frame_size);
+        debug_hex_dump("icf_tx_ctrl_job", tx_buffer, out_frame_size);
+        icf_free_mem(tx_buffer);
     }
     return ICF_STATUS_SUCCESS;
 }
