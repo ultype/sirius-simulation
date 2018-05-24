@@ -4,7 +4,7 @@
 PURPOSE:
       (Describe the Time Management Module Variables and Algorithm)
 LIBRARY DEPENDENCY:
-      ((../src/time.cpp))
+      ((../src/Time_management.cpp))
 PROGRAMMERS:
       (((Lai Jun Xu) () () () ))
 *******************************************************************************/
