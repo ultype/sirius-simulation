@@ -39,6 +39,8 @@ class time_management {
 
     void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
     void dm_time();/* convert simulation time to gps time */
+    uint16_t get_gpstime_week_num();
+    uint32_t get_gpstime_msec_of_week();
 
     time_util::GPS_TIME get_gpstime();
     time_util::UTC_TIME get_utctime();

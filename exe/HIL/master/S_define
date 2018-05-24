@@ -291,15 +291,15 @@ class Rocket_SimObject : public Trick::SimObject {
             struct sdt_gpsr_motion_data_t mot_data;
             struct gpsr_s_nav_tlm_frame_t *tmp_frame = (struct gpsr_s_nav_tlm_frame_t *)data_frame;
             int send_size = sizeof(struct gpsr_s_nav_tlm_frame_t);
-            mot_data.gps_week_num = 0x12;
-            mot_data.gps_time = 0x76;
-            mot_data.validity = 0x1111;
-            mot_data.posx = -3034818.2746660495;
-            mot_data.posy = 5072117.3653596658;
-            mot_data.posz = 2388670.1371833533;
-            mot_data.velx = 0;
-            mot_data.vely = 0;
-            mot_data.velz = 0;
+            mot_data.gps_week_num = time->get_gpstime_week_num();
+            mot_data.gps_time = time->get_gpstime_msec_of_week();
+            mot_data.validity = 0x1;  //  navigation data always valid
+            mot_data.posx = dynamics.get_double_SBEE()[0];
+            mot_data.posy = dynamics.get_double_SBEE()[1];
+            mot_data.posz = dynamics.get_double_SBEE()[2];
+            mot_data.velx = dynamics.get_double_VBEE()[0];
+            mot_data.vely = dynamics.get_double_VBEE()[1];
+            mot_data.velz = dynamics.get_double_VBEE()[2];
             mot_data.visibility_satellites_map = 0x911;
             sdt_gpsr_convert_motion_data_to_tlm((void *)&mot_data, tmp_frame);
             icf_tx_direct(C, EGSE_GPSR01_SW_QIDX, tmp_frame, send_size);

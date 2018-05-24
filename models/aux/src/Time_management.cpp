@@ -47,3 +47,15 @@ time_util::Modified_julian_date time_management::get_modified_julian_date() {
     // cout<<setprecision(20)<<"Julian_Date: "<<ret.get_jd()<<endl;
     return ret;
 }
+
+uint16_t time_management::get_gpstime_week_num() {
+    uint16_t week_num;
+    week_num = gpstime.get_week();
+    return week_num;
+}
+
+uint32_t time_management::get_gpstime_msec_of_week() {
+    uint32_t msec_of_week;
+    msec_of_week = gpstime.get_SOW() * 1000;
+    return msec_of_week;
+}

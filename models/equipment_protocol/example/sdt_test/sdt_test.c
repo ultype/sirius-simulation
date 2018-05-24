@@ -11,6 +11,7 @@
 #include "rs422_serialport.h"
 #include "icf_utility.h"
 #include <stdint.h>
+#include "gpsr_s_nav_tlm.h"
 
 
 void set_mincount(int fd, int mcount)
@@ -29,6 +30,14 @@ void set_mincount(int fd, int mcount)
         printf("Error tcsetattr: %s\n", strerror(errno));
 }
 
+void gpsr_tlm_dump(struct gpsr_s_nav_tlm_frame_t *tlm) {
+    fprintf(stderr, "$TLM, %d, %d, %f, %f, %f, %f, %f, %f\n",
+            tlm->gps_week_num, tlm->gps_time,
+            tlm->posx, tlm->posy, tlm->posz,
+            tlm->velx, tlm->vely, tlm->velz);
+}
+
+
 int main(int argc, char *argv[])
 {
     char portname[IFNAMSIZ] = "/dev/ttyAP0";
@@ -41,6 +50,7 @@ int main(int argc, char *argv[])
     uint32_t buf_offset = 0;
     int rdlen;
     uint32_t idx = 0;
+    struct gpsr_s_nav_tlm_frame_t tlm;
     /* Initialize the timeout structure */
     timeout.tv_sec  = 0;
     timeout.tv_usec = 100;
@@ -76,7 +86,9 @@ int main(int argc, char *argv[])
                     rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->frame.payload_len + dev_info->header_size - buf_offset);
                     buf_offset += rdlen;
                 }
-                hex_dump("RX data payload", (uint8_t *)rs422payload + dev_info->header_size, dev_info->frame.payload_len);
+                //  hex_dump("RX data payload", (uint8_t *)rs422payload + dev_info->header_size, dev_info->frame.payload_len);
+                memcpy(&tlm, rs422payload + dev_info->header_size, sizeof(struct gpsr_s_nav_tlm_frame_t));
+                gpsr_tlm_dump(&tlm);
             } else if (rdlen < 0) {
                 fprintf(stderr, "Error from read: %d: %s\n", rdlen, strerror(errno));
             }
