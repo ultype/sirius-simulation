@@ -88,7 +88,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             //  fprintf(stderr, "%f %f %f %f\n", theta_a_rad, theta_c_rad, theta_b_rad, theta_d_rad);
             /*Frame tvc no1*/
             /* Target ID */
-            tvc_no1_frame.can_id  = FC2TVC_III_NO1;
+            tvc_no1_frame.can_id  = FC_to_TVC_III_NO1;
             tvc_no1_frame.can_dlc = 8;
             /*  Indicator */
             tvc_no1_frame.data[0] = 0x1;
@@ -101,7 +101,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             /*Frame tvc no2*/
             /* Target ID */
-            tvc_no2_frame.can_id  = FC2TVC_III_NO2;
+            tvc_no2_frame.can_id  = FC_to_TVC_III_NO2;
             tvc_no2_frame.can_dlc = 8;
             /*  Indicator */
             tvc_no2_frame.data[0] = 0x2;
