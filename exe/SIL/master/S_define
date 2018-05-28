@@ -50,7 +50,7 @@ LIBRARY DEPENDENCIES:
 ##include "transceiver.hh"
 ##include "Dataflow_Binding.hh"
 ##include  "DM_FSW_Interface.hh"
-
+##include "mission_define.h"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:

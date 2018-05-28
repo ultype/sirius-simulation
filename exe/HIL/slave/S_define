@@ -26,6 +26,7 @@ LIBRARY DEPENDENCIES:
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"
 ##include "fc_agent.hh"
+##include "mission_define.h"
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
 

@@ -12,6 +12,7 @@ PROGRAMMERS:
 #define MODELS_EQUIPMENT_PROTOCOL_INCLUDE_FLIGHT_COMPUTER_EQPT_H_
 #include "icf_trx_ctrl.h"
 #include "dsp_can_interfaces.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

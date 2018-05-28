@@ -53,6 +53,7 @@ LIBRARY DEPENDENCIES:
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"
 ##include "ExternalSourceClock.hh"
+##include "mission_define.h"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -264,8 +265,8 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
-            P1 (int_step, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
-            P1 (int_step, "scheduled") mission_event_code_handler(&icf_ctrl);
+            P1 (0.002, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P1 (0.002, "scheduled") mission_event_code_handler(&icf_ctrl);
 
             P2 (int_step, "scheduled") time->dm_time();
             P2 (int_step, "scheduled") tvc.actuate(int_step, &icf_ctrl);
