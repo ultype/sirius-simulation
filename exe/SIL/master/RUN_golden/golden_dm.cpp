@@ -8,6 +8,7 @@
 #include "../../../xil_common/Modified_data/golden.h"
 #include "../../../xil_common/Modified_data/nspo.h"
 #include "../../../xil_common/Modified_data/gps.h"
+#include "../../../xil_common/Modified_data/report.h"
 #include "../../../xil_common/include/realtime.h"
 #include "../../../xil_common/include/mission_event_handler.h"
 #include "../../../xil_common/include/sirius_utility.h"
@@ -17,6 +18,7 @@ extern "C" int run_me() {
     record_nspo();
     record_gps();
     record_golden();
+    record_report();
     // external_clock_switch(&rkt.ext_clk);
     // realtime();
     master_startup(&rkt);

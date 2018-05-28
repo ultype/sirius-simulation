@@ -15,16 +15,24 @@ const double PSIBDX         = 90.0;      //  Yawing   angle of veh wrt geod coor
 const double ALPHA0X        = 0;    // Initial angle-of-attack   - deg  module newton
 const double BETA0X         = 0;    // Initial sideslip angle    - deg  module newton
 const double DVBE           = 0;    // Vehicle geographic speed  - m/s  module newton
-const double XCG_0          = 6.4138;    //  vehicle initial xcg
-const double XCG_1          = 4.7888;     //  vehicle final xcg
-const double MOI_ROLL_0     = 517.8;    //  vehicle initial moi in roll direction
-const double MOI_ROLL_1     = 180.9;     //  vehicle final moi in roll direction
-const double MOI_PITCH_0    = 32525.4;  //  vehicle initial transverse moi
-const double MOI_PITCH_1    = 19377.7;   //  vehicle final transverse moi
-const double MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi
-const double MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi
+const double XCG_0          = 6.4138;    //  vehicle initial xcg  TWD use 6.18
+const double XCG_1          = 4.7888;     //  vehicle final xcg  TWD use 4.51
+const double MOI_ROLL_0     = 517.8;    //  vehicle initial moi in roll direction  TWD use 461.87
+const double MOI_ROLL_1     = 180.9;     //  vehicle final moi in roll direction   TWD use 168.01
+const double MOI_PITCH_0    = 32525.4;  //  vehicle initial transverse moi   TWD use 27023.19
+const double MOI_PITCH_1    = 19377.7;   //  vehicle final transverse moi    TWD use 18620.51
+const double MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi   TWD use 27023.19
+const double MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi    TWD use 18620.51
 const double SPI            = 291.6145604;     //  Specific impusle
 const double FUEL_FLOW_RATE = 29.587;     //  fuel flow rate
+const double RBODY_XCG_0 = 6.18;
+const double RBODY_XCG_1 = 4.51;
+const double RBODY_MOI_ROLL_0 = 461.87;
+const double RBODY_MOI_ROLL_1 = 168.01;
+const double RBODY_MOI_PITCH_0 = 27023.19;
+const double RBODY_MOI_PITCH_1 = 18620.51;
+const double RBODY_MOI_YAW_0 = 27023.19;
+const double RBODY_MOI_YAW_1 = 18620.51;
 /****************Engine coefficients*********************/
 const double S2_E1_MASS_0   = 117.13;
 const double S2_E1_MASS_1   = 27.42;
@@ -85,7 +93,8 @@ extern "C" int event_start() {
         return 0;
     rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_LIFTOFF);
     PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
-    rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);
+    rkt.propulsion.set_input_thrust(XCG_0, XCG_1, MOI_ROLL_0, MOI_ROLL_1, MOI_PITCH_0, MOI_PITCH_1, MOI_YAW_0, MOI_YAW_1, SPI, FUEL_FLOW_RATE);
+    // rkt.propulsion.set_input_thrust(RBODY_XCG_0, RBODY_XCG_1, RBODY_MOI_ROLL_0, RBODY_MOI_ROLL_1, RBODY_MOI_PITCH_0, RBODY_MOI_PITCH_1, RBODY_MOI_YAW_0, RBODY_MOI_YAW_1, SPI, FUEL_FLOW_RATE);
     rkt.tvc.set_S2_TVC();
 
     rkt.propulsion.set_S2_E1_VARIABLE(S2_E1_XCG_0, S2_E1_XCG_1, S2_E1_ROLL_0, S2_E1_ROLL_1, S2_E1_PITCH_0, S2_E1_PITCH_1
@@ -168,6 +177,7 @@ extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
     rkt->propulsion.set_TWD(0);
     rkt->forces.set_TWD_flag(0);
     rkt->forces.set_aero_flag(1);
+    rkt->dynamics.set_liftoff(0);  // 1 only for test
 }
 
 extern "C" void master_init_time(Rocket_SimObject *rkt) {
@@ -278,6 +288,7 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
 
     rkt->tvc.set_s2_ratelim(16.0 * RAD);
     rkt->tvc.set_s2_tvclim(7.0 * RAD);
+    rkt->tvc.set_s2_tvc_acc_lim(360.0 * RAD);
 }
 
 extern "C" void mission_event_handler_configuration(Rocket_SimObject *rkt) {
