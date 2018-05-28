@@ -7,7 +7,7 @@
 struct sv_channel_t {
     uint8_t sv_id;
     uint8_t snr;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct gpsr_s_nav_tlm_frame_t {
     uint16_t gps_week_num;
@@ -51,5 +51,5 @@ struct gpsr_s_nav_tlm_frame_t {
     uint16_t wn_lsf;
     uint8_t dn;
     uint8_t delta_t_lsf;
-} __attribute__ ((packed));
+} __attribute__((packed));
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_GPSR_S_NAV_TLM_H_

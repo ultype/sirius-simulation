@@ -12,69 +12,69 @@ static const char cmd_SCENARIO_ITERATION_RATE[] = "SCENARIO_ITERATION_RATE\n";
 static const char *MONTH_TBL[13] = {"", "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
                                     "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
-static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff) {
+static int simgen_remote_motion_cmd_gen(void *data, char *cmdbuff, int buf_size) {
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     char veh_mot_str[32];
     int offset;
     strncpy(veh_mot_str, VEH_MOT(1), 32);
-    //  sprintf(cmdbuff, "%1d %02d:%02d:%07.3f,", motion_info->sim_time.ts.day, motion_info->sim_time.ts.hour, motion_info->sim_time.ts.minute, motion_info->sim_time.ts.second);
-    sprintf(cmdbuff, "%07.3f,", motion_info->sim_time.second);
+    //  snprintf(cmdbuff, buf_size,"%1d %02d:%02d:%07.3f,", motion_info->sim_time.ts.day, motion_info->sim_time.ts.hour, motion_info->sim_time.ts.minute, motion_info->sim_time.ts.second);
+    snprintf(cmdbuff, buf_size, "%07.3f,", motion_info->sim_time.second);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%s,%s,", g_remote_motion_cmd_list[motion_info->cmd_idx], veh_mot_str);
+    snprintf(cmdbuff + offset, buf_size - offset, "%s,%s,", g_remote_motion_cmd_list[motion_info->cmd_idx], veh_mot_str);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->position_xyz[0], motion_info->position_xyz[1], motion_info->position_xyz[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->position_xyz[0], motion_info->position_xyz[1], motion_info->position_xyz[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->velocity_xyz[0], motion_info->velocity_xyz[1], motion_info->velocity_xyz[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->velocity_xyz[0], motion_info->velocity_xyz[1], motion_info->velocity_xyz[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->acceleration_xyz[0], motion_info->acceleration_xyz[1], motion_info->acceleration_xyz[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->acceleration_xyz[0], motion_info->acceleration_xyz[1], motion_info->acceleration_xyz[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->jerk_xyz[0], motion_info->jerk_xyz[1], motion_info->jerk_xyz[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->jerk_xyz[0], motion_info->jerk_xyz[1], motion_info->jerk_xyz[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->heb[0], motion_info->heb[1], motion_info->heb[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->heb[0], motion_info->heb[1], motion_info->heb[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->angular_velocity[0], motion_info->angular_velocity[1], motion_info->angular_velocity[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->angular_velocity[0], motion_info->angular_velocity[1], motion_info->angular_velocity[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f,", motion_info->angular_acceleration[0], motion_info->angular_acceleration[1], motion_info->angular_acceleration[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f,", motion_info->angular_acceleration[0], motion_info->angular_acceleration[1], motion_info->angular_acceleration[2]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%20.10f,%20.10f,%20.10f\n", motion_info->angular_jerk[0], motion_info->angular_jerk[1], motion_info->angular_jerk[2]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%20.10f,%20.10f,%20.10f\n", motion_info->angular_jerk[0], motion_info->angular_jerk[1], motion_info->angular_jerk[2]);
     return 0;
 }
 
-static int simgen_remote_gps_start_time_cmd_gen(void *data, char *cmdbuff) {
+static int simgen_remote_gps_start_time_cmd_gen(void *data, char *cmdbuff, int buf_size) {
     struct simgen_gps_start_time_t *start_time = (struct simgen_gps_start_time_t *)data;
     int offset = 0;
 
-    sprintf(cmdbuff, "START_TIME,");
+    snprintf(cmdbuff, buf_size, "START_TIME,");
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%02d-", start_time->day);
+    snprintf(cmdbuff + offset, buf_size - offset, "%02d-", start_time->day);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%s-", MONTH_TBL[start_time->month]);
+    snprintf(cmdbuff + offset, buf_size - offset, "%s-", MONTH_TBL[start_time->month]);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%d ", start_time->year);
+    snprintf(cmdbuff + offset, buf_size - offset, "%d ", start_time->year);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%02d:", start_time->hour);
+    snprintf(cmdbuff + offset, buf_size - offset, "%02d:", start_time->hour);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%02d:", start_time->minute);
+    snprintf(cmdbuff + offset, buf_size - offset, "%02d:", start_time->minute);
     offset = strlen(cmdbuff);
 
-    sprintf(cmdbuff + offset, "%02d,", start_time->second);
+    snprintf(cmdbuff + offset, buf_size - offset, "%02d,", start_time->second);
     offset = strlen(cmdbuff);
     /* Duration */
-    sprintf(cmdbuff + offset, "01:00:00\n");
+    snprintf(cmdbuff + offset, buf_size - offset,  "01:00:00\n");
 
     return 0;
 }
@@ -165,7 +165,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     char *cmd_start_time = NULL;
     uint32_t cmd_len;
 
-    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
+    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     /* Create TCP Socket */
     fprintf(stderr, "Connect to simgen TCP Server....\n");
     if (simgen_create_remote_cmd_channel(eqmt_info, SIMGEN_IP, SIMGEN_PORT) < 0) {
@@ -177,7 +177,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     cmd_start_time = (char *)malloc(64);
     if (cmd_start_time == NULL)
         goto CMD_INIT_FAIL;
-    simgen_remote_gps_start_time_cmd_gen(&eqmt_info->gps_start_time, cmd_start_time);
+    simgen_remote_gps_start_time_cmd_gen(&eqmt_info->gps_start_time, cmd_start_time, 63);
     cmd_payload = (uint8_t *)cmd_start_time;
     cmd_len = strlen(cmd_start_time);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
@@ -203,7 +203,7 @@ int simgen_remote_cmd_init(struct simgen_eqmt_info_t *eqmt_info, void *data) {
     cmd_mot_t0 = (char *)malloc(1024);
     if (cmd_mot_t0 == NULL)
         goto CMD_INIT_FAIL;
-    simgen_remote_motion_cmd_gen(motion_info, cmd_mot_t0);
+    simgen_remote_motion_cmd_gen(motion_info, cmd_mot_t0, 1023);
     cmd_payload = (uint8_t *)cmd_mot_t0;
     cmd_len = strlen(cmd_mot_t0);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
@@ -270,12 +270,12 @@ int simgen_remote_tn_motion_send(struct simgen_eqmt_info_t *eqmt_info, void *dat
     char *cmd_mot_tn = NULL;
     uint32_t cmd_len;
 
-    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t * )data;
+    struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     /* Send tn mot by TCP*/
     cmd_mot_tn = (char *)malloc(1024);
     if (cmd_mot_tn == NULL)
         goto CMD_Tn_FAIL;
-    simgen_remote_motion_cmd_gen(motion_info, cmd_mot_tn);
+    simgen_remote_motion_cmd_gen(motion_info, cmd_mot_tn, 1023);
     cmd_payload = (uint8_t *)cmd_mot_tn;
     cmd_len = strlen(cmd_mot_tn);
     if (remote_cmd_send(eqmt_info, cmd_payload, cmd_len) < cmd_len) {
@@ -380,6 +380,7 @@ int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *st
     char *token;
     char line[1024];
     int idx = 0;
+    char *saveptr = NULL;
     if (fgets(line, 1024, stream) == NULL) {
         return EXIT_SUCCESS;
     }
@@ -388,51 +389,51 @@ int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *st
         return EXIT_SUCCESS;
     }
     /* get the first token */
-    token = strtok(line, delimiter);
+    token = strtok_r(line, delimiter, &saveptr);
     motion_data->sim_time.second = atof(token);
     /* SOW by pass */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     /* Position */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->position_xyz[0] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->position_xyz[1] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->position_xyz[2] = atof(token);
     /* velocity */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->velocity_xyz[0] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->velocity_xyz[1] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->velocity_xyz[2] = atof(token);
     /* acceleration */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->acceleration_xyz[0] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->acceleration_xyz[1] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->acceleration_xyz[2] = atof(token);
     /* JERK */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->jerk_xyz[0] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->jerk_xyz[1] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->jerk_xyz[2] = atof(token);
     /* heb */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->heb[0] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->heb[1] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->heb[2] = atof(token);
     /* angular_velocity */
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->angular_velocity[0] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->angular_velocity[1] = atof(token);
-    token = strtok(NULL, delimiter);
+    token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->angular_velocity[2] = atof(token);
     return EXIT_SUCCESS;
 }

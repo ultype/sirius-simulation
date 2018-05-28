@@ -14,8 +14,7 @@
 #include "gpsr_s_nav_tlm.h"
 
 
-void set_mincount(int fd, int mcount)
-{
+void set_mincount(int fd, int mcount) {
     struct termios tty;
 
     if (tcgetattr(fd, &tty) < 0) {
@@ -38,8 +37,7 @@ void gpsr_tlm_dump(struct gpsr_s_nav_tlm_frame_t *tlm) {
 }
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     char portname[IFNAMSIZ] = "/dev/ttyAP0";
     uint32_t pkt_cnt = 0;
     struct rs422_device_info_t *dev_info;
@@ -71,12 +69,12 @@ int main(int argc, char *argv[])
         FD_ZERO(&readfs);
         FD_SET(dev_info->rs422_fd, &readfs);
         if (select(dev_info->rs422_fd + 1, &readfs, NULL, NULL, &timeout) < 0)
-            fprintf(stderr, "[%s:%d] %s\n", __FUNCTION__, __LINE__, strerror(errno));;
+            fprintf(stderr, "[%s:%d] %s\n", __FUNCTION__, __LINE__, strerror(errno));
         if (FD_ISSET(dev_info->rs422_fd, &readfs)) {
             while (buf_offset < dev_info->header_size) {
                 rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->header_size - buf_offset);
                 buf_offset += rdlen;
-                if(idx++ == 10) printf("[%s] pkt_cnt: %d\n" ,portname ,pkt_cnt);
+                if (idx++ == 10) printf("[%s] pkt_cnt: %d\n", portname, pkt_cnt);
             }
 
             if (buf_offset == dev_info->header_size) {

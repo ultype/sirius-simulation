@@ -21,7 +21,7 @@ PROGRAMMERS:
 #include <unistd.h>
 #include <errno.h>
 #define SIMGEN_IP "127.0.0.1"
-//#define SIMGEN_IP "192.168.0.8"
+//  #define SIMGEN_IP "192.168.0.8"
 #define SIMGEN_PORT 15650
 #define VEH_MOT(id) "v"#id"_m1"
 
@@ -57,16 +57,16 @@ struct simgen_motion_data_t {
     } sim_time;
     uint8_t cmd_idx;
     uint8_t vehicle_id;
-    double position_xyz[3];         // uint: metres
-    double velocity_xyz[3];         // uint: m/s
-    double acceleration_xyz[3];     // uint: m/s^2
-    double jerk_xyz[3];             // uint: m/s^3
-    double heb[3];                  // heading: uint range +/- pi
-                                    // elevation: uint range +/- pi/2
-                                    // bank: uint range +/- pi
-    double angular_velocity[3];     // uint: rad/s
-    double angular_acceleration[3]; // uint: rad/s^2
-    double angular_jerk[3];         // uint: rad/s^3
+    double position_xyz[3];          //  uint: metres
+    double velocity_xyz[3];          //  uint: m/s
+    double acceleration_xyz[3];      //  uint: m/s^2
+    double jerk_xyz[3];              //  uint: m/s^3
+    double heb[3];                   //  heading: uint range +/- pi
+                                     //  elevation: uint range +/- pi/2
+                                     //  bank: uint range +/- pi
+    double angular_velocity[3];      //  uint: rad/s
+    double angular_acceleration[3];  //  uint: rad/s^2
+    double angular_jerk[3];          //  uint: rad/s^3
 };
 
 struct simgen_eqmt_info_t {

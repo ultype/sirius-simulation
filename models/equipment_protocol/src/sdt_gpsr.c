@@ -5,7 +5,7 @@
 int sdt_gpsr_convert_motion_data_to_tlm(void *data , struct gpsr_s_nav_tlm_frame_t *tlm_frame) {
     struct sdt_gpsr_motion_data_t *mot_data = (struct sdt_gpsr_motion_data_t *)data;
 
-    memset(tlm_frame,0 , sizeof(struct gpsr_s_nav_tlm_frame_t));
+    memset(tlm_frame, 0, sizeof(struct gpsr_s_nav_tlm_frame_t));
     tlm_frame->gps_week_num = mot_data->gps_week_num;
     tlm_frame->gps_time = mot_data->gps_time;
     tlm_frame->validity = mot_data->validity;
