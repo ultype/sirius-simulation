@@ -25,9 +25,9 @@ int fc_agent_tvc_cmd_movement(struct can_frame *tvc_no1_frame, struct can_frame 
     /* Task Command */
     tvc_no1_frame->data[1] = TVC_MOVEMENT_FAKE;
     /* TVC no1 pos idx2 => theta_a*/
-    databuffer_cputobe16(&tvc_no1_frame->data[2], reinterpret_cast<uint16_t *>&theta_a_cnt);
+    databuffer_cputobe16(&tvc_no1_frame->data[2], reinterpret_cast<uint16_t *>(&theta_a_cnt));
     /* TVC no1 pos idx4 => theta_b*/
-    databuffer_cputobe16(&tvc_no1_frame->data[4], reinterpret_cast<uint16_t *>&theta_b_cnt);
+    databuffer_cputobe16(&tvc_no1_frame->data[4], reinterpret_cast<uint16_t *>(&theta_b_cnt));
 
     /*Frame tvc no2*/
     /* Target ID */
@@ -38,8 +38,8 @@ int fc_agent_tvc_cmd_movement(struct can_frame *tvc_no1_frame, struct can_frame 
     /* Task Command */
     tvc_no2_frame->data[1] = TVC_MOVEMENT_FAKE;
     /* TVC no2 pos idx2 => theta_c*/
-    databuffer_cputobe16(&tvc_no2_frame->data[2], reinterpret_cast<uint16_t *>&theta_c_cnt);
+    databuffer_cputobe16(&tvc_no2_frame->data[2], reinterpret_cast<uint16_t *>(&theta_c_cnt));
     /* TVC no2 pos idx4 => theta_d*/
-    databuffer_cputobe16(&tvc_no2_frame->data[4], reinterpret_cast<uint16_t *>&theta_d_cnt);
+    databuffer_cputobe16(&tvc_no2_frame->data[4], reinterpret_cast<uint16_t *>(&theta_d_cnt));
     return 0;
 }
