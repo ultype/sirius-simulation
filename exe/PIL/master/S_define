@@ -181,6 +181,7 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_s2_act2_acc    = LINK(tvc, get_s2_act2_acc);
             forces.grab_s2_act3_acc    = LINK(tvc, get_s2_act3_acc);
             forces.grab_s2_act4_acc    = LINK(tvc, get_s2_act4_acc);
+            forces.grab_structure_XCG  = LINK(propulsion, get_structure_XCG);
 
             gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
             gps_con.grab_TEI           = LINK( env, get_TEI);
@@ -217,6 +218,10 @@ class Rocket_SimObject : public Trick::SimObject {
             propulsion.grab_press      = LINK( env, get_press);
             propulsion.grab_SLOSH_CG   = LINK( forces, get_SLOSH_CG);
             propulsion.grab_slosh_mass = LINK( forces, get_slosh_mass);
+            propulsion.grab_e1_XCG    = LINK( forces, get_e1_XCG);
+            propulsion.grab_e2_XCG    = LINK( forces, get_e2_XCG);
+            propulsion.grab_e3_XCG    = LINK( forces, get_e3_XCG);
+            propulsion.grab_e4_XCG    = LINK( forces, get_e4_XCG);
         };
 
         void egse_uplink_packet_enqueue(struct icf_ctrlblk_t *C) {
