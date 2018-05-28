@@ -1,4 +1,4 @@
-#include "flight_computer_agent.h"
+#include "flight_computer_eqpt.h"
 
 int fc_can_cmd_dispatch(void *rxframe) {
     int qidx = EGSE_EMPTY_SW_QIDX;

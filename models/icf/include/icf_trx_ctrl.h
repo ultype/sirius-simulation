@@ -21,7 +21,7 @@ PROGRAMMERS:
 #include "ringbuffer.h"
 #include "icf_drivers.h"
 #include "trick/exec_proto.h"
-#include "flight_computer_agent.h"
+#include "flight_computer_eqpt.h"
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 #define ICF_CTRLBLK_MAXPORT_NUMBER  16
 #define ICF_EGSE_CONNECT_IP "127.0.0.1"
