@@ -6,7 +6,9 @@ cd $SIRIUS_HOME_PATH/exe/HIL/master
 make clean
 cd $SIRIUS_HOME_PATH/exe/HIL/slave
 make clean
-cd $SIRIUS_HOME_PATH/exe/HIL/cannon_sample_code
+cd $SIRIUS_HOME_PATH/exe/HIL/simgen_sample_code
+make clean
+cd $SIRIUS_HOME_PATH/exe/HIL/sdt_sample_code
 make clean
 cd $SIRIUS_HOME_PATH/exe/PIL/master
 make clean

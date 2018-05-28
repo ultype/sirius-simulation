@@ -122,7 +122,7 @@ static int remote_cmd_recv(struct simgen_eqmt_info_t *eqmt_info, uint8_t *rx_buf
                 rdlen = 0;
             else
                 return -1;
-        } else if(rdlen == 0) {
+        } else if (rdlen == 0) {
             break;
         }
         offset += rdlen;
@@ -308,7 +308,6 @@ void simgen_remote_end_scenario_now(struct simgen_eqmt_info_t *eqmt_info) {
 }
 
 int simgen_udp_motion_cmd_gen(void *data, struct simgen_udp_command_t *udp_cmd) {
-
     struct simgen_motion_data_t *motion_info = (struct simgen_motion_data_t *)data;
     udp_cmd->type_ = UDP_CMD_MOT;
     udp_cmd->time_action_ = ACTION_AT_TIMESTAMP_ENUM;
@@ -362,7 +361,6 @@ int simgen_default_remote_data(struct simgen_motion_data_t *motion_info) {
     motion_info->angular_jerk[1] = 0.0;
     motion_info->angular_jerk[2] = 0.0;
     return 0;
-
 }
 
 int simgen_init_input_file(FILE **stream) {
@@ -382,7 +380,7 @@ int simgen_convert_csv_to_mot(struct simgen_motion_data_t *motion_data, FILE *st
     char *token;
     char line[1024];
     int idx = 0;
-    if(fgets(line, 1024, stream) == NULL) {
+    if (fgets(line, 1024, stream) == NULL) {
         return EXIT_SUCCESS;
     }
 

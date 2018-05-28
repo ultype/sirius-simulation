@@ -321,7 +321,6 @@ empty:
 
 static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
     int qidx = 0;
-    struct can_frame *pframe = NULL;
 
     if (system_type == ICF_SYSTEM_TYPE_ESPS) {
         qidx = ESPS_GNC_SW_QIDX;
@@ -337,31 +336,16 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
 
     if (system_type == ICF_SYSTEM_TYPE_SIL_EGSE) {
         qidx = EGSE_SIL_DOWNLINK_SW_QIDX;
-        debug_hex_dump("esps_dispatch", rxframe, 24);
+        debug_hex_dump("egse_sil_dispatch", rxframe, 24);
         return qidx;
     }
-    pframe = (struct can_frame *)rxframe;
-    switch (pframe->can_id) {
-        case FC2TVC_III_NO1:
-        case FC2TVC_III_NO2:
-        case FC2TVC_II_NO1:
-        case FC2TVC_II_NO2:
-            qidx = EGSE_TVC_SW_QIDX;
-            break;
-        case FC2VALVE_III_NO1:
-        case FC2RCS_III:
-        case FC2ORDNANCE_FAIRING_III:
-        case FC2VALVE_II_NO1:
-        case FC2ORDNANCE_SEPARATION_II:
-            qidx = EGSE_EMPTY_SW_QIDX;
-            break;
-        case 0x555:
-            qidx = EGSE_RX_MISSION_EVENT_QIDX;
-            break;
-        default:
-            fprintf(stderr, "[%s] Unknown CAN command. ID = 0x%x\n", __FUNCTION__, pframe->can_id);
-            qidx = EGSE_EMPTY_SW_QIDX;
+
+    if (system_type == ICF_SYSTEM_TYPE_EGSE) {
+        qidx = fc_can_cmd_dispatch(rxframe);
+        debug_hex_dump("egse_dispatch", rxframe, 24);
+        return qidx;
     }
+    fprintf(stderr, "[%s:%d] System type not match !!\n", __FUNCTION__, __LINE__);
     return qidx;
 }
 
