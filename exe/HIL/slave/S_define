@@ -89,6 +89,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             if (icf_rx_dequeue(C, ESPS_GNC_SW_QIDX, &dm_ins_db, sizeof(refactor_uplink_packet_t)) > 0)
                 debug_hex_dump("esps", (uint8_t *)&dm_ins_db, sizeof(refactor_uplink_packet_t));
         }
+
         FlightComputer_SimObject() : ins(),
                                      gps()
         {
@@ -100,7 +101,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             ("initialization") control.initialize();
             ("initialization") ins.initialize();
 
-            P1 (0.05, "scheduled") time->dm_time();
+            P1 (0.05, "scheduled") time->dm_time(0.05);
             P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_esps_ctrl, HW_PORT8, sizeof(refactor_uplink_packet_t));
             P2 (0.05, "scheduled") load_input(&icf_esps_ctrl);
             P2 (0.01, "scheduled") clear_flag();
