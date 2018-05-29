@@ -9,7 +9,9 @@ int fc_can_cmd_dispatch(void *rxframe) {
         case FC_to_TVC_III_NO2:
         case FC_to_TVC_II_NO1:
         case FC_to_TVC_II_NO2:
-            qidx = EGSE_TVC_SW_QIDX;
+            if (pframe->data[0] == TVC_MOVEMENT_FAKE || pframe->data[0] == TVC_MOVEMENT_REAL) {
+                qidx = EGSE_TVC_SW_QIDX;
+            }
             break;
         case FC_to_PFS_III:
         case FC_to_RCS_III:

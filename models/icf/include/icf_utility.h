@@ -11,7 +11,7 @@
 #define BIT(n) ((0x1U) << (n))
 #define BITS(m, n) (~(BIT(m) - 1) & ((BIT(n) - 1) | BIT(n)))
 
-
+#define OUT_RANGE(i, min, max) (i < min) || (i > max) ? 1 : 0
 #define SWAP32(x) \
     ((uint32_t) (\
     (((uint32_t) (x) & (uint32_t) 0x000000ffUL) << 24) | \
@@ -26,7 +26,20 @@
 
 #define debug_print(...) do { if (ICF_DEBUG_ENABLE) \
                                    fprintf(stderr, __VA_ARGS__);} while (0)
-
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define PP_HTONS(x) ((uint16_t)((((x) & (uint16_t)0x00ffU) << 8) | (((x) & (uint16_t)0xff00U) >> 8)))
+#define PP_NTOHS(x) PP_HTONS(x)
+#define PP_HTONL(x) ((((x) & (uint32_t)0x000000ffUL) << 24) | \
+                     (((x) & (uint32_t)0x0000ff00UL) <<  8) | \
+                     (((x) & (uint32_t)0x00ff0000UL) >>  8) | \
+                     (((x) & (uint32_t)0xff000000UL) >> 24))
+#define PP_NTOHL(x) PP_HTONL(x)
+#else /* __ORDER_BIG_ENDIAN__ */
+#define PP_HTONS(x) (x)
+#define PP_NTOHS(x) (x)
+#define PP_HTONL(x) (x)
+#define PP_NTOHL(x) (x)
+#endif
 /**
  * @brief   TiSPACE EGSE System Profiling Server (ESPS)
  */
@@ -78,8 +91,8 @@ uint32_t invert_crc32(uint32_t crc);
 uint32_t crc_checker(uint32_t rx_crc, const uint8_t *buf, uint32_t size);
 double get_curr_time(void);
 int get_arr_num(int arrary_size, int element_size);
-int databuffer_cputobe16(uint8_t *dest, uint16_t *src);
-int databuffer_be16tocpu(uint16_t *dest, uint8_t *src);
+int copy_buffer_htons(uint8_t *dest, uint16_t *src);
+int copy_buffer_ntohs(uint16_t *dest, uint8_t *src);
 #ifdef __cplusplus
 }
 #endif

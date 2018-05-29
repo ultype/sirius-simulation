@@ -20,26 +20,22 @@ int fc_agent_tvc_cmd_movement(struct can_frame *tvc_no1_frame, struct can_frame 
     /* Target ID */
     tvc_no1_frame->can_id  = FC_to_TVC_III_NO1;
     tvc_no1_frame->can_dlc = 8;
-    /*  Indicator */
-    tvc_no1_frame->data[0] = 0x1;
     /* Task Command */
-    tvc_no1_frame->data[1] = TVC_MOVEMENT_FAKE;
-    /* TVC no1 pos idx2 => theta_a*/
-    databuffer_cputobe16(&tvc_no1_frame->data[2], reinterpret_cast<uint16_t *>(&theta_a_cnt));
-    /* TVC no1 pos idx4 => theta_b*/
-    databuffer_cputobe16(&tvc_no1_frame->data[4], reinterpret_cast<uint16_t *>(&theta_b_cnt));
+    tvc_no1_frame->data[0] = TVC_MOVEMENT_FAKE;
+    /* TVC_no1 pitch => theta_a*/
+    copy_buffer_htons(&tvc_no1_frame->data[1], reinterpret_cast<uint16_t *>(&theta_a_cnt));
+    /* TVC_no1 yaw => theta_b*/
+    copy_buffer_htons(&tvc_no1_frame->data[3], reinterpret_cast<uint16_t *>(&theta_b_cnt));
 
     /*Frame tvc no2*/
     /* Target ID */
     tvc_no2_frame->can_id  = FC_to_TVC_III_NO2;
     tvc_no2_frame->can_dlc = 8;
-    /*  Indicator */
-    tvc_no2_frame->data[0] = 0x2;
     /* Task Command */
-    tvc_no2_frame->data[1] = TVC_MOVEMENT_FAKE;
-    /* TVC no2 pos idx2 => theta_c*/
-    databuffer_cputobe16(&tvc_no2_frame->data[2], reinterpret_cast<uint16_t *>(&theta_c_cnt));
-    /* TVC no2 pos idx4 => theta_d*/
-    databuffer_cputobe16(&tvc_no2_frame->data[4], reinterpret_cast<uint16_t *>(&theta_d_cnt));
+    tvc_no2_frame->data[0] = TVC_MOVEMENT_FAKE;
+    /* TVC_no2 pitch => theta_c*/
+    copy_buffer_htons(&tvc_no2_frame->data[1], reinterpret_cast<uint16_t *>(&theta_c_cnt));
+    /* TVC_no2 yaw => theta_d*/
+    copy_buffer_htons(&tvc_no2_frame->data[3], reinterpret_cast<uint16_t *>(&theta_d_cnt));
     return 0;
 }

@@ -117,16 +117,17 @@ int get_arr_num(int arrary_size, int element_size) {
     return (arrary_size/element_size);
 }
 
-int databuffer_cputobe16(uint8_t *dest, uint16_t *src) {
+int copy_buffer_htons(uint8_t *dest, uint16_t *src) {
     uint16_t be_value;
-    be_value = htobe16(*src);
-    memcpy(dest, &be_value, sizeof(uint16_t));
+    be_value = PP_HTONS(*src);
+    dest[1] = (be_value & 0xFF00U) >> 8;
+    dest[0] = (be_value & 0xFFU);
     return 0;
 }
 
-int databuffer_be16tocpu(uint16_t *dest, uint8_t *src) {
+int copy_buffer_ntohs(uint16_t *dest, uint8_t *src) {
     uint16_t be_value;
-    memcpy(&be_value, src, sizeof(uint16_t));
-    *dest = be16toh(be_value);
+    be_value = (src[1] << 8) | (src[0]);
+    *dest = PP_NTOHS(be_value);
     return 0;
 }
