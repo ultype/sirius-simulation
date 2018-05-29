@@ -1,5 +1,5 @@
-#ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
-#define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
+#ifndef EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_
+#define EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_
 #include "sirius_utility.h"
 #include "trick/exec_proto.h"
 #include "trick/jit_input_file_proto.hh"
@@ -89,10 +89,10 @@ extern "C" int event_start() {
     double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
     double spi            = 291.6145604;     //  Specific impusle 291.6145604 274.8
     double fuel_flow_rate = 29.587;     //  fuel flow rate
-    if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_LIFTOFF, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+    if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_CODE_LIFTOFF, rkt.egse_flight_event_handler_bitmap, rkt.flight_event_code_record))
         return 0;
-    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_LIFTOFF);
-    PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
+    rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_LIFTOFF);
+    PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
     rkt.propulsion.set_input_thrust(XCG_0, XCG_1, MOI_ROLL_0, MOI_ROLL_1, MOI_PITCH_0, MOI_PITCH_1, MOI_YAW_0, MOI_YAW_1, SPI, FUEL_FLOW_RATE);
     // rkt.propulsion.set_input_thrust(RBODY_XCG_0, RBODY_XCG_1, RBODY_MOI_ROLL_0, RBODY_MOI_ROLL_1, RBODY_MOI_PITCH_0, RBODY_MOI_PITCH_1, RBODY_MOI_YAW_0, RBODY_MOI_YAW_1, SPI, FUEL_FLOW_RATE);
     rkt.tvc.set_S2_TVC();
@@ -124,10 +124,10 @@ extern "C" int event_separation_1() {
     double spi            = 288.4111169;  // 288.4111169 290.0
     double fuel_flow_rate = 3.814;
 
-     if (!IS_MISSION_ARRIVED(MISSION_EVENT_CODE_S3_SEPERATION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+     if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_CODE_S3_SEPERATION, rkt.egse_flight_event_handler_bitmap, rkt.flight_event_code_record))
         return 0;
-    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_CODE_S3_SEPERATION);
-    PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
+    rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S3_SEPERATION);
+    PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
 
     rkt.aerodynamics.set_refa(0.7542);
     rkt.aerodynamics.set_refd(0.98);
@@ -157,16 +157,16 @@ extern "C" int event_S3_ignition() {
 }
 
 extern "C" int event_fairing_separation() {
-    if (!IS_MISSION_ARRIVED(MISSION_EVENT_FAIRING_JETTSION, rkt.egse_mission_handler_bitmap, rkt.mission_event_code_record))
+    if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_FAIRING_JETTSION, rkt.egse_flight_event_handler_bitmap, rkt.flight_event_code_record))
         return 0;
-    rkt.egse_mission_handler_bitmap &= ~(0x1U << MISSION_EVENT_FAIRING_JETTSION);
-    PRINT_MISSION_MESSAGE("EGSE", exec_get_sim_time(), "Recived mission_code", rkt.mission_event_code_record);
+    rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_FAIRING_JETTSION);
+    PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
     rkt.propulsion.set_vmass0(691.4);
     return 0;
 }
 
 extern "C" void master_startup(Rocket_SimObject *rkt) {
-    rkt->egse_mission_handler_bitmap &= ~(0x1U << 0);
+    rkt->egse_flight_event_handler_bitmap &= ~(0x1U << 0);
 }
 
 extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
@@ -291,7 +291,7 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     rkt->tvc.set_s2_tvc_acc_lim(360.0 * RAD);
 }
 
-extern "C" void mission_event_handler_configuration(Rocket_SimObject *rkt) {
+extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     /* events */
     jit_add_event("event_start", "LIFTOFF", 0.001);
     jit_add_event("event_separation_1", "S3", 0.001);
@@ -301,4 +301,4 @@ extern "C" void mission_event_handler_configuration(Rocket_SimObject *rkt) {
     exec_set_terminate_time(200.001  + rkt->stand_still_time);
 }
 
-#endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_HANDLER_H_
+#endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_

@@ -16,7 +16,7 @@ INCLUDES = -I${TRICK_HOME}/trick_models \
 		   -I$(SIRIUS_HOME)/models/icf/include \
 		   -I$(SIRIUS_HOME)/models/clock_source_mgmt \
 		   -I$(SIRIUS_HOME)/models/equipment_protocol/include \
-		   -I$(SIRIUS_HOME)/models/mission/include
+		   -I$(SIRIUS_HOME)/models/flight_events/include
 
 TRICK_CFLAGS += --std=c++11 ${INCLUDES} -g -D_GNU_SOURCE -DCONFIG_HIL_ENABLE
 TRICK_CFLAGS += -Wall -Wmissing-prototypes -Wextra -Wshadow

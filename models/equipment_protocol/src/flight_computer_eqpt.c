@@ -19,7 +19,7 @@ int fc_can_cmd_dispatch(void *rxframe) {
             qidx = EGSE_EMPTY_SW_QIDX;
             break;
         case FC_to_EGSE_MISSION_EVENT_FAKE:
-            qidx = EGSE_RX_MISSION_EVENT_QIDX;
+            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
             break;
         default:
             fprintf(stderr, "[%s] Unknown CAN command. ID = 0x%x\n", __FUNCTION__, pframe->can_id);

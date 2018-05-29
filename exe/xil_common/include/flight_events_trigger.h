@@ -1,5 +1,5 @@
-#ifndef EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
-#define EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
+#ifndef EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_
+#define EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_
 #include "sirius_utility.h"
 #include "trick/exec_proto.h"
 #include "trick/jit_input_file_proto.hh"
@@ -81,8 +81,8 @@ const double S3_AOACMD = -0.0;
 
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_LIFTOFF;
-    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_CODE_LIFTOFF", fc.ctl_tvc_db.mission_event_code);
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_LIFTOFF;
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_LIFTOFF", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
@@ -110,14 +110,14 @@ extern "C" int event_aoac_on(void) {
 
 extern "C" int event_control_off(void) {
     fc.control.set_NO_CONTROL();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_CONTROL_OFF;
-    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_CODE_CONTROL_OFF", fc.ctl_tvc_db.mission_event_code);
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_CONTROL_OFF;
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_CONTROL_OFF", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
 extern "C" int event_fairing_jettison(void) {
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_FAIRING_JETTSION;
-    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_FAIRING_JETTSION", fc.ctl_tvc_db.mission_event_code);
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_FAIRING_JETTSION;
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_FAIRING_JETTSION", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
@@ -170,8 +170,8 @@ extern "C" int event_s3_seperation(void) {
     fc.control.set_attcmd(S3_rollcmd, S3_pitchcmd, S3_yawcmd);
     fc.control.set_aoacmd(S3_aoacmd);
     fc.control.set_ierror_zero();
-    fc.ctl_tvc_db.mission_event_code = MISSION_EVENT_CODE_S3_SEPERATION;
-    PRINT_MISSION_MESSAGE("FC", exec_get_sim_time(), "MISSION_EVENT_CODE_S3_SEPERATION", fc.ctl_tvc_db.mission_event_code);
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S3_SEPERATION;
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S3_SEPERATION", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
@@ -328,7 +328,7 @@ extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
     return 0;
 }
 
-extern "C" void mission_event_trigger_configuration(FlightComputer_SimObject *fc) {
+extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc) {
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
     jit_add_read(0.001 + fc->stand_still_time, "event_control_rcs_on");
@@ -342,4 +342,4 @@ extern "C" void mission_event_trigger_configuration(FlightComputer_SimObject *fc
 
     exec_set_terminate_time(200.001 + fc->stand_still_time);
 }
-#endif  //  EXE_XIL_COMMON_INCLUDE_MISSION_EVENT_TRIGGER_H_
+#endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

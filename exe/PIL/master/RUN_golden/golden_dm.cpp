@@ -9,7 +9,7 @@
 #include "../../../xil_common/Modified_data/nspo.h"
 #include "../../../xil_common/Modified_data/gps.h"
 #include "../../../xil_common/include/realtime.h"
-#include "../../../xil_common/include/mission_event_handler.h"
+#include "../../../xil_common/include/flight_events_handler.h"
 #include "../../../xil_common/include/sirius_utility.h"
 
 extern "C" int run_me() {
@@ -30,6 +30,6 @@ extern "C" int run_me() {
     master_init_propulsion(&rkt);
     master_init_sensors(&rkt);
     master_init_tvc(&rkt);
-    mission_event_handler_configuration(&rkt);
+    flight_events_handler_configuration(&rkt);
     return 0;
 }

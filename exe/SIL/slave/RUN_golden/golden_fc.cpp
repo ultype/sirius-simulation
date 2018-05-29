@@ -6,7 +6,7 @@
 #include "trick/external_application_c_intf.h"
 #include "../../../xil_common/include/realtime.h"
 #include "../../../xil_common/Modified_data/gps_fc.h"
-#include "../../../xil_common/include/mission_event_trigger.h"
+#include "../../../xil_common/include/flight_events_trigger.h"
 
 extern "C" int run_me() {
     record_gps_slave();
@@ -19,6 +19,6 @@ extern "C" int run_me() {
 
     slave_init_stage2_control(&fc);
     /* events */
-    mission_event_trigger_configuration(&fc);
+    flight_events_trigger_configuration(&fc);
     return 0;
 }
