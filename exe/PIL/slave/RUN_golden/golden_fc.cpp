@@ -6,7 +6,6 @@
 #include "trick/external_application_c_intf.h"
 #include "../../../xil_common/include/realtime.h"
 #include "../../../xil_common/Modified_data/gps_fc.h"
-#include  "../../../models/gnc/include/DM_FSW_Interface.hh"
 #include "../../../xil_common/include/mission_event_trigger.h"
 
 extern "C" int run_me() {

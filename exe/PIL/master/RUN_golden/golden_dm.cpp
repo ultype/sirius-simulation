@@ -11,7 +11,6 @@
 #include "../../../xil_common/include/realtime.h"
 #include "../../../xil_common/include/mission_event_handler.h"
 #include "../../../xil_common/include/sirius_utility.h"
-#include "../../../models/gnc/include/DM_FSW_Interface.hh"
 
 extern "C" int run_me() {
     record_nspo();
