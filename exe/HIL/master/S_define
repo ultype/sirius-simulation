@@ -214,7 +214,8 @@ class Rocket_SimObject : public Trick::SimObject {
             dynamics.grab_ddrhoC_1     = LINK( forces, get_ddrhoC_1);
             dynamics.collect_forces_and_propagate = LINK( forces, collect_forces_and_propagate);
             dynamics.grab_ddang_slosh_theta = LINK( forces, get_ddang_slosh_theta);
-            dynamics.grab_ddang_slosh_psi = LINK( forces, get_ddang_slosh_psi); 
+            dynamics.grab_ddang_slosh_psi = LINK( forces, get_ddang_slosh_psi);
+            dynamics.grab_Q_TVC        = LINK( tvc, get_Q_TVC); 
             dynamics.dm_icf_info_hook = &icf_ctrl;
 
             accelerometer->grab_FSPB   = LINK( dynamics, get_FSPB);
