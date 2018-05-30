@@ -336,10 +336,10 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
             ("initialization") wait_for_1st_pps();
 
-            P1 (0.002, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
-            P1 (0.002, "scheduled") flight_event_code_handler(&icf_ctrl);
+            P1 (int_step, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P1 (int_step, "scheduled") flight_event_code_handler(&icf_ctrl);
 
-            P2 (int_step, "scheduled") time->dm_time(int_step);
+            P2 (int_step, "scheduled") time->dm_time();
             P2 (int_step, "scheduled") tvc.actuate(int_step, &icf_ctrl);
             P2 (int_step, "scheduled") dynamics.propagate(int_step);
 
@@ -354,11 +354,11 @@ class Rocket_SimObject : public Trick::SimObject {
             P4 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            //  P4 (int_step, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, int_step);
+            P4 (int_step, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, int_step);
             P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, int_step);
             P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 
-            P4 (1,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, (void *)&tlm_frame);
+            P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, (void *)&tlm_frame);
 
 
             (int_step, "logging") env.update_diagnostic_attributes(int_step);

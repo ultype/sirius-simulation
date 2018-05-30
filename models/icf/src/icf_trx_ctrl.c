@@ -424,6 +424,8 @@ int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t siz
     struct icf_driver_ops *drv_ops = ctrlport->drv_priv_ops;
 
     frame_full_size = size;
+    if (ctrlport->drv_priv_data == NULL)
+        return ICF_STATUS_SUCCESS;
     if (drv_ops->get_header_size) {
         frame_full_size += drv_ops->get_header_size(ctrlport->drv_priv_data);
     }
@@ -494,6 +496,11 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     txcell = (uint8_t *)rb_pop(whichring);
     if (txcell) {
         out_frame_size = txcell->frame_full_size;
+        if (ctrlport->drv_priv_data == NULL) {
+            icf_free_mem(txcell->l2frame);
+            icf_free_mem(txcell);
+            return ICF_STATUS_SUCCESS;
+        }
         if (drv_ops->get_header_size) {
             out_frame_size += drv_ops->get_header_size(ctrlport->drv_priv_data);
         }

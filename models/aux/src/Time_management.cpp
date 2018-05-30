@@ -4,8 +4,8 @@ time_management::time_management() {
     last_time = 0;
 }
 
-void time_management::dm_time(double int_step) { /* convert simulation time to gps time */
-    double this_time = get_rettime() + int_step;
+void time_management::dm_time() { /* convert simulation time to gps time */
+    double this_time = get_rettime();
 
     /* Get current GPS time */
     /* deduct DM_dt because PV comes from dm_att() output of previous cycle */
