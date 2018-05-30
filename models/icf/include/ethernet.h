@@ -12,6 +12,7 @@ struct ethernet_device_info_t {
     struct sockaddr_in client_addr;
     int client_addr_len;
     uint32_t header_size;
+    int sock_type;
 };
 
 #ifdef __cplusplus

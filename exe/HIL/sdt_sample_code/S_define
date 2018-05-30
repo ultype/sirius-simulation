@@ -1,0 +1,65 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (This S_define works with the RUN_analytic input file)
+LIBRARY DEPENDENCIES:
+    (
+    )
+*************************************************************/
+
+#include "sim_objects/default_trick_sys.sm"
+##include "ExternalSourceClock.hh"
+##include  "icf_trx_ctrl.h"
+##include "sdt_gpsr.h"
+##include "gpsr_s_nav_tlm.h"
+class SDTSimObject : public Trick::SimObject {
+
+    public:
+        struct icf_ctrlblk_t   icf_ctrl;
+        struct sdt_gpsr_motion_data_t mot_data;
+        struct gpsr_s_nav_tlm_frame_t tlm_buff;
+        void trick_heartbeat(void) {
+            char date_buf[80];
+            char currentTime[84] = "";
+            static struct timespec ts;
+            uint32_t milli;
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            ts.tv_sec = time(NULL);
+            milli = ts.tv_nsec / 1000000;
+            strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+            snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+            fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
+        };
+
+        void wait_for_1st_pps(void) {
+            fprintf(stderr, "Wainting for the 1st PPS...");
+            ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            fprintf(stderr, "Go !!\n");
+        };
+
+        void set_gpsr_sdt_mot_data(void) {
+            mot_data.gps_week_num = 0x12;
+            mot_data.gps_time = 0x76;
+            mot_data.validity = 0x1111;
+            mot_data.posx = -3034818.2746660495;
+            mot_data.posy = 5072117.3653596658;
+            mot_data.posz = 2388670.1371833533;
+            mot_data.velx = 0;
+            mot_data.vely = 0;
+            mot_data.velz = 0;
+            mot_data.visibility_satellites_map = 0x911;
+        }
+
+        SDTSimObject()
+        {
+        	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            P1 (5, "scheduled") trick_heartbeat();
+            P1 (1, "scheduled") set_gpsr_sdt_mot_data();
+            P1 (1, "scheduled") sdt_gpsr_convert_motion_data_to_tlm(&mot_data, &tlm_buff);
+            P1 (1, "scheduled") icf_tx_enqueue(&icf_ctrl, EGSE_GPSR01_SW_QIDX, &tlm_buff, sizeof(struct gpsr_s_nav_tlm_frame_t));
+            P1 (1, "scheduled") sdt_gpsr_layer2_tlm_frame_transfer(&icf_ctrl);
+            ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+        }
+} ;
+
+SDTSimObject dyn ;

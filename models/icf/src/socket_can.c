@@ -25,6 +25,7 @@ int socket_can_init(void **priv_data, char *ifname, int netport) {
     dev_info->header_size = 0;
     strncpy(dev_info->ifr.ifr_name, ifname, sizeof(dev_info->ifr.ifr_name));
     if (ioctl(dev_info->can_fd, SIOCGIFINDEX, &dev_info->ifr) < 0) {
+        fprintf(stderr, "open port %s error\n", ifname);
         errExit("interface not exist !!");
     }
     dev_info->addr.can_family  = PF_CAN;
@@ -140,7 +141,10 @@ int can_frame_recv(void *priv_data, uint8_t *rx_buff, uint32_t buff_size) {
     int rx_nbytes;
     struct can_device_info_t *dev_info = priv_data;
     struct can_frame *pframe = rx_buff;
-    rx_nbytes = read(dev_info->can_fd, pframe, buff_size);
+    if ((rx_nbytes = read(dev_info->can_fd, pframe, buff_size)) < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            rx_nbytes = 0;
+    }
     if (rx_nbytes > 0) {
         if (pframe->can_id & CAN_ERR_FLAG) {
             fprintf(stderr, "error frame\n");
@@ -155,7 +159,10 @@ int can_frame_send(void *priv_data, uint8_t *payload, uint32_t frame_len) {
     struct can_device_info_t *dev_info = priv_data;
     struct can_frame *pframe = NULL;
     pframe = (struct can_frame *)payload;
-    tx_nbytes = write(dev_info->can_fd, pframe, frame_len);
+    if ((tx_nbytes = write(dev_info->can_fd, pframe, frame_len)) < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            tx_nbytes = 0;
+    }
     return tx_nbytes;
 }
 

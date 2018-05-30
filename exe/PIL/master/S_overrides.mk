@@ -13,11 +13,14 @@ INCLUDES = -I${TRICK_HOME}/trick_models \
 		   -I$(SIRIUS_HOME)/models/aux/include \
 		   -I$(SIRIUS_HOME)/models/sensor/include \
 		   -I$(SIRIUS_HOME)/models/driver/include \
-		   -I$(SIRIUS_HOME)/models/icf/include
+		   -I$(SIRIUS_HOME)/models/icf/include \
+		   -I$(SIRIUS_HOME)/models/clock_source_mgmt \
+		   -I$(SIRIUS_HOME)/models/equipment_protocol/include \
+		   -I$(SIRIUS_HOME)/models/flight_events/include
 
 TRICK_CFLAGS += --std=c++11 ${INCLUDES} -g -D_GNU_SOURCE -DCONFIG_PIL_ENABLE
 TRICK_CFLAGS += -Wall -Wmissing-prototypes -Wextra -Wshadow
 TRICK_CXXFLAGS += --std=c++11 ${INCLUDES} -g -DCONFIG_PIL_ENABLE
-TRICK_CXXFLAGS += -Wall -Wextra -Wshadow
-TRICK_USER_LINK_LIBS += -larmadillo -lboost_serialization
+TRICK_CXXFLAGS += -Wall -Wextra -Wshadow -Wno-narrowing
+TRICK_USER_LINK_LIBS += -larmadillo -lboost_serialization -lbiodaq
 MAKEFLAGS += -j16

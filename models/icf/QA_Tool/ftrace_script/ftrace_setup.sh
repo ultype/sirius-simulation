@@ -13,6 +13,7 @@ echo "mono" > /sys/kernel/debug/tracing/trace_clock
 ##### Function Tracer #####
 echo function > /sys/kernel/debug/tracing/current_tracer
 #echo :mod:adv17v35x > /sys/kernel/debug/tracing/set_ftrace_filter
+#echo :mod:bio1737 > /sys/kernel/debug/tracing/set_ftrace_filter
 #echo :mod:pcan > /sys/kernel/debug/tracing/set_ftrace_filter
 #echo serialadv_start_tx > /sys/kernel/debug/tracing/set_ftrace_filter
 #echo pcan_pci_irqhandler >> /sys/kernel/debug/tracing/set_ftrace_filter

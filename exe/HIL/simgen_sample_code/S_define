@@ -1,0 +1,95 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (This S_define works with the RUN_analytic input file)
+LIBRARY DEPENDENCIES:
+    (
+    )
+*************************************************************/
+
+#include "sim_objects/default_trick_sys.sm"
+##include "ExternalSourceClock.hh"
+##include "simgen_remote.h"
+##include <time.h>
+
+class SimgenSimObject : public Trick::SimObject {
+
+    public:
+        struct simgen_eqmt_info_t simgen_dev;
+        ExternalSourceClock ext_clk;
+        FILE *nspo_stream;
+        int simgen_time_jump_per_cycle;
+
+        void trick_heartbeat(void) {
+            char date_buf[80];
+            char currentTime[84] = "";
+            static struct timespec ts;
+            uint32_t milli;
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            ts.tv_sec = time(NULL);
+            milli = ts.tv_nsec / 1000000;
+            strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+            snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+            fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
+        };
+
+        void set_motion_start_time(struct simgen_gps_start_time_t *start_time) {
+            start_time->year = 2017;
+            start_time->month = 3;
+            start_time->day = 22;
+            start_time->hour = 2;
+            start_time->minute = 0;
+            start_time->second = 18;
+        };
+
+        void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
+            struct simgen_motion_data_t *motion_data = &simgen_dev->motion_data;
+            simgen_default_remote_data(motion_data);
+            set_motion_start_time(&simgen_dev->gps_start_time);
+            motion_data->position_xyz[0] = -3034818.2746660495;
+            motion_data->position_xyz[1] = 5072117.3653596658;
+            motion_data->position_xyz[2] = 2388670.1371833533;
+            motion_data->heb[0] = 1.5707963268;
+            motion_data->heb[1] = 1.5707963268;
+            motion_data->heb[2] = 0.0;
+        };
+
+        void transfer_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev, int ratio) {
+            struct simgen_udp_command_t udp_cmd;
+            uint32_t send_size = sizeof(struct simgen_udp_command_t);
+            int idx;
+            for (idx = 0; idx < ratio; ++idx) {
+                simgen_convert_csv_to_mot(&simgen_dev->motion_data, nspo_stream, ratio - idx);
+            }
+            if(simgen_dev->udp_motion_enable & 0x1) {
+                simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
+                simgen_motion_tn_udp_send(simgen_dev, &simgen_dev->motion_data);
+            } else {
+                simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
+            }
+        };
+
+        void wait_for_1st_pps(void) {
+            fprintf(stderr, "Wainting for the 1st PPS...");
+            ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            fprintf(stderr, "Go !!\n");
+        };
+
+        SimgenSimObject() : ext_clk() 
+        {
+        	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
+            ("initialization") set_default_simgen_motdata(&simgen_dev);
+            ("initialization") simgen_init_input_file(&nspo_stream);
+            ("initialization") simgen_equipment_udp_channel_init(&simgen_dev, SIMGEN_IP);
+            ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
+            ("initialization") wait_for_1st_pps();
+
+            P1 (5, "scheduled") trick_heartbeat();
+            P2 (0.004, "scheduled") transfer_simgen_motdata(&simgen_dev, simgen_time_jump_per_cycle);
+
+            ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
+            ("shutdown") simgen_remote_cmd_channel_deinit(&simgen_dev);
+            ("shutdown") simgen_udp_channel_deinit(&simgen_dev);
+        }
+} ;
+
+SimgenSimObject dyn ;

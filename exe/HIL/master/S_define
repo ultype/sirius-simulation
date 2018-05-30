@@ -52,11 +52,16 @@ LIBRARY DEPENDENCIES:
 
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"
-
+##include "ExternalSourceClock.hh"
+##include "simgen_remote.h"
+##include "sdt_gpsr.h"
+##include "gpsr_s_nav_tlm.h"
+##include "flight_events_define.h"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
-        double int_step = 0.001;
+        double int_step = 0.005;
+        double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
         Environment env;
         Forces forces;
@@ -66,6 +71,9 @@ class Rocket_SimObject : public Trick::SimObject {
         sensor::Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
+        ExternalSourceClock ext_clk;
+        struct simgen_eqmt_info_t simgen_dev;
+        struct gpsr_s_nav_tlm_frame_t tlm_frame;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -73,7 +81,8 @@ class Rocket_SimObject : public Trick::SimObject {
         refactor_uplink_packet_t dm_ins_db;
         DM_SAVE_decl();
         struct icf_ctrlblk_t   icf_ctrl;
-
+        uint64_t egse_flight_event_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
+        uint64_t flight_event_code_record = 0;
         Transceiver transceiver;
 
         void link(){
@@ -147,6 +156,38 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_xcp            = LINK( aerodynamics, get_xcp);
             forces.grab_xcg            = LINK( propulsion, get_xcg);
             forces.grab_oxidizer_mass  = LINK( propulsion, get_oxidizer_mass);
+            forces.grab_ang_slosh_theta = LINK( dynamics, get_ang_slosh_theta);
+            forces.grab_ang_slosh_psi = LINK( dynamics, get_ang_slosh_psi);
+            forces.grab_dang_slosh_theta = LINK( dynamics, get_dang_slosh_theta);
+            forces.grab_dang_slosh_psi = LINK( dynamics, get_dang_slosh_psi);
+            forces.grab_NEXT_ACC = LINK( dynamics, get_NEXT_ACC);
+            forces.grab_liftoff = LINK(dynamics, get_liftoff);
+            forces.grab_FSPB           = LINK( dynamics, get_FSPB);
+            forces.grab_dang_e1_B      = LINK(tvc, get_s2_act1_rate);
+            forces.grab_dang_e2_B      = LINK(tvc, get_s2_act2_rate);
+            forces.grab_dang_e3_B      = LINK(tvc, get_s2_act3_rate);
+            forces.grab_dang_e4_B      = LINK(tvc, get_s2_act4_rate);
+            forces.grab_ang_e1_theta   = LINK(tvc, get_s2_act1_y2_saturation);
+            forces.grab_ang_e2_psi     = LINK(tvc, get_s2_act2_y2_saturation);
+            forces.grab_ang_e3_theta   = LINK(tvc, get_s2_act3_y2_saturation);
+            forces.grab_ang_e4_psi     = LINK(tvc, get_s2_act4_y2_saturation);
+            forces.grab_e1_XCG         = LINK(propulsion, get_S2_E1_xcg);
+            forces.grab_e2_XCG         = LINK(propulsion, get_S2_E2_xcg);
+            forces.grab_e3_XCG         = LINK(propulsion, get_S2_E3_xcg);
+            forces.grab_e4_XCG         = LINK(propulsion, get_S2_E4_xcg);
+            forces.grab_e1_mass        = LINK(propulsion, get_S2_E1_mass);
+            forces.grab_e2_mass        = LINK(propulsion, get_S2_E2_mass);
+            forces.grab_e3_mass        = LINK(propulsion, get_S2_E3_mass);
+            forces.grab_e4_mass        = LINK(propulsion, get_S2_E4_mass);
+            forces.grab_I_S2_E1        = LINK(propulsion, get_I_S2_E1);
+            forces.grab_I_S2_E2        = LINK(propulsion, get_I_S2_E2);
+            forces.grab_I_S2_E3        = LINK(propulsion, get_I_S2_E3);
+            forces.grab_I_S2_E4        = LINK(propulsion, get_I_S2_E4);
+            forces.grab_s2_act1_acc    = LINK(tvc, get_s2_act1_acc);
+            forces.grab_s2_act2_acc    = LINK(tvc, get_s2_act2_acc);
+            forces.grab_s2_act3_acc    = LINK(tvc, get_s2_act3_acc);
+            forces.grab_s2_act4_acc    = LINK(tvc, get_s2_act4_acc);
+            forces.grab_structure_XCG  = LINK(propulsion, get_structure_XCG);
 
             gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
             gps_con.grab_TEI           = LINK( env, get_TEI);
@@ -171,6 +212,11 @@ class Rocket_SimObject : public Trick::SimObject {
             dynamics.grab_thrust       = LINK( propulsion, get_thrust);
             dynamics.grab_rhoC_1       = LINK( forces, get_rhoC_1);
             dynamics.grab_ddrhoC_1     = LINK( forces, get_ddrhoC_1);
+            dynamics.collect_forces_and_propagate = LINK( forces, collect_forces_and_propagate);
+            dynamics.grab_ddang_slosh_theta = LINK( forces, get_ddang_slosh_theta);
+            dynamics.grab_ddang_slosh_psi = LINK( forces, get_ddang_slosh_psi);
+            dynamics.grab_Q_TVC        = LINK( tvc, get_Q_TVC); 
+            dynamics.dm_icf_info_hook = &icf_ctrl;
 
             accelerometer->grab_FSPB   = LINK( dynamics, get_FSPB);
 
@@ -178,6 +224,12 @@ class Rocket_SimObject : public Trick::SimObject {
             gyro->grab_FSPB            = LINK( dynamics, get_FSPB);
 
             propulsion.grab_press      = LINK( env, get_press);
+            propulsion.grab_SLOSH_CG   = LINK( forces, get_SLOSH_CG);
+            propulsion.grab_slosh_mass = LINK( forces, get_slosh_mass);
+            propulsion.grab_e1_XCG    = LINK( forces, get_e1_XCG);
+            propulsion.grab_e2_XCG    = LINK( forces, get_e2_XCG);
+            propulsion.grab_e3_XCG    = LINK( forces, get_e3_XCG);
+            propulsion.grab_e4_XCG    = LINK( forces, get_e4_XCG);
 
 
         };
@@ -191,8 +243,75 @@ class Rocket_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
             /* TVC_No2 Command*/
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+            /* Mission Event*/
+            icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+        };
+        void flight_event_code_handler(struct icf_ctrlblk_t *C) {
+            struct can_frame receive_event;
+            if (icf_rx_dequeue(C, EGSE_RX_FLIGHT_EVENT_QIDX, &receive_event, sizeof(struct can_frame)) > 0) {
+                flight_event_code_record = receive_event.data[0];
+                //  fprintf(stderr, "[sim:%f] flight_event_code_record : %d\n", receive_event.data[0], exec_get_sim_time());
+            }
+        };
+        void wait_for_1st_pps(void) {
+            fprintf(stderr, "Wainting for the 1st PPS...");
+            ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            fprintf(stderr, "Go !!\n");
         };
 
+        void set_motion_start_time(struct simgen_gps_start_time_t *start_time) {
+            start_time->year = time->tm_gps_start_time_year;
+            start_time->month = time->tm_gps_start_time_month;
+            start_time->day = time->tm_gps_start_time_day;
+            start_time->hour = time->tm_gps_start_time_hour;
+            start_time->minute = time->tm_gps_start_time_minute;
+            start_time->second = (uint8_t) time->tm_gps_start_time_second;
+        };
+
+        void set_default_simgen_motdata(struct simgen_eqmt_info_t *simgen_dev) {
+            struct simgen_motion_data_t *motion_data = &simgen_dev->motion_data;
+            simgen_default_remote_data(motion_data);
+            memcpy(&motion_data->position_xyz, dynamics.get_double_SBEE(), sizeof(double) * 3);
+            memcpy(&motion_data->velocity_xyz, dynamics.get_double_VBEE(), sizeof(double) * 3);
+            memcpy(&motion_data->acceleration_xyz, dynamics.get_double_ABEE(), sizeof(double) * 3);
+            memcpy(&motion_data->jerk_xyz, dynamics.get_double_JBEE(), sizeof(double) * 3);
+            motion_data->heb[0] = dynamics.get_double_psibd();
+            motion_data->heb[1] = dynamics.get_double_thtbd();
+            motion_data->heb[2] = dynamics.get_double_phibd();
+            memcpy(&motion_data->angular_velocity, dynamics.get_double_WBEB(), sizeof(double) * 3);
+            set_motion_start_time(&simgen_dev->gps_start_time);
+        };
+
+        void transfer_simgen_motdata(struct icf_ctrlblk_t *C, struct simgen_eqmt_info_t *simgen_dev) {
+            struct simgen_udp_command_t udp_cmd;
+            uint32_t send_size = sizeof(struct simgen_udp_command_t);
+            icf_tx_dequeue(C, EGSE_TX_GPSRF_EMU_QIDX, &simgen_dev->motion_data);
+            if (simgen_dev->udp_motion_enable & 0x1) {
+                simgen_udp_motion_cmd_gen(&simgen_dev->motion_data, &udp_cmd);
+                icf_tx_direct(C, EGSE_TX_GPSRF_EMU_QIDX, &udp_cmd, send_size);
+            } else {
+                simgen_remote_tn_motion_send(simgen_dev, &simgen_dev->motion_data);
+            }
+        };
+
+        void gather_sdt_gpsr_motion_info(struct icf_ctrlblk_t* C, void *data_frame) {
+            struct sdt_gpsr_motion_data_t mot_data;
+            struct gpsr_s_nav_tlm_frame_t *tmp_frame = (struct gpsr_s_nav_tlm_frame_t *)data_frame;
+            int send_size = sizeof(struct gpsr_s_nav_tlm_frame_t);
+            mot_data.gps_week_num = time->get_gpstime_week_num();
+            mot_data.gps_time = time->get_gpstime_msec_of_week();
+            mot_data.validity = 0x1;  //  navigation data always valid
+            mot_data.posx = dynamics.get_double_SBEE()[0];
+            mot_data.posy = dynamics.get_double_SBEE()[1];
+            mot_data.posz = dynamics.get_double_SBEE()[2];
+            mot_data.velx = dynamics.get_double_VBEE()[0];
+            mot_data.vely = dynamics.get_double_VBEE()[1];
+            mot_data.velz = dynamics.get_double_VBEE()[2];
+            mot_data.visibility_satellites_map = 0x911;
+            sdt_gpsr_convert_motion_data_to_tlm((void *)&mot_data, tmp_frame);
+            icf_tx_direct(C, EGSE_GPSR01_SW_QIDX, tmp_frame, send_size);
+            //  icf_tx_direct(C, EGSE_GPSR02_SW_QIDX, tlm_frame, send_size);
+        };
 
         Rocket_SimObject() 
             :   env         (  ) ,
@@ -201,9 +320,9 @@ class Rocket_SimObject : public Trick::SimObject {
                 tvc         (  ) ,
                 forces      ( propulsion   , tvc ) ,
                 gps_con     (  ),
-                dynamics    (  )
+                dynamics    (  ),
+                ext_clk     (  )
             {
-            ("initialization") transceiver.initialize_connection("ENVIRONMENT");
             ("initialization") link();
             ("initialization") aerodynamics.initialize();
             ("initialization") dynamics.initialize();
@@ -213,42 +332,39 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
-            
+            ("initialization") set_default_simgen_motdata(&simgen_dev);
+            ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
+            ("initialization") wait_for_1st_pps();
+
+            P1 (0.002, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P1 (0.002, "scheduled") flight_event_code_handler(&icf_ctrl);
+
+            P2 (int_step, "scheduled") time->dm_time(int_step);
+            P2 (int_step, "scheduled") tvc.actuate(int_step, &icf_ctrl);
+            P2 (int_step, "scheduled") dynamics.propagate(int_step);
+
+            P3 (int_step, "scheduled") env.propagate(int_step);
+            P3 (int_step, "scheduled") propulsion.propagate(int_step);
+            P3 (int_step, "scheduled") aerodynamics.calculate_aero(int_step);
+            P3 (0.05, "scheduled") gps_con.compute();
+            P3 (0.005, "scheduled") gyro->propagate_error(0.005);
+            P3 (0.005, "scheduled") accelerometer->propagate_error(0.005, &icf_ctrl);
+            P3 (0.005, "scheduled") sdt->compute(0.005);
+
+            P4 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
+            P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
+            P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
+            //  P4 (int_step, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, int_step);
+            P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, int_step);
+            P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
+
+            P4 (1,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, (void *)&tlm_frame);
 
 
-            P1 (5, "scheduled") icf_heartbeat();
-            P1 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
-
-            P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU01_SW_QIDX);
-            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_X_SW_QIDX);
-            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_Y_SW_QIDX);
-            P1 (0.001, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_RATETBL_Z_SW_QIDX);
-            P1 (0.005, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_IMU02_SW_QIDX);
-            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR01_SW_QIDX);
-            P1 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_GPSR02_SW_QIDX);
-
-
-
-
-            P1 (int_step, "scheduled") time->dm_time();
-            P1 (int_step, "scheduled") dynamics.propagate(int_step);
-            P1 (int_step, "scheduled") env.propagate(int_step);
-            P1 (int_step, "scheduled") propulsion.propagate(int_step);
-            P1 (int_step, "scheduled") aerodynamics.calculate_aero(int_step);
-            P1 (0.05, "scheduled") gps_con.compute();
-            P1 (0.005, "scheduled") gyro->propagate_error(0.005);
-            P1 (0.005, "scheduled") accelerometer->propagate_error(0.005, &icf_ctrl);
-            P1 (0.005, "scheduled") sdt->compute(0.005);
-
-            P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
-            P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
-            P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-
-            P3 (0.001, "scheduled") tvc.actuate(0.001,&icf_ctrl);
-            P3 (0.001, "scheduled") forces.collect_forces_and_propagate();
-
-            (0.001, "logging") env.update_diagnostic_attributes(0.001);
-            (0.001, "logging") dynamics.update_diagnostic_attributes(0.001);
+            (int_step, "logging") env.update_diagnostic_attributes(int_step);
+            (int_step, "logging") dynamics.update_diagnostic_attributes(int_step);
+            (5, "scheduled") icf_heartbeat();
+            ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
 
         }

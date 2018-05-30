@@ -20,15 +20,36 @@ PROGRAMMERS:
 #include "icf_utility.h"
 #include "ringbuffer.h"
 #include "icf_drivers.h"
-#include "dsp_can_interfaces.h"
-
+#include "trick/exec_proto.h"
+#include "flight_computer_eqpt.h"
 #define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
 #define ICF_CTRLBLK_MAXPORT_NUMBER  16
+#define ICF_EGSE_CONNECT_IP "127.0.0.1"
 
-#ifdef CONFIG_HIL_ENABLE
-#define HIL_INTF 1
-#else
-#define HIL_INTF 0
+#if defined(CONFIG_HIL_ENABLE)
+#define CAN_PORT_EN             1
+#define RS422_IMU_PORT_EN       0
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      1
+#define ETH_FC_PORT_EN          1
+#define ETH_SIMGEN_PORT_EN      1
+
+#elif defined(CONFIG_SAMPLE_SDT_ENABLE)
+#define CAN_PORT_EN             0
+#define RS422_IMU_PORT_EN       1
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      1
+#define ETH_FC_PORT_EN          0
+#define ETH_SIMGEN_PORT_EN      0
+
+#else  //  Other
+#define CAN_PORT_EN             1
+#define RS422_IMU_PORT_EN       0
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      0
+#define ETH_FC_PORT_EN          1
+#define ETH_SIMGEN_PORT_EN      0
+
 #endif  //  CONFIG_HIL_ENABLE
 
 typedef enum _ENUM_ICF_STATUS {
@@ -49,6 +70,8 @@ typedef enum _ENUM_ICF_EGSE_SW_QUEUE {
     EGSE_FLIGHT_COMPUTER_SW_QIDX = 8,
     EGSE_GPSRF_EMULATOR_SW_QIDX = 9,
     EGSE_SIL_DOWNLINK_SW_QIDX = 10,
+    EGSE_RX_FLIGHT_EVENT_QIDX = 11,
+    EGSE_TX_GPSRF_EMU_QIDX = 12,
     EGSE_NUM_OF_SW_QUE
 }ENUM_ICF_EGSE_SW_QUEUE;
 
@@ -56,6 +79,7 @@ typedef enum _ENUM_ICF_ESPS_SW_QUEUE {
     ESPS_EMPTY_SW_QIDX = -1,
     ESPS_TVC_SW_QIDX = 0,
     ESPS_GNC_SW_QIDX = 1,
+    ESPS_TX_MISSION_CODE_QIDX = 2,
     ESPS_NUM_OF_SW_QUE
 }ENUM_ICF_ESPS_SW_QUEUE;
 
@@ -76,6 +100,8 @@ typedef enum _ENUM_ICF_HW_PORT {
 
 typedef enum _ENUM_ICF_NETPORT {
     EMPTY_NETPORT = -1,
+    RS422_HEADER_NONE = 0,
+    RS422_HEADER_CRC = 1,
     NUM_OF_NETPORT
 }ENUM_ICF_NETPORT;
 
@@ -96,6 +122,7 @@ typedef enum _ENUM_ICF_DRIVERS_ID {
     ICF_DRIVERS_ID0 = 0,
     ICF_DRIVERS_ID1,
     ICF_DRIVERS_ID2,
+    ICF_DRIVERS_ID3,
 }ENUM_ICF_DRIVERS_ID;
 
 typedef enum _ENUM_ICF_SYSTEM_TYPE {
@@ -150,6 +177,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size);
 
 int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
 int icf_tx_enqueue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);
+int icf_tx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload);
 int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx);
 void icf_heartbeat(void);
 
