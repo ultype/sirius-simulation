@@ -61,12 +61,10 @@ for answer_row, target_row,  egse_1khz_row in itertools.izip(answer_arr, target_
     sim_data_list.append(gpsr_speed_err * 100)
 # EGSE_1KHZ_benchmark
     sim_data_list.append(" ")
-    # egse_1khz Answer Error: 1khz_answer_gpsr_s_nav - egse_1khz_gpsr
-    egse_1khz_length = math.sqrt(float(egse_1khz_row[2])**2 + float(egse_1khz_row[3])**2  + float(egse_1khz_row[4])**2)
-    egse_1khz_length_err = float(answer_row[15]) - egse_1khz_length
+    # egse_1khz gpsr Answer Error: 1khz_answer_gpsr_s_nav - egse_1khz_gpsr
+    egse_1khz_length_err = float(answer_row[15]) - float(egse_1khz_row[15])
     sim_data_list.append(egse_1khz_length_err)
-    egse_1khz_speed = math.sqrt(float(egse_1khz_row[5])**2 + float(egse_1khz_row[6])**2  + float(egse_1khz_row[7])**2)
-    egse_1khz_speed_err = float(answer_row[16]) - egse_1khz_speed
+    egse_1khz_speed_err = float(answer_row[16]) - float(egse_1khz_row[16])
     sim_data_list.append(egse_1khz_speed_err * 100)
 # Write into the CSV
     csvCursor.writerow(sim_data_list)
