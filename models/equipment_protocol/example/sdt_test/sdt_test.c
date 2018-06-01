@@ -13,22 +13,6 @@
 #include <stdint.h>
 #include "gpsr_s_nav_tlm.h"
 
-
-void set_mincount(int fd, int mcount) {
-    struct termios tty;
-
-    if (tcgetattr(fd, &tty) < 0) {
-        printf("Error tcgetattr: %s\n", strerror(errno));
-        return;
-    }
-
-    tty.c_cc[VMIN] = mcount ? 1 : 0;
-    tty.c_cc[VTIME] = 5;        /* half second timer */
-
-    if (tcsetattr(fd, TCSANOW, &tty) < 0)
-        printf("Error tcsetattr: %s\n", strerror(errno));
-}
-
 void gpsr_tlm_dump(struct gpsr_s_nav_tlm_frame_t *tlm) {
     fprintf(stderr, "$TLM, %d, %d, %f, %f, %f, %f, %f, %f\n",
             tlm->gps_week_num, tlm->gps_time,
@@ -36,18 +20,52 @@ void gpsr_tlm_dump(struct gpsr_s_nav_tlm_frame_t *tlm) {
             tlm->velx, tlm->vely, tlm->velz);
 }
 
+int rx_frame_receive_with_header(void *dev, uint8_t *rs422payload, int buff_size) {
+    struct rs422_device_info_t *dev_info = (struct rs422_device_info_t *)dev;
+    int rdlen = 0;
+    uint32_t buf_offset = 0;
+    memset(rs422payload, 0, buff_size);
+    while (buf_offset < dev_info->header_size) {
+        rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->header_size - buf_offset);
+        buf_offset += rdlen;
+    }
+
+    if (buf_offset == dev_info->header_size) {
+        memcpy(&dev_info->frame, rs422payload, dev_info->header_size);
+        while (buf_offset < dev_info->frame.payload_len + dev_info->header_size) {
+            rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->frame.payload_len + dev_info->header_size - buf_offset);
+            buf_offset += rdlen;
+        }
+        //  hex_dump("RX data payload", (uint8_t *)rs422payload + dev_info->header_size, dev_info->frame.payload_len);
+    }
+    if (rdlen < 0) {
+        fprintf(stderr, "Error from read: %d: %s\n", rdlen, strerror(errno));
+    }
+    return rdlen;
+}
+
+int rx_frame_receive_without_header(void *dev, uint8_t *rs422payload, int pkt_size) {
+    struct rs422_device_info_t *dev_info = (struct rs422_device_info_t *)dev;
+    int rdlen = 0;
+    uint32_t buf_offset = 0;
+    memset(rs422payload, 0, pkt_size);
+    while (buf_offset <  pkt_size){
+            rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, pkt_size - buf_offset);
+            buf_offset += rdlen;
+        }
+        //  hex_dump("RX data payload", (uint8_t *)rs422payload, pkt_size);
+    if (rdlen < 0) {
+        fprintf(stderr, "Error from read: %d: %s\n", rdlen, strerror(errno));
+    }
+    return rdlen;
+}
 
 int main(int argc, char *argv[]) {
     char portname[IFNAMSIZ] = "/dev/ttyAP0";
-    uint32_t pkt_cnt = 0;
     struct rs422_device_info_t *dev_info;
     uint8_t rx_buf[1024] = {0};
-    uint8_t *rs422payload = rx_buf;
     struct timeval timeout;
     fd_set readfs;
-    uint32_t buf_offset = 0;
-    int rdlen;
-    uint32_t idx = 0;
     struct gpsr_s_nav_tlm_frame_t tlm;
     /* Initialize the timeout structure */
     timeout.tv_sec  = 0;
@@ -61,34 +79,19 @@ int main(int argc, char *argv[]) {
 
     /* simple noncanonical input */
     do {
-        idx = 0;
-        rdlen = 0;
-        buf_offset = 0;
-        memset(rs422payload, 0, 1024);
         /* Initialize the input set */
         FD_ZERO(&readfs);
         FD_SET(dev_info->rs422_fd, &readfs);
         if (select(dev_info->rs422_fd + 1, &readfs, NULL, NULL, &timeout) < 0)
             fprintf(stderr, "[%s:%d] %s\n", __FUNCTION__, __LINE__, strerror(errno));
         if (FD_ISSET(dev_info->rs422_fd, &readfs)) {
-            while (buf_offset < dev_info->header_size) {
-                rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->header_size - buf_offset);
-                buf_offset += rdlen;
-                if (idx++ == 10) printf("[%s] pkt_cnt: %d\n", portname, pkt_cnt);
-            }
-
-            if (buf_offset == dev_info->header_size) {
-                memcpy(&dev_info->frame, rs422payload, dev_info->header_size);
-                pkt_cnt++;
-                while (buf_offset < dev_info->frame.payload_len + dev_info->header_size) {
-                    rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->frame.payload_len + dev_info->header_size - buf_offset);
-                    buf_offset += rdlen;
-                }
-                //  hex_dump("RX data payload", (uint8_t *)rs422payload + dev_info->header_size, dev_info->frame.payload_len);
-                memcpy(&tlm, rs422payload + dev_info->header_size, sizeof(struct gpsr_s_nav_tlm_frame_t));
+            fprintf(stderr, "[Time: %f] \n", get_curr_time());
+            if (dev_info->header_size > 0) {
+                rx_frame_receive_with_header(dev_info, rx_buf, 1024);
+                memcpy(&tlm, rx_buf + dev_info->header_size, sizeof(struct gpsr_s_nav_tlm_frame_t));
                 gpsr_tlm_dump(&tlm);
-            } else if (rdlen < 0) {
-                fprintf(stderr, "Error from read: %d: %s\n", rdlen, strerror(errno));
+            } else {
+                rx_frame_receive_without_header(dev_info, rx_buf, sizeof(struct gpsr_s_nav_tlm_frame_t));
             }
         }
     /* repeat read to get full message */
