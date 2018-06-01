@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 		printf("%s\n", argv[1]);
         memcpy(portname, argv[1], IFNAMSIZ);
 	}
-	rs422_serialport_init((void **)&dev_info, portname, 0);
+	rs422_serialport_init((void **)&dev_info, portname, CONFIG_ESPS_HEADER_ENABLE);
 
 	/* simple noncanonical input */
 	do {
