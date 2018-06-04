@@ -1,7 +1,6 @@
 #ifndef MODELS_ICF_INCLUDE_ICF_UTILITY_H_
 #define MODELS_ICF_INCLUDE_ICF_UTILITY_H_
 #include "icf_export.h"
-
 #define ICF_DEBUG_ENABLE 0
 /* Must can devide by 8*/
 #define BILLION             1000000000L
@@ -10,7 +9,8 @@
 #define BIT(n) ((0x1U) << (n))
 #define BITS(m, n) (~(BIT(m) - 1) & ((BIT(n) - 1) | BIT(n)))
 
-#define OUT_RANGE(i, min, max) (i < min) || (i > max) ? 1 : 0
+#define OUT_RANGE(i, min, max) ((i < min) || (i > max) ? 1 : 0)
+
 #define SWAP32(x) \
     ((uint32_t) (\
     (((uint32_t) (x) & (uint32_t) 0x000000ffUL) << 24) | \
@@ -92,6 +92,7 @@ double get_curr_time(void);
 int get_arr_num(int arrary_size, int element_size);
 int copy_buffer_htons(uint8_t *dest, uint16_t *src);
 int copy_buffer_ntohs(uint16_t *dest, uint8_t *src);
+int16_t TRUNCAT_16BIT(double x);
 #ifdef __cplusplus
 }
 #endif

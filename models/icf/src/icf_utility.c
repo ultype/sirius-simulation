@@ -131,3 +131,10 @@ int copy_buffer_ntohs(uint16_t *dest, uint8_t *src) {
     *dest = PP_NTOHS(be_value);
     return 0;
 }
+
+int16_t TRUNCAT_16BIT(double x) {
+    if (x < SHRT_MIN || x > SHRT_MAX)
+        errExit("int16_t overflow");
+    else
+        return (int16_t)(x);
+}

@@ -9,10 +9,10 @@ int fc_agent_tvc_cmd_movement(struct can_frame *tvc_no1_frame, struct can_frame 
     theta_c_rad = ctl_tvc_db->theta_c_cmd;
     theta_d_rad = ctl_tvc_db->theta_d_cmd;
 
-    theta_a_cnt = theta_a_rad * 180 / PI / TVC_DSP_RESOLUTION;
-    theta_b_cnt = theta_b_rad * 180 / PI / TVC_DSP_RESOLUTION;
-    theta_c_cnt = theta_c_rad * 180 / PI / TVC_DSP_RESOLUTION;
-    theta_d_cnt = theta_d_rad * 180 / PI / TVC_DSP_RESOLUTION;
+    theta_a_cnt = TRUNCAT_16BIT(theta_a_rad * 180 / PI / TVC_DSP_RESOLUTION);
+    theta_b_cnt = TRUNCAT_16BIT(theta_b_rad * 180 / PI / TVC_DSP_RESOLUTION);
+    theta_c_cnt = TRUNCAT_16BIT(theta_c_rad * 180 / PI / TVC_DSP_RESOLUTION);
+    theta_d_cnt = TRUNCAT_16BIT(theta_d_rad * 180 / PI / TVC_DSP_RESOLUTION);
 
     //  fprintf(stderr, "%d %d %d %d\n", theta_a_cnt, theta_c_cnt, theta_b_cnt, theta_d_cnt);
     //  fprintf(stderr, "%f %f %f %f\n", theta_a_rad, theta_c_rad, theta_b_rad, theta_d_rad);
