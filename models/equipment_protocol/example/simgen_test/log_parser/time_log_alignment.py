@@ -4,8 +4,11 @@ import itertools
 import sys
 import re
 
+if len(sys.argv) > 0:
+    log_nspo_csv_name = sys.argv[1]
+
 input_gpsr_s_nav_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
-input_dm_nspo_fileobj = open('log_nspo_1khz_stand_still.csv', 'rbU')
+input_dm_nspo_fileobj = open(log_nspo_csv_name, 'rbU')
 output_time_compare_fileobj = open('refine_log_nspo.csv', 'w')
 csvCursor = csv.writer(output_time_compare_fileobj)
 
@@ -31,4 +34,4 @@ for gpsr_elem in enumerate(gpsr_s_nav_arr):
 input_dm_nspo_fileobj.close()
 input_gpsr_s_nav_fileobj.close()
 print "refine_log_nspo.csv\n"
-print "Next step ./combine_result_dm_and_gpsr_log.py <egse_1khz | answer | ' '>"
+print "Next step ./combine_result_dm_and_gpsr_log.py <liftoff_time> <egse_1khz | answer | ' '> "
