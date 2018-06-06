@@ -55,18 +55,18 @@ def main():
     # Calculate DM Speed
         DM_Speed = math.sqrt(float(dm_row[5])**2 + float(dm_row[6])**2  + float(dm_row[7])**2)
         sim_data_list.append(DM_Speed)
-    ###### GPSR Part ######
+    ###### GPSR_TLM Part ######
         for x in xrange(0,7):
             sim_data_list.append(gpsr_row[x])
-    # Calculate GPSR Length
+    # Calculate GPSR_TLM Length
         GPSR_Length = math.sqrt(float(gpsr_row[1])**2 + float(gpsr_row[2])**2  + float(gpsr_row[3])**2)
         sim_data_list.append(GPSR_Length)
-    # Calculate GPSR Speed
+    # Calculate GPSR_TLM Speed
         GPSR_Speed = math.sqrt(float(gpsr_row[4])**2 + float(gpsr_row[5])**2  + float(gpsr_row[6])**2)
         sim_data_list.append(GPSR_Speed)
-    #Calculate DM - GPSR Length Error
+    #Calculate DM - GPSR_TLM Length Error
         sim_data_list.append(DM_Length - GPSR_Length)
-    #Calculate DM - GPSR Speed Error
+    #Calculate DM - GPSR_TLM Speed Error
         sim_data_list.append(DM_Speed - GPSR_Speed)
         csvCursor.writerow(sim_data_list)
     # Root Mean square
