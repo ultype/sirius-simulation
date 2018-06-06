@@ -4,9 +4,7 @@ import itertools
 import sys
 import re
 import math
-def get_root_mean_square( mean_square, number):
-    return math.sqrt(mean_square / number)
-
+from parser_utility import *
 def main():
     lift_off_time = 120.0
     csv_gpsr_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
