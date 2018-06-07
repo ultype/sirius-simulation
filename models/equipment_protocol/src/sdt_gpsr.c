@@ -62,7 +62,7 @@ int sdt_gpsr_layer2_tlm_frame_transfer(struct icf_ctrlblk_t *C) {
     tx_buffer = malloc(sizeof(struct nspo_gpsr_frame_t));
     send_size = sdt_gpsr_append_nspo_frame_header(&tlm_frame, tx_buffer);
     icf_tx_direct(C, EGSE_GPSR01_SW_QIDX, tx_buffer, send_size);
-    //  icf_tx_direct(C, EGSE_GPSR02_SW_QIDX, , send_size);
+    icf_tx_direct(C, EGSE_GPSR02_SW_QIDX, tx_buffer, send_size);
     //  hex_dump("TX TLM Frame", (uint8_t *) , sizeof(struct gpsr_s_nav_tlm_frame_t));
     if (tx_buffer) {
         free(tx_buffer);
@@ -82,22 +82,22 @@ int sdt_gpsr_init_input_file(FILE **stream) {
     return EXIT_SUCCESS;
 }
 
-int sdt_gpsr_convert_csv_to_motdata(struct sdt_gpsr_motion_data_t *motion_data, FILE *stream, int execution) {
+int sdt_gpsr_convert_csv_to_motdata(struct sdt_gpsr_motion_data_t *motion_data, FILE *stream) {
     const char delimiter[2] = ",";
     char *token;
     char line[1024];
     int idx = 0;
     char *saveptr = NULL;
+    double gps_time_sec;
     if (fgets(line, 1024, stream) == NULL) {
         return EXIT_SUCCESS;
     }
 
-    if (execution > 1) {
-        return EXIT_SUCCESS;
-    }
     /* get the first token */
     token = strtok_r(line, delimiter, &saveptr);
-    motion_data->gps_time = atof(token);
+    gps_time_sec = atof(token);
+    motion_data->gps_time =  ROUND_32BIT(gps_time_sec * 1000.0);
+
     /* Position */
     token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->posx = atof(token);

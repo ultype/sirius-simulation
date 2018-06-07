@@ -93,6 +93,7 @@ int get_arr_num(int arrary_size, int element_size);
 int copy_buffer_htons(uint8_t *dest, uint16_t *src);
 int copy_buffer_ntohs(uint16_t *dest, uint8_t *src);
 int16_t TRUNCAT_16BIT(double x);
+int32_t ROUND_32BIT(double x);
 #ifdef __cplusplus
 }
 #endif

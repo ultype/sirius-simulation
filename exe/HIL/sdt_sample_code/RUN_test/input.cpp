@@ -9,6 +9,6 @@
 extern "C" int run_me() {
     //  external_clock_switch(&dyn.ext_clk);
     realtime();
-    exec_set_terminate_time(200.0);
+    exec_set_terminate_time(300.0);
     return 0;
 }

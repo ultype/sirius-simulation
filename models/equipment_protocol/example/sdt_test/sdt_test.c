@@ -16,7 +16,7 @@
 void gpsr_tlm_dump(struct nspo_gpsr_frame_t *data) {
     struct gpsr_s_nav_tlm_frame_t *tlm = (struct gpsr_s_nav_tlm_frame_t *)(&data->tlm_data);
     struct nspo_gpsr_frame_header_t *frame_head = (struct nspo_gpsr_frame_header_t *)(&data->nspo_head);
-    fprintf(stderr, "$TLM, %c%c%c%c, %d, %d, %f, %f, %f, %f, %f, %f\n",
+    fprintf(stderr, "$TLM, %c%c%c%c, %d, %d ms, %f, %f, %f, %f, %f, %f\n",
             frame_head->start_of_frame[0], frame_head->start_of_frame[1], frame_head->start_of_frame[2],frame_head->start_of_frame[3],
             tlm->gps_week_num, tlm->gps_time,
             tlm->posx, tlm->posy, tlm->posz,
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         printf("%s\n", argv[1]);
         memcpy(portname, argv[1], IFNAMSIZ);
     }
-    rs422_serialport_init((void **) &dev_info, portname, 1);
+    rs422_serialport_init((void **) &dev_info, portname, 0);
 
 
     /* simple noncanonical input */
@@ -95,6 +95,8 @@ int main(int argc, char *argv[]) {
                 gpsr_tlm_dump(&nspo_frame);
             } else {
                 rx_frame_receive_without_header(dev_info, rx_buf, sizeof(struct nspo_gpsr_frame_t));
+                memcpy(&nspo_frame, rx_buf, sizeof(struct nspo_gpsr_frame_t));
+                gpsr_tlm_dump(&nspo_frame);
             }
         }
     /* repeat read to get full message */

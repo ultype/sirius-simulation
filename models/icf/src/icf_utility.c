@@ -138,3 +138,12 @@ int16_t TRUNCAT_16BIT(double x) {
     else
         return (int16_t)(x);
 }
+
+int32_t ROUND_32BIT(double x) {
+      if (x < (INT_MIN - 0.5) || x > (INT_MAX + 0.5)) {
+          errExit("int32_t overflow");
+      }
+      if (x >= 0)
+         return (int32_t) ( x + 0.5);
+      return (int32_t) (x - 0.5);
+}
