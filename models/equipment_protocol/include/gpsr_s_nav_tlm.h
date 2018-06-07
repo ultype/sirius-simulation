@@ -9,7 +9,31 @@ struct sv_channel_t {
     uint8_t snr;
 } __attribute__((packed));
 
+typedef enum _NSPO_FRAME_TYPE_ENUM {
+    NSPO_FRAME_TYPE_TC = 0,
+    NSPO_FRAME_TYPE_TLM = 2
+} NSPO_FRAME_TYPE_ENUM;
+
+struct nspo_gpsr_frame_header_t {
+    /* Header Part*/
+    char start_of_frame[4];
+    union {
+        uint16_t packed;
+        struct {
+            uint16_t data_length:10;
+            uint16_t frame_id:4;
+            uint16_t frame_type:2;
+        };
+    } attribute_;
+} __attribute__((packed));
+
+struct nspo_gpsr_frame_tail_t {
+    /* Tail Part*/
+    uint8_t checksum;
+} __attribute__((packed));
+
 struct gpsr_s_nav_tlm_frame_t {
+    /* Data Part*/
     uint16_t gps_week_num;
     uint32_t gps_time;
     uint16_t validity;
@@ -51,5 +75,11 @@ struct gpsr_s_nav_tlm_frame_t {
     uint16_t wn_lsf;
     uint8_t dn;
     uint8_t delta_t_lsf;
+} __attribute__((packed));
+
+struct nspo_gpsr_frame_t {
+    struct nspo_gpsr_frame_header_t  nspo_head;
+    struct gpsr_s_nav_tlm_frame_t tlm_data;
+    struct nspo_gpsr_frame_tail_t nspo_tail;
 } __attribute__((packed));
 #endif  //  MODELS_EQUIPMENT_PROTOCOL_INCLUDE_GPSR_S_NAV_TLM_H_

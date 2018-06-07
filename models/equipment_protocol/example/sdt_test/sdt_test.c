@@ -13,8 +13,11 @@
 #include <stdint.h>
 #include "gpsr_s_nav_tlm.h"
 
-void gpsr_tlm_dump(struct gpsr_s_nav_tlm_frame_t *tlm) {
-    fprintf(stderr, "$TLM, %d, %d, %f, %f, %f, %f, %f, %f\n",
+void gpsr_tlm_dump(struct nspo_gpsr_frame_t *data) {
+    struct gpsr_s_nav_tlm_frame_t *tlm = (struct gpsr_s_nav_tlm_frame_t *)(&data->tlm_data);
+    struct nspo_gpsr_frame_header_t *frame_head = (struct nspo_gpsr_frame_header_t *)(&data->nspo_head);
+    fprintf(stderr, "$TLM, %c%c%c%c, %d, %d, %f, %f, %f, %f, %f, %f\n",
+            frame_head->start_of_frame[0], frame_head->start_of_frame[1], frame_head->start_of_frame[2],frame_head->start_of_frame[3],
             tlm->gps_week_num, tlm->gps_time,
             tlm->posx, tlm->posy, tlm->posz,
             tlm->velx, tlm->vely, tlm->velz);
@@ -66,7 +69,7 @@ int main(int argc, char *argv[]) {
     uint8_t rx_buf[1024] = {0};
     struct timeval timeout;
     fd_set readfs;
-    struct gpsr_s_nav_tlm_frame_t tlm;
+    struct nspo_gpsr_frame_t nspo_frame;
     /* Initialize the timeout structure */
     timeout.tv_sec  = 0;
     timeout.tv_usec = 100;
@@ -88,10 +91,10 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "[Time: %f] \n", get_curr_time());
             if (dev_info->header_size > 0) {
                 rx_frame_receive_with_header(dev_info, rx_buf, 1024);
-                memcpy(&tlm, rx_buf + dev_info->header_size, sizeof(struct gpsr_s_nav_tlm_frame_t));
-                gpsr_tlm_dump(&tlm);
+                memcpy(&nspo_frame, rx_buf + dev_info->header_size, sizeof(struct nspo_gpsr_frame_t));
+                gpsr_tlm_dump(&nspo_frame);
             } else {
-                rx_frame_receive_without_header(dev_info, rx_buf, sizeof(struct gpsr_s_nav_tlm_frame_t));
+                rx_frame_receive_without_header(dev_info, rx_buf, sizeof(struct nspo_gpsr_frame_t));
             }
         }
     /* repeat read to get full message */
