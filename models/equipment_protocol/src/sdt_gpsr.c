@@ -54,16 +54,14 @@ static uint32_t sdt_gpsr_append_nspo_frame_header(void *data, uint8_t *tx_buffer
     return offset;
 }
 
-int sdt_gpsr_layer2_tlm_frame_transfer(struct icf_ctrlblk_t *C) {
-    struct gpsr_s_nav_tlm_frame_t tlm_frame;
+int sdt_gpsr_layer2_tlm_frame_direct_transfer(struct icf_ctrlblk_t *C, struct gpsr_s_nav_tlm_frame_t *tlm_frame) {
     uint32_t send_size;
     uint8_t *tx_buffer = NULL;
-    icf_tx_dequeue(C, EGSE_GPSR01_SW_QIDX, &tlm_frame);
     tx_buffer = malloc(sizeof(struct nspo_gpsr_frame_t));
-    send_size = sdt_gpsr_append_nspo_frame_header(&tlm_frame, tx_buffer);
+    send_size = sdt_gpsr_append_nspo_frame_header(tlm_frame, tx_buffer);
     icf_tx_direct(C, EGSE_GPSR01_SW_QIDX, tx_buffer, send_size);
     icf_tx_direct(C, EGSE_GPSR02_SW_QIDX, tx_buffer, send_size);
-    //  hex_dump("TX TLM Frame", (uint8_t *) , sizeof(struct gpsr_s_nav_tlm_frame_t));
+    //  gpsr_tlm_dump((struct nspo_gpsr_frame_t *)tx_buffer);
     if (tx_buffer) {
         free(tx_buffer);
     }
@@ -113,4 +111,14 @@ int sdt_gpsr_convert_csv_to_motdata(struct sdt_gpsr_motion_data_t *motion_data, 
     token = strtok_r(NULL, delimiter, &saveptr);
     motion_data->velz = atof(token);
     return EXIT_SUCCESS;
+}
+
+void gpsr_tlm_dump(struct nspo_gpsr_frame_t *data) {
+    struct gpsr_s_nav_tlm_frame_t *tlm = (struct gpsr_s_nav_tlm_frame_t *)(&data->tlm_data);
+    struct nspo_gpsr_frame_header_t *frame_head = (struct nspo_gpsr_frame_header_t *)(&data->nspo_head);
+    fprintf(stderr, "$TLM, %c%c%c%c, %d, %d ms, %f, %f, %f, %f, %f, %f\n",
+            frame_head->start_of_frame[0], frame_head->start_of_frame[1], frame_head->start_of_frame[2],frame_head->start_of_frame[3],
+            tlm->gps_week_num, tlm->gps_time,
+            tlm->posx, tlm->posy, tlm->posz,
+            tlm->velx, tlm->vely, tlm->velz);
 }

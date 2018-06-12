@@ -308,9 +308,8 @@ class Rocket_SimObject : public Trick::SimObject {
             mot_data.vely = dynamics.get_double_VBEE()[1];
             mot_data.velz = dynamics.get_double_VBEE()[2];
             mot_data.visibility_satellites_map = 0x911;
-            sdt_gpsr_convert_motion_data_to_tlm((void *)&mot_data, tmp_frame);
-            icf_tx_direct(C, EGSE_GPSR01_SW_QIDX, tmp_frame, send_size);
-            //  icf_tx_direct(C, EGSE_GPSR02_SW_QIDX, tlm_frame, send_size);
+            sdt_gpsr_convert_motion_data_to_tlm(&mot_data, tmp_frame);
+            sdt_gpsr_layer2_tlm_frame_direct_transfer(C, tmp_frame);
         };
 
         Rocket_SimObject() 
@@ -358,8 +357,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, int_step);
             P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 
-            P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, (void *)&tlm_frame);
-
+            P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, &tlm_frame);
 
             (int_step, "logging") env.update_diagnostic_attributes(int_step);
             (int_step, "logging") dynamics.update_diagnostic_attributes(int_step);

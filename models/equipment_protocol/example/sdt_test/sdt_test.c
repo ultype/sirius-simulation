@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
         /* Initialize the input set */
         FD_ZERO(&readfs);
         FD_SET(dev_info->rs422_fd, &readfs);
+        memset(&nspo_frame, 0, sizeof(struct nspo_gpsr_frame_t));
         if (select(dev_info->rs422_fd + 1, &readfs, NULL, NULL, &timeout) < 0)
             fprintf(stderr, "[%s:%d] %s\n", __FUNCTION__, __LINE__, strerror(errno));
         if (FD_ISSET(dev_info->rs422_fd, &readfs)) {
