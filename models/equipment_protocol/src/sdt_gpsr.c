@@ -117,7 +117,7 @@ void gpsr_tlm_dump(struct nspo_gpsr_frame_t *data) {
     struct gpsr_s_nav_tlm_frame_t *tlm = (struct gpsr_s_nav_tlm_frame_t *)(&data->tlm_data);
     struct nspo_gpsr_frame_header_t *frame_head = (struct nspo_gpsr_frame_header_t *)(&data->nspo_head);
     fprintf(stderr, "$TLM, %c%c%c%c, %d, %d ms, %f, %f, %f, %f, %f, %f\n",
-            frame_head->start_of_frame[0], frame_head->start_of_frame[1], frame_head->start_of_frame[2],frame_head->start_of_frame[3],
+            frame_head->start_of_frame[0], frame_head->start_of_frame[1], frame_head->start_of_frame[2], frame_head->start_of_frame[3],
             tlm->gps_week_num, tlm->gps_time,
             tlm->posx, tlm->posy, tlm->posz,
             tlm->velx, tlm->vely, tlm->velz);

@@ -132,6 +132,7 @@ extern "C" int event_separation_1() {
     rkt.propulsion.set_no_thrust();
 
     rkt.forces.set_reference_point(-3.275);  // set reference point
+    rkt.dynamics.set_reference_point(-3.275);
 
     rkt.tvc.set_s3_tau1(20.0);
     rkt.tvc.set_s3_tau2(20.0);
@@ -246,6 +247,7 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
     rkt->propulsion.set_payload(0.0);  // payload mass
     rkt->forces.set_reference_point(-8.436);  // set reference point
+    rkt->dynamics.set_reference_point(-8.436);
 
     rkt->propulsion.set_S2_E1_VARIABLE(S2_E1_XCG_0, S2_E1_XCG_1, S2_E1_ROLL_0, S2_E1_ROLL_1, S2_E1_PITCH_0, S2_E1_PITCH_1
         , S2_E1_YAW_0, S2_E1_YAW_1, S2_E1_MASS_0, S2_E1_MASS_1);
