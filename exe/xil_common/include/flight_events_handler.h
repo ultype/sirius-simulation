@@ -97,14 +97,6 @@ extern "C" int event_start() {
     // rkt.propulsion.set_input_thrust(RBODY_XCG_0, RBODY_XCG_1, RBODY_MOI_ROLL_0, RBODY_MOI_ROLL_1, RBODY_MOI_PITCH_0, RBODY_MOI_PITCH_1, RBODY_MOI_YAW_0, RBODY_MOI_YAW_1, SPI, FUEL_FLOW_RATE);
     rkt.tvc.set_S2_TVC();
 
-    rkt.propulsion.set_S2_E1_VARIABLE(S2_E1_XCG_0, S2_E1_XCG_1, S2_E1_ROLL_0, S2_E1_ROLL_1, S2_E1_PITCH_0, S2_E1_PITCH_1
-        , S2_E1_YAW_0, S2_E1_YAW_1, S2_E1_MASS_0, S2_E1_MASS_1);
-    rkt.propulsion.set_S2_E2_VARIABLE(S2_E2_XCG_0, S2_E2_XCG_1, S2_E2_ROLL_0, S2_E2_ROLL_1, S2_E2_PITCH_0, S2_E2_PITCH_1
-        , S2_E2_YAW_0, S2_E2_YAW_1, S2_E2_MASS_0, S2_E2_MASS_1);
-    rkt.propulsion.set_S2_E3_VARIABLE(S2_E3_XCG_0, S2_E3_XCG_1, S2_E3_ROLL_0, S2_E3_ROLL_1, S2_E3_PITCH_0, S2_E3_PITCH_1
-        , S2_E3_YAW_0, S2_E3_YAW_1, S2_E3_MASS_0, S2_E3_MASS_1);
-    rkt.propulsion.set_S2_E4_VARIABLE(S2_E4_XCG_0, S2_E4_XCG_1, S2_E4_ROLL_0, S2_E4_ROLL_1, S2_E4_PITCH_0, S2_E4_PITCH_1
-        , S2_E4_YAW_0, S2_E4_YAW_1, S2_E4_MASS_0, S2_E4_MASS_1);
     rkt.forces.set_e1_d(0.0, 0.0, -0.69);
     rkt.forces.set_e2_d(0.0, 0.69, 0.0);
     rkt.forces.set_e3_d(0.0, 0.0, 0.69);
@@ -254,6 +246,15 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
     rkt->propulsion.set_payload(0.0);  // payload mass
     rkt->forces.set_reference_point(-8.436);  // set reference point
+
+    rkt->propulsion.set_S2_E1_VARIABLE(S2_E1_XCG_0, S2_E1_XCG_1, S2_E1_ROLL_0, S2_E1_ROLL_1, S2_E1_PITCH_0, S2_E1_PITCH_1
+        , S2_E1_YAW_0, S2_E1_YAW_1, S2_E1_MASS_0, S2_E1_MASS_1);
+    rkt->propulsion.set_S2_E2_VARIABLE(S2_E2_XCG_0, S2_E2_XCG_1, S2_E2_ROLL_0, S2_E2_ROLL_1, S2_E2_PITCH_0, S2_E2_PITCH_1
+        , S2_E2_YAW_0, S2_E2_YAW_1, S2_E2_MASS_0, S2_E2_MASS_1);
+    rkt->propulsion.set_S2_E3_VARIABLE(S2_E3_XCG_0, S2_E3_XCG_1, S2_E3_ROLL_0, S2_E3_ROLL_1, S2_E3_PITCH_0, S2_E3_PITCH_1
+        , S2_E3_YAW_0, S2_E3_YAW_1, S2_E3_MASS_0, S2_E3_MASS_1);
+    rkt->propulsion.set_S2_E4_VARIABLE(S2_E4_XCG_0, S2_E4_XCG_1, S2_E4_ROLL_0, S2_E4_ROLL_1, S2_E4_PITCH_0, S2_E4_PITCH_1
+        , S2_E4_YAW_0, S2_E4_YAW_1, S2_E4_MASS_0, S2_E4_MASS_1);
 }
 
 extern "C" void master_init_sensors(Rocket_SimObject *rkt) {

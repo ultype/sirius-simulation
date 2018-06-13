@@ -333,7 +333,7 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
     jit_add_read(0.001 + fc->stand_still_time, "event_control_rcs_on");
     jit_add_read(12.001 + fc->stand_still_time, "event_control_on");
-    //  jit_add_read(15.001, "event_s2_control_on");
+    // jit_add_read(15.001 + fc->stand_still_time, "event_s2_control_on");
     jit_add_read(82.001 + fc->stand_still_time, "event_aoac_on");
     jit_add_read(100.001 + fc->stand_still_time, "event_s3_seperation");
     jit_add_read(102.051 + fc->stand_still_time, "event_s3_control_on");
