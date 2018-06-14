@@ -8,7 +8,7 @@ from numpy import genfromtxt
 import Gnuplot
 def main():
     s_nav_log_input_file_name = sys.argv[1]
-    print s_nav_log_input_file_name
+    print (s_nav_log_input_file_name)
     output_s_nav_file = open('gpsr_s_nav_tlm.csv', 'w')
     search_string = "$POS,"
 
@@ -19,7 +19,7 @@ def main():
     sim_data_list = []
     for element in enumerate(s_nav_input_log):
         if (search_string in element[1]) == True:
-            print element[1]
+            print (element[1])
             line = element[1].replace(search_string, "")
             sim_data_list.append(line)
 
@@ -29,8 +29,8 @@ def main():
 
     s_nav_file_src.close()
     output_s_nav_file.close()
-    print "gpsr_s_nav_tlm.csv\n"
-    print "Next step ./time_log_alignment.py <DM log_nspo file>"
+    print ("gpsr_s_nav_tlm.csv\n")
+    print ("Next step ./time_log_alignment.py <DM log_nspo file>")
 
     g = Gnuplot.Gnuplot(persist = 1)
     g('set grid')

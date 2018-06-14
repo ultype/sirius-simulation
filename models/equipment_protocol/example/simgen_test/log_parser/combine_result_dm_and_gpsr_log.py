@@ -43,7 +43,7 @@ def main():
         sim_data_list = []
         if iter_idx <= 1:
             continue
-        print dm_row[0]
+        print (dm_row[0])
         if float(dm_row[0]) == lift_off_time:
             start_flight_idx = iter_idx
     ###### DM Part ######
@@ -84,8 +84,8 @@ def main():
     print ( "The position of root mean square with DM is %f meters." % (rms_length))
     print ( "The speed of root mean square with DM is %f cm/s." % (rms_speed))
 
-    print answer_file_name + "combine_result_dm_and_gpsr_log.csv\n"
-    print "Next step ./error_with_gpsr_answer.py <lift_off_time>"
+    print (answer_file_name + "combine_result_dm_and_gpsr_log.csv\n")
+    print ("Next step ./error_with_gpsr_answer.py <lift_off_time>")
 
 if __name__ == "__main__":
     main()
