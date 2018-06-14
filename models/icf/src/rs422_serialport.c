@@ -23,7 +23,7 @@ int rs422_serialport_init(void **priv_data, char *ifname, int is_header_en) {
         fprintf(stderr, "open port %s error\n", dev_info->portname);
         errExit("Encounter a Error !!!\n");
     }
-    set_interface_attribs(dev_info->rs422_fd, B921600, 0);
+    set_interface_attribs(dev_info->rs422_fd, B230400, 0);
     *priv_data = dev_info;
     return status;
 error:
