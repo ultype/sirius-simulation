@@ -12,7 +12,7 @@
 #include "icf_utility.h"
 #include <stdint.h>
 
-#define CONFIG_ESPS_HEADER_ENABLE 1
+#define CONFIG_ESPS_HEADER_ENABLE 0
 
 int rx_frame_receive_with_header(void *dev, uint8_t *rs422payload, int buff_size) {
     struct rs422_device_info_t *dev_info = (struct rs422_device_info_t *)dev;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
             if (dev_info->header_size > 0) {
                 rx_frame_receive_with_header(dev_info, rx_buf, 1024);
             } else {
-                rx_frame_receive_without_header(dev_info, rx_buf, 102);
+                rx_frame_receive_without_header(dev_info, rx_buf, 4);
             }
         }
 	} while (1);
