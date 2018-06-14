@@ -132,6 +132,23 @@ int copy_buffer_ntohs(uint16_t *dest, uint8_t *src) {
     return 0;
 }
 
+int copy_buffer_htonl(uint8_t *dest, uint32_t *src) {
+    uint32_t be_value;
+    be_value = PP_HTONL(*src);
+    dest[3] = ((be_value & 0xFF000000U) >> 24);
+    dest[2] = ((be_value & 0x00FF0000U) >> 16);
+    dest[1] = ((be_value & 0x0000FF00U) >> 8);
+    dest[0] = ((be_value & 0x000000FFU) >> 0);
+    return 0;
+}
+
+int copy_buffer_ntohl(uint32_t *dest, uint8_t *src) {
+    uint32_t be_value;
+    be_value = (src[3] << 24) | (src[2] << 16) | (src[1] << 8) | (src[0]);
+    *dest = PP_NTOHL(be_value);
+    return 0;
+}
+
 int16_t TRUNCAT_16BIT(double x) {
     if (x < SHRT_MIN || x > SHRT_MAX)
         errExit("int16_t overflow");

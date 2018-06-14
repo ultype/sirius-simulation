@@ -44,7 +44,7 @@ int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *s
     token = strtok_r(NULL, delimiter, &saveptr);
     axis[2] = atof(token);
     motion_data->hwil_input[2] =  ROUND_32BIT(axis[2] * eqmt->hwil_ratio_data);
-    //  fprintf(stderr, "[%s:%d] \n", __FUNCTION__, __LINE__,motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    //  fprintf(stderr, "[%s:%d] \n", __FUNCTION__, __LINE__, motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
     return EXIT_SUCCESS;
 }
 
@@ -52,9 +52,15 @@ int ratetable_layer2_frame_direct_transfer(struct icf_ctrlblk_t *C, struct ratet
     struct ratetable_motion_data_t *motion_data = &eqmt->mot_data;
     uint32_t send_size = 4;
     uint8_t tx_buffer[4]= {0};
-    icf_tx_direct(C, EGSE_RATETBL_X_SW_QIDX, (uint8_t *)&motion_data->hwil_input[0], send_size);
-    icf_tx_direct(C, EGSE_RATETBL_Y_SW_QIDX, (uint8_t *)&motion_data->hwil_input[1], send_size);
-    icf_tx_direct(C, EGSE_RATETBL_X_SW_QIDX, (uint8_t *)&motion_data->hwil_input[2], send_size);
+
+    copy_buffer_htonl(&tx_buffer, (uint32_t *)&motion_data->hwil_input[0]);
+    icf_tx_direct(C, EGSE_RATETBL_X_SW_QIDX, &tx_buffer, send_size);
+
+    copy_buffer_htonl(&tx_buffer, (uint32_t *)&motion_data->hwil_input[1]);
+    icf_tx_direct(C, EGSE_RATETBL_Y_SW_QIDX, &tx_buffer, send_size);
+
+    copy_buffer_htonl(&tx_buffer, (uint32_t *)&motion_data->hwil_input[2]);
+    icf_tx_direct(C, EGSE_RATETBL_Z_SW_QIDX, &tx_buffer, send_size);
 
     return 0;
 }
