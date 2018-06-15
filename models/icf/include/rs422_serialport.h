@@ -47,6 +47,7 @@ struct rs422_device_info_t {
     int32_t rs422_fd;
     struct rs422_frame_header_t frame;
     uint32_t header_size;
+    fd_set *set;
 };
 
 struct rs422_device_name_t {

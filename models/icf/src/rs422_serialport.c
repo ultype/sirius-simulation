@@ -12,6 +12,12 @@ int rs422_serialport_init(void **priv_data, char *ifname, int is_header_en) {
         goto error;
     }
 
+    dev_info->set = calloc(1, sizeof(fd_set));
+    if (dev_info->set == NULL) {
+        fprintf(stderr, "[%s:%d] fd_set Memory allocate fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
+        goto error;
+    }
+
     strncpy(dev_info->portname, ifname, IFNAMSIZ);
     dev_info->frame.crc = 0;
     dev_info->frame.payload_len = 0;
@@ -24,10 +30,15 @@ int rs422_serialport_init(void **priv_data, char *ifname, int is_header_en) {
         errExit("Encounter a Error !!!\n");
     }
     set_interface_attribs(dev_info->rs422_fd, B230400, 0);
+
     *priv_data = dev_info;
     return status;
 error:
     status = -1;
+    if (dev_info->set) {
+        free(dev_info->set);
+        dev_info->set = NULL;
+    }
     if (dev_info) {
         free(dev_info);
         dev_info = NULL;
@@ -64,7 +75,7 @@ int open_port(char *portname) {
 
 int set_interface_attribs(int fd, int speed, int parity) {
     struct termios options;
-    int ret = 0;
+    int ret = 0, setflag;
     // Get the current options for the port
     if ((ret = tcgetattr(fd, &options)) < 0) {
         fprintf(stderr, "failed to get attr: %d, %s\n", fd, strerror(errno));
@@ -99,7 +110,7 @@ int set_interface_attribs(int fd, int speed, int parity) {
 
     /* fetch bytes as they become available */
     options.c_cc[VMIN]  = 0;            // read doesn't block
-    options.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+    options.c_cc[VTIME] = 0;            // 0.5 seconds read timeout
 
 
     // Set the new attributes
@@ -107,26 +118,56 @@ int set_interface_attribs(int fd, int speed, int parity) {
         fprintf(stderr, "failed to set attr: %d, %s\n", fd, strerror(errno));
         errExit("Encounter a Error !!!\n");
     }
+
+    setflag = fcntl(fd, F_GETFL);
+    setflag = setflag | O_NONBLOCK;
+    ret = fcntl(fd, F_SETFL, setflag);
+    if (ret != 0) {
+        fprintf(stderr, "fcntl set fail. ret: %s\n", strerror(errno));
+    }
     return ret;
 }
 
 int rs422_data_send_scatter(void *priv_data, uint8_t *payload, uint32_t frame_len) {
     struct rs422_device_info_t *dev_info = priv_data;
-    uint32_t cur_len = 0;
-    int sent_len = 0;
+    uint32_t offset = 0;
+    int wdlen = 0;
     uint8_t *tx_buffer;
-    int ret = 0;
     tx_buffer = payload;
-    while (cur_len < frame_len) {
-        sent_len = write(dev_info->rs422_fd, tx_buffer + cur_len, frame_len - cur_len);
-        if (sent_len < 0) {
-            fprintf(stderr, "ERROR status %d\n", sent_len);
-            goto error;
+    while (offset < frame_len) {
+        if ((wdlen = write(dev_info->rs422_fd, tx_buffer + offset, frame_len - offset)) < 0) {
+            if (wdlen < 0 && errno == EAGAIN) {
+                wdlen = 0;
+            } else {
+                fprintf(stderr, "%s: %s\n", __FUNCTION__, strerror(errno));
+                return -1;
+            }
         }
-        cur_len += sent_len;
+        offset += wdlen;
     }
-error:
-    return ret;
+    return offset;
+}
+
+int rs422_data_recv_gather(void *priv_data, uint8_t *payload, uint32_t frame_len) {
+    struct rs422_device_info_t *dev_info = priv_data;
+    uint32_t offset = 0;
+    int rdlen = 0;
+    uint8_t *rx_buffer;
+    rx_buffer = payload;
+    while (offset < frame_len) {
+        if ((rdlen = read(dev_info->rs422_fd, rx_buffer + offset, frame_len - offset)) < 0) {
+            if (errno == EAGAIN) {
+                rdlen = 0;
+            } else {
+                fprintf(stderr, "%s: %s\n", __FUNCTION__, strerror(errno));
+                return -1;
+            }
+        } else if (rdlen == 0) {
+            break;
+        }
+        offset += rdlen;
+    }
+    return offset;
 }
 
 uint8_t* rs422_frame_alloc(uint32_t size) {
@@ -175,19 +216,46 @@ uint32_t rs422_frame_get_header_size(void *priv_data) {
     return dev_info->header_size;
 }
 
+int rs422_select(void *priv_data, struct timeval *timeout) {
+    int ret = 0;
+    struct rs422_device_info_t *dev_info = priv_data;
+    ret = select(dev_info->rs422_fd + 1, dev_info->set, NULL, NULL, timeout);
+    return ret;
+}
+
+
+void rs422_fd_clr(void *priv_data) {
+    struct rs422_device_info_t *dev_info = priv_data;
+    FD_CLR(dev_info->rs422_fd, dev_info->set);
+}
+int rs422_fd_isset(void *priv_data) {
+    struct rs422_device_info_t *dev_info = priv_data;
+    int ret = 0;
+    ret = FD_ISSET(dev_info->rs422_fd, dev_info->set);
+    return ret;
+}
+void rs422_fd_set(void *priv_data) {
+    struct rs422_device_info_t *dev_info = priv_data;
+    FD_SET(dev_info->rs422_fd, dev_info->set);
+}
+void rs422_fd_zero(void *priv_data) {
+    struct rs422_device_info_t *dev_info = priv_data;
+    FD_ZERO(dev_info->set);
+}
+
 struct icf_driver_ops icf_driver_rs422_ops = {
     .open_interface = rs422_serialport_init,
-    .recv_data = NULL,
+    .recv_data = rs422_data_recv_gather,
     .send_data = rs422_data_send_scatter,
 
     .header_set = rs422_frame_header_set,
     .header_copy = rs422_frame_header_copy,
     .get_header_size = rs422_frame_get_header_size,
-    .select = NULL,
-    .fd_clr = NULL,
-    .fd_isset = NULL,
-    .fd_set = NULL,
-    .fd_zero = NULL,
+    .select = rs422_select,
+    .fd_clr = rs422_fd_clr,
+    .fd_isset = rs422_fd_isset,
+    .fd_set = rs422_fd_set,
+    .fd_zero = rs422_fd_zero,
     .close_interface = rs422_serialport_deinit,
 };
 

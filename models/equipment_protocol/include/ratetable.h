@@ -47,6 +47,7 @@ int ratetable_init(struct ratetable_eqmt_info_t *eqmt);
 int ratetable_init_input_file(FILE **stream);
 int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *stream);
 int ratetable_layer2_frame_direct_transfer(struct icf_ctrlblk_t *C, struct ratetable_eqmt_info_t *eqmt);
+int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eqmt_info_t *eqmt);
 #ifdef __cplusplus
 }
 #endif

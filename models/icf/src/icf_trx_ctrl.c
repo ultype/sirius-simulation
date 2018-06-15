@@ -11,7 +11,10 @@ static const struct icf_mapping g_icf_egse_maptbl[] = {
     {HW_PORT7, EGSE_GPSR02_SW_QIDX,           ICF_DRIVERS_ID1},
     {HW_PORT8, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DRIVERS_ID2},
     {HW_PORT0, EGSE_RX_FLIGHT_EVENT_QIDX,     ICF_DRIVERS_ID0},
-    {HW_PORT9, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DRIVERS_ID3}
+    {HW_PORT9, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DRIVERS_ID3},
+    {HW_PORT2, EGSE_RX_RATETBL_X_SW_QIDX,     ICF_DRIVERS_ID1},
+    {HW_PORT3, EGSE_RX_RATETBL_Y_SW_QIDX,     ICF_DRIVERS_ID1},
+    {HW_PORT4, EGSE_RX_RATETBL_Z_SW_QIDX,     ICF_DRIVERS_ID1}
 };
 
 
@@ -39,7 +42,10 @@ static struct icf_ctrl_queue g_egse_queue[] = {
     {1, EGSE_GPSR02_SW_QIDX,           ICF_DIRECTION_TX, NULL, {}},
     {1, EGSE_FLIGHT_COMPUTER_SW_QIDX,  ICF_DIRECTION_TX, NULL, {}},
     {1, EGSE_RX_FLIGHT_EVENT_QIDX,     ICF_DIRECTION_RX, NULL, {}},
-    {1, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DIRECTION_TX, NULL, {}}
+    {1, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_RX_RATETBL_X_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_RX_RATETBL_Y_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_RX_RATETBL_Z_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
@@ -319,7 +325,7 @@ empty:
     return 0;
 }
 
-static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
+static int icf_dispatch_rx_frame(int system_type, void *rxframe, int hw_port_idx) {
     int qidx = 0;
 
     if (system_type == ICF_SYSTEM_TYPE_ESPS) {
@@ -341,8 +347,23 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe) {
     }
 
     if (system_type == ICF_SYSTEM_TYPE_EGSE) {
-        qidx = fc_can_cmd_dispatch(rxframe);
         debug_hex_dump("egse_dispatch", rxframe, 24);
+        switch (hw_port_idx) {
+            case HW_PORT0:
+                qidx = fc_can_cmd_dispatch(rxframe);
+                break;
+            case HW_PORT2:
+                qidx = EGSE_RX_RATETBL_X_SW_QIDX;
+                break;
+            case HW_PORT3:
+                qidx = EGSE_RX_RATETBL_Y_SW_QIDX;
+                break;
+            case HW_PORT4:
+                qidx = EGSE_RX_RATETBL_Z_SW_QIDX;
+                break;
+            default:
+                qidx = fc_can_cmd_dispatch(rxframe);
+        }
         return qidx;
     }
     fprintf(stderr, "[%s:%d] System type not match !!\n", __FUNCTION__, __LINE__);
@@ -369,7 +390,7 @@ static int icf_l2frame_receive_process(struct icf_ctrlblk_t* C, struct icf_drive
     if (drv_ops->recv_data(ctrlport->drv_priv_data, (uint8_t *)rxcell->l2frame, rxcell->frame_full_size) < 0)
         goto empty;
     debug_hex_dump("icf_rx_ctrl_job", (uint8_t *)rxcell->l2frame, rxcell->frame_full_size);
-    qidx = icf_dispatch_rx_frame(C->system_type, rxcell->l2frame);
+    qidx = icf_dispatch_rx_frame(C->system_type, rxcell->l2frame, ctrlport->hw_port_idx);
     if (qidx == EGSE_EMPTY_SW_QIDX)
         goto empty;
     ctrlqueue = C->ctrlqueue[qidx];
@@ -393,6 +414,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
 
     switch (ctrlport->dev_type) {
         case CAN_DEVICE_TYPE:
+        case RS422_DEVICE_TYPE:
             drv_ops->fd_zero(ctrlport->drv_priv_data);
             drv_ops->fd_set(ctrlport->drv_priv_data);
             ret = drv_ops->select(ctrlport->drv_priv_data, &tv);
@@ -401,7 +423,7 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
             if (drv_ops->fd_isset(ctrlport->drv_priv_data)) {
                 if (icf_l2frame_receive_process(C, drv_ops, ctrlport, rx_buff_size) < 0)
                     break;
-                debug_print("[%lf] RX CAN Received !!\n", get_curr_time());
+                debug_print("[%lf] RX Received !!\n", get_curr_time());
             }
             break;
         case ETHERNET_DEVICE_TYPE:

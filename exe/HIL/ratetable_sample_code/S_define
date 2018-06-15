@@ -36,6 +36,12 @@ class RatetableSimObject : public Trick::SimObject {
             fprintf(stderr, "Go !!\n");
         };
 
+        void ratetable_feedback_group(struct icf_ctrlblk_t *C) {
+            icf_rx_ctrl_job(C, HW_PORT2, 4);
+            icf_rx_ctrl_job(C, HW_PORT2, 4);
+            icf_rx_ctrl_job(C, HW_PORT2, 4);
+        }
+
         RatetableSimObject()
         {
         	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
@@ -46,6 +52,8 @@ class RatetableSimObject : public Trick::SimObject {
             P1 (5, "scheduled") trick_heartbeat();
             P1 (0.050, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
             P1 (0.050, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
+            P1 (0.050, "scheduled") ratetable_feedback_group(&icf_ctrl);
+            P1 (0.050, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;
