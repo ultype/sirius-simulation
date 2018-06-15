@@ -1,5 +1,5 @@
 #include "ratetable.h"
-
+static double __PI = 3.1415926536;
 int ratetable_init(struct ratetable_eqmt_info_t *eqmt) {
     eqmt->hwil_ratio_data = 1000;
     eqmt->hwil_type_comm_input = RATETABLE_REALTIME_TYPE_INPUT_RS422;
@@ -34,17 +34,17 @@ int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *s
 
     /* xet the first token */
     token = strtok_r(line, delimiter, &saveptr);
-    axis[0] = atof(token);
+    axis[0] = atof(token) * (180 / __PI);
     motion_data->hwil_input[0] =  ROUND_32BIT(axis[0] * eqmt->hwil_ratio_data);
 
     token = strtok_r(NULL, delimiter, &saveptr);
-    axis[1] = atof(token);
+    axis[1] = atof(token) * (180 / __PI);
     motion_data->hwil_input[1] =  ROUND_32BIT(axis[1] * eqmt->hwil_ratio_data);
 
     token = strtok_r(NULL, delimiter, &saveptr);
-    axis[2] = atof(token);
+    axis[2] = atof(token) * (180 / __PI);
     motion_data->hwil_input[2] =  ROUND_32BIT(axis[2] * eqmt->hwil_ratio_data);
-    //  fprintf(stderr, "[%s:%d] \n", __FUNCTION__, __LINE__, motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    //  fprintf(stderr, "%d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
     return EXIT_SUCCESS;
 }
 
