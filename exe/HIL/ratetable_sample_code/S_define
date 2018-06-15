@@ -11,12 +11,12 @@ LIBRARY DEPENDENCIES:
 ##include "icf_trx_ctrl.h"
 ##include "ratetable.h"
 class RatetableSimObject : public Trick::SimObject {
-
     public:
         struct icf_ctrlblk_t   icf_ctrl;
         ExternalSourceClock ext_clk;
         FILE *ratetable_stream;
         struct ratetable_eqmt_info_t rt_dev_info;
+        double int_step = 0.05;
         void trick_heartbeat(void) {
             char date_buf[80];
             char currentTime[84] = "";
@@ -38,8 +38,8 @@ class RatetableSimObject : public Trick::SimObject {
 
         void ratetable_feedback_group(struct icf_ctrlblk_t *C) {
             icf_rx_ctrl_job(C, HW_PORT2, 4);
-            icf_rx_ctrl_job(C, HW_PORT2, 4);
-            icf_rx_ctrl_job(C, HW_PORT2, 4);
+            icf_rx_ctrl_job(C, HW_PORT3, 4);
+            icf_rx_ctrl_job(C, HW_PORT4, 4);
         }
 
         RatetableSimObject()
@@ -50,10 +50,10 @@ class RatetableSimObject : public Trick::SimObject {
             ("initialization") ratetable_init_input_file(&ratetable_stream);
             ("initialization") wait_for_1st_pps();
             P1 (5, "scheduled") trick_heartbeat();
-            P1 (0.050, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
-            P1 (0.050, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
-            P1 (0.050, "scheduled") ratetable_feedback_group(&icf_ctrl);
-            P1 (0.050, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
+            P1 (int_step, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
+            P1 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
+            P1 (int_step, "scheduled") ratetable_feedback_group(&icf_ctrl);
+            P1 (int_step, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;
