@@ -15,24 +15,24 @@ const double PSIBDX         = 90.0;      //  Yawing   angle of veh wrt geod coor
 const double ALPHA0X        = 0;    // Initial angle-of-attack   - deg  module newton
 const double BETA0X         = 0;    // Initial sideslip angle    - deg  module newton
 const double DVBE           = 0;    // Vehicle geographic speed  - m/s  module newton
-const double XCG_0          = 6.4138;    //  vehicle initial xcg  TWD use 6.18
-const double XCG_1          = 4.7888;     //  vehicle final xcg  TWD use 4.51
-const double MOI_ROLL_0     = 517.8;    //  vehicle initial moi in roll direction  TWD use 461.87
-const double MOI_ROLL_1     = 180.9;     //  vehicle final moi in roll direction   TWD use 168.01
-const double MOI_PITCH_0    = 32525.4;  //  vehicle initial transverse moi   TWD use 27023.19
-const double MOI_PITCH_1    = 19377.7;   //  vehicle final transverse moi    TWD use 18620.51
-const double MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi   TWD use 27023.19
-const double MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi    TWD use 18620.51
-const double SPI            = 291.6145604;     //  Specific impusle
-const double FUEL_FLOW_RATE = 29.587;     //  fuel flow rate
-const double RBODY_XCG_0 = 6.18;
-const double RBODY_XCG_1 = 4.51;
-const double RBODY_MOI_ROLL_0 = 461.87;
-const double RBODY_MOI_ROLL_1 = 168.01;
-const double RBODY_MOI_PITCH_0 = 27023.19;
-const double RBODY_MOI_PITCH_1 = 18620.51;
-const double RBODY_MOI_YAW_0 = 27023.19;
-const double RBODY_MOI_YAW_1 = 18620.51;
+const double S2_XCG_0          = 6.4138;    //  vehicle initial xcg  TWD use 6.18
+const double S2_XCG_1          = 4.7888;     //  vehicle final xcg  TWD use 4.51
+const double S2_MOI_ROLL_0     = 517.8;    //  vehicle initial moi in roll direction  TWD use 461.87
+const double S2_MOI_ROLL_1     = 180.9;     //  vehicle final moi in roll direction   TWD use 168.01
+const double S2_MOI_PITCH_0    = 32525.4;  //  vehicle initial transverse moi   TWD use 27023.19
+const double S2_MOI_PITCH_1    = 19377.7;   //  vehicle final transverse moi    TWD use 18620.51
+const double S2_MOI_YAW_0      = 32519.8;  //  vehicle initial transverse moi   TWD use 27023.19
+const double S2_MOI_YAW_1      = 19372.3;   //  vehicle final transverse moi    TWD use 18620.51
+const double S2_SPI            = 291.6145604;     //  Specific impusle
+const double S2_FUEL_FLOW_RATE = 29.587;     //  fuel flow rate
+const double S2_RBODY_XCG_0 = 6.18;
+const double S2_RBODY_XCG_1 = 4.51;
+const double S2_RBODY_MOI_ROLL_0 = 461.87;
+const double S2_RBODY_MOI_ROLL_1 = 168.01;
+const double S2_RBODY_MOI_PITCH_0 = 27023.19;
+const double S2_RBODY_MOI_PITCH_1 = 18620.51;
+const double S2_RBODY_MOI_YAW_0 = 27023.19;
+const double S2_RBODY_MOI_YAW_1 = 18620.51;
 /****************Engine coefficients*********************/
 const double S2_E1_MASS_0   = 117.13;
 const double S2_E1_MASS_1   = 27.42;
@@ -79,22 +79,11 @@ const double S2_E4_XCG_0    = 0.67362;
 const double S2_E4_XCG_1    = 0.77217;
 
 extern "C" int event_start() {
-    double xcg_0          = 6.4138;    //  vehicle initial xcg
-    double xcg_1          = 4.7888;     //  vehicle final xcg
-    double moi_roll_0     = 517.8;    //  vehicle initial moi in roll direction
-    double moi_roll_1     = 180.9;     //  vehicle final moi in roll direction
-    double moi_pitch_0    = 32525.4;  //  vehicle initial transverse moi
-    double moi_pitch_1    = 19377.7;   //  vehicle final transverse moi
-    double moi_yaw_0    = 32519.8;  //  vehicle initial transverse moi
-    double moi_yaw_1    = 19372.3;   //  vehicle final transverse moi
-    double spi            = 291.6145604;     //  Specific impusle 291.6145604 274.8
-    double fuel_flow_rate = 29.587;     //  fuel flow rate
     if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_CODE_LIFTOFF, rkt.egse_flight_event_handler_bitmap, rkt.flight_event_code_record))
         return 0;
     rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_LIFTOFF);
     PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
-    rkt.propulsion.set_input_thrust(XCG_0, XCG_1, MOI_ROLL_0, MOI_ROLL_1, MOI_PITCH_0, MOI_PITCH_1, MOI_YAW_0, MOI_YAW_1, SPI, FUEL_FLOW_RATE);
-    // rkt.propulsion.set_input_thrust(RBODY_XCG_0, RBODY_XCG_1, RBODY_MOI_ROLL_0, RBODY_MOI_ROLL_1, RBODY_MOI_PITCH_0, RBODY_MOI_PITCH_1, RBODY_MOI_YAW_0, RBODY_MOI_YAW_1, SPI, FUEL_FLOW_RATE);
+    rkt.propulsion.engine_ignition();
     rkt.tvc.set_S2_TVC();
 
     rkt.forces.set_e1_d(0.0, 0.0, -0.69);
@@ -232,18 +221,8 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_vmass0(4473.5);       // vehicle initial mass
     rkt->propulsion.set_fmass0(2958.7);      // vehicle initail fuel mass
 
-    double xcg_0          = XCG_0;    //  vehicle initial xcg
-    double xcg_1          = XCG_1;     //  vehicle final xcg
-    double moi_roll_0     = MOI_ROLL_0;    //  vehicle initial moi in roll direction
-    double moi_roll_1     = MOI_ROLL_1;     //  vehicle final moi in roll direction
-    double moi_pitch_0    = MOI_PITCH_0;  //  vehicle initial transverse moi
-    double moi_pitch_1    = MOI_PITCH_1;   //  vehicle final transverse moi
-    double moi_yaw_0    = MOI_YAW_0;  //  vehicle initial transverse moi
-    double moi_yaw_1    = MOI_YAW_1;   //  vehicle final transverse moi
-    double spi            = SPI;     //  Specific impusle
-    double fuel_flow_rate = FUEL_FLOW_RATE;     //  fuel flow rate
-    rkt->propulsion.get_input_file_var(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_pitch_0, moi_pitch_1, moi_yaw_0, moi_yaw_1, spi, fuel_flow_rate);  //  get variable for input file
-
+    rkt->propulsion.get_input_file_var(S2_XCG_0, S2_XCG_1, S2_MOI_ROLL_0, S2_MOI_ROLL_1, S2_MOI_PITCH_0, S2_MOI_PITCH_1, S2_MOI_YAW_0, S2_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
+    // rkt->propulsion.get_input_file_var(S2_RBODY_XCG_0, S2_RBODY_XCG_1, S2_RBODY_MOI_ROLL_0, S2_RBODY_MOI_ROLL_1, S2_RBODY_MOI_PITCH_0, S2_RBODY_MOI_PITCH_1, S2_RBODY_MOI_YAW_0, S2_RBODY_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
     rkt->propulsion.set_aexit(0.03329156 * 4.0);  // nozzle exhaust area
     rkt->propulsion.set_payload(0.0);  // payload mass
     rkt->forces.set_reference_point(-8.436);  // set reference point
