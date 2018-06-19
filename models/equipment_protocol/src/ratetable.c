@@ -1,7 +1,7 @@
 #include "ratetable.h"
 static double __PI = 3.1415926536;
 int ratetable_init(struct ratetable_eqmt_info_t *eqmt) {
-    eqmt->hwil_ratio_data = 1000;
+    eqmt->hwil_ratio_data = 10000;
     eqmt->hwil_type_comm_input = RATETABLE_REALTIME_TYPE_INPUT_RS422;
     eqmt->hwil_tx_speed_baud = 230400;
     eqmt->hwil_send_freq = 100;
@@ -75,9 +75,11 @@ int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eq
     icf_rx_dequeue(C, EGSE_RX_RATETBL_X_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[0], rx_buffer);
 
+    memset(rx_buffer, 0, rx_buff_size);
     icf_rx_dequeue(C, EGSE_RX_RATETBL_Y_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[1], rx_buffer);
 
+    memset(rx_buffer, 0, rx_buff_size);
     icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[2], rx_buffer);
     fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
