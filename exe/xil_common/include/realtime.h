@@ -13,6 +13,7 @@ extern "C" void realtime() {
     exec_set_thread_cpu_affinity(0, 1);
     frame_log_on();
     fprintf(stderr, "%s\n", real_time_clock_get_name());
+    fprintf(stderr, "S_main_Linux_5.4_x86_64.exe Process ID : %d\n", getpid());
 }
 
 extern "C" void freeze_cmd(void) {
