@@ -16,7 +16,7 @@ class RatetableSimObject : public Trick::SimObject {
         ExternalSourceClock ext_clk;
         FILE *ratetable_stream;
         struct ratetable_eqmt_info_t rt_dev_info;
-        double int_step = 0.05;
+        double int_step = 0.005;
         void trick_heartbeat(void) {
             char date_buf[80];
             char currentTime[84] = "";

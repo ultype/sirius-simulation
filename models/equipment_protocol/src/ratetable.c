@@ -4,7 +4,7 @@ int ratetable_init(struct ratetable_eqmt_info_t *eqmt) {
     eqmt->hwil_ratio_data = 10000;
     eqmt->hwil_type_comm_input = RATETABLE_REALTIME_TYPE_INPUT_RS422;
     eqmt->hwil_tx_speed_baud = 230400;
-    eqmt->hwil_send_freq = 100;
+    eqmt->hwil_send_freq = 200;
     eqmt->movement_mode = RATETABLE_MOVEMENT_MODE_RATE;
     return EXIT_SUCCESS;
 }
