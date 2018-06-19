@@ -6,6 +6,7 @@ int ratetable_init(struct ratetable_eqmt_info_t *eqmt) {
     eqmt->hwil_tx_speed_baud = 230400;
     eqmt->hwil_send_freq = 200;
     eqmt->movement_mode = RATETABLE_MOVEMENT_MODE_RATE;
+    memset(&eqmt->mot_data, 0, sizeof(struct ratetable_motion_data_t));
     return EXIT_SUCCESS;
 }
 
@@ -32,7 +33,7 @@ int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *s
         return EXIT_SUCCESS;
     }
 
-    /* xet the first token */
+    /* get the first token */
     token = strtok_r(line, delimiter, &saveptr);
     axis[0] = atof(token) * (180 / __PI);
     motion_data->hwil_input[0] =  ROUND_32BIT(axis[0] * eqmt->hwil_ratio_data);
@@ -44,7 +45,7 @@ int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *s
     token = strtok_r(NULL, delimiter, &saveptr);
     axis[2] = atof(token) * (180 / __PI);
     motion_data->hwil_input[2] =  ROUND_32BIT(axis[2] * eqmt->hwil_ratio_data);
-    fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
     return EXIT_SUCCESS;
 }
 
@@ -82,7 +83,7 @@ int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eq
     memset(rx_buffer, 0, rx_buff_size);
     icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[2], rx_buffer);
-    fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
+    //  fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
 
     return 0;
 }

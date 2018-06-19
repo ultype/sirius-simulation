@@ -34,7 +34,7 @@ class SDTSimObject : public Trick::SimObject {
 
         void wait_for_1st_pps(void) {
             fprintf(stderr, "Wainting for the 1st PPS...");
-            ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
             fprintf(stderr, "Go !!\n");
         };
 

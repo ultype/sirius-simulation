@@ -5,9 +5,11 @@
 #include "trick/external_application_c_intf.h"
 
 #include "../../../xil_common/include/realtime.h"
+#include "../../../xil_common/Modified_data/ratetable_feedback.h"
 
 extern "C" int run_me() {
-    external_clock_switch(&dyn.ext_clk);
+    record_ratetable_feedback();
+    external_clock_switch(&rkt.ext_clk);
     realtime();
     exec_set_terminate_time(200.0);
     return 0;

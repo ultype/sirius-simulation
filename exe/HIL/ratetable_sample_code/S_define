@@ -16,7 +16,7 @@ class RatetableSimObject : public Trick::SimObject {
         ExternalSourceClock ext_clk;
         FILE *ratetable_stream;
         struct ratetable_eqmt_info_t rt_dev_info;
-        double int_step = 0.005;
+        double int_step = 0.050;
         void trick_heartbeat(void) {
             char date_buf[80];
             char currentTime[84] = "";
@@ -32,7 +32,7 @@ class RatetableSimObject : public Trick::SimObject {
 
         void wait_for_1st_pps(void) {
             fprintf(stderr, "Wainting for the 1st PPS...");
-            ioctl(6, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
             fprintf(stderr, "Go !!\n");
         };
 
@@ -58,4 +58,4 @@ class RatetableSimObject : public Trick::SimObject {
         }
 } ;
 
-RatetableSimObject dyn ;
+RatetableSimObject rkt ;
