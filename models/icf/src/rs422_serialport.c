@@ -110,7 +110,7 @@ int set_interface_attribs(int fd, int speed, int parity) {
 
     /* fetch bytes as they become available */
     options.c_cc[VMIN]  = 0;            // read doesn't block
-    options.c_cc[VTIME] = 0;            // 0.5 seconds read timeout
+    options.c_cc[VTIME] = 0.001;            // 0.5 seconds read timeout
 
 
     // Set the new attributes
@@ -136,7 +136,7 @@ int rs422_data_send_scatter(void *priv_data, uint8_t *payload, uint32_t frame_le
     tx_buffer = payload;
     while (offset < frame_len) {
         if ((wdlen = write(dev_info->rs422_fd, tx_buffer + offset, frame_len - offset)) < 0) {
-            if (wdlen < 0 && errno == EAGAIN) {
+            if (wdlen < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
                 wdlen = 0;
             } else {
                 fprintf(stderr, "%s: %s\n", __FUNCTION__, strerror(errno));
@@ -154,9 +154,10 @@ int rs422_data_recv_gather(void *priv_data, uint8_t *payload, uint32_t frame_len
     int rdlen = 0;
     uint8_t *rx_buffer;
     rx_buffer = payload;
+    memset(rx_buffer, 0, frame_len);
     while (offset < frame_len) {
         if ((rdlen = read(dev_info->rs422_fd, rx_buffer + offset, frame_len - offset)) < 0) {
-            if (errno == EAGAIN) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 rdlen = 0;
             } else {
                 fprintf(stderr, "%s: %s\n", __FUNCTION__, strerror(errno));

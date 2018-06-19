@@ -44,7 +44,7 @@ int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *s
     token = strtok_r(NULL, delimiter, &saveptr);
     axis[2] = atof(token) * (180 / __PI);
     motion_data->hwil_input[2] =  ROUND_32BIT(axis[2] * eqmt->hwil_ratio_data);
-    //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
     return EXIT_SUCCESS;
 }
 
@@ -75,14 +75,12 @@ int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eq
     icf_rx_dequeue(C, EGSE_RX_RATETBL_X_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[0], rx_buffer);
 
-    memset(rx_buffer, 0, rx_buff_size);
     icf_rx_dequeue(C, EGSE_RX_RATETBL_Y_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[1], rx_buffer);
 
-    memset(rx_buffer, 0, rx_buff_size);
     icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size);
     copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[2], rx_buffer);
-    //  fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
+    fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
 
     return 0;
 }

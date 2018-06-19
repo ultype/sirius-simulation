@@ -21,6 +21,8 @@ int rx_frame_receive_with_header(void *dev, uint8_t *rs422payload, int buff_size
     memset(rs422payload, 0, buff_size);
     while (buf_offset < dev_info->header_size) {
         rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->header_size - buf_offset);
+        if (rdlen < 0)
+            fprintf(stderr, "[%s:%d] %d: %s\n", __FUNCTION__, __LINE__, rdlen, strerror(errno));
         buf_offset += rdlen;
     }
 
@@ -28,12 +30,11 @@ int rx_frame_receive_with_header(void *dev, uint8_t *rs422payload, int buff_size
         memcpy(&dev_info->frame, rs422payload, dev_info->header_size);
         while (buf_offset < dev_info->frame.payload_len + dev_info->header_size) {
             rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, dev_info->frame.payload_len + dev_info->header_size - buf_offset);
+            if (rdlen < 0)
+                fprintf(stderr, "[%s:%d] %d: %s\n", __FUNCTION__, __LINE__, rdlen, strerror(errno));
             buf_offset += rdlen;
         }
         hex_dump("RX data payload", (uint8_t *)rs422payload + dev_info->header_size, dev_info->frame.payload_len);
-    }
-    if (rdlen < 0) {
-        fprintf(stderr, "Error from read: %d: %s\n", rdlen, strerror(errno));
     }
     return rdlen;
 }
@@ -45,12 +46,11 @@ int rx_frame_receive_without_header(void *dev, uint8_t *rs422payload, int pkt_si
     memset(rs422payload, 0, pkt_size);
     while (buf_offset <  pkt_size){
             rdlen = read(dev_info->rs422_fd, rs422payload + buf_offset, pkt_size - buf_offset);
+            if (rdlen < 0)
+                fprintf(stderr, "[%s:%d] %d: %s\n", __FUNCTION__, __LINE__, rdlen, strerror(errno));
             buf_offset += rdlen;
         }
         hex_dump("RX data payload", (uint8_t *)rs422payload, pkt_size);
-    if (rdlen < 0) {
-        fprintf(stderr, "Error from read: %d: %s\n", rdlen, strerror(errno));
-    }
     return rdlen;
 }
 
