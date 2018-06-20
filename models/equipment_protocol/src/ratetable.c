@@ -73,15 +73,15 @@ int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eq
     uint32_t rx_buff_size = 4;
     uint8_t rx_buffer[4]= {0};
 
-    if(icf_rx_dequeue(C, EGSE_RX_RATETBL_X_SW_QIDX, rx_buffer, rx_buff_size) > 0)
+    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_X_SW_QIDX, rx_buffer, rx_buff_size) > 0)
         copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[0], rx_buffer);
 
     memset(rx_buffer, 0, rx_buff_size);
-    if(icf_rx_dequeue(C, EGSE_RX_RATETBL_Y_SW_QIDX, rx_buffer, rx_buff_size) > 0)
+    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_Y_SW_QIDX, rx_buffer, rx_buff_size) > 0)
         copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[1], rx_buffer);
 
     memset(rx_buffer, 0, rx_buff_size);
-    if(icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size) > 0)
+    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size) > 0)
         copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[2], rx_buffer);
     //  fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
 
