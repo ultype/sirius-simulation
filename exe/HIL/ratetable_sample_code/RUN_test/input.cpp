@@ -11,6 +11,6 @@ extern "C" int run_me() {
     record_ratetable_feedback(rkt.rt_feedback_period);
     external_clock_switch(&rkt.ext_clk);
     realtime();
-    exec_set_terminate_time(200.0);
+    exec_set_terminate_time(20.0);
     return 0;
 }

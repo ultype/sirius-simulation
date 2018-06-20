@@ -16,7 +16,7 @@ class RatetableSimObject : public Trick::SimObject {
         ExternalSourceClock ext_clk;
         FILE *ratetable_stream;
         struct ratetable_eqmt_info_t rt_dev_info;
-        double int_step = 0.050;
+        double int_step = 0.010;
         double rt_feedback_period = 0.005;
         void trick_heartbeat(void) {
             char date_buf[80];
@@ -53,8 +53,8 @@ class RatetableSimObject : public Trick::SimObject {
             P1 (5, "scheduled") trick_heartbeat();
             P1 (int_step, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
             P1 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
-            P1 (rt_feedback_period, "scheduled") ratetable_feedback_group(&icf_ctrl);
-            P1 (rt_feedback_period, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
+            P1 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);
+            P1 (rt_feedback_period, 0.001, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;
