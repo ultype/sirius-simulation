@@ -556,7 +556,11 @@ void icf_heartbeat(void) {
 }
 
 void *icf_alloc_mem(size_t size) {
-    return calloc(1, size);
+    void *ptr = NULL;
+    ptr = calloc(1, size);
+    if (ptr)
+        return ptr;
+    return NULL;
 }
 
 
