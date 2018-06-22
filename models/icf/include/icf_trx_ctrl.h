@@ -180,7 +180,7 @@ extern "C" {
 #endif
 
 void *icf_alloc_mem(size_t size);
-void icf_free_mem(void *ptr);
+void icf_free_mem(void **ptr);
 int icf_ctrlblk_init(struct icf_ctrlblk_t* C, int system_type);
 int icf_ctrlblk_deinit(struct icf_ctrlblk_t* C, int system_type);
 int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t size);

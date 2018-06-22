@@ -317,8 +317,8 @@ int icf_rx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t si
     if (rxcell == NULL)
         goto empty;
     memcpy(payload, rxcell->l2frame, size);
-    icf_free_mem(rxcell->l2frame);
-    icf_free_mem(rxcell);
+    icf_free_mem(&rxcell->l2frame);
+    icf_free_mem(&rxcell);
     debug_hex_dump("icf_rx_dequeue", payload, size);
     return 1;
 empty:
@@ -397,8 +397,8 @@ static int icf_l2frame_receive_process(struct icf_ctrlblk_t* C, struct icf_drive
     rb_push(&ctrlqueue->data_ring, rxcell);
     return ICF_STATUS_SUCCESS;
 empty:
-    icf_free_mem(rxcell->l2frame);
-    icf_free_mem(rxcell);
+    icf_free_mem(&rxcell->l2frame);
+    icf_free_mem(&rxcell);
     return ICF_STATUS_FAIL;
 }
 
@@ -461,7 +461,7 @@ int icf_tx_direct(struct icf_ctrlblk_t* C, int qidx, void *payload, uint32_t siz
     memcpy(tx_buffer + offset, (uint8_t *) payload, size);
     drv_ops->send_data(ctrlport->drv_priv_data, tx_buffer, frame_full_size);
     debug_hex_dump("icf_tx_direct", tx_buffer, frame_full_size);
-    icf_free_mem(tx_buffer);
+    icf_free_mem(&tx_buffer);
     return ICF_STATUS_SUCCESS;
 }
 
@@ -499,8 +499,8 @@ int icf_tx_dequeue(struct icf_ctrlblk_t* C, int qidx, void *payload) {
     if (txcell) {
         memcpy(payload, txcell->l2frame, txcell->frame_full_size);
         debug_hex_dump("icf_tx_dequeue", txcell->l2frame, txcell->frame_full_size);
-        icf_free_mem(txcell->l2frame);
-        icf_free_mem(txcell);
+        icf_free_mem(&txcell->l2frame);
+        icf_free_mem(&txcell);
     }
     return ICF_STATUS_SUCCESS;
 }
@@ -519,8 +519,8 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
     if (txcell) {
         out_frame_size = txcell->frame_full_size;
         if (ctrlport->drv_priv_data == NULL) {
-            icf_free_mem(txcell->l2frame);
-            icf_free_mem(txcell);
+            icf_free_mem(&txcell->l2frame);
+            icf_free_mem(&txcell);
             return ICF_STATUS_SUCCESS;
         }
         if (drv_ops->get_header_size) {
@@ -533,11 +533,11 @@ int icf_tx_ctrl_job(struct icf_ctrlblk_t* C, int qidx) {
             offset += drv_ops->header_copy(ctrlport->drv_priv_data, tx_buffer);
         }
         memcpy(tx_buffer + offset, (uint8_t *) txcell->l2frame, txcell->frame_full_size);
-        icf_free_mem(txcell->l2frame);
-        icf_free_mem(txcell);
+        icf_free_mem(&txcell->l2frame);
+        icf_free_mem(&txcell);
         drv_ops->send_data(ctrlport->drv_priv_data, tx_buffer, out_frame_size);
         debug_hex_dump("icf_tx_ctrl_job", tx_buffer, out_frame_size);
-        icf_free_mem(tx_buffer);
+        icf_free_mem(&tx_buffer);
     }
     return ICF_STATUS_SUCCESS;
 }
@@ -556,18 +556,14 @@ void icf_heartbeat(void) {
 }
 
 void *icf_alloc_mem(size_t size) {
-    void *ptr = NULL;
-    ptr = calloc(1, size);
-    if (ptr)
-        return ptr;
-    return NULL;
+    return calloc(1, size);
 }
 
 
-void icf_free_mem(void *ptr) {
-    if (ptr) {
-        free(ptr);
-        ptr = NULL;
+void icf_free_mem(void **ptr) {
+    if (*ptr) {
+        free(*ptr);
+        *ptr = NULL;
     }
     return;
 }
