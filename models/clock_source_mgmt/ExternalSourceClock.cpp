@@ -66,7 +66,7 @@ int ExternalSourceClock::clock_init() {
 /**
 @details
 -# Call the system clock_gettime to get the current real time.
--# Return the current real time as a count of microseconds
+-# Return the current real time as a count of millisecond
 */
 long long ExternalSourceClock::wall_clock_time() {
     struct ioctl_tispace_cmd wall_time;
@@ -74,7 +74,7 @@ long long ExternalSourceClock::wall_clock_time() {
         fprintf(stderr, "[%s:%d] ioctl error \n", __FUNCTION__, __LINE__);
     }
     //  fprintf(stderr, "[%lld us] wall_clock_time \n", wall_time.time_tics/1000);
-    /* wall_time.time_tics = nanoseconds*/
+    /* wall_time.time_tics uints is nanoseconds. */
     return wall_time.time_tics/EXT_WALLCLOCK_TICS_RATIO;
 }
 

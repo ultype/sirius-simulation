@@ -16,6 +16,8 @@ class SDTSimObject : public Trick::SimObject {
     public:
         struct icf_ctrlblk_t   icf_ctrl;
         ExternalSourceClock ext_clk;
+        double int_step = 0.05;
+        double send_delay = 0.005;
         struct sdt_gpsr_motion_data_t mot_data;
         struct gpsr_s_nav_tlm_frame_t tlm_buff;
         FILE *s_nav_stream;
@@ -52,9 +54,9 @@ class SDTSimObject : public Trick::SimObject {
             ("initialization") sdt_gpsr_init_input_file(&s_nav_stream);
             ("initialization") wait_for_1st_pps();
             P1 (5, "scheduled") trick_heartbeat();
-            P1 (0.05, "scheduled") update_gpsr_sdt_mot_data();
-            P1 (0.05, "scheduled") sdt_gpsr_convert_motion_data_to_tlm(&mot_data, &tlm_buff);
-            P1 (0.05, "scheduled") sdt_gpsr_layer2_tlm_frame_direct_transfer(&icf_ctrl, &tlm_buff);
+            P1 (int_step, send_delay, "scheduled") update_gpsr_sdt_mot_data();
+            P1 (int_step, send_delay, "scheduled") sdt_gpsr_convert_motion_data_to_tlm(&mot_data, &tlm_buff);
+            P1 (int_step, send_delay, "scheduled") sdt_gpsr_layer2_tlm_frame_direct_transfer(&icf_ctrl, &tlm_buff);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;
