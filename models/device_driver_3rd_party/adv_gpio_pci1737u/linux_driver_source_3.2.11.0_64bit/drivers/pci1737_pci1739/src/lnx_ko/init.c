@@ -125,6 +125,7 @@ int __devinit daq_device_probe(struct pci_dev *dev, const struct pci_device_id *
 
 #if (TISPACE_CUSTOMIZED == 1)
      atomic_set(&daq_dev->is_wallclock_arrive, 0);
+     daq_dev->pps_cnt = 0;
 #endif /* TISPACE_CUSTOMIZED */
 
    /* get device information */

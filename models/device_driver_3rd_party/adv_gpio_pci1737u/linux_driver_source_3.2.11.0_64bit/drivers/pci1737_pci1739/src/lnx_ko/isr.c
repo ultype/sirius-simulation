@@ -2,7 +2,7 @@
  * isr.c
  *
  * Created on: May 10th, 2017
- * Author: 
+ * Author:Dung-Ru
  */
 #include "kdriver.h"
 #include "hw.h"
@@ -27,7 +27,7 @@ void daq_dev_tasklet_func(unsigned long arg)
    daq_device_t  *daq_dev = (daq_device_t *) arg;
    DEVICE_SHARED *shared  = &daq_dev->shared;
    __u8          *snapped = NULL;
-   DEV_INT_CS_R  int_state;   
+   DEV_INT_CS_R  int_state;
    unsigned long flags;
 
    // Copy the interrupt state to local cache to avoid impose the interrupt handler.
@@ -70,7 +70,6 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
 {
    daq_device_t *daq_dev = (daq_device_t *) dev_id;
    __u32        int_state;
-   
    int_state = AdxIoInB(daq_dev->shared.IoBase, DR_INT_CS);
    if (!(int_state  & DEV_INT_MASK)) {
       return IRQ_RETVAL(0);
@@ -81,9 +80,8 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
    spin_unlock(&daq_dev->dev_lock);
 #if (TISPACE_CUSTOMIZED == 1)
     ktime_t isr_curr_tics = ktime_get();
-    daq_dev->pps_cnt++;
-    if (daq_dev->pps_cnt == 1) {
-        daq_dev->prev_pps_tics = isr_curr_tics;
+    if (daq_dev->pps_cnt == 0) {
+        daq_dev->prev_pps_tics.tv64 = isr_curr_tics.tv64 - 1000000000LL;
         daq_dev->curr_pps_tics = isr_curr_tics;
         daq_dev->curr_ideal_tics = isr_curr_tics;
     } else {
@@ -91,10 +89,10 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
         daq_dev->curr_pps_tics = isr_curr_tics;
         daq_dev->curr_ideal_tics.tv64 += 1000000000LL;
     }
-    printk("<0>""isr %d pps tics %lld\n",daq_dev->pps_cnt ,daq_dev->curr_pps_tics.tv64);
+    daq_dev->pps_cnt++;
+    printk("<0>""isr %d pps tics %lld\n", daq_dev->pps_cnt, daq_dev->curr_pps_tics.tv64);
 
     if (wait_task != NULL) {
-        //  printk("<0>""[%d:%s] wake up process !!\n", __LINE__, __FUNCTION__);
         local_irq_disable();
         wake_up_process(wait_task);
     }

@@ -285,15 +285,14 @@ int daq_ioctl_di_wait_gpio_int(daq_device_t *daq_dev, unsigned long arg)
     /* yield as possible */
     while (!atomic_dec_and_test(&user_flag))
         schedule();
-
     wait_task = current;
     set_current_state(TASK_UNINTERRUPTIBLE);
     schedule();
     __set_current_state(TASK_RUNNING);
+    wait_task = NULL;
     local_irq_enable();
     atomic_set(&user_flag, 1);
-
-   return 0;
+    return 0;
 }
 
 int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg)
