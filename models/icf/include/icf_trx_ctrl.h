@@ -22,7 +22,7 @@ PROGRAMMERS:
 #include "icf_drivers.h"
 #include "trick/exec_proto.h"
 #include "flight_computer_eqpt.h"
-#define ICF_CTRLBLK_MAXQUEUE_NUMBER  16
+#define ICF_CTRLBLK_MAXQUEUE_NUMBER  20
 #define ICF_CTRLBLK_MAXPORT_NUMBER  16
 #define ICF_EGSE_CONNECT_IP "127.0.0.1"
 
@@ -44,7 +44,7 @@ PROGRAMMERS:
 
 #elif defined(CONFIG_SAMPLE_RATETABLE_ENABLE)
 #define CAN_PORT_EN             0
-#define RS422_IMU_PORT_EN       0
+#define RS422_IMU_PORT_EN       1
 #define RS422_RATETBL_PORT_EN   1
 #define RS422_GPSR_PORT_EN      0
 #define ETH_FC_PORT_EN          0
@@ -83,6 +83,8 @@ typedef enum _ENUM_ICF_EGSE_SW_QUEUE {
     EGSE_RX_RATETBL_X_SW_QIDX = 13,
     EGSE_RX_RATETBL_Y_SW_QIDX = 14,
     EGSE_RX_RATETBL_Z_SW_QIDX = 15,
+    EGSE_IMU01_RX_SW_QIDX = 16,
+    EGSE_IMU02_RX_SW_QIDX = 17,
     EGSE_NUM_OF_SW_QUE
 }ENUM_ICF_EGSE_SW_QUEUE;
 

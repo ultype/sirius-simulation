@@ -10,12 +10,14 @@ LIBRARY DEPENDENCIES:
 ##include "ExternalSourceClock.hh"
 ##include "icf_trx_ctrl.h"
 ##include "ratetable.h"
+##include "sdt_imu.h"
 class RatetableSimObject : public Trick::SimObject {
     public:
         struct icf_ctrlblk_t   icf_ctrl;
         ExternalSourceClock ext_clk;
         FILE *ratetable_stream;
         struct ratetable_eqmt_info_t rt_dev_info;
+        struct imu_adis16488_data_t adis16488_data;
         double int_step = 0.005;
         double rt_feedback_period = 0.002;
         void trick_heartbeat(void) {
@@ -55,6 +57,7 @@ class RatetableSimObject : public Trick::SimObject {
             P1 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
             P1 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);
             P1 (rt_feedback_period, 0.001, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
+            P1 ("scheduled") imu_adis16488_receive(&icf_ctrl, &adis16488_data);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;

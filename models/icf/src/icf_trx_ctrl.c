@@ -14,17 +14,19 @@ static const struct icf_mapping g_icf_egse_maptbl[] = {
     {HW_PORT9, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DRIVERS_ID3},
     {HW_PORT2, EGSE_RX_RATETBL_X_SW_QIDX,     ICF_DRIVERS_ID1},
     {HW_PORT3, EGSE_RX_RATETBL_Y_SW_QIDX,     ICF_DRIVERS_ID1},
-    {HW_PORT4, EGSE_RX_RATETBL_Z_SW_QIDX,     ICF_DRIVERS_ID1}
+    {HW_PORT4, EGSE_RX_RATETBL_Z_SW_QIDX,     ICF_DRIVERS_ID1},
+    {HW_PORT1, EGSE_IMU01_RX_SW_QIDX,         ICF_DRIVERS_ID1},
+    {HW_PORT5, EGSE_IMU02_RX_SW_QIDX,         ICF_DRIVERS_ID1}
 };
 
 
 static struct icf_ctrl_port g_egse_port[] = {
     {CAN_PORT_EN,           HW_PORT0, "can0",        EMPTY_NETPORT,     CAN_DEVICE_TYPE,       NULL, NULL},
-    {RS422_IMU_PORT_EN,     HW_PORT1, "/dev/ttyAP0", RS422_HEADER_CRC,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {RS422_IMU_PORT_EN,     HW_PORT1, "/dev/ttyAP0", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_RATETBL_PORT_EN, HW_PORT2, "/dev/ttyAP1", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_RATETBL_PORT_EN, HW_PORT3, "/dev/ttyAP2", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_RATETBL_PORT_EN, HW_PORT4, "/dev/ttyAP3", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
-    {RS422_IMU_PORT_EN,     HW_PORT5, "/dev/ttyAP4", RS422_HEADER_CRC,  RS422_DEVICE_TYPE,     NULL, NULL},
+    {RS422_IMU_PORT_EN,     HW_PORT5, "/dev/ttyAP4", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_GPSR_PORT_EN,    HW_PORT6, "/dev/ttyAP5", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {RS422_GPSR_PORT_EN,    HW_PORT7, "/dev/ttyAP6", RS422_HEADER_NONE, RS422_DEVICE_TYPE,     NULL, NULL},
     {ETH_FC_PORT_EN,        HW_PORT8, "egse_server", 8700,              ETHERNET_DEVICE_TYPE,  NULL, NULL},
@@ -45,7 +47,9 @@ static struct icf_ctrl_queue g_egse_queue[] = {
     {1, EGSE_TX_GPSRF_EMU_QIDX,        ICF_DIRECTION_TX, NULL, {}},
     {1, EGSE_RX_RATETBL_X_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}},
     {1, EGSE_RX_RATETBL_Y_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}},
-    {1, EGSE_RX_RATETBL_Z_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}}
+    {1, EGSE_RX_RATETBL_Z_SW_QIDX,     ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_IMU01_RX_SW_QIDX,         ICF_DIRECTION_RX, NULL, {}},
+    {1, EGSE_IMU02_RX_SW_QIDX,         ICF_DIRECTION_RX, NULL, {}}
 };
 
 static const struct icf_mapping g_icf_esps_maptbl[] = {
@@ -352,6 +356,9 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe, int hw_port_idx
             case HW_PORT0:
                 qidx = fc_can_cmd_dispatch(rxframe);
                 break;
+            case HW_PORT1:
+                qidx = EGSE_IMU01_RX_SW_QIDX;
+                break;
             case HW_PORT2:
                 qidx = EGSE_RX_RATETBL_X_SW_QIDX;
                 break;
@@ -360,6 +367,9 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe, int hw_port_idx
                 break;
             case HW_PORT4:
                 qidx = EGSE_RX_RATETBL_Z_SW_QIDX;
+                break;
+            case HW_PORT5:
+                qidx = EGSE_IMU02_RX_SW_QIDX;
                 break;
             default:
                 qidx = fc_can_cmd_dispatch(rxframe);
