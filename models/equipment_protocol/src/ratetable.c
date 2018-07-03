@@ -35,16 +35,16 @@ int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *s
 
     /* get the first token */
     token = strtok_r(line, delimiter, &saveptr);
-    axis[0] = atof(token) * (180 / __PI);
-    motion_data->hwil_input[0] =  ROUND_32BIT(axis[0] * eqmt->hwil_ratio_data);
+    motion_data->hwil_input_deg[0] = atof(token) * (180 / __PI);
+    motion_data->hwil_input[0] =  ROUND_32BIT(motion_data->hwil_input_deg[0] * eqmt->hwil_ratio_data);
 
     token = strtok_r(NULL, delimiter, &saveptr);
-    axis[1] = atof(token) * (180 / __PI);
-    motion_data->hwil_input[1] =  ROUND_32BIT(axis[1] * eqmt->hwil_ratio_data);
+    motion_data->hwil_input_deg[1] = atof(token) * (180 / __PI);
+    motion_data->hwil_input[1] =  ROUND_32BIT(motion_data->hwil_input_deg[1] * eqmt->hwil_ratio_data);
 
     token = strtok_r(NULL, delimiter, &saveptr);
-    axis[2] = atof(token) * (180 / __PI);
-    motion_data->hwil_input[2] =  ROUND_32BIT(axis[2] * eqmt->hwil_ratio_data);
+    motion_data->hwil_input_deg[2] = atof(token) * (180 / __PI);
+    motion_data->hwil_input[2] =  ROUND_32BIT(motion_data->hwil_input_deg[2] * eqmt->hwil_ratio_data);
     //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
     return EXIT_SUCCESS;
 }
@@ -73,16 +73,22 @@ int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eq
     uint32_t rx_buff_size = 4;
     uint8_t rx_buffer[4]= {0};
 
-    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_X_SW_QIDX, rx_buffer, rx_buff_size) > 0)
+    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_X_SW_QIDX, rx_buffer, rx_buff_size) > 0) {
         copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[0], rx_buffer);
+        motion_data->hwil_output_deg[0] = (double)motion_data->hwil_output[0] / eqmt->hwil_ratio_data;
+    }
 
     memset(rx_buffer, 0, rx_buff_size);
-    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_Y_SW_QIDX, rx_buffer, rx_buff_size) > 0)
+    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_Y_SW_QIDX, rx_buffer, rx_buff_size) > 0) {
         copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[1], rx_buffer);
+        motion_data->hwil_output_deg[1] = (double)motion_data->hwil_output[1] / eqmt->hwil_ratio_data;
+    }
 
     memset(rx_buffer, 0, rx_buff_size);
-    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size) > 0)
+    if (icf_rx_dequeue(C, EGSE_RX_RATETBL_Z_SW_QIDX, rx_buffer, rx_buff_size) > 0) {
         copy_buffer_ntohl((uint32_t *)&motion_data->hwil_output[2], rx_buffer);
+        motion_data->hwil_output_deg[2] = (double)motion_data->hwil_output[2] / eqmt->hwil_ratio_data;
+    }
     //  fprintf(stderr, "[RT->EGSE] %d, %d, %d\n", motion_data->hwil_output[0], motion_data->hwil_output[1], motion_data->hwil_output[2]);
 
     return 0;

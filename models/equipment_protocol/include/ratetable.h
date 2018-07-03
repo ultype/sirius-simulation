@@ -27,6 +27,8 @@ typedef enum _RATETABLE_REALTIME_TYPE_INPUT_ENUM {
 struct ratetable_motion_data_t {
     int32_t hwil_input[3];
     int32_t hwil_output[3];
+    double hwil_input_deg[3];  /* *io (°/s) rate */
+    double hwil_output_deg[3];  /* *io (°/s) rate */
 } __attribute__((packed));
 
 struct ratetable_eqmt_info_t {
