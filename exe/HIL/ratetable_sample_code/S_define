@@ -57,7 +57,7 @@ class RatetableSimObject : public Trick::SimObject {
             P1 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
             P1 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);
             P1 (rt_feedback_period, 0.001, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
-            P1 ("scheduled") imu_adis16488_receive(&icf_ctrl, &adis16488_data);
+            P1 (rt_feedback_period, 0.001, "scheduled") imu_adis16488_receive(&icf_ctrl, &adis16488_data);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;
