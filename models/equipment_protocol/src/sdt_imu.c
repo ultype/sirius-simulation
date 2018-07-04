@@ -10,5 +10,13 @@ int imu_adis16488_receive(struct icf_ctrlblk_t *C, struct sdt_imu_dev_t *dev_inf
         fprintf(stderr, "[%s:%d] Received Error !! \n", __FUNCTION__, __LINE__);
         return -1;
     }
+
+    log_data->accel_log[0] = (motion_data->accel_hi[0] + motion_data->accel_low[0] / 65536.0) * ADIS16488_ACCEL_RES * LOCAL_GRAVITY;
+    log_data->accel_log[1] = (motion_data->accel_hi[1] + motion_data->accel_low[1] / 65536.0) * ADIS16488_ACCEL_RES * LOCAL_GRAVITY;
+    log_data->accel_log[2] = (motion_data->accel_hi[2] + motion_data->accel_low[2] / 65536.0) * ADIS16488_ACCEL_RES * LOCAL_GRAVITY;
+    log_data->angular_vel_log[0] = (motion_data->angular_vel_hi[0] + motion_data->angular_vel_low[0] / 65536.0) * ADIS16488_GYRO_RES;
+    log_data->angular_vel_log[1] = (motion_data->angular_vel_hi[1] + motion_data->angular_vel_low[1] / 65536.0) * ADIS16488_GYRO_RES;
+    log_data->angular_vel_log[2] = (motion_data->angular_vel_hi[2] + motion_data->angular_vel_low[2] / 65536.0) * ADIS16488_GYRO_RES;
+
     return 0;
 }

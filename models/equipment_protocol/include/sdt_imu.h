@@ -12,6 +12,11 @@ PROGRAMMERS:
 *******************************************************************************/
 #include <stdint.h>
 #include "icf_trx_ctrl.h"
+
+#define ADIS16488_ACCEL_RES (0.0008)
+#define ADIS16488_GYRO_RES (0.02)
+#define LOCAL_GRAVITY (9.80665)
+
 struct imu_adis16488_data_t {
     uint16_t accel_hi[3];
     uint16_t accel_low[3];
