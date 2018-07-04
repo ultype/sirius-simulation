@@ -40,6 +40,7 @@ extern "C" {
 
 /* Function Declare */
 int imu_adis16488_receive(struct icf_ctrlblk_t *C, struct sdt_imu_dev_t *dev_info);
+int imu_adis16488_init(struct sdt_imu_dev_t *dev_info);
 #ifdef __cplusplus
 }
 #endif
