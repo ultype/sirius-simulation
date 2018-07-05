@@ -281,7 +281,6 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (0.005, "scheduled") gyro->propagate_error(0.005);
             P3 (0.005, "scheduled") accelerometer->propagate_error(0.005, &icf_ctrl);
             P3 (0.005, "scheduled") sdt->compute(0.005);
-            P3 (0.005, "logging") dynamics.Interpolation_Extrapolation(int_step, 0.001);
 
             P4 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
             P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);

@@ -61,6 +61,7 @@ LIBRARY DEPENDENCIES:
 class Rocket_SimObject : public Trick::SimObject {
     public:
         double int_step = 0.005;
+        double ext_porlation = 0.002;
         double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
         Environment env;
@@ -350,13 +351,13 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (0.005, "scheduled") gyro->propagate_error(0.005);
             P3 (0.005, "scheduled") accelerometer->propagate_error(0.005, &icf_ctrl);
             P3 (0.005, "scheduled") sdt->compute(0.005);
-            P3 (0.005, "logging") dynamics.Interpolation_Extrapolation(int_step, 0.001);
+            P3 (0.005, "scheduled") dynamics.Interpolation_Extrapolation(int_step, 0.001, ext_porlation);
 
             P4 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P4 (int_step, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, int_step);
-            P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, int_step);
+            P4 (int_step, 0.0, stand_still_time, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, ext_porlation);
+            P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
             P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 
             P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, &tlm_frame);
