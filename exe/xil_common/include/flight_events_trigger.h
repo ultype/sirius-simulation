@@ -5,21 +5,21 @@
 #include "trick/jit_input_file_proto.hh"
 extern FlightComputer_SimObject fc;
 /* Stage2 Control Variable Constant */
-const double S2_MDOT = 29.587;
-const double S2_FMASS0 = 2958.7;
-const double S2_XCG_1 = 4.7888;
-const double S2_XCG_0 = 6.4138;
-const double S2_ISP = 291.6145604;
-const double S2_MOI_ROLL_0 = 517.8;
-const double S2_MOI_ROLL_1 = 180.9;
-const double S2_MOI_PITCH_0 = 32525.4;
-const double S2_MOI_PITCH_1 = 19377.7;
-const double S2_MOI_YAW_0 = 32519.8;
-const double S2_MOI_YAW_1 = 19372.3;
+const double S2_MDOT = 18.54667;
+const double S2_FMASS0 = 2782.0;
+const double S2_XCG_1 = 5.5404;
+const double S2_XCG_0 = 6.9903;
+const double S2_ISP = 272.0;
+const double S2_MOI_ROLL_0 = 1003.315;
+const double S2_MOI_ROLL_1 = 304.448;
+const double S2_MOI_PITCH_0 = 22328.316;
+const double S2_MOI_PITCH_1 = 14017.096;
+const double S2_MOI_YAW_0 = 22326.832;
+const double S2_MOI_YAW_1 = 14015.971;
 const double S2_KPP = 3.0;
 const double S2_KPI = 0.08;
 const double S2_KPD = 0.01;
-const double S2_KPPP = 6.25;
+const double S2_KPPP = 9.375;
 const double S2_PN = 1000.0;
 const double S2_KRP = 3.0;
 const double S2_KRI = 0.33;
@@ -29,7 +29,7 @@ const double S2_RN = 1000.0;
 const double S2_KYP = 3.0;
 const double S2_KYI = 0.08;
 const double S2_KYD = 0.01;
-const double S2_KYPP = 7.5;
+const double S2_KYPP = 9.0;
 const double S2_YN = 1000.0;
 const double S2_KAOAP = 3.0;
 const double S2_KAOAI = 0.15;
@@ -37,22 +37,23 @@ const double S2_KAOAD = 0.01;
 const double S2_KAOAPP = 9.375;
 const double S2_AOAN = 1000.0;
 const double S2_ROLLCMD = 0.0;
-const double S2_PITCHCMD = -3.0;
+const double S2_PITCHCMD = -1.0;
 const double S2_YAWCMD = 0.0;
 const double S2_AOACMD = 0.0;
+const double S2_REFERENCE_P = -8.55;
 
 /* Stage3 Control Variable Constant*/
-const double S3_MDOT = 3.814;
-const double S3_FMASS0 = 381.4;
-const double S3_XCG_1 = 2.5371;
-const double S3_XCG_0 = 2.5808;
-const double S3_ISP = 290;
-const double S3_MOI_ROLL_0 = 65.3;
-const double S3_MOI_ROLL_1 = 50.8;
-const double S3_MOI_PITCH_0 = 633.6;
-const double S3_MOI_PITCH_1 = 421.8;
-const double S3_MOI_YAW_0 = 628.0;
-const double S3_MOI_YAW_1 = 419.0;
+const double S3_MDOT = 2.155789474;
+const double S3_FMASS0 = 409.6;
+const double S3_XCG_1 = 2.6442;
+const double S3_XCG_0 = 3.0234;
+const double S3_ISP = 292.0;
+const double S3_MOI_ROLL_0 = 72.939;
+const double S3_MOI_ROLL_1 = 27.41;
+const double S3_MOI_PITCH_0 = 530.607;
+const double S3_MOI_PITCH_1 = 293.92;
+const double S3_MOI_YAW_0 = 529.535;
+const double S3_MOI_YAW_1 = 292.481;
 const double S3_KPP = 3.0;
 const double S3_KPI = 0.08;
 const double S3_KPD = 0.01;
@@ -71,40 +72,75 @@ const double S3_YN = 1000.0;
 const double S3_KAOAP = 3.0;
 const double S3_KAOAI = 0.15;
 const double S3_KAOAD = 0.01;
-const double S3_KAOAPP = 9.375;
+const double S3_KAOAPP = 4.6875;
 const double S3_AOAN = 1000.0;
 const double S3_ROLLCMD = 0.0;
 const double S3_PITCHCMD = 0.0;
 const double S3_YAWCMD = 0.0;
 const double S3_AOACMD = -0.0;
+const double S3_REFERENCE_P = -3.917;
+const double HS_time = 2.0;
 
 
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_LIFTOFF;
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_LIFTOFF);
     PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_LIFTOFF", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
 extern "C" int event_control_rcs_on(void) {
     fc.control.set_S2_ROLL_CONTROL();
+    // fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S2_ROLL_CONTROL;
+    // fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S2_ROLL_CONTROL);
+    // PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S2_ROLL_CONTROL", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
-extern "C" int event_control_on(void) {
-    fc.control.set_S2_PITCH_DOWN();
+extern "C" int event_pitch_down_phase_1(void) {
+    if (fc.ins.get_altc() >= 500.0) {
+        if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_PITCH_DOWN_PHASE_I, fc.egse_flight_event_trigger_bitmap, FLIGHT_EVENT_PITCH_DOWN_PHASE_I))
+        return 0;
+    } else {
+        return 0;
+    }
+
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_PITCH_DOWN_PHASE_I);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_PITCH_DOWN_PHASE_I", FLIGHT_EVENT_PITCH_DOWN_PHASE_I);
+    fc.control.set_S2_PITCH_DOWN_I();
     return 0;
 }
 
-extern "C" int event_s2_control_on(void) {
+extern "C" int event_pitch_down_phase_2(void) {
+    if (fc.ins.get_altc() >= 2000.0) {
+        if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_PITCH_DOWN_PHASE_II, fc.egse_flight_event_trigger_bitmap, FLIGHT_EVENT_PITCH_DOWN_PHASE_II))
+        return 0;
+    } else {
+        return 0;
+    }
+
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_PITCH_DOWN_PHASE_II);
     double S2_rollcmd = S2_ROLLCMD;
     double S2_yawcmd = S2_YAWCMD;
-    fc.control.set_attcmd(S2_rollcmd, -5.0, S2_yawcmd);
+    fc.control.set_attcmd(S2_rollcmd, -5.5, S2_yawcmd);
+    fc.control.set_S2_PITCH_DOWN_II();
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_PITCH_DOWN_PHASE_II", FLIGHT_EVENT_PITCH_DOWN_PHASE_II);
     return 0;
 }
 
 extern "C" int event_aoac_on(void) {
+    if (fc.ins.get_altc() >= 20000.0 && fc.ins.get_alphacx() <= 1.0) {
+        if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_AOA_CONTROL, fc.egse_flight_event_trigger_bitmap, FLIGHT_EVENT_AOA_CONTROL))
+        return 0;
+    } else {
+        return 0;
+    }
+
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_AOA_CONTROL);
+
     fc.control.set_S2_AOA();
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_AOA_CONTROL", FLIGHT_EVENT_AOA_CONTROL);
     return 0;
 }
 
@@ -116,133 +152,74 @@ extern "C" int event_control_off(void) {
 }
 
 extern "C" int event_fairing_jettison(void) {
+    if (fc.ins.get_altc() >= 95000.0) {
+        if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_FAIRING_JETTSION, fc.egse_flight_event_trigger_bitmap, FLIGHT_EVENT_FAIRING_JETTSION))
+        return 0;
+    } else {
+        return 0;
+    }
+
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_FAIRING_JETTSION);
+
     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_FAIRING_JETTSION;
     PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_FAIRING_JETTSION", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
+extern "C" int event_hot_staging(void) {
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_HOT_STAGING;
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_HOT_STAGING);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_HOT_STAGING", fc.ctl_tvc_db.flight_event_code);
+    return 0;
+}
+
 extern "C" int event_s3_control_on(void) {
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S3_CONTROL_ON;
     fc.control.set_S3_AOA();
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S3_CONTROL_ON);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S3_CONTROL_ON", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
 extern "C" int event_s3_seperation(void) {
-    double S3_mdot = S3_MDOT;
-    double S3_fmass0 = S3_FMASS0;
-    double S3_xcg_1 = S3_XCG_1;
-    double S3_xcg_0 = S3_XCG_0;
-    double S3_isp = S3_ISP;
-    double S3_moi_roll_0 = S3_MOI_ROLL_0;
-    double S3_moi_roll_1 = S3_MOI_ROLL_1;
-    double S3_moi_pitch_0 = S3_MOI_PITCH_0;
-    double S3_moi_pitch_1 = S3_MOI_PITCH_1;
-    double S3_moi_yaw_0 = S3_MOI_YAW_0;
-    double S3_moi_yaw_1 = S3_MOI_YAW_1;
-    double S3_kpp = S3_KPP;
-    double S3_kpi = S3_KPI;
-    double S3_kpd = S3_KPD;
-    double S3_kppp = S3_KPPP;
-    double S3_pN = S3_PN;
-    double S3_krp = S3_KRP;
-    double S3_kri = S3_KRI;
-    double S3_krd = S3_KRD;
-    double S3_krpp = S3_KRPP;
-    double S3_rN = S3_RN;
-    double S3_kyp = S3_KYP;
-    double S3_kyi = S3_KYI;
-    double S3_kyd = S3_KYD;
-    double S3_kypp = S3_KYPP;
-    double S3_yN = S3_YN;
-    double S3_kaoap = S3_KAOAP;
-    double S3_kaoai = S3_KAOAI;
-    double S3_kaoad = S3_KAOAD;
-    double S3_kaoapp = S3_KAOAPP;
-    double S3_aoaN = S3_AOAN;
-    double S3_rollcmd = S3_ROLLCMD;
-    double S3_pitchcmd = S3_PITCHCMD;
-    double S3_yawcmd = S3_YAWCMD;
-    double S3_aoacmd = S3_AOACMD;
-    fc.control.set_controller_var(S3_mdot, S3_fmass0, S3_xcg_1, S3_xcg_0, S3_isp);
-    fc.control.set_IBBB0(S3_moi_roll_0, S3_moi_pitch_0, S3_moi_yaw_0);
-    fc.control.set_IBBB1(S3_moi_roll_1, S3_moi_pitch_1, S3_moi_yaw_1);
-    fc.control.get_control_gain(S3_kpp, S3_kpi, S3_kpd, S3_kppp, S3_pN, S3_krp, S3_kri, S3_krd, S3_krpp, S3_rN, S3_kyp, S3_kyi,
-                                S3_kyd, S3_kypp, S3_yN, S3_kaoap, S3_kaoai, S3_kaoad, S3_kaoapp, S3_aoaN);
-    fc.control.set_attcmd(S3_rollcmd, S3_pitchcmd, S3_yawcmd);
-    fc.control.set_aoacmd(S3_aoacmd);
+    fc.control.set_controller_var(S3_MDOT, S3_FMASS0, S3_XCG_1, S3_XCG_0, S3_ISP, S3_MDOT * HS_time);
+    fc.control.set_IBBB0(S3_MOI_ROLL_0, S3_MOI_PITCH_0, S3_MOI_YAW_0);
+    fc.control.set_IBBB1(S3_MOI_ROLL_1, S3_MOI_PITCH_1, S3_MOI_YAW_1);
+    fc.control.get_control_gain(S3_KPP, S3_KPI, S3_KPD, S3_KPPP, S3_PN, S3_KRP, S3_KRI, S3_KRD, S3_KRPP, S3_RN, S3_KYP, S3_KYI,
+                                S3_KYD, S3_KYPP, S3_YN, S3_KAOAP, S3_KAOAI, S3_KAOAD, S3_KAOAPP, S3_AOAN);
+    fc.control.set_attcmd(S3_ROLLCMD, S3_PITCHCMD, S3_YAWCMD);
+    fc.control.set_aoacmd(S3_AOACMD);
     fc.control.set_ierror_zero();
+    fc.control.set_reference_point(S3_REFERENCE_P);
+    fc.control.set_engine_d(0.0);
+    // fc.control.set_S3_AOA();
     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S3_SEPERATION;
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S3_SEPERATION);
     PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S3_SEPERATION", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
 extern "C" int slave_init_stage2_control(FlightComputer_SimObject *fc) {
     /* Control variable Stage2 */
-    double S2_mdot = S2_MDOT;
-    double S2_fmass0 = S2_FMASS0;
-    double S2_xcg_1 = S2_XCG_1;
-    double S2_xcg_0 = S2_XCG_0;
-    double S2_isp = S2_ISP;
-    double S2_moi_roll_0 = S2_MOI_ROLL_0;
-    double S2_moi_roll_1 = S2_MOI_ROLL_1;
-    double S2_moi_pitch_0 = S2_MOI_PITCH_0;
-    double S2_moi_pitch_1 = S2_MOI_PITCH_1;
-    double S2_moi_yaw_0 = S2_MOI_YAW_0;
-    double S2_moi_yaw_1 = S2_MOI_YAW_1;
-    double S2_kpp = S2_KPP;
-    double S2_kpi = S2_KPI;
-    double S2_kpd = S2_KPD;
-    double S2_kppp = S2_KPPP;
-    double S2_pN = S2_PN;
-    double S2_krp = S2_KRP;
-    double S2_kri = S2_KRI;
-    double S2_krd = S2_KRD;
-    double S2_krpp = S2_KRPP;
-    double S2_rN = S2_RN;
-    double S2_kyp = S2_KYP;
-    double S2_kyi = S2_KYI;
-    double S2_kyd = S2_KYD;
-    double S2_kypp = S2_KYPP;
-    double S2_yN = S2_YN;
-    double S2_kaoap = S2_KAOAP;
-    double S2_kaoai = S2_KAOAI;
-    double S2_kaoad = S2_KAOAD;
-    double S2_kaoapp = S2_KAOAPP;
-    double S2_aoaN = S2_AOAN;
-    double S2_rollcmd = S2_ROLLCMD;
-    double S2_pitchcmd = S2_PITCHCMD;
-    double S2_yawcmd = S2_YAWCMD;
-    double S2_aoacmd = S2_AOACMD;
-
-    fc->control.set_controller_var(S2_mdot, S2_fmass0, S2_xcg_1, S2_xcg_0, S2_isp);
-    fc->control.set_IBBB0(S2_moi_roll_0, S2_moi_pitch_0, S2_moi_yaw_0);
-    fc->control.set_IBBB1(S2_moi_roll_1, S2_moi_pitch_1, S2_moi_yaw_1);
-    //  fc->control.set_kpp(S2_kpp)
-    //  fc->control.set_kpi(S2_kpi)
-    //  fc->control.set_kppp(S2_kppp)
-    //  fc->control.set_krp(S2_krp)
-    //  fc->control.set_kri(S2_kri)
-    //  fc->control.set_krpp(S2_krpp)
-    //  fc->control.set_kyp(S2_kyp)
-    //  fc->control.set_kyi(S2_kyi)
-    //  fc->control.set_kypp(S2_kypp)
-    //  fc->control.set_kaoap(S2_kaoap)
-    //  fc->control.set_kaoai(S2_kaoai)
-    //  fc->control.set_kaoad(S2_kaoad)
-    //  fc->control.set_kaoapp(S2_kaoapp)
-    fc->control.set_attcmd(S2_rollcmd, S2_pitchcmd, S2_yawcmd);
-    fc->control.set_aoacmd(S2_aoacmd);
-    fc->control.get_control_gain(S2_kpp, S2_kpi, S2_kpd, S2_kppp, S2_pN, S2_krp, S2_kri, S2_krd,
-                                S2_krpp, S2_rN, S2_kyp, S2_kyi, S2_kyd, S2_kypp, S2_yN, S2_kaoap, S2_kaoai, S2_kaoad, S2_kaoapp, S2_aoaN);
+    fc->control.set_controller_var(S2_MDOT, S2_FMASS0, S2_XCG_1, S2_XCG_0, S2_ISP, 0.0);
+    fc->control.set_IBBB0(S2_MOI_ROLL_0, S2_MOI_PITCH_0, S2_MOI_YAW_0);
+    fc->control.set_IBBB1(S2_MOI_ROLL_1, S2_MOI_PITCH_1, S2_MOI_YAW_1);
+    fc->control.set_attcmd(S2_ROLLCMD, S2_PITCHCMD, S2_YAWCMD);
+    fc->control.set_aoacmd(S2_AOACMD);
+    fc->control.get_control_gain(S2_KPP, S2_KPI, S2_KPD, S2_KPPP, S2_PN, S2_KRP, S2_KRI, S2_KRD,
+                                S2_KRPP, S2_RN, S2_KYP, S2_KYI, S2_KYD, S2_KYPP, S2_YN, S2_KAOAP, S2_KAOAI, S2_KAOAD, S2_KAOAPP, S2_AOAN);
+    fc->control.set_reference_point(S2_REFERENCE_P);
+    fc->control.set_engine_d(0.425);
     return 0;
 }
 
 extern "C" int slave_init_ins_variable(FlightComputer_SimObject *fc) {
     //  Vehicle longitude - deg  module newton
-    double lonx = 120.893501;
+    double lonx = 120.8901527777778;
     //  Vehicle latitude  - deg  module newton
-    double latx = 22.138917;
+    double latx = 22.262097222222224;
     // Vehicle altitude  - m  module newton
-    double alt = 5;
+    double alt = 6.0;
     fc->ins.load_location(lonx, latx, alt);
 
     //  Rolling  angle of veh wrt geod coord - deg  module kinematics
@@ -332,14 +309,21 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
     jit_add_read(0.001 + fc->stand_still_time, "event_control_rcs_on");
-    jit_add_read(12.001 + fc->stand_still_time, "event_control_on");
-    // jit_add_read(15.001 + fc->stand_still_time, "event_s2_control_on");
-    jit_add_read(82.001 + fc->stand_still_time, "event_aoac_on");
-    jit_add_read(100.001 + fc->stand_still_time, "event_s3_seperation");
-    jit_add_read(102.051 + fc->stand_still_time, "event_s3_control_on");
-    jit_add_read(107.001 + fc->stand_still_time, "event_fairing_jettison");
-    jit_add_read(200.001 + fc->stand_still_time, "event_control_off");
+    jit_add_read(148.0 + fc->stand_still_time, "event_hot_staging");
+    jit_add_read(151.0 + fc->stand_still_time, "event_s3_seperation");
+    jit_add_read(151.05 + fc->stand_still_time, "event_s3_control_on");
+    jit_add_event("event_pitch_down_phase_1", "PITCH DOWN PHASE I", 0.05);
+    jit_add_event("event_pitch_down_phase_2", "PITCH DOWN PHASE II", 0.05);
+    jit_add_event("event_fairing_jettison", "FARING JETTISON", 0.05);
+    jit_add_event("event_aoac_on", "AOA CONTROL", 0.05);
+    // jit_add_read(12.001 + fc->stand_still_time, "event_pitch_down_phase_1");
+    // // jit_add_read(15.001 + fc->stand_still_time, "event_s2_control_on");
+    // jit_add_read(82.001 + fc->stand_still_time, "event_aoac_on");
+    // jit_add_read(100.001 + fc->stand_still_time, "event_s3_seperation");
+    // jit_add_read(102.051 + fc->stand_still_time, "event_s3_control_on");
+    // jit_add_read(107.001 + fc->stand_still_time, "event_fairing_jettison");
+    // jit_add_read(200.001 + fc->stand_still_time, "event_control_off");
 
-    exec_set_terminate_time(200.001 + fc->stand_still_time);
+    exec_set_terminate_time(350.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

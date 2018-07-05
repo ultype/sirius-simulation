@@ -61,10 +61,10 @@ extern "C" void record_gps_slave() {
     //  drg->add_variable("fc.ins._TESTV[1]");
     //  drg->add_variable("fc.ins._TESTV[2]");
     //  drg->add_variable("fc.ins.liftoff");
-    //  drg->add_variable("fc.control.theta_a_cmd");
-    //  drg->add_variable("fc.control.theta_c_cmd");
-    //  drg->add_variable("fc.control.theta_b_cmd");
-    //  drg->add_variable("fc.control.theta_d_cmd");
+     drg->add_variable("fc.control.theta_a_cmd");
+     // drg->add_variable("fc.control.theta_c_cmd");
+     drg->add_variable("fc.control.theta_b_cmd");
+     // drg->add_variable("fc.control.theta_d_cmd");
     //  drg->add_variable("fc.control.fmasse");
     //  drg->add_variable("fc.control._WBICBT[0]");
     //  drg->add_variable("fc.control._WBICBT[1]");
@@ -79,6 +79,7 @@ extern "C" void record_gps_slave() {
      drg->add_variable("fc.control._euler[0]");
      drg->add_variable("fc.control._euler[1]");
      drg->add_variable("fc.control._euler[2]");
+     // drg->add_variable("fc.control.pitchcmd_new");
     //  drg->add_variable("fc.control._delta_euler[0]");
     //  drg->add_variable("fc.control._delta_euler[1]");
     //  drg->add_variable("fc.control._delta_euler[2]");

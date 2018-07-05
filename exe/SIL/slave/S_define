@@ -37,6 +37,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         Control control;
 
         time_management *time = time_management::get_instance();
+        uint64_t egse_flight_event_trigger_bitmap = 0xFFFFFFFFFFFFFFFF;
 
         Transceiver transceiver;
         struct icf_ctrlblk_t   icf_esps_ctrl;
