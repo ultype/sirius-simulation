@@ -2,8 +2,8 @@
 #include <string.h>
 
 int imu_adis16488_init(struct sdt_imu_dev_t *dev_info) {
-	memset(dev_info, 0, sizeof(struct sdt_imu_dev_t));
-	return 0;
+    memset(dev_info, 0, sizeof(struct sdt_imu_dev_t));
+    return 0;
 }
 
 int imu_adis16488_receive(struct icf_ctrlblk_t *C, struct sdt_imu_dev_t *dev_info) {
