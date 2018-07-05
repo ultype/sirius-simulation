@@ -13,6 +13,7 @@ PROGRAMMERS:
 #include <stdint.h>
 #include <stdio.h>
 #include "icf_trx_ctrl.h"
+#include "sim_services/include/simtime.h"
 
 typedef enum _RATETABLE_MOVEMENT_MODE_ENUM {
     RATETABLE_MOVEMENT_MODE_POSITION = 0,
@@ -50,6 +51,8 @@ int ratetable_init_input_file(FILE **stream);
 int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *stream);
 int ratetable_layer2_frame_direct_transfer(struct icf_ctrlblk_t *C, struct ratetable_eqmt_info_t *eqmt);
 int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eqmt_info_t *eqmt);
+int ratetable_cmd_step_check(struct ratetable_eqmt_info_t *eqmt, double degree);
+int ratetable_cmd_ramp_check(struct ratetable_eqmt_info_t *eqmt, double start, double end, int freqency);
 #ifdef __cplusplus
 }
 #endif

@@ -54,11 +54,32 @@ class RatetableSimObject : public Trick::SimObject {
             ("initialization") ratetable_init_input_file(&ratetable_stream);
             ("initialization") wait_for_1st_pps();
             P1 (5, "scheduled") trick_heartbeat();
+            /* Log File Input*/
             P1 (int_step, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
-            P1 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
-            P1 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);
-            P1 (rt_feedback_period, 0.001, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
-            P1 (rt_feedback_period, 0.001, "scheduled") imu_adis16488_receive(&icf_ctrl, &adis16488_dev);
+            /*  Step Check Input*/
+            // P2 (int_step, 0.0, 4.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // Warm up
+            // P2 (int_step, 5.0, 5.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
+            // P2 (int_step, 6.0, 6.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 1.0);
+            // P2 (int_step, 7.0, 7.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 2.0);
+            // P2 (int_step, 8.0, 8.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 7.0);
+            // P2 (int_step, 9.0, 9.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 22.0);
+            // P2 (int_step, 10.0, 10.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 7.0);
+            // P2 (int_step, 11.0, 11.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 2.0);
+            // P2 (int_step, 12.0, 12.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 1.0);
+            // P2 (int_step, 13.0, 13.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
+            /* Ramp check Input*/
+            // P2 (int_step, 0.0, 4.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // Warm up
+            // P2 (int_step, 5.0, 5.995, "scheduled") ratetable_cmd_ramp_check(&rt_dev_info, 0.0, 5.0, 200);
+            // P2 (int_step, 6.0, 6.995, "scheduled") ratetable_cmd_ramp_check(&rt_dev_info, 5.0, 0.0, 200);
+            // P2 (int_step, 7.0, 7.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
+            // P2 (int_step, 8.0, 8.995, "scheduled") ratetable_cmd_ramp_check(&rt_dev_info, 0.0, 2.5, 200);
+            // P2 (int_step, 9.0, 9.995, "scheduled") ratetable_cmd_ramp_check(&rt_dev_info, 2.5, 0.0, 200);
+            // P2 (int_step, 10.0, 10.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // END
+            /* Routine Job */
+            P4 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
+            P4 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);
+            P4 (rt_feedback_period, 0.001, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
+            P4 (rt_feedback_period, 0.001, "scheduled") imu_adis16488_receive(&icf_ctrl, &adis16488_dev);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;

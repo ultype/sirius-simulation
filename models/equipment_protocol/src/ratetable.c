@@ -22,6 +22,37 @@ int ratetable_init_input_file(FILE **stream) {
     return EXIT_SUCCESS;
 }
 
+int ratetable_cmd_step_check(struct ratetable_eqmt_info_t *eqmt, double degree) {
+    struct ratetable_motion_data_t *motion_data = &eqmt->mot_data;
+
+    motion_data->hwil_input_deg[0] = degree;
+    motion_data->hwil_input[0] =  ROUND_32BIT(motion_data->hwil_input_deg[0] * eqmt->hwil_ratio_data);
+
+    motion_data->hwil_input_deg[1] = degree;
+    motion_data->hwil_input[1] =  ROUND_32BIT(motion_data->hwil_input_deg[1] * eqmt->hwil_ratio_data);
+
+    motion_data->hwil_input_deg[2] = degree;
+    motion_data->hwil_input[2] =  ROUND_32BIT(motion_data->hwil_input_deg[2] * eqmt->hwil_ratio_data);
+    //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    return EXIT_SUCCESS;
+}
+
+int ratetable_cmd_ramp_check(struct ratetable_eqmt_info_t *eqmt, double start, double end, int freqency) {
+    struct ratetable_motion_data_t *motion_data = &eqmt->mot_data;
+    double slope;
+    slope = (end - start)/freqency;
+    motion_data->hwil_input_deg[0] += slope;
+    motion_data->hwil_input[0] =  ROUND_32BIT(motion_data->hwil_input_deg[0] * eqmt->hwil_ratio_data);
+
+    motion_data->hwil_input_deg[1] += slope;
+    motion_data->hwil_input[1] =  ROUND_32BIT(motion_data->hwil_input_deg[1] * eqmt->hwil_ratio_data);
+
+    motion_data->hwil_input_deg[2] += slope;
+    motion_data->hwil_input[2] =  ROUND_32BIT(motion_data->hwil_input_deg[2] * eqmt->hwil_ratio_data);
+    //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    return EXIT_SUCCESS;
+}
+
 int ratetable_convert_csv_to_motdata(struct ratetable_eqmt_info_t *eqmt, FILE *stream) {
     const char delimiter[2] = ",";
     char *token;
