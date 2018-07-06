@@ -30,6 +30,7 @@ struct ratetable_motion_data_t {
     int32_t hwil_output[3];
     double hwil_input_deg[3];  /* *io (°/s) rate */
     double hwil_output_deg[3];  /* *io (°/s) rate */
+    double time_stamp;
 } __attribute__((packed));
 
 struct ratetable_eqmt_info_t {
@@ -53,6 +54,7 @@ int ratetable_layer2_frame_direct_transfer(struct icf_ctrlblk_t *C, struct ratet
 int ratetable_layer2_frame_received(struct icf_ctrlblk_t *C, struct ratetable_eqmt_info_t *eqmt);
 int ratetable_cmd_step_check(struct ratetable_eqmt_info_t *eqmt, double degree);
 int ratetable_cmd_ramp_check(struct ratetable_eqmt_info_t *eqmt, double start, double end, int freqency);
+int ratetable_cmd_sine_check(struct ratetable_eqmt_info_t *eqmt, double Wg, int freq, double int_step);
 #ifdef __cplusplus
 }
 #endif

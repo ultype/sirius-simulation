@@ -56,7 +56,7 @@ class RatetableSimObject : public Trick::SimObject {
             P1 (5, "scheduled") trick_heartbeat();
             /* Log File Input*/
             P1 (int_step, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
-            /*  Step Check Input*/
+            /****  Step Check Input ****/
             // P2 (int_step, 0.0, 4.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // Warm up
             // P2 (int_step, 5.0, 5.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
             // P2 (int_step, 6.0, 6.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 1.0);
@@ -67,6 +67,15 @@ class RatetableSimObject : public Trick::SimObject {
             // P2 (int_step, 11.0, 11.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 2.0);
             // P2 (int_step, 12.0, 12.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 1.0);
             // P2 (int_step, 13.0, 13.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
+
+            /****  SIN Check Block  ****/
+            /* sin() Check Input Case Wg = 2, f = 1*/
+            /* sin() Check Input Case Wg = 2, f = 10*/
+            /* sin() Check Input Case Wg = 5, f = 1*/
+            /* sin() Check Input Case Wg = 5, f = 10*/
+            // P2 (int_step, 0.0, 4.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // Warm up
+            // P2 (int_step, 5.0, 14.995, "scheduled") ratetable_cmd_sine_check(&rt_dev_info, 2, 1, int_step);
+            // P2 (int_step, 15.0, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // END sin check
             /* Routine Job */
             P4 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
             P4 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);

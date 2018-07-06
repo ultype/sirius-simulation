@@ -1,4 +1,5 @@
 #include "ratetable.h"
+#include <math.h>
 static double __PI = 3.1415926536;
 int ratetable_init(struct ratetable_eqmt_info_t *eqmt) {
     eqmt->hwil_ratio_data = 10000;
@@ -48,6 +49,23 @@ int ratetable_cmd_ramp_check(struct ratetable_eqmt_info_t *eqmt, double start, d
     motion_data->hwil_input[1] =  ROUND_32BIT(motion_data->hwil_input_deg[1] * eqmt->hwil_ratio_data);
 
     motion_data->hwil_input_deg[2] += slope;
+    motion_data->hwil_input[2] =  ROUND_32BIT(motion_data->hwil_input_deg[2] * eqmt->hwil_ratio_data);
+    //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
+    return EXIT_SUCCESS;
+}
+
+int ratetable_cmd_sine_check(struct ratetable_eqmt_info_t *eqmt, double Wg, int freq, double int_step) {
+    struct ratetable_motion_data_t *motion_data = &eqmt->mot_data;
+    double sine_value;
+    motion_data->time_stamp += int_step;
+    sine_value = (Wg / 2.0) * sin(2 * __PI * freq * motion_data->time_stamp);
+    motion_data->hwil_input_deg[0] = sine_value;
+    motion_data->hwil_input[0] =  ROUND_32BIT(motion_data->hwil_input_deg[0] * eqmt->hwil_ratio_data);
+
+    motion_data->hwil_input_deg[1] = sine_value;
+    motion_data->hwil_input[1] =  ROUND_32BIT(motion_data->hwil_input_deg[1] * eqmt->hwil_ratio_data);
+
+    motion_data->hwil_input_deg[2] = sine_value;
     motion_data->hwil_input[2] =  ROUND_32BIT(motion_data->hwil_input_deg[2] * eqmt->hwil_ratio_data);
     //  fprintf(stderr, "[EGSE->RT] %d, %d, %d\n", motion_data->hwil_input[0], motion_data->hwil_input[1], motion_data->hwil_input[2]);
     return EXIT_SUCCESS;
