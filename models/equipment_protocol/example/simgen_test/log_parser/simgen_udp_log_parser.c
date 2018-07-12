@@ -66,6 +66,7 @@ int simgen_udp_latency_log_parser(FILE *input_binary) {
                 udp_cmd.latency_wrt_tov_and_current_tir_ms_);
     }
     fclose(output_text);
+    printf("Next ./simgen_remote_received_check <log_nspo_xxx.csv> \n");
     return EXIT_SUCCESS;
 }
 
