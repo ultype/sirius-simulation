@@ -29,7 +29,7 @@ def main():
                  'GPSR_SBEE_X ', 'GPSR_SBEE_Y ', 'GPSR_SBEE_Z ',
                  'GPSR_VBEE_X ', 'GPSR_VBEE_Y ', 'GPSR_VBEE_Z ',
                  'GPSR_Length', 'GPSR_Speed ',
-                 'DM_GPSR_ERR_Length','DM_GPSR_ERR_Speed']
+                 'DM-GPSR_ERR_Length','DM-GPSR_ERR_Speed']
     csvCursor.writerow(csvHeader)
 
     sim_data_list = []
@@ -85,7 +85,7 @@ def main():
     print ( "The speed of root mean square with DM is %f cm/s." % (rms_speed))
 
     print (answer_file_name + "combine_result_dm_and_gpsr_log.csv\n")
-    print ("Next step ./error_with_gpsr_answer.py <lift_off_time>")
+    print ("Next step ./error_with_gpsr_answer.py <lift_off_time> <egse_1khz | ' '>")
 
 if __name__ == "__main__":
     main()

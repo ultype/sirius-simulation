@@ -38,11 +38,18 @@ def gpsr_tlm_compare(target_arr, answer_arr, lift_off_time, fileobj, csv_header)
                  # DM SPEED
                 dm_speed = math.sqrt(float(answer_elem[1][5])**2 + float(answer_elem[1][6])**2  + float(answer_elem[1][7])**2)
                 sim_data_list.append(dm_speed)
-                # Target Benchmark
+                # Target Benchmark (DM_GPSR_TLM - target_GPSR_TLM)
                 target_length_err = float(answer_elem[1][17]) - float(target_elem[1][17])
                 target_speed_err = float(answer_elem[1][18]) - float(target_elem[1][18])
                 sim_data_list.append(target_length_err)
                 sim_data_list.append(target_speed_err)
+                # Answer DM-TLM
+                sim_data_list.append(answer_elem[1][19])
+                sim_data_list.append(answer_elem[1][20])
+                # Target DM-TLM
+                sim_data_list.append(target_elem[1][19])
+                sim_data_list.append(target_elem[1][20])
+
                 filecusor.writerow(sim_data_list)
                 # Root Mean square
                 if iter_idx >= start_flight_idx:
