@@ -46,6 +46,7 @@ int simgen_udp_latency_log_parser(FILE *input_binary) {
     FILE *output_text;
     int iter;
     struct simgen_udp_command_t udp_cmd;
+    double sim_time_sec = 0.0;
     if ((output_text = fopen("UDP_mot_receive_in_simgen.csv", "w")) == NULL) {
         fclose(input_binary);
         return EXIT_FAILURE;
@@ -55,11 +56,12 @@ int simgen_udp_latency_log_parser(FILE *input_binary) {
             break ;
 
         if (iter == 0) {
-            fprintf(output_text,"Iteration, sim_time_ms, VBEE_X, VBEE_Y, VBEE_Z, latency\n");
+            fprintf(output_text,"sim_time_sec, SBEE_X, SBEE_Y, SBEE_Z, VBEE_X, VBEE_Y, VBEE_Z, Latency\n");
             continue;
         }
-
-        fprintf(output_text,"%4d, %6d, %20.10f, %20.10f, %20.10f, %d\n", iter - 1, udp_cmd.time_of_validity_ms_,
+        sim_time_sec = udp_cmd.time_of_validity_ms_ / 1000.0;
+        fprintf(output_text," %f, %20.10f, %20.10f, %20.10f, %20.10f, %20.10f, %20.10f, %d\n", sim_time_sec,
+                udp_cmd.data.mot_.position_ecef_xyz_[0], udp_cmd.data.mot_.position_ecef_xyz_[1], udp_cmd.data.mot_.position_ecef_xyz_[2],
                 udp_cmd.data.mot_.velocity_mps_xyz_[0], udp_cmd.data.mot_.velocity_mps_xyz_[1], udp_cmd.data.mot_.velocity_mps_xyz_[2],
                 udp_cmd.latency_wrt_tov_and_current_tir_ms_);
     }
