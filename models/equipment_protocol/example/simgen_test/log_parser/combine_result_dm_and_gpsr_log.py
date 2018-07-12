@@ -29,7 +29,7 @@ def main():
                  'GPSR_SBEE_X ', 'GPSR_SBEE_Y ', 'GPSR_SBEE_Z ',
                  'GPSR_VBEE_X ', 'GPSR_VBEE_Y ', 'GPSR_VBEE_Z ',
                  'GPSR_Length', 'GPSR_Speed ',
-                 'DM-GPSR_ERR_Length','DM-GPSR_ERR_Speed']
+                 'DM-GPSR_TLM ERR_Length','DM-GPSR_TLM ERR_Speed']
     csvCursor.writerow(csvHeader)
 
     sim_data_list = []

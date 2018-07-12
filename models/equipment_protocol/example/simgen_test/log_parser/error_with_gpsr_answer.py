@@ -34,7 +34,7 @@ def main():
 
     ## Target File
     csv_answer_fileobj.seek(0)
-    error_target_file = open('error_with_gpsr_snav_target.csv', 'w')
+    error_target_file = open(target_file_name + 'error_with_gpsr_snav_target.csv', 'w')
     num, mean_length_square, mean_speed_square = gpsr_tlm_compare(target_arr, answer_arr, lift_off_time,
                                                          error_target_file, csv_target_header)
     rms_length = get_root_mean_square(mean_length_square, num)
