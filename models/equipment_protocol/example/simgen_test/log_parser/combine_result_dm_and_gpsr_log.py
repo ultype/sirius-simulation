@@ -9,14 +9,14 @@ def main():
     lift_off_time = 120.0
     csv_gpsr_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
     csv_dm_fileobj = open('refine_log_nspo.csv', 'rbU')
-    answer_file_name = ""
+    out_file_name = ""
     if len(sys.argv) == 3:
-        answer_file_name = sys.argv[2] + "_"
+        out_file_name = sys.argv[2] + "_"
         lift_off_time = float(sys.argv[1])
     if len(sys.argv) == 2:
         lift_off_time = float(sys.argv[1])
 
-    combine_file = open(answer_file_name + 'combine_result_dm_and_gpsr_log.csv', 'w')
+    combine_file = open(out_file_name + 'combine_result_dm_and_gpsr_log.csv', 'w')
     csvCursor = csv.writer(combine_file)
 
     dm_arr = csv.reader(csv_dm_fileobj)
@@ -84,8 +84,8 @@ def main():
     print ( "The position of root mean square with DM is %f meters." % (rms_length))
     print ( "The speed of root mean square with DM is %f cm/s." % (rms_speed))
 
-    print (answer_file_name + "combine_result_dm_and_gpsr_log.csv\n")
-    print ("Next step ./error_with_gpsr_answer.py <lift_off_time> <egse_1khz | ' '>")
+    print (out_file_name + "combine_result_dm_and_gpsr_log.csv\n")
+    print ("Next step ./error_with_gpsr_tlm_golden.py <lift_off_time> <egse_1khz | rt200hz | ' '>")
 
 if __name__ == "__main__":
     main()
