@@ -55,6 +55,12 @@ const double S3_FARING_SEP_XCG_1 = 2.75567;
 const double PAYLOAD = 200.0;
 const double S3_vmass0 = PAYLOAD + FARING_MASS + S3_REMAINING_FUEL_MASS + S3_PROPELLANT_MASS + S3_STRUCTURE_MASS;
 const double S2_vmass0 = S3_vmass0 + S2_REMAINING_FUEL_MASS + S2_PROPELLANT_MASS + S2_STRUCTURE_MASS;
+const double S3_FARING_MOI_ROLL_0 = 63.833;
+const double S3_FARING_MOI_ROLL_1 = 20.304;
+const double S3_FARING_MOI_PITCH_0 = 419.074;
+const double S3_FARING_MOI_PITCH_1 = 218.847;
+const double S3_FARING_MOI_YAW_0 = 417.744;
+const double S3_FARING_MOI_YAW_1 = 217.509;
 /****************Engine coefficients*********************/
 const double S2_E1_MASS_0   = 117.13;
 const double S2_E1_MASS_1   = 27.42;
@@ -167,7 +173,7 @@ extern "C" int event_fairing_separation() {
     rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_FAIRING_JETTSION);
     PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
     rkt.propulsion.set_faring_sep();
-    rkt.propulsion.get_input_file_var(S3_FARING_SEP_XCG_0, S3_FARING_SEP_XCG_1, S3_MOI_ROLL_0, S3_MOI_ROLL_1, S3_MOI_PITCH_0, S3_MOI_PITCH_1, S3_MOI_YAW_0, S3_MOI_YAW_1, S3_SPI, S3_FUEL_FLOW_RATE);
+    rkt.propulsion.get_input_file_var(S3_FARING_SEP_XCG_0, S3_FARING_SEP_XCG_1, S3_FARING_MOI_ROLL_0, S3_FARING_MOI_ROLL_1, S3_FARING_MOI_PITCH_0, S3_FARING_MOI_PITCH_1, S3_FARING_MOI_YAW_0, S3_FARING_MOI_YAW_1, S3_SPI, S3_FUEL_FLOW_RATE);
     return 0;
 }
 

@@ -8,7 +8,7 @@
 extern "C" void record_gps() {
     Trick::DRAscii *drg = new Trick::DRAscii("gps");
     drg->set_freq(Trick::DR_Always);
-    drg->set_cycle(0.005);
+    drg->set_cycle(0.05);
     drg->set_single_prec_only(false);
     drg->add_variable("rkt.dynamics._SBEE[0]");
     drg->add_variable("rkt.dynamics._SBEE[1]");
@@ -105,8 +105,8 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.aerodynamics.clm");
     // drg->add_variable("rkt.aerodynamics.cln");
     drg->add_variable("rkt.propulsion._xcg[0]");
-    drg->add_variable("rkt.propulsion._xcg[1]");
-    drg->add_variable("rkt.propulsion._xcg[2]");
+    // drg->add_variable("rkt.propulsion._xcg[1]");
+    // drg->add_variable("rkt.propulsion._xcg[2]");
     // drg->add_variable("rkt.propulsion._structure_XCG[0]");
     // drg->add_variable("rkt.propulsion._structure_XCG[1]");
     // drg->add_variable("rkt.propulsion._structure_XCG[2]");
@@ -254,13 +254,20 @@ extern "C" void record_gps() {
     drg->add_variable("rkt.forces._FAPB[1]");
     drg->add_variable("rkt.forces._FAPB[2]");
     drg->add_variable("rkt.propulsion.mass_ratio");
-    drg->add_variable("rkt.propulsion.S2_fmasse");
-    drg->add_variable("rkt.propulsion.S3_fmasse");
-    drg->add_variable("rkt.propulsion.S2_timer");
-    drg->add_variable("rkt.propulsion.S3_timer");
+    // drg->add_variable("rkt.propulsion.S2_fmasse");
+    // drg->add_variable("rkt.propulsion.S3_fmasse");
+    // drg->add_variable("rkt.propulsion.S2_timer");
+    // drg->add_variable("rkt.propulsion.S3_timer");
     drg->add_variable("rkt.dynamics._LT_euler[0]");
     drg->add_variable("rkt.dynamics._LT_euler[1]");
     drg->add_variable("rkt.dynamics._LT_euler[2]");
+    drg->add_variable("rkt.dynamics._TBLQ[0]");
+    drg->add_variable("rkt.dynamics._TBLQ[1]");
+    drg->add_variable("rkt.dynamics._TBLQ[2]");
+    drg->add_variable("rkt.dynamics._TBLQ[3]");
+    // drg->add_variable("rkt.dynamics.Roll");
+    // drg->add_variable("rkt.dynamics.Pitch");
+    // drg->add_variable("rkt.dynamics.Yaw");
     // drg->add_variable("rkt.tvc._Q_TVC[0]");
     // drg->add_variable("rkt.tvc._Q_TVC[1]");
     // drg->add_variable("rkt.tvc._Q_TVC[2]");

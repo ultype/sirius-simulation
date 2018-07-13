@@ -81,6 +81,15 @@ const double S3_AOACMD = -0.0;
 const double S3_REFERENCE_P = -3.917;
 const double HS_time = 2.0;
 
+const double FARING_MOI_ROLL_0 = 63.833;
+const double FARING_MOI_ROLL_1 = 20.304;
+const double FARING_MOI_PITCH_0 = 419.074;
+const double FARING_MOI_PITCH_1 = 218.847;
+const double FARING_MOI_YAW_0 = 417.744;
+const double FARING_MOI_YAW_1 = 217.509;
+const double FARING_XCG_0 = 3.09199;
+const double FARING_XCG_1 = 2.75567;
+
 
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
@@ -158,6 +167,10 @@ extern "C" int event_fairing_jettison(void) {
     } else {
         return 0;
     }
+
+    fc.control.set_IBBB0(FARING_MOI_ROLL_0, FARING_MOI_PITCH_0, FARING_MOI_YAW_0);
+    fc.control.set_IBBB1(FARING_MOI_ROLL_1, FARING_MOI_PITCH_1, FARING_MOI_YAW_1);
+    fc.control.set_controller_var(S3_MDOT, S3_FMASS0, FARING_XCG_1, FARING_XCG_0, S3_ISP, S3_MDOT * HS_time);
 
     fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_FAIRING_JETTSION);
 
