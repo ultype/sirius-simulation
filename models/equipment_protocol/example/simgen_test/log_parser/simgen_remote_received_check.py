@@ -17,8 +17,8 @@ def main():
                  'SIMGEN VBEE_X ', 'SIMGEN VBEE_Y ', 'SIMGEN VBEE_Z ', 'Latency' ,
                  'DM_SBEE_X', 'DM_SBEE_Y', 'DM_SBEE_Z' ,
                  'DM_VBEE_X', 'DM_VBEE_Y', 'DM_VBEE_Z',
-                 'SIMGEN_Length', 'SIMGEN_Speed',
                  'DM_Length', 'DM_Speed',
+                 'SIMGEN_Length', 'SIMGEN_Speed',
                  'DM-SIMGEN_Length_ERR', 'DM-SIMGEN_Speed_ERR']
     csvCursor.writerow(csvHeader)
 
@@ -58,10 +58,10 @@ def main():
                 
                 dm_speed = math.sqrt(float(dm_elem[1][5])**2 + float(dm_elem[1][6])**2 + float(dm_elem[1][7])**2)
                 simgen_speed = math.sqrt(float(simgen_elem[1][4])**2 + float(simgen_elem[1][5])**2 + float(simgen_elem[1][6])**2)
-                sim_data_list.append(simgen_length)
                 sim_data_list.append(dm_length)
-                sim_data_list.append(simgen_speed)
                 sim_data_list.append(dm_speed)
+                sim_data_list.append(simgen_length)
+                sim_data_list.append(simgen_speed)
                 sim_data_list.append(dm_length - simgen_length)
                 sim_data_list.append(dm_speed - simgen_speed)
                 csvCursor.writerow(sim_data_list)
