@@ -77,7 +77,7 @@ const double S3_AOAN = 1000.0;
 const double S3_ROLLCMD = 0.0;
 const double S3_PITCHCMD = 0.0;
 const double S3_YAWCMD = 0.0;
-const double S3_AOACMD = -0.0;
+const double S3_AOACMD = 0.0;
 const double S3_REFERENCE_P = -3.917;
 const double HS_time = 2.0;
 

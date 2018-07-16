@@ -157,6 +157,7 @@ extern "C" int event_separation_1() {
     rkt.tvc.set_s3_tau4(20.0);
     rkt.tvc.set_s3_ratelim(16.0 * RAD);
     rkt.tvc.set_s3_tvclim(7 * RAD);
+    rkt.tvc.set_s3_tvc_acc_lim(360.0 * RAD);
     rkt.tvc.set_S3_TVC();
     rkt.propulsion.engine_ignition();
 
