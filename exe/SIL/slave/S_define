@@ -13,6 +13,7 @@ LIBRARY DEPENDENCIES:
 ##include "Ins.hh"
 ##include "Control.hh"
 ##include "GPS.hh"
+##include "cad_utility_c.h"
 ##include "cad_utility.hh"
 ##include "datadeck.hh"
 ##include "time_utility.hh"

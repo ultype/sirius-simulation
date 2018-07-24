@@ -16,6 +16,7 @@ LIBRARY DEPENDENCIES:
 ##include "Rocket_Flight_DM.hh"
 
 ##include "cad_utility.hh"
+##include "cad_utility_c.h"
 ##include "datadeck.hh"
 ##include "schmitt_trigger.hh"
 

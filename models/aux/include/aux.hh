@@ -42,4 +42,9 @@ ICG: (No)
 
 inline double get_elapsed_time() { return get_rettime(); }
 
+#define MATRIX_BIND(mat_name, n, m) \
+        mat_name = gsl_matrix_view_array(_ ## mat_name, n, m)
+
+#define VECTOR_BIND(vec_name, n) \
+        vec_name = gsl_vector_view_array(_ ## vec_name, n)
 #endif  // utility_header__HPP
