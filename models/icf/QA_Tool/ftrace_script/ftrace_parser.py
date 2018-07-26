@@ -19,8 +19,8 @@ def counting_actual_size(file, output):
     return body_size
 
 ### CONSTANT ###
-SAMPLE_HZ = "20 "
-GRAPH_TITLE = "RS422 "
+SAMPLE_HZ = "200 "
+GRAPH_TITLE = "No title"
 file_input = open("logg.txt","r")
 file_out = open("output.txt","w+")
 
@@ -33,23 +33,28 @@ file_out.close()
 with open("output.txt", "r") as file_out:
     data = file_out.readlines()
 
-#### GNU PLOT Setting: User defined #### 
-PLOT_CONFIG_INFO = [
-    ["Search Keywords",   "Title ", "x label, y label", "parsing_mode"],
-    ["sys_enter: NR 510", "[HIL] " + GRAPH_TITLE + SAMPLE_HZ + "Hz (SIM Time: 200 secs)", "Timeframe " + SAMPLE_HZ + " Hz", "Schedule Period (ms)", "SCHEDULE"], # 1
-    ["daq_irq_handler", "[HIL] The Jitter of GPIO interrupt " + SAMPLE_HZ + "Hz(SIM Time: 200 secs)", "Timeframe 1 Hz", "Jitter(ms)", "JITTER"] # 2
-]
 if len(sys.argv) < 0:
-    print "Please imput the PLOT_CONFIG_INFO : 0~7"
+    print "Please imput the < 1 | 2 | 3 > <sample HZ> <Graph title>"
     sys.exit(0)
 IDX = int(sys.argv[1])
+SAMPLE_HZ = int(sys.argv[2])
+GRAPH_TITLE = str(sys.argv[3])
+#### GNU PLOT Setting: User defined ####
+PLOT_CONFIG_INFO = [
+    ["Search Keywords", "Search secondary Keywords","Title ", "x label, y label", "parsing_mode"],
+    ["sys_enter: NR 510", " ",                  "[HIL] " + GRAPH_TITLE, "Time frame (sec)", "Schedule Period (ms)", "SCHEDULE"], # 1
+    ["daq_irq_handler"  , " ",                  "[HIL] " + GRAPH_TITLE, "Timeframe 1 Hz",   "Jitter(ms)",           "JITTER"], # 2
+    ["sys_enter: NR 510", "sys_enter: NR 511",  "[HIL] " + GRAPH_TITLE, "Time frame (sec)", "Period (ms)",          "PERIOD"], # 3
+]
 
-search_string = PLOT_CONFIG_INFO[IDX][0]
-gtitle= PLOT_CONFIG_INFO[IDX][1]
-xlabel = PLOT_CONFIG_INFO[IDX][2]
-ylabel = PLOT_CONFIG_INFO[IDX][3]
+
+search_string_1 = PLOT_CONFIG_INFO[IDX][0]
+search_string_2 = PLOT_CONFIG_INFO[IDX][1]
+gtitle= PLOT_CONFIG_INFO[IDX][2]
+xlabel = PLOT_CONFIG_INFO[IDX][3]
+ylabel = PLOT_CONFIG_INFO[IDX][4]
 photo_name = gtitle +".png"
-parsing_mode = PLOT_CONFIG_INFO[IDX][4]
+parsing_mode = PLOT_CONFIG_INFO[IDX][5]
 ################################
 trip_time_ms_list = []
 abnormal_cnt = 0
@@ -59,7 +64,7 @@ end_time = 0
 
 if parsing_mode == "SCHEDULE":
     for idx, element in enumerate(data):
-        if element.find(search_string) > 0:
+        if element.find(search_string_1) > 0:
             temp_list = re.findall("\d+\.\d+", data[idx])
             end_time = float(temp_list[0])
             if start_time != 0:
@@ -72,7 +77,7 @@ if parsing_mode == "JITTER":
     for idx, element in enumerate(data):
       if idx < PASER_START_IDX:
           continue
-      if element.find(search_string) > 0:
+      if element.find(search_string_1) > 0:
           temp_list = re.findall("\d+\.\d+", data[idx - PASER_START_IDX])
           start_time = float(temp_list[0])
           temp_list = re.findall("\d+\.\d+", data[idx+1])
@@ -82,32 +87,30 @@ if parsing_mode == "JITTER":
               abnormal_cnt += 1;
               print "[%d]output.txt Line: %d, time duration:%f" % (abnormal_cnt, idx+1, duration)
           trip_time_ms_list.append(duration)
-
-# for idx, element in enumerate(data):
-#   if element.find("irq_handler_entry: irq=16 name=pcan") > 0:
-#       irq_count += 1
-#       if irq_count == 1:
-#           temp_list = re.findall("\d+\.\d+", data[idx])
-#           start_time = float(temp_list[0])
-#       if irq_count == 7:
-#           temp_list = re.findall("\d+\.\d+", data[idx + 172])
-#           end_time = float(temp_list[0])
-#           duration = (end_time - start_time) * 1000
-#           if duration > 3:
-#               abnormal_cnt += 1;
-#               print "[%d]output.txt Line: %d, time duration:%f" % (abnormal_cnt, idx+1, duration)
-#           trip_time_ms_list.append(duration)
-#           irq_count = 0
+if parsing_mode == "PERIOD":
+    temp_list_start = []
+    temp_list_end = []
+    for idx, element in enumerate(data):
+        if element.find(search_string_1) > 0:
+            temp_list_start = re.findall("\d+\.\d+", data[idx])
+            start_time = float(temp_list_start[0])
+            continue
+        if element.find(search_string_2) > 0:
+            temp_list_end = re.findall("\d+\.\d+", data[idx])
+            end_time = float(temp_list_end[0])
+            duration = (end_time - start_time) * 1000
+            trip_time_ms_list.append(duration)
 
 print("|Round trip count | %d |" % (len(trip_time_ms_list)))
 print("|Avg| %f ms |" % (sum(trip_time_ms_list)/len(trip_time_ms_list)))
 print("|Max| %f ms |" % (max(trip_time_ms_list)))
 print("|Min| %f ms |" % (min(trip_time_ms_list)))
 print("|sigma| %f  |" % (numpy.std(trip_time_ms_list)))
-
+time_stamp = 0
 with open("plot_data_input.txt", "w") as file_out:
     for idx in range(len(trip_time_ms_list)):
-        file_out.write(str(idx+1) + " " + str(trip_time_ms_list[idx]) +"\n")
+        time_stamp += (1 / float(SAMPLE_HZ))
+        file_out.write(str(time_stamp) + " " + str(trip_time_ms_list[idx]) +"\n")
 
 data_string = " count=" + "\\n" + str(len(trip_time_ms_list)) + "\\n"
 data_string += " Max=" + "\\n" + str(max(trip_time_ms_list)) + "\\n"

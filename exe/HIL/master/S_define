@@ -337,7 +337,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") set_default_simgen_motdata(&simgen_dev);
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);
             ("initialization") wait_for_1st_pps();
-
+            P1 (0.005, "scheduled") syscall(510);
             P1 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P1 (0.005, "scheduled") flight_event_code_handler(&icf_ctrl);
 
@@ -359,6 +359,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
             P4 (int_step, 0.0, sst_last_cycle, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, ext_porlation);
             P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
+            //  P4 (int_step, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
             P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 
             P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, &tlm_frame);
@@ -366,6 +367,7 @@ class Rocket_SimObject : public Trick::SimObject {
             (int_step, "logging") env.update_diagnostic_attributes(int_step);
             (int_step, "logging") dynamics.update_diagnostic_attributes(int_step);
             (5, "scheduled") icf_heartbeat();
+            (0.005, "scheduled") syscall(511);
             ("shutdown") simgen_remote_end_scenario_now(&simgen_dev);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
 
