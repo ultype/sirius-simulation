@@ -9,20 +9,11 @@ LIBRARY DEPENDENCIES:
 #include "sim_objects/default_trick_sys.sm"
 
 ##include "Time_management.hh"
-
 ##include "Ins.hh"
 ##include "Control.hh"
 ##include "GPS.hh"
-##include "cad_utility_c.h"
-##include "cad_utility.hh"
-##include "datadeck.hh"
 ##include "time_utility.hh"
-##include "math_utility.hh"
-##include "integrate.hh"
-##include "stochastic.hh"
-##include "matrix/utility.hh"
 ##include "Dataflow_Binding.hh"
-
 ##include "transceiver.hh"
 ##include  "icf_trx_ctrl.h"
 ##include  "DM_FSW_Interface.hh"

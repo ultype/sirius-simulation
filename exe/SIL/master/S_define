@@ -14,11 +14,7 @@ LIBRARY DEPENDENCIES:
 ##include "Time_management.hh"
 ##include "GPS_constellation.hh"
 ##include "Rocket_Flight_DM.hh"
-
-##include "cad_utility.hh"
-##include "cad_utility_c.h"
-##include "datadeck.hh"
-##include "schmitt_trigger.hh"
+##include "Environment.hh"
 
 ##include "env/atmosphere.hh"
 ##include "env/atmosphere_nasa2002.hh"
@@ -42,11 +38,6 @@ LIBRARY DEPENDENCIES:
 ##include "sdt/SDT.hh"
 
 ##include "time_utility.hh"
-
-##include "math_utility.hh"
-##include "integrate.hh"
-##include "stochastic.hh"
-##include "matrix/utility.hh"
 
 ##include "transceiver.hh"
 ##include "Dataflow_Binding.hh"
