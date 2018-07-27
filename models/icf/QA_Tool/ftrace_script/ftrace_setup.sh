@@ -31,18 +31,18 @@ cat /sys/kernel/debug/tracing/set_ftrace_filter
 echo "id>=500" > /sys/kernel/debug/tracing/events/raw_syscalls/sys_enter/filter
 echo 1 > /sys/kernel/debug/tracing/events/raw_syscalls/sys_enter/enable
 
-#Use trace-cmd
-#sudo trace-cmd record -p nop -e irq_handler_entry -f "irq==16" -e sys_enter -f "id>=500"
-#trace-cmd report
+##### UDP tracer #####
+#echo udp_* > /sys/kernel/debug/tracing/set_ftrace_filter
+#echo function_graph > /sys/kernel/debug/tracing/current_tracer
+
+##### Net event #####
+#echo "net:*" > /sys/kernel/debug/tracing/set_event
+#echo function > /sys/kernel/debug/tracing/current_tracer
 
 ##### Socket CAN Interface Enable #####
 # sudo ip link set can0 up type can bitrate 125000
 # sudo ip link set can1 up type can bitrate 125000
 
-##### CPU Isolation #####
-# sudo vim /etc/default/grub ===> add GRUB_CMDLINE_LINUX_DEFAULT="isolcpus=1"
-# sudo update-grub
-# sudo reboot
-
-##### Loogin Permission #####
-# sudo vim /etc/ssh/sshd_config ===> modify "PermitRootLogin yes"
+#Use trace-cmd
+#sudo trace-cmd record -p nop -e irq_handler_entry -f "irq==16" -e sys_enter -f "id>=500"
+#trace-cmd report
