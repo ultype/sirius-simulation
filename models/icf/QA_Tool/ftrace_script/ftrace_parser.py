@@ -45,6 +45,7 @@ PLOT_CONFIG_INFO = [
     ["sys_enter: NR 510", " ",                  "[HIL] " + GRAPH_TITLE, "Time frame (sec)", "Schedule Period (ms)", "SCHEDULE"], # 1
     ["daq_irq_handler"  , " ",                  "[HIL] " + GRAPH_TITLE, "Timeframe 1 Hz",   "Jitter(ms)",           "JITTER"], # 2
     ["sys_enter: NR 510", "sys_enter: NR 511",  "[HIL] " + GRAPH_TITLE, "Time frame (sec)", "Period (ms)",          "PERIOD"], # 3
+    ["udp_sendmsg",       "net_dev_xmit",       "[HIL] " + GRAPH_TITLE, "Time frame (sec)", "Period (ms)",          "TRACE-CMD"], # 4
 ]
 
 
@@ -99,6 +100,26 @@ if parsing_mode == "PERIOD":
             temp_list_end = re.findall("\d+\.\d+", data[idx])
             end_time = float(temp_list_end[0])
             duration = (end_time - start_time) * 1000
+            trip_time_ms_list.append(duration)
+if parsing_mode == "TRACE-CMD":
+    temp_list_start = []
+    temp_list_end = []
+    flag = 0
+    for idx, element in enumerate(data):
+        if element.find(search_string_1) > 0 and flag == 0:
+            flag = 1
+            result = element.split(":")
+            result = result[0].split(" ")
+            temp_list_start = result[3]
+            start_time = float(temp_list_start)
+            continue
+        if element.find(search_string_2) > 0 and flag == 1:
+            flag = 0
+            result = element.split(":")
+            result = result[0].split(" ")
+            temp_list_end = result[3]
+            end_time = float(temp_list_end)
+            duration = (end_time - start_time) / 1000000.0
             trip_time_ms_list.append(duration)
 
 print("|Round trip count | %d |" % (len(trip_time_ms_list)))
