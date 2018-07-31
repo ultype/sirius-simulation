@@ -66,7 +66,7 @@ end_time = 0
 if parsing_mode == "SCHEDULE":
     for idx, element in enumerate(data):
         if element.find(search_string_1) > 0:
-            temp_list = re.findall("\d+\.\d+", data[idx])
+            temp_list = re.findall("([0-9]+\.[0-9]+)", data[idx])
             end_time = float(temp_list[0])
             if start_time != 0:
                 duration = (end_time - start_time) * 1000
@@ -79,9 +79,9 @@ if parsing_mode == "JITTER":
       if idx < PASER_START_IDX:
           continue
       if element.find(search_string_1) > 0:
-          temp_list = re.findall("\d+\.\d+", data[idx - PASER_START_IDX])
+          temp_list = re.findall("([0-9]+\.[0-9]+)", data[idx - PASER_START_IDX])
           start_time = float(temp_list[0])
-          temp_list = re.findall("\d+\.\d+", data[idx+1])
+          temp_list = re.findall("([0-9]+\.[0-9]+)", data[idx+1])
           end_time = float(temp_list[0])
           duration = (end_time - start_time) * 1000
           if duration > 3:
@@ -93,11 +93,11 @@ if parsing_mode == "PERIOD":
     temp_list_end = []
     for idx, element in enumerate(data):
         if element.find(search_string_1) > 0:
-            temp_list_start = re.findall("\d+\.\d+", data[idx])
+            temp_list_start = re.findall("([0-9]+\.[0-9]+)", data[idx])
             start_time = float(temp_list_start[0])
             continue
         if element.find(search_string_2) > 0:
-            temp_list_end = re.findall("\d+\.\d+", data[idx])
+            temp_list_end = re.findall("([0-9]+\.[0-9]+)", data[idx])
             end_time = float(temp_list_end[0])
             duration = (end_time - start_time) * 1000
             trip_time_ms_list.append(duration)
