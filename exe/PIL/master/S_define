@@ -54,6 +54,7 @@ LIBRARY DEPENDENCIES:
 ##include  "DM_FSW_Interface.hh"
 ##include "ExternalSourceClock.hh"
 ##include "flight_events_define.h"
+##include "flight_events_handler.h"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -240,14 +241,6 @@ class Rocket_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
         };
 
-        void flight_event_code_handler(struct icf_ctrlblk_t *C) {
-            struct can_frame receive_event;
-            if (icf_rx_dequeue(C, EGSE_RX_FLIGHT_EVENT_QIDX, &receive_event, sizeof(struct can_frame)) > 0) {
-                flight_event_code_record = receive_event.data[0];
-                //  fprintf(stderr, "[sim:%f] flight_event_code_record : %d\n", receive_event.data[0], exec_get_sim_time());
-            }
-        };
-
         Rocket_SimObject() 
             :   env         (  ) ,
                 propulsion  (  )      ,
@@ -268,7 +261,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
             P1 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
-            P1 (0.005, "scheduled") flight_event_code_handler(&icf_ctrl);
+            P1 (0.005, "scheduled") flight_event_code_handler(&icf_ctrl, &flight_event_code_record, ICF_SYSTEM_TYPE_EGSE);
 
             P2 (int_step, "scheduled") time->dm_time();
             P2 (int_step, "scheduled") tvc.actuate(int_step, &icf_ctrl);
