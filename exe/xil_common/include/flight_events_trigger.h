@@ -99,11 +99,11 @@ extern "C" int event_liftoff(void) {
     return 0;
 }
 
-extern "C" int event_control_rcs_on(void) {
+extern "C" int s2_event_control_on(void) {
     fc.control.set_S2_ROLL_CONTROL();
     // fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S2_ROLL_CONTROL;
-    // fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S2_ROLL_CONTROL);
-    // PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S2_ROLL_CONTROL", fc.ctl_tvc_db.flight_event_code);
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S2_ROLL_CONTROL);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S2_ROLL_CONTROL", fc.ctl_tvc_db.flight_event_code);
     return 0;
 }
 
@@ -321,7 +321,7 @@ extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
 extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc) {
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
-    jit_add_read(0.001 + fc->stand_still_time, "event_control_rcs_on");
+    jit_add_read(0.001 + fc->stand_still_time, "s2_event_control_on");
     jit_add_read(148.0 + fc->stand_still_time, "event_hot_staging");
     jit_add_read(151.0 + fc->stand_still_time, "event_s3_seperation");
     jit_add_read(151.05 + fc->stand_still_time, "event_s3_control_on");
