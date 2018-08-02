@@ -63,7 +63,6 @@ class Rocket_SimObject : public Trick::SimObject {
         double int_step = 0.005;
         double ext_porlation = 0.002;
         double stand_still_time = 120.0;
-        double sst_last_cycle = stand_still_time - int_step;
         Rocket_Flight_DM dynamics;
         Environment env;
         Forces forces;
@@ -357,9 +356,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P4 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P4 (int_step, 0.0, sst_last_cycle, "scheduled") dynamics.stand_still_motion_data(&icf_ctrl, ext_porlation);
-            P4 (int_step, stand_still_time, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
-            //  P4 (int_step, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
+            P4 (int_step, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
             P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 
             P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, &tlm_frame);
