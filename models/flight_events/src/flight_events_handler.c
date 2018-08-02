@@ -4,7 +4,7 @@
 
 int flight_event_code_handler(struct icf_ctrlblk_t *C, uint64_t *event_code, int system_type) {
     struct can_frame receive_event;
-    switch(system_type) {
+    switch (system_type) {
         case ICF_SYSTEM_TYPE_SIL_EGSE:
             break;
         case ICF_SYSTEM_TYPE_EGSE:
