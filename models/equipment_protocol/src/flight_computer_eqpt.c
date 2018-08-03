@@ -1,6 +1,6 @@
 #include "flight_computer_eqpt.h"
 
-const static struct flight_seq_datablk_t cmd_dispatch_map[] = {
+static const  struct flight_seq_datablk_t cmd_dispatch_map[] = {
     {FC_to_TVC_III_NO1, TVC_REPORT_STATUS, EGSE_RX_FLIGHT_EVENT_QIDX},
     {FC_to_TVC_III_NO1, TVC_BUILD_IN_TEST, EGSE_RX_FLIGHT_EVENT_QIDX},
     {FC_to_TVC_III_NO1, TVC_START, EGSE_RX_FLIGHT_EVENT_QIDX},
@@ -69,6 +69,7 @@ const static struct flight_seq_datablk_t cmd_dispatch_map[] = {
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_READY_TO_SEPARATE, EGSE_EMPTY_SW_QIDX},
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III, EGSE_EMPTY_SW_QIDX}
 };
+
 int fc_can_cmd_dispatch(void *rxframe) {
     int qidx = EGSE_EMPTY_SW_QIDX;
     struct can_frame *pframe = NULL;
