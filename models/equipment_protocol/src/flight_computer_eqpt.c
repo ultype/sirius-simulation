@@ -1,154 +1,74 @@
 #include "flight_computer_eqpt.h"
 
-int fc_can_cmd_tvc_box(struct can_frame *pframe) {
-    int qidx = EGSE_EMPTY_SW_QIDX;
-    switch (pframe->data[0]) {
-        case TVC_REPORT_STATUS:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case TVC_BUILD_IN_TEST:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case TVC_START:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case TVC_STOP:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case TVC_MOVEMENT_FAKE:
-        case TVC_MOVEMENT_REAL:
-            qidx = EGSE_TVC_SW_QIDX;
-            break;
-        default:
-            fprintf(stderr, "[%s] Unknown TASK command. TVC ID = 0x%x TASK = 0x%x\n", __FUNCTION__, pframe->can_id, pframe->data[0]);
-            qidx = EGSE_EMPTY_SW_QIDX;
-    }
-    return qidx;
-}
+const static struct flight_seq_datablk_t cmd_dispatch_map[] = {
+    {FC_to_TVC_III_NO1, TVC_REPORT_STATUS, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO1, TVC_BUILD_IN_TEST, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO1, TVC_START, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO1, TVC_STOP, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO1, TVC_MOVEMENT_FAKE, EGSE_TVC_SW_QIDX},
+    {FC_to_TVC_III_NO1, TVC_MOVEMENT_REAL, EGSE_TVC_SW_QIDX},
 
-int fc_can_cmd_pfs_box(struct can_frame *pframe) {
-    int qidx = EGSE_EMPTY_SW_QIDX;
-    switch (pframe->data[0]) {
-        case PFS_REPORT_STATUS:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case PFS_BUILD_IN_TEST:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case PFS_START:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case PFS_STOP:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case PFS_BALL_VALVES_ONOFF_FAKE:
-        case PFS_BALL_VALVES_ONOFF_REAL:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        default:
-            fprintf(stderr, "[%s] Unknown TASK command. PFS ID = 0x%x TASK = 0x%x\n", __FUNCTION__, pframe->can_id, pframe->data[0]);
-            qidx = EGSE_EMPTY_SW_QIDX;
-    }
-    return qidx;
-}
+    {FC_to_TVC_III_NO2, TVC_REPORT_STATUS, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO2, TVC_BUILD_IN_TEST, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO2, TVC_START, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO2, TVC_STOP, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_III_NO2, TVC_MOVEMENT_FAKE, EGSE_TVC_SW_QIDX},
+    {FC_to_TVC_III_NO2, TVC_MOVEMENT_REAL, EGSE_TVC_SW_QIDX},
 
-int fc_can_cmd_rcs_box(struct can_frame *pframe) {
-    int qidx = EGSE_EMPTY_SW_QIDX;
-    switch (pframe->data[0]) {
-        case RCS_REPORT_STATUS:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case RCS_BUILD_IN_TEST:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case RCS_START:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case RCS_STOP:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case RCS_BALL_VALVES_ONOFF_FAKE:
-        case RCS_BALL_VALVES_ONOFF_REAL:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        default:
-            fprintf(stderr, "[%s] Unknown TASK command. RCS ID = 0x%x TASK = 0x%x\n", __FUNCTION__, pframe->can_id, pframe->data[0]);
-            qidx = EGSE_EMPTY_SW_QIDX;
-    }
-    return qidx;
-}
+    {FC_to_TVC_II_NO1, TVC_REPORT_STATUS, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO1, TVC_BUILD_IN_TEST, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO1, TVC_START, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO1, TVC_STOP, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO1, TVC_MOVEMENT_FAKE, EGSE_TVC_SW_QIDX},
+    {FC_to_TVC_II_NO1, TVC_MOVEMENT_REAL, EGSE_TVC_SW_QIDX},
 
-int fc_can_cmd_ordnance_fairing_box(struct can_frame *pframe) {
-    int qidx = EGSE_EMPTY_SW_QIDX;
-    switch (pframe->data[0]) {
-        case ORDNANCE_FAIRING_REPORT_STATUS:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_BUILD_IN_TEST:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_NOSECONE_CTRL_READY_OPEN_FAIRING:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_NOSECONE_CTRL_DISABLE_FAIRING_FUNC:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_NOSECONE_CTRL_OPEN_FAIRING_FAKE:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_NOSECONE_CTRL_OPEN_FAIRING_REAL:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_READY_DEPLOY_PAYLOAD:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_DISABLE_DEPLOY_FUNC:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_PAYLOAD:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO1:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO2:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO3:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO4:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-        default:
-            fprintf(stderr, "[%s] Unknown TASK command. ordnance_fairing ID = 0x%x TASK = 0x%x\n", __FUNCTION__, pframe->can_id, pframe->data[0]);
-            qidx = EGSE_EMPTY_SW_QIDX;
-    }
-    return qidx;
-}
+    {FC_to_TVC_II_NO2, TVC_REPORT_STATUS, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO2, TVC_BUILD_IN_TEST, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO2, TVC_START, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO2, TVC_STOP, EGSE_RX_FLIGHT_EVENT_QIDX},
+    {FC_to_TVC_II_NO2, TVC_MOVEMENT_FAKE, EGSE_TVC_SW_QIDX},
+    {FC_to_TVC_II_NO2, TVC_MOVEMENT_REAL, EGSE_TVC_SW_QIDX},
 
-int fc_can_cmd_ordnance_separation_box(struct can_frame *pframe) {
-    int qidx = EGSE_EMPTY_SW_QIDX;
-    switch (pframe->data[0]) {
-        case ORDNANCE_SEPARATION_REPORT_STATUS:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_SEPARATION_BUILD_IN_TEST:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_SEPARATION_CTRL_READY_TO_SEPARATE:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        case ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        default:
-            fprintf(stderr, "[%s] Unknown TASK command. ordnance_separation ID = 0x%x TASK = 0x%x\n", __FUNCTION__, pframe->can_id, pframe->data[0]);
-            qidx = EGSE_EMPTY_SW_QIDX;
-    }
-    return qidx;
-}
+    {FC_to_PFS_III, PFS_REPORT_STATUS, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_III, PFS_BUILD_IN_TEST, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_III, PFS_START, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_III, PFS_STOP, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_III, PFS_BALL_VALVES_ONOFF_FAKE, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_III, PFS_BALL_VALVES_ONOFF_REAL, EGSE_EMPTY_SW_QIDX},
 
+    {FC_to_PFS_II, PFS_REPORT_STATUS, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_II, PFS_BUILD_IN_TEST, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_II, PFS_START, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_II, PFS_STOP, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_II, PFS_BALL_VALVES_ONOFF_FAKE, EGSE_EMPTY_SW_QIDX},
+    {FC_to_PFS_II, PFS_BALL_VALVES_ONOFF_REAL, EGSE_EMPTY_SW_QIDX},
 
+    {FC_to_RCS_III, RCS_REPORT_STATUS, EGSE_EMPTY_SW_QIDX},
+    {FC_to_RCS_III, RCS_BUILD_IN_TEST, EGSE_EMPTY_SW_QIDX},
+    {FC_to_RCS_III, RCS_START, EGSE_EMPTY_SW_QIDX},
+    {FC_to_RCS_III, RCS_STOP, EGSE_EMPTY_SW_QIDX},
+    {FC_to_RCS_III, RCS_BALL_VALVES_ONOFF_FAKE, EGSE_EMPTY_SW_QIDX},
+    {FC_to_RCS_III, RCS_BALL_VALVES_ONOFF_REAL, EGSE_EMPTY_SW_QIDX},
+
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_REPORT_STATUS, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_BUILD_IN_TEST, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_NOSECONE_CTRL_READY_OPEN_FAIRING, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_NOSECONE_CTRL_DISABLE_FAIRING_FUNC, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_NOSECONE_CTRL_OPEN_FAIRING_FAKE, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_NOSECONE_CTRL_OPEN_FAIRING_REAL, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_READY_DEPLOY_PAYLOAD, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_DISABLE_DEPLOY_FUNC, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_PAYLOAD, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO1, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO2, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO3, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_PAYLOAD_CTRL_DEPLOY_CUBESAT_NO4, EGSE_EMPTY_SW_QIDX},
+
+    {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_REPORT_STATUS, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_BUILD_IN_TEST, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_READY_TO_SEPARATE, EGSE_EMPTY_SW_QIDX},
+    {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III, EGSE_EMPTY_SW_QIDX}
+};
 int fc_can_cmd_dispatch(void *rxframe) {
     int qidx = EGSE_EMPTY_SW_QIDX;
     struct can_frame *pframe = NULL;

@@ -13,6 +13,12 @@ PROGRAMMERS:
 #include "icf_trx_ctrl.h"
 #include "dsp_can_interfaces.h"
 
+struct flight_seq_datablk_t {
+    uint32_t target_id;
+    uint8_t task_id;
+    int queue_idx;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
