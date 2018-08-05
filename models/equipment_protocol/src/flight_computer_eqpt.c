@@ -1,6 +1,6 @@
 #include "flight_computer_eqpt.h"
 
-static const  struct flight_seq_datablk_t cmd_dispatch_map[] = {
+static const  struct fc_can_info_t cmd_dispatch_map[] = {
     {FC_to_TVC_III_NO1, TVC_REPORT_STATUS, EGSE_RX_FLIGHT_EVENT_QIDX},
     {FC_to_TVC_III_NO1, TVC_BUILD_IN_TEST, EGSE_RX_FLIGHT_EVENT_QIDX},
     {FC_to_TVC_III_NO1, TVC_START, EGSE_RX_FLIGHT_EVENT_QIDX},
@@ -69,6 +69,53 @@ static const  struct flight_seq_datablk_t cmd_dispatch_map[] = {
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_READY_TO_SEPARATE, EGSE_EMPTY_SW_QIDX},
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III, EGSE_EMPTY_SW_QIDX}
 };
+
+static struct fc_can_hash_table *g_fc_can_hash_object;
+
+struct fc_can_hash_table *fc_can_hash_table_create(void) {
+    struct fc_can_hash_table *object;
+    object = malloc(sizeof(struct fc_can_hash_table));
+    if (object == NULL)
+        goto fail;
+    object->bucket = malloc(sizeof(struct fc_can_hash_entry*) * FC_CAN_HASHTBL_SIZE);
+    if (object == NULL)
+        goto fail;
+    memset(object->bucket, 0 , sizeof(struct hash_fc_can_hash_entryentry*) * FC_CAN_HASHTBL_SIZE);
+    object->size = FC_CAN_HASHTBL_SIZE;
+    return object;
+fail:
+    if (object->bucket)
+        free(object->bucket);
+    if (object)
+        free(object);
+    return NULL;
+}
+
+int fc_can_hash_entry_find(struct fc_can_hash_table *object, uint32_t canid, uint8_t taskcmd) {
+    struct fc_can_hash_entry **curr;
+    uint8_t hash_idx;
+    hash_idx = FLIGHT_EVENT_HASH_INDEX(canid, taskcmd);
+    return hash_idx;
+}
+
+int fc_can_hash_entry_add(struct fc_can_hash_table *object, struct fc_can_info_t *info) {
+    struct fc_can_hash_entry **curr;
+    uint8_t hash_idx;
+    hash_idx = FLIGHT_EVENT_HASH_INDEX(info->canid, info->taskcmd);
+    return hash_idx;
+}
+
+int fc_can_hashtbl_init(void) {
+    g_fc_can_hash_object = fc_can_hash_table_create();
+    int idx = 0;
+    uint8_t hash_idx;
+    int cmd_count = sizeof(cmd_dispatch_map) /sizeof(struct fc_can_info_t);
+    for (idx = 0; idx < cmd_count; ++idx) {
+        hash_idx = fc_can_hash_entry_add(g_fc_can_hash_object, &cmd_dispatch_map[idx]);
+        printf("[%d] hash_idx: %d\n", idx, hash_idx);
+    }
+}
+
 
 int fc_can_cmd_dispatch(void *rxframe) {
     int qidx = EGSE_EMPTY_SW_QIDX;
