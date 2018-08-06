@@ -117,7 +117,7 @@ struct fc_can_info_t *fc_can_hash_entry_find(struct fc_can_hash_table *object, u
     hash_idx = FLIGHT_EVENT_HASH_INDEX(canid, taskcmd);
     find_key = (((uint64_t)canid << 8) & 0xFFFFFFFF00) | ((uint64_t)taskcmd & 0xFF);
     curr = object->bucket[hash_idx];
-    while(curr != NULL) {
+    while(curr->next != NULL) {
         if (curr->key == find_key) {
             return curr->data;
         }
