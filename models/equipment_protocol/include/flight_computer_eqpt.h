@@ -28,7 +28,7 @@ struct fc_can_info_t {
 
 struct fc_can_hash_entry {
     uint64_t key;
-    struct flight_seq_datablk_t *data;
+    struct fc_can_info_t *data;
     struct fc_can_hash_entry *next;
 };
 

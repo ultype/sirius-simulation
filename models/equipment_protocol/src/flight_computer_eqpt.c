@@ -67,7 +67,8 @@ static const  struct fc_can_info_t cmd_dispatch_map[] = {
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_REPORT_STATUS, EGSE_EMPTY_SW_QIDX},
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_BUILD_IN_TEST, EGSE_EMPTY_SW_QIDX},
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_READY_TO_SEPARATE, EGSE_EMPTY_SW_QIDX},
-    {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III, EGSE_EMPTY_SW_QIDX}
+    {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III, EGSE_EMPTY_SW_QIDX},
+    {FC_to_EGSE_MISSION_EVENT_FAKE, 0x0, EGSE_RX_FLIGHT_EVENT_QIDX}
 };
 
 static struct fc_can_hash_table *p_fc_can_hash_object;
@@ -154,7 +155,6 @@ int fc_can_hashtbl_init(void) {
     int cmd_count = sizeof(cmd_dispatch_map) /sizeof(struct fc_can_info_t);
     for (idx = 0; idx < cmd_count; idx++) {
         hash_idx = fc_can_hash_entry_add(p_fc_can_hash_object, &cmd_dispatch_map[idx]);
-        printf("[%d]hash_idx: %d\n", idx, hash_idx);
     }
     fc_can_hash_table_dump(p_fc_can_hash_object);
     return 0;
@@ -164,29 +164,12 @@ int fc_can_hashtbl_init(void) {
 int fc_can_cmd_dispatch(void *rxframe) {
     int qidx = EGSE_EMPTY_SW_QIDX;
     struct can_frame *pframe = NULL;
+    struct fc_can_info_t *info = NULL;
     pframe = (struct can_frame *)rxframe;
-    switch (pframe->can_id) {
-        case FC_to_TVC_III_NO1:
-        case FC_to_TVC_III_NO2:
-        case FC_to_TVC_II_NO1:
-        case FC_to_TVC_II_NO2:
-            if (pframe->data[0] == TVC_MOVEMENT_FAKE || pframe->data[0] == TVC_MOVEMENT_REAL) {
-                qidx = EGSE_TVC_SW_QIDX;
-            }
-            break;
-        case FC_to_PFS_III:
-        case FC_to_RCS_III:
-        case FC_to_ORDNANCE_FAIRING_III:
-        case FC_to_PFS_II:
-        case FC_to_ORDNANCE_SEPARATION_II:
-            qidx = EGSE_EMPTY_SW_QIDX;
-            break;
-        case FC_to_EGSE_MISSION_EVENT_FAKE:
-            qidx = EGSE_RX_FLIGHT_EVENT_QIDX;
-            break;
-        default:
-            fprintf(stderr, "[%s] Unknown CAN command. ID = 0x%x\n", __FUNCTION__, pframe->can_id);
-            qidx = EGSE_EMPTY_SW_QIDX;
-    }
+    info = fc_can_hash_entry_find(p_fc_can_hash_object, pframe->can_id, pframe->data[0]);
+    if (info == NULL)
+        fprintf(stderr, "[%s:%d] HASH COMMAND Not Found in Table\n", __FUNCTION__, __LINE__);
+    else
+        qidx = info->sw_queue_idx;
     return qidx;
 }
