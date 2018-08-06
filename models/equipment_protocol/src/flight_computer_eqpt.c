@@ -102,7 +102,7 @@ void fc_can_hash_table_dump(struct fc_can_hash_table *object) {
     for (idx = 0; idx < FC_CAN_HASHTBL_SIZE; idx++) {
         curr = object->bucket[idx];
         printf("[%d]:", idx);
-        while(curr != NULL) {
+        while (curr != NULL) {
             printf("0x%x, ", curr->key);
             curr = curr->next;
         }
@@ -117,7 +117,7 @@ struct fc_can_info_t *fc_can_hash_entry_find(struct fc_can_hash_table *object, u
     hash_idx = FLIGHT_EVENT_HASH_INDEX(canid, taskcmd);
     find_key = (((uint64_t)canid << 8) & 0xFFFFFFFF00) | ((uint64_t)taskcmd & 0xFF);
     curr = object->bucket[hash_idx];
-    while(curr->next != NULL) {
+    while (curr->next != NULL) {
         if (curr->key == find_key) {
             return curr->data;
         }
@@ -132,7 +132,7 @@ int fc_can_hash_entry_add(struct fc_can_hash_table *object, struct fc_can_info_t
     hash_idx = FLIGHT_EVENT_HASH_INDEX(info->canid, info->taskcmd);
 
     curr = object->bucket[hash_idx];
-    while(curr->next != NULL) {
+    while (curr->next != NULL) {
         curr = curr->next;
     }
     curr->next = malloc(sizeof(struct fc_can_hash_entry));
