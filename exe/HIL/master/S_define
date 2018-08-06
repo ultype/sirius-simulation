@@ -327,6 +327,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
             ("initialization") gps_con.initialize();
+            ("initialization") fc_can_hashtbl_init();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
             ("initialization") set_default_simgen_motdata(&simgen_dev);
             ("initialization") simgen_remote_cmd_init(&simgen_dev, &simgen_dev.motion_data);

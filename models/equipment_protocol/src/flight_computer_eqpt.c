@@ -70,50 +70,94 @@ static const  struct fc_can_info_t cmd_dispatch_map[] = {
     {FC_to_ORDNANCE_SEPARATION_II, ORDNANCE_SEPARATION_CTRL_SEPARATE_II_and_III, EGSE_EMPTY_SW_QIDX}
 };
 
-static struct fc_can_hash_table *g_fc_can_hash_object;
+static struct fc_can_hash_table *p_fc_can_hash_object;
 
 struct fc_can_hash_table *fc_can_hash_table_create(void) {
     struct fc_can_hash_table *object;
+    int idx = 0;
     object = malloc(sizeof(struct fc_can_hash_table));
     if (object == NULL)
         goto fail;
-    object->bucket = malloc(sizeof(struct fc_can_hash_entry*) * FC_CAN_HASHTBL_SIZE);
-    if (object == NULL)
-        goto fail;
-    memset(object->bucket, 0 , sizeof(struct hash_fc_can_hash_entryentry*) * FC_CAN_HASHTBL_SIZE);
+    for (idx = 0; idx < FC_CAN_HASHTBL_SIZE; idx++) {
+        object->bucket[idx] = malloc(sizeof(struct fc_can_hash_entry));
+        memset(object->bucket[idx], 0 , sizeof(struct fc_can_hash_entry));
+    }
+    if (object->bucket == NULL) {
+            fprintf(stderr, "[%s:%d] Memory allocate fail !!\n", __FUNCTION__, __LINE__);
+            goto fail;
+    }
     object->size = FC_CAN_HASHTBL_SIZE;
     return object;
 fail:
     if (object->bucket)
-        free(object->bucket);
+        free(object->bucket[idx]);
     if (object)
         free(object);
     return NULL;
 }
 
-int fc_can_hash_entry_find(struct fc_can_hash_table *object, uint32_t canid, uint8_t taskcmd) {
-    struct fc_can_hash_entry **curr;
+void fc_can_hash_table_dump(struct fc_can_hash_table *object) {
+    int idx = 0;
+    struct fc_can_hash_entry *curr;
+    for (idx = 0; idx < FC_CAN_HASHTBL_SIZE; idx++) {
+        curr = object->bucket[idx];
+        printf("[%d]:", idx);
+        while(curr != NULL) {
+            printf("0x%x, ", curr->key);
+            curr = curr->next;
+        }
+        printf("\n");
+    }
+}
+
+struct fc_can_info_t *fc_can_hash_entry_find(struct fc_can_hash_table *object, uint32_t canid, uint8_t taskcmd) {
+    struct fc_can_hash_entry *curr;
     uint8_t hash_idx;
+    uint64_t find_key;
     hash_idx = FLIGHT_EVENT_HASH_INDEX(canid, taskcmd);
-    return hash_idx;
+    find_key = (((uint64_t)canid << 8) & 0xFFFFFFFF00) | ((uint64_t)taskcmd & 0xFF);
+    curr = object->bucket[hash_idx];
+    while(curr != NULL) {
+        if (curr->key == find_key) {
+            return curr->data;
+        }
+        curr = curr->next;
+    }
+    return NULL;
 }
 
 int fc_can_hash_entry_add(struct fc_can_hash_table *object, struct fc_can_info_t *info) {
-    struct fc_can_hash_entry **curr;
+    struct fc_can_hash_entry *curr;
     uint8_t hash_idx;
     hash_idx = FLIGHT_EVENT_HASH_INDEX(info->canid, info->taskcmd);
+
+    curr = object->bucket[hash_idx];
+    while(curr->next != NULL) {
+        curr = curr->next;
+    }
+    curr->next = malloc(sizeof(struct fc_can_hash_entry));
+    if (curr->next == NULL) {
+            fprintf(stderr, "[%s:%d] Memory allocate fail !!\n", __FUNCTION__, __LINE__);
+            return -1;
+    }
+    memset(curr->next, 0 , sizeof(struct fc_can_hash_entry));
+    curr->key = (((uint64_t)info->canid << 8) & 0xFFFFFFFF00) | ((uint64_t)info->taskcmd & 0xFF);
+    curr->data = info;
+    curr->next->next = NULL;
     return hash_idx;
 }
 
 int fc_can_hashtbl_init(void) {
-    g_fc_can_hash_object = fc_can_hash_table_create();
+    p_fc_can_hash_object = fc_can_hash_table_create();
     int idx = 0;
     uint8_t hash_idx;
     int cmd_count = sizeof(cmd_dispatch_map) /sizeof(struct fc_can_info_t);
-    for (idx = 0; idx < cmd_count; ++idx) {
-        hash_idx = fc_can_hash_entry_add(g_fc_can_hash_object, &cmd_dispatch_map[idx]);
-        printf("[%d] hash_idx: %d\n", idx, hash_idx);
+    for (idx = 0; idx < cmd_count; idx++) {
+        hash_idx = fc_can_hash_entry_add(p_fc_can_hash_object, &cmd_dispatch_map[idx]);
+        printf("[%d]hash_idx: %d\n", idx, hash_idx);
     }
+    fc_can_hash_table_dump(p_fc_can_hash_object);
+    return 0;
 }
 
 

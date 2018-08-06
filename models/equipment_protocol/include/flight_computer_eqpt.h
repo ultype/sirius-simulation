@@ -27,14 +27,14 @@ struct fc_can_info_t {
 };
 
 struct fc_can_hash_entry {
-    int key;
+    uint64_t key;
     struct flight_seq_datablk_t *data;
-    struct hash_entry *next;
+    struct fc_can_hash_entry *next;
 };
 
 struct fc_can_hash_table {
     int size;
-    struct hash_entry **bucket;
+    struct fc_can_hash_entry *bucket[FC_CAN_HASHTBL_SIZE];
 };
 
 #ifdef __cplusplus
