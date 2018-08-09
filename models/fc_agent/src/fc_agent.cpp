@@ -1,5 +1,25 @@
 #include "fc_agent.hh"
 
+struct fc_agent_can_format_info_t fc_agent_can_mapping_tbl[] = {
+    {1, FC_to_TVC_II_NO1, TVC_START, {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, FLIGHT_EVENT_CODE_LIFTOFF},
+    {1, FC_to_PFS_III, PFS_24V_PWR,  {0x10, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, FLIGHT_EVENT_CODE_HOT_STAGING},
+    {1, FC_to_PFS_II, PFS_BALL_VALVES_ONOFF_REAL, {0xBC, 0x23, 0xAD, 0x14, 0xAA, 0xFF, 0xFF}, FLIGHT_EVENT_CODE_S3_SEPERATION},
+    {1, FC_to_ORDNANCE_FAIRING_III, ORDNANCE_FAIRING_NOSECONE_CTRL_OPEN_FAIRING_REAL, {0xDC, 0x43, 0xBA, 0x21, 0xAA, 0xFF, 0xFF}, FLIGHT_EVENT_FAIRING_JETTSION},
+    {1, FC_to_EGSE_MISSION_EVENT_FAKE, 0x00, {}, FLIGHT_EVENT_CODE_EMPTY}
+};
+
+struct fc_agent_can_format_info_t *fc_agent_find_can_format(uint64_t event_code) {
+    struct fc_agent_can_format_info_t *obj = NULL;
+    int tbl_size = sizeof(fc_agent_can_mapping_tbl)/sizeof(struct fc_agent_can_format_info_t);
+    int idx = 0;
+    for (idx = 0; idx < tbl_size; ++idx) {
+        obj = &fc_agent_can_mapping_tbl[idx];
+        if (obj->event_code == event_code)
+            break;
+    }
+    return obj;
+}
+
 int fc_agent_tvc_cmd_movement(struct can_frame *tvc_no1_frame, struct can_frame *tvc_no2_frame, void *data_base) {
     double theta_a_rad, theta_b_rad, theta_c_rad, theta_d_rad;
     int16_t theta_a_cnt, theta_b_cnt, theta_c_cnt, theta_d_cnt;
@@ -38,4 +58,19 @@ int fc_agent_tvc_cmd_movement(struct can_frame *tvc_no1_frame, struct can_frame 
     /* TVC_no2 yaw => theta_d*/
     copy_buffer_htons(&tvc_no2_frame->data[3], reinterpret_cast<uint16_t *>(&theta_d_cnt));
     return 0;
+}
+
+int fc_agent_flight_event_can_cmd_generate(struct can_frame *event_frame, uint64_t event_code) {
+        struct fc_agent_can_format_info_t *obj = NULL;
+        /* Event_frame */
+        obj = fc_agent_find_can_format(event_code);
+        if (obj->rest_of_trigger > 0) {
+            obj->rest_of_trigger--;
+            event_frame->can_id = obj->canid;
+            event_frame->can_dlc = 8;
+            event_frame->data[0] = obj->taskcmd;
+            memcpy(&event_frame->data[1], obj->content, 7);
+            return 1;
+        }
+        return 0;
 }
