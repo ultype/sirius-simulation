@@ -128,7 +128,7 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.env.atmosphere->g");
     // drg->add_variable("rkt.env.atmosphere->tmb");
     // drg->add_variable("rkt.env.atmosphere->expv");
-    // drg->add_variable("rkt.propulsion.thrust");
+    drg->add_variable("rkt.propulsion.thrust");
     // drg->add_variable("rkt.propulsion.fuel_mass");
     // drg->add_variable("rkt.tvc.s2_act1_y1");
     // drg->add_variable("rkt.tvc.lx");
