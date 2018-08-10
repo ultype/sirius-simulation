@@ -13,6 +13,14 @@ PROGRAMMERS:
 #include <stdint.h>
 #include "icf_trx_ctrl.h"
 
+struct flight_event_can_info_t {
+    uint8_t times_of_handle;
+    uint32_t canid;
+    uint8_t taskcmd;
+    uint8_t content[7];
+    uint64_t event_code;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

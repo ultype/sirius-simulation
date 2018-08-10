@@ -73,18 +73,21 @@ class FlightComputer_SimObject : public Trick::SimObject {
             struct can_frame tvc_no2_frame;
             struct can_frame event_frame;
             int ret = 0;
+            uint8_t need_send = 0;
 
             fc_agent_tvc_cmd_movement(&tvc_no1_frame, &tvc_no2_frame, &ctl_tvc_db);
 
             /* Event_frame */
-            fc_agent_flight_event_can_cmd_generate(&event_frame, ctl_tvc_db.flight_event_code);
-            event_frame.can_id = 0x555;
-            event_frame.can_dlc = 8;
-            event_frame.data[0] = 0x0;
-            event_frame.data[1] = ctl_tvc_db.flight_event_code;
+            need_send = fc_agent_flight_event_can_cmd_generate(&event_frame, ctl_tvc_db.flight_event_code);
+            // event_frame.can_id = 0x555;
+            // event_frame.can_dlc = 8;
+            // event_frame.data[0] = 0x0;
+            // event_frame.data[1] = ctl_tvc_db.flight_event_code;
             icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no1_frame, sizeof(struct can_frame));
             icf_tx_direct(C, ESPS_TVC_SW_QIDX, (uint8_t *)&tvc_no2_frame, sizeof(struct can_frame));
-            icf_tx_direct(C, ESPS_TX_MISSION_CODE_QIDX, (uint8_t *)&event_frame, sizeof(struct can_frame));
+            if (need_send) {
+                icf_tx_direct(C, ESPS_TX_MISSION_CODE_QIDX, (uint8_t *)&event_frame, sizeof(struct can_frame));
+            }
             return ret;
         }
 
