@@ -1,5 +1,0 @@
-2016-11-05 Chung-Fan Yang <sonic.tw.tp@gmail.com>
-  * Ported the model code from Rocket Simulation in 6DOF
-  * Ported Input File from Rocket Simulation in 6DOF
-  * Reproduce the result of Rocket Simulation in 6DOF up to 700 seconds
-  * Made golden result data set
