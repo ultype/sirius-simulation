@@ -79,6 +79,3 @@ cd docs
 dot topology.dot -Tpng > topology.png
 ```
 Then you can use a typical image viewer to view it.
-
-# Detailed documentation
-See: (https://tainan.tispace.com/folder/Simulator/SIRIUS/SIRIUS)
