@@ -2,7 +2,6 @@ Sirius is a Simulation of rocket
 From version 0.1.0, it is ported form Rocket Simulation in 6DOF.
 The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
 
-
 # Dependencies
  - NASA Trick 17.0.5
    - Github [NASA/trick](https://github.com/nasa/trick)
