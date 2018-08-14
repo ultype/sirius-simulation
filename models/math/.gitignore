@@ -1,0 +1,6 @@
+googletest
+
+unit_test/*.o
+unit_test/*.a
+unit_test/*Test
+*.xml
