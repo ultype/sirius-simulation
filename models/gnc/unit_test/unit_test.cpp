@@ -3,8 +3,8 @@
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-    INS ins;
-
+    INS ins; // dddd
+    
     return 0;
 }
 
