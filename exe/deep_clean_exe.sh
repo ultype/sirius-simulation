@@ -12,6 +12,8 @@ cd $SIRIUS_HOME_PATH/exe/HIL/sdt_sample_code
 make clean
 cd $SIRIUS_HOME_PATH/exe/HIL/ratetable_sample_code
 make clean
+cd $SIRIUS_HOME_PATH/exe/HIL/fc_can_test
+make clean
 cd $SIRIUS_HOME_PATH/exe/PIL/master
 make clean
 cd $SIRIUS_HOME_PATH/exe/PIL/slave

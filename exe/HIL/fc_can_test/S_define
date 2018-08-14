@@ -1,0 +1,67 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (This S_define works with the RUN_analytic input file)
+LIBRARY DEPENDENCIES:
+    (
+    )
+*************************************************************/
+
+#include "sim_objects/default_trick_sys.sm"
+##include "ExternalSourceClock.hh"
+##include "icf_trx_ctrl.h"
+class FC_CAN_TEST_SimObject : public Trick::SimObject {
+    public:
+        struct icf_ctrlblk_t   icf_ctrl;
+        ExternalSourceClock ext_clk;
+        double int_step = 0.005;
+        struct can_frame event_can;
+        void trick_heartbeat(void) {
+            char date_buf[80];
+            char currentTime[84] = "";
+            static struct timespec ts;
+            uint32_t milli;
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            ts.tv_sec = time(NULL);
+            milli = ts.tv_nsec / 1000000;
+            strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+            snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+            fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
+        };
+
+        void egse_downlink_rx_job_group(struct icf_ctrlblk_t *C) {
+            /* TVC_No1 Command*/
+            icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+            /* TVC_No2 Command*/
+            icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+            /* Mission Event*/
+            icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
+        };
+
+        void rx_can_cmd_record(struct icf_ctrlblk_t *C) {
+            if (icf_rx_dequeue(C, EGSE_RX_FLIGHT_EVENT_QIDX, &event_can, sizeof(struct can_frame)) > 0) {
+                fprintf(stderr, " CAN_ID: 0x%0x, DATA: 0x%x%x%x%x_%x%x%x%x \n",
+                                                event_can.can_id, event_can.data[0], event_can.data[1],
+                                                event_can.data[2], event_can.data[3], event_can.data[4], 
+                                                event_can.data[5], event_can.data[6], event_can.data[7]);
+            }
+        };
+
+        void wait_for_1st_pps(void) {
+            fprintf(stderr, "Wainting for the 1st PPS...");
+            ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            fprintf(stderr, "Go !!\n");
+        };
+
+        FC_CAN_TEST_SimObject()
+        {
+        	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            ("initialization") wait_for_1st_pps();
+            P1 (5, "scheduled") trick_heartbeat();
+            P1 (int_step, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P1 (int_step, "scheduled") rx_can_cmd_record(&icf_ctrl);
+            ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+        }
+} ;
+
+FC_CAN_TEST_SimObject rkt ;

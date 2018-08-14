@@ -50,6 +50,14 @@ PROGRAMMERS:
 #define ETH_FC_PORT_EN          0
 #define ETH_SIMGEN_PORT_EN      0
 
+#elif defined(CONFIG_FC_CAN_TEST_ENABLE)
+#define CAN_PORT_EN             1
+#define RS422_IMU_PORT_EN       0
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      0
+#define ETH_FC_PORT_EN          0
+#define ETH_SIMGEN_PORT_EN      0
+
 #else  //  Other
 #define CAN_PORT_EN             1
 #define RS422_IMU_PORT_EN       0
