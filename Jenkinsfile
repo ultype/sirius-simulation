@@ -4,7 +4,7 @@ def builds = [:]
 def common        // for storing the groovy script
 
 node { // for loading the shared functions
-    git 'git@tainan.tispace.com:tools/shareGroovy.git'
+    git 'https://github.com/octoberskyTW/shareGroovy.git'
     common = load 'common.groovy'
 }
 
