@@ -42,6 +42,9 @@ extern "C" {
 #endif
 int fc_can_cmd_dispatch(void *rxframe);
 int fc_can_hashtbl_init(void);
+int fc_can_cmd_record_init(FILE **output_file);
+int fc_can_cmd_record_deinit(FILE *output_file);
+int fc_can_cmd_record_to_file(FILE *output_file, struct can_frame *event_can);
 #ifdef __cplusplus
 }
 #endif

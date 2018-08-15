@@ -13,6 +13,7 @@ class FC_CAN_TEST_SimObject : public Trick::SimObject {
     public:
         struct icf_ctrlblk_t   icf_ctrl;
         ExternalSourceClock ext_clk;
+        FILE* can_file;
         double int_step = 0.005;
         struct can_frame event_can;
         void trick_heartbeat(void) {
@@ -37,12 +38,13 @@ class FC_CAN_TEST_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
         };
 
-        void rx_can_cmd_record(struct icf_ctrlblk_t *C) {
+        void rx_can_cmd_record(struct icf_ctrlblk_t *C, FILE *file) {
             if (icf_rx_dequeue(C, EGSE_RX_FLIGHT_EVENT_QIDX, &event_can, sizeof(struct can_frame)) > 0) {
-                fprintf(stderr, " CAN_ID: 0x%0x, DATA: 0x%x%x%x%x_%x%x%x%x \n",
-                                                event_can.can_id, event_can.data[0], event_can.data[1],
-                                                event_can.data[2], event_can.data[3], event_can.data[4], 
-                                                event_can.data[5], event_can.data[6], event_can.data[7]);
+                fc_can_cmd_record_to_file(file, &event_can);
+                fprintf(stderr," 0x%x, 0x%x%x%x%x%x%x%x%x\n",
+                        event_can.can_id, event_can.data[0], event_can.data[1],
+                        event_can.data[2], event_can.data[3], event_can.data[4],
+                        event_can.data[5], event_can.data[6], event_can.data[7]);
             }
         };
 
@@ -56,10 +58,12 @@ class FC_CAN_TEST_SimObject : public Trick::SimObject {
         {
         	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            ("initialization") fc_can_hashtbl_init();
+            ("initialization") fc_can_cmd_record_init(&can_file);
             ("initialization") wait_for_1st_pps();
             P1 (5, "scheduled") trick_heartbeat();
             P1 (int_step, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
-            P1 (int_step, "scheduled") rx_can_cmd_record(&icf_ctrl);
+            P1 (int_step, "scheduled") rx_can_cmd_record(&icf_ctrl, can_file);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
         }
 } ;

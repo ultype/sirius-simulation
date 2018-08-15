@@ -174,3 +174,38 @@ int fc_can_cmd_dispatch(void *rxframe) {
         qidx = info->sw_queue_idx;
     return qidx;
 }
+
+
+void fc_can_cmd_record_time(FILE *output_file) {
+    char date_buf[80];
+    char currentTime[84] = "";
+    static struct timespec ts;
+    uint32_t milli;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    ts.tv_sec = time(NULL);
+    milli = ts.tv_nsec / 1000000;
+    strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+    snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+    fprintf(output_file, "%s, %f,", currentTime, exec_get_sim_time());
+}
+
+int fc_can_cmd_record_init(FILE **output_file) {
+    if ((*output_file = fopen("fc_can_cmd_record.csv", "w")) == NULL)
+        return EXIT_FAILURE;
+    fprintf(*output_file, "Local Time, Sim time (sec), CAN_ID, CAN_Data\n");
+    return EXIT_SUCCESS;
+}
+
+int fc_can_cmd_record_deinit(FILE *output_file) {
+    close(output_file);
+    return EXIT_SUCCESS;
+}
+
+int fc_can_cmd_record_to_file(FILE *output_file, struct can_frame *event_can) {
+    fc_can_cmd_record_time(output_file);
+    fprintf(output_file, " 0x%x, 0x%x%x%x%x%x%x%x%x\n",
+            event_can->can_id, event_can->data[0], event_can->data[1],
+            event_can->data[2], event_can->data[3], event_can->data[4],
+            event_can->data[5], event_can->data[6], event_can->data[7]);
+    return EXIT_SUCCESS;
+}
