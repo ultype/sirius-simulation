@@ -48,7 +48,7 @@ int cpp_init(INS *ins, time_management *time) {
     ins->set_gps_correction(gpsupdate);
     ins->initialize();
 
-    std::cout<<"CPP->SBIIC[0]: "<<ins->get_SBIIC()(0)<<"SBIIC[1]: "<<ins->get_SBIIC()(1)<<"SBIIC[2]: "<<ins->get_SBIIC()(2)<<std::endl;
+    std::cout << "CPP->SBIIC[0]: " << ins->get_SBIIC()(0) << "SBIIC[1]: " << ins->get_SBIIC()(1) << "SBIIC[2]: " << ins->get_SBIIC()(2) << std::endl;
     return 0;
 }
 
