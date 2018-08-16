@@ -28,6 +28,7 @@ extern const double __WEII3;
 extern const double ___PI;
 extern const double __EPS;
 extern const double __DEG;
+extern const double __RAD;
 /** INS Variables **/
 /* Matrix */
 extern gsl_matrix *WEII;
@@ -91,27 +92,37 @@ extern double ins_psi_err;
 extern unsigned int gpsupdate;
 extern unsigned int liftoff;
 extern unsigned int ideal;
-/*******************/
 
-int load_location(double lonx, double latx, double alt);
-int load_angle(double yaw, double roll, double pitch, GPS_TIME gps_time);
-int load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
-int calculate_INS_derived_TEI(GPS_TIME gps, gsl_matrix *TEIC);
-int AccelHarmonic(const gsl_vector *SBII, double CS[21][21], int n_max, int m_max, const gsl_matrix *TEIC, gsl_vector *acc_out);
-int DCM_2_Euler_angle(const gsl_matrix *TBD, double *phibdc, double *thtbdc, double *psibdc);
-int calculate_INS_derived_phip(gsl_vector *VBECB, double *phipc);
-int calculate_INS_derived_thtvd(gsl_vector *VBECD, double *thtvd);
-int calculate_INS_derived_psivd(gsl_vector *VBECD, double *psivd);
-int calculate_INS_derived_alpp(gsl_vector *VBECB, double *alpp);
-int calculate_INS_derived_beta(gsl_vector *VBECB, double *beta);
-int calculate_INS_derived_alpha(gsl_vector *VBECB, double *alpha);
-int build_VBEB(double _alpha0x, double _beta0x, double _dvbe, gsl_vector *VBEB);
-int INS_update(const double int_step, double *dvbec, unsigned int liftoff, double *alphacx, double *betacx
-                , double *alppcx, double *phipcx, double *loncx, double *latcx, double *altc, double *psivdcx, double *thtvdcx
-                , double *phibdc, double *thtbdc, double *psibdc
-                , gsl_vector *WBICB, gsl_vector *PHI, gsl_vector *DELTA_VEL
-                , gsl_vector *PHI_HIGH, gsl_vector *PHI_LOW, GPS_TIME gps, gsl_matrix *TEIC
-                , gsl_vector *SBIIC, gsl_vector *GRAVGI, gsl_matrix *TBIC, gsl_vector *SBEEC
-                , gsl_vector *VBEEC, gsl_matrix *WEII, gsl_matrix *TLI, gsl_matrix *TDCI
-                , gsl_matrix *TBICI, gsl_matrix *TBDC, gsl_vector *TBDCQ);
+extern GPS_TIME gpstime;
+extern UTC_TIME utctime;
+/*******************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+    int load_location(double lonx, double latx, double alt);
+    int load_angle(double yaw, double roll, double pitch, GPS_TIME gps_time);
+    int load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
+    int calculate_INS_derived_TEI(GPS_TIME gps, gsl_matrix *TEIC);
+    int AccelHarmonic(const gsl_vector *SBII, double CS[21][21], int n_max, int m_max, const gsl_matrix *TEIC, gsl_vector *acc_out);
+    int DCM_2_Euler_angle(const gsl_matrix *TBD, double *phibdc, double *thtbdc, double *psibdc);
+    int calculate_INS_derived_phip(gsl_vector *VBECB, double *phipc);
+    int calculate_INS_derived_thtvd(gsl_vector *VBECD, double *thtvd);
+    int calculate_INS_derived_psivd(gsl_vector *VBECD, double *psivd);
+    int calculate_INS_derived_alpp(gsl_vector *VBECB, double *alpp);
+    int calculate_INS_derived_beta(gsl_vector *VBECB, double *beta);
+    int calculate_INS_derived_alpha(gsl_vector *VBECB, double *alpha);
+    int build_VBEB(double _alpha0x, double _beta0x, double _dvbe, gsl_vector *VBEB);
+    int INS_update(const double int_step, double *dvbec, unsigned int liftoff, double *alphacx, double *betacx
+                    , double *alppcx, double *phipcx, double *loncx, double *latcx, double *altc, double *psivdcx, double *thtvdcx
+                    , double *phibdc, double *thtbdc, double *psibdc
+                    , gsl_vector *WBICB, gsl_vector *PHI, gsl_vector *DELTA_VEL
+                    , gsl_vector *PHI_HIGH, gsl_vector *PHI_LOW, GPS_TIME gps, gsl_matrix *TEIC
+                    , gsl_vector *SBIIC, gsl_vector *GRAVGI, gsl_matrix *TBIC, gsl_vector *SBEEC
+                    , gsl_vector *VBEEC, gsl_matrix *WEII, gsl_matrix *TLI, gsl_matrix *TDCI
+                    , gsl_matrix *TBICI, gsl_matrix *TBDC, gsl_vector *TBDCQ);
+    int INS_init(GPS_TIME gps_time);
+    int INS_alloc();
+#ifdef __cplusplus
+}
+#endif
 #endif

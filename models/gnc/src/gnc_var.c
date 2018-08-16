@@ -1,6 +1,7 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_vector.h>
+#include "time_utility_c.h"
 
 /** INS Variables **/
 /* Matrix */
@@ -65,6 +66,9 @@ double ins_psi_err;
 unsigned int gpsupdate;
 unsigned int liftoff;
 unsigned int ideal;
+
+GPS_TIME gpstime;
+UTC_TIME utctime;
 /*******************/
 
 

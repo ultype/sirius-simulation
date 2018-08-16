@@ -314,6 +314,18 @@ int MJD_2_JD(double mjd, double *jd) {
     return 0;
 }
 
+int load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, double Sec, UTC_TIME *utc_time, GPS_TIME *gps_time) {
+    utc_time->year = Year;
+    utc_time->DOY = DOY;
+    utc_time->hour = Hour;
+    utc_time->min = Min;
+    utc_time->sec = Sec;
+    UTC_TIME_DOY_2_CALENDAR_DATE(Year, DOY, utc_time);
+    UTC_TIME_2_GPS_TIME(*utc_time, gps_time);
+
+    return 0;
+}
+
 
 
 

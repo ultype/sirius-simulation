@@ -253,7 +253,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
 
-            P1 (int_step, "scheduled") time->dm_time();
+            P1 (int_step, "scheduled") time->dm_time(int_step);
 	        P1 (int_step, "scheduled") env.propagate(int_step);
             P1 (int_step, "scheduled") propulsion.propagate(int_step);
             P1 (int_step, "scheduled") aerodynamics.calculate_aero(int_step);

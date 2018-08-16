@@ -2,7 +2,7 @@
 PURPOSE:
       (Helper Functions and MARCOs)
 LIBRARY DEPENDENCY:
-      ()
+      ((../src/aux.cpp))
 PROGRAMMERS:
       ((() () () () ))
 ICG: (No)
@@ -12,7 +12,6 @@ ICG: (No)
 #define aux_header__HPP
 
 #include <type_traits>
-#include "sim_services/include/simtime.h"
 
 
 #define TRICK_INTERFACE(class_name) \
@@ -40,8 +39,7 @@ ICG: (No)
 #define IMPORT(model, func) \
         #model, #func
 
-inline double get_elapsed_time() { return get_rettime(); }
-
+double get_elapsed_time();
 #define MATRIX_BIND(mat_name, n, m) \
         mat_name = gsl_matrix_view_array(_ ## mat_name, n, m)
 

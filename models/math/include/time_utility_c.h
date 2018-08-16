@@ -12,7 +12,10 @@ PROGRAMMERS:
 #include <time.h>
 #include <stdio.h>
 #include <stdint.h>
-
+#ifdef __cplusplus
+extern "C"{
+#endif
+    
 typedef struct _GPS_TIME {
     uint32_t week;
     double SOW;
@@ -47,4 +50,11 @@ int MJD_2_GPS_TIME(double mjd, GPS_TIME *out);
 int UTC_TIME_DOY_2_CALENDAR_DATE(uint32_t year_in, uint32_t doy_in, UTC_TIME *out);
 int UTC_CALENDAR_DATE_2_DOY(UTC_TIME *utc);
 int MJD_2_JD(double mjd, double *jd);
+int load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, double Sec, UTC_TIME *utc_time, GPS_TIME *gps_time);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif

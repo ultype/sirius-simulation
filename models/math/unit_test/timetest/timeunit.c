@@ -6,14 +6,14 @@ int main() {
 	double mjd;
 	// gps.week = 2012;
 	// gps.SOW = 172818 + 86400;
-	utc.year = 2018;
-	utc.month = 8;
-	utc.day = 2;
-	utc.hour = 6;
-	utc.min = 13;
-	utc.sec = 18.0;
+	utc.year = 2017;
+	utc.month = 3;
+	utc.day = 22;
+	utc.hour = 2;
+	utc.min = 0;
+	utc.sec = 0.0;
 	printf("*********Time service test***********\n");
-	printf("Input: 8-2-2018 6:13:18\n");
+	printf("Input: 3-22-2018 2:00:00\n");
 	printf("Result :\n");
 
 	printf("***Calendar date to Day of year***\n");

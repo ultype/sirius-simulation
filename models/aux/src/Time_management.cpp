@@ -1,21 +1,22 @@
 #include "Time_management.hh"
+// #include "sim_services/include/simtime.h"
 
 time_management::time_management() {
     last_time = 0;
 }
 
-void time_management::dm_time() { /* convert simulation time to gps time */
-    double this_time = get_rettime();
+void time_management::dm_time(double int_step) { /* convert simulation time to gps time */
+    // double this_time = get_rettime();
 
     /* Get current GPS time */
     /* deduct DM_dt because PV comes from dm_att() output of previous cycle */
-    gpstime += this_time - last_time;
+    gpstime += int_step;
 
-    last_time = this_time;
+    // last_time = this_time;
 }
 
 // Load simulation start time in Calender date form and UTC time and convert into gps time form
-void time_management::load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec) {
+void time_management::load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, double Sec) {
     time_util::UTC_TIME caldate;
 
     caldate.set_day_of_year(Year, DOY);
@@ -32,7 +33,7 @@ void time_management::load_start_time(unsigned int Year, unsigned int DOY, unsig
 }
 
 time_util::GPS_TIME time_management::get_gpstime() {
-    // cout<<setprecision(10)<<"gps week: "<<gpstime.get_week()<<'\t'<<"gps sow :"<<gpstime.get_SOW()<<'\t'<<endl;
+    // std::cout<<std::setprecision(15)<<"gps week: "<<gpstime.get_week()<<'\t'<<"gps sow :"<<gpstime.get_SOW()<<'\t'<<std::endl;
     return gpstime;
 }
 

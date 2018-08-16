@@ -11,10 +11,10 @@ PROGRAMMERS:
 #include "global_constants.hh"
 #include "aux.hh"
 #include <ctime>
-#include "sim_services/include/simtime.h"
 #include <iomanip>
 #include "time_utility.hh"
 #include <armadillo>
+#include <iostream>
 
 class time_management {
     TRICK_INTERFACE(time_management);
@@ -37,8 +37,8 @@ class time_management {
 
     ~time_management() {}
 
-    void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, unsigned int Sec);
-    void dm_time();/* convert simulation time to gps time */
+    void load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, double Sec);
+    void dm_time(double int_setp);/* convert simulation time to gps time */
     uint16_t get_gpstime_week_num();
     uint32_t get_gpstime_msec_of_week();
 
