@@ -65,6 +65,7 @@ class FC_CAN_TEST_SimObject : public Trick::SimObject {
             P1 (int_step, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
             P1 (int_step, "scheduled") rx_can_cmd_record(&icf_ctrl, can_file);
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            ("shutdown") fc_can_cmd_record_deinit(can_file);
         }
 } ;
 
