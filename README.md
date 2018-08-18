@@ -30,7 +30,6 @@ Execuate the PIL Master
     cd exe/PIL/master
     ./Deploy_EGSE_PIL.sh
 ```
-
 Execuate the HIL Master
 ```
     cd exe/HIL/master
