@@ -35,20 +35,23 @@ def gpsr_tlm_compare(target_arr, answer_arr, lift_off_time, fileobj, csv_header)
                 # DM Length
                 dm_length = math.sqrt(float(answer_elem[1][2])**2 + float(answer_elem[1][3])**2  + float(answer_elem[1][4])**2)
                 sim_data_list.append(dm_length)
-                 # DM SPEED
+                # DM SPEED
                 dm_speed = math.sqrt(float(answer_elem[1][5])**2 + float(answer_elem[1][6])**2  + float(answer_elem[1][7])**2)
                 sim_data_list.append(dm_speed)
+                # DM ABEE
+                dm_abee = float(answer_elem[1][10])
+                sim_data_list.append(dm_abee)
                 # Target Benchmark (DM_GPSR_TLM - target_GPSR_TLM)
-                target_length_err = float(answer_elem[1][17]) - float(target_elem[1][17])
-                target_speed_err = float(answer_elem[1][18]) - float(target_elem[1][18])
+                target_length_err = float(answer_elem[1][18]) - float(target_elem[1][18])
+                target_speed_err = float(answer_elem[1][19]) - float(target_elem[1][19])
                 sim_data_list.append(target_length_err)
                 sim_data_list.append(target_speed_err)
                 # Answer DM-TLM
-                sim_data_list.append(answer_elem[1][19])
                 sim_data_list.append(answer_elem[1][20])
+                sim_data_list.append(answer_elem[1][21])
                 # Target DM-TLM
-                sim_data_list.append(target_elem[1][19])
                 sim_data_list.append(target_elem[1][20])
+                sim_data_list.append(target_elem[1][21])
 
                 filecusor.writerow(sim_data_list)
                 # Root Mean square

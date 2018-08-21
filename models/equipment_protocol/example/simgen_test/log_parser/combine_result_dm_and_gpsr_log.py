@@ -24,7 +24,7 @@ def main():
     csvHeader = ['sim_time (sec)', 'DM_gps_sow (sec)',
                  'DM_SBEE_X ', 'DM_SBEE_Y ', 'DM_SBEE_Z ',
                  'DM_VBEE_X ', 'DM_VBEE_Y ', 'DM_VBEE_Z ',
-                 'DM_Length' , 'DM_Speed',
+                 'DM_Length' , 'DM_Speed', 'DM_ABEE',
                  'GPSR_gps_sow (sec)',
                  'GPSR_SBEE_X ', 'GPSR_SBEE_Y ', 'GPSR_SBEE_Z ',
                  'GPSR_VBEE_X ', 'GPSR_VBEE_Y ', 'GPSR_VBEE_Z ',
@@ -55,6 +55,9 @@ def main():
     # Calculate DM Speed
         DM_Speed = math.sqrt(float(dm_row[5])**2 + float(dm_row[6])**2  + float(dm_row[7])**2)
         sim_data_list.append(DM_Speed)
+    # Calculate DM ABEE
+        DM_ABEE = math.sqrt(float(dm_row[8])**2 + float(dm_row[9])**2  + float(dm_row[10])**2)
+        sim_data_list.append(DM_ABEE)
     ###### GPSR_TLM Part ######
         for x in xrange(0,7):
             sim_data_list.append(gpsr_row[x])

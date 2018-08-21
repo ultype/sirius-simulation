@@ -19,7 +19,7 @@ def main():
     golden_arr = csv.reader(csv_golden_fileobj)
 
     csv_target_header = ['sim_time (sec)', 'DM_gps_sow (sec)',
-                         'DM_LENGTH ', 'DM_SPEED ',
+                         'DM_LENGTH ', 'DM_SPEED ', 'DM_ABEE',
                          'DM_TLM-targetTLM LEN_ERR ', 'DM_TLM-targetTLM SPEED_ERR ',
                          'Golden DM-TLM ERR_Length ', 'Golden DM-TLM ERR_Speed ',
                          target_name + ' DM-TLM ERR_Length ', target_name + ' DM-TLM ERR_Speed ']
