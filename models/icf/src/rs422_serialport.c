@@ -3,9 +3,11 @@ PURPOSE: (Send data by RS422 serial port.)
 *************************************************************************/
 #include "rs422_serialport.h"
 
-int rs422_serialport_init(void **priv_data, char *ifname, int is_header_en) {
+int rs422_serialport_init(void **priv_data, char *ifname, int bitmap_config) {
     struct rs422_device_info_t *dev_info = NULL;
     int  status = 0;
+    uint8_t baudrate_config;
+    int baudrate;
     dev_info = malloc(sizeof(struct rs422_device_info_t));
     if (dev_info == NULL) {
         fprintf(stderr, "[%s:%d]Memory allocate fail. status: %s\n", __FUNCTION__, __LINE__, strerror(errno));
@@ -22,14 +24,28 @@ int rs422_serialport_init(void **priv_data, char *ifname, int is_header_en) {
     dev_info->frame.crc = 0;
     dev_info->frame.payload_len = 0;
     dev_info->frame.seq_no = 0;
-    dev_info->header_size = is_header_en ? sizeof(struct rs422_frame_header_t) : 0;
+    dev_info->header_size = (bitmap_config & 0x1) ? sizeof(struct rs422_frame_header_t) : 0;
     dev_info->rs422_fd  = open_port(dev_info->portname);
     printf("%s\n", dev_info->portname);
     if (dev_info->rs422_fd  < 0) {
         fprintf(stderr, "open port %s error\n", dev_info->portname);
         errExit("Encounter a Error !!!\n");
     }
-    set_interface_attribs(dev_info->rs422_fd, B230400, 0);
+    baudrate_config = (bitmap_config & 0xFF00) >> 8;
+    switch (baudrate_config) {
+        case 0x1:
+            baudrate = B115200;
+            break;
+        case 0x2:
+            baudrate = B230400;
+            break;
+        case 0x3:
+            baudrate = B921600;
+            break;
+        default:
+            baudrate = B230400;
+    }
+    set_interface_attribs(dev_info->rs422_fd, baudrate, 0);
 
     *priv_data = dev_info;
     return status;
