@@ -352,8 +352,8 @@ class Rocket_SimObject : public Trick::SimObject {
             P4 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P4 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P4 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
-            P4 (int_step, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
-            P4 (int_step, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
+            P4 (int_step, 0.002, "scheduled") dynamics.enqueue_to_simgen_buffer(&icf_ctrl, ext_porlation);
+            P4 (int_step, 0.002, "scheduled") transfer_simgen_motdata(&icf_ctrl, &simgen_dev);
 
             P4 (0.050,"scheduled") gather_sdt_gpsr_motion_info(&icf_ctrl, &tlm_frame);
 
