@@ -28,7 +28,7 @@ def main():
                 continue;
             if abs(float(gpsr_elem[1][0]) - float(dm_elem[1][1])) < 1e-4:
                 csvCursor.writerow(dm_elem[1])
-                print dm_elem[1]
+                print (dm_elem[1])
                 break
 
     input_dm_nspo_fileobj.close()
