@@ -122,15 +122,17 @@ int build_psi_tht_phi_TM_C(const double psi, const double tht, const double phi,
 
 int Matrix2Quaternion_C(gsl_matrix *Matrix_in, gsl_vector *Quaternion_out) {
     gsl_vector *q_square;
+    gsl_matrix *Matrix_copy;
     q_square = gsl_vector_calloc(4);
+    Matrix_copy = gsl_matrix_calloc(3, 3);
     double q_square_max;
     int j;
-    gsl_matrix_transpose(Matrix_in);
+    gsl_matrix_transpose_memcpy(Matrix_copy, Matrix_in);
 
-    gsl_vector_set(q_square, 0, fabs(1.0 + gsl_matrix_get(Matrix_in, 0, 0) + gsl_matrix_get(Matrix_in, 1, 1) + gsl_matrix_get(Matrix_in, 2, 2)));
-    gsl_vector_set(q_square, 1, fabs(1.0 + gsl_matrix_get(Matrix_in, 0, 0) - gsl_matrix_get(Matrix_in, 1, 1) - gsl_matrix_get(Matrix_in, 2, 2)));
-    gsl_vector_set(q_square, 2, fabs(1.0 - gsl_matrix_get(Matrix_in, 0, 0) + gsl_matrix_get(Matrix_in, 1, 1) - gsl_matrix_get(Matrix_in, 2, 2)));
-    gsl_vector_set(q_square, 3, fabs(1.0 - gsl_matrix_get(Matrix_in, 0, 0) - gsl_matrix_get(Matrix_in, 1, 1) + gsl_matrix_get(Matrix_in, 2, 2)));
+    gsl_vector_set(q_square, 0, fabs(1.0 + gsl_matrix_get(Matrix_copy, 0, 0) + gsl_matrix_get(Matrix_copy, 1, 1) + gsl_matrix_get(Matrix_copy, 2, 2)));
+    gsl_vector_set(q_square, 1, fabs(1.0 + gsl_matrix_get(Matrix_copy, 0, 0) - gsl_matrix_get(Matrix_copy, 1, 1) - gsl_matrix_get(Matrix_copy, 2, 2)));
+    gsl_vector_set(q_square, 2, fabs(1.0 - gsl_matrix_get(Matrix_copy, 0, 0) + gsl_matrix_get(Matrix_copy, 1, 1) - gsl_matrix_get(Matrix_copy, 2, 2)));
+    gsl_vector_set(q_square, 3, fabs(1.0 - gsl_matrix_get(Matrix_copy, 0, 0) - gsl_matrix_get(Matrix_copy, 1, 1) + gsl_matrix_get(Matrix_copy, 2, 2)));
 
     q_square_max = gsl_vector_max(q_square);
     j = gsl_vector_max_index(q_square);
@@ -138,33 +140,34 @@ int Matrix2Quaternion_C(gsl_matrix *Matrix_in, gsl_vector *Quaternion_out) {
     switch (j) {
         case 0:
             gsl_vector_set(Quaternion_out, 0, 0.5 * sqrt(q_square_max));
-            gsl_vector_set(Quaternion_out, 1, 0.25 * (gsl_matrix_get(Matrix_in, 2, 1) - gsl_matrix_get(Matrix_in, 1, 2)) / gsl_vector_get(Quaternion_out, 0));
-            gsl_vector_set(Quaternion_out, 2, 0.25 * (gsl_matrix_get(Matrix_in, 0, 2) - gsl_matrix_get(Matrix_in, 2, 0)) / gsl_vector_get(Quaternion_out, 0));
-            gsl_vector_set(Quaternion_out, 3, 0.25 * (gsl_matrix_get(Matrix_in, 1, 0) - gsl_matrix_get(Matrix_in, 0 ,1)) / gsl_vector_get(Quaternion_out, 0));
+            gsl_vector_set(Quaternion_out, 1, 0.25 * (gsl_matrix_get(Matrix_copy, 2, 1) - gsl_matrix_get(Matrix_copy, 1, 2)) / gsl_vector_get(Quaternion_out, 0));
+            gsl_vector_set(Quaternion_out, 2, 0.25 * (gsl_matrix_get(Matrix_copy, 0, 2) - gsl_matrix_get(Matrix_copy, 2, 0)) / gsl_vector_get(Quaternion_out, 0));
+            gsl_vector_set(Quaternion_out, 3, 0.25 * (gsl_matrix_get(Matrix_copy, 1, 0) - gsl_matrix_get(Matrix_copy, 0 ,1)) / gsl_vector_get(Quaternion_out, 0));
             break;
         case 1:
             gsl_vector_set(Quaternion_out, 1, 0.5 * sqrt(q_square_max));
-            gsl_vector_set(Quaternion_out, 0, 0.25 * (gsl_matrix_get(Matrix_in, 2, 1) - gsl_matrix_get(Matrix_in, 1, 2)) / gsl_vector_get(Quaternion_out, 1));
-            gsl_vector_set(Quaternion_out, 2, 0.25 * (gsl_matrix_get(Matrix_in, 1, 0) - gsl_matrix_get(Matrix_in, 0, 1)) / gsl_vector_get(Quaternion_out, 1));
-            gsl_vector_set(Quaternion_out, 3, 0.25 * (gsl_matrix_get(Matrix_in, 0, 2) - gsl_matrix_get(Matrix_in, 2, 0)) / gsl_vector_get(Quaternion_out, 1));
+            gsl_vector_set(Quaternion_out, 0, 0.25 * (gsl_matrix_get(Matrix_copy, 2, 1) - gsl_matrix_get(Matrix_copy, 1, 2)) / gsl_vector_get(Quaternion_out, 1));
+            gsl_vector_set(Quaternion_out, 2, 0.25 * (gsl_matrix_get(Matrix_copy, 1, 0) - gsl_matrix_get(Matrix_copy, 0, 1)) / gsl_vector_get(Quaternion_out, 1));
+            gsl_vector_set(Quaternion_out, 3, 0.25 * (gsl_matrix_get(Matrix_copy, 0, 2) - gsl_matrix_get(Matrix_copy, 2, 0)) / gsl_vector_get(Quaternion_out, 1));
             break;
         case 2:
             gsl_vector_set(Quaternion_out, 2, 0.5 * sqrt(q_square_max));
-            gsl_vector_set(Quaternion_out, 0, 0.25 * (gsl_matrix_get(Matrix_in, 0, 2) - gsl_matrix_get(Matrix_in, 2, 0)) / gsl_vector_get(Quaternion_out, 2));
-            gsl_vector_set(Quaternion_out, 1, 0.25 * (gsl_matrix_get(Matrix_in, 1, 0) - gsl_matrix_get(Matrix_in, 0, 1)) / gsl_vector_get(Quaternion_out, 2));
-            gsl_vector_set(Quaternion_out, 3, 0.25 * (gsl_matrix_get(Matrix_in, 2, 1) - gsl_matrix_get(Matrix_in, 1, 2)) / gsl_vector_get(Quaternion_out, 2));
+            gsl_vector_set(Quaternion_out, 0, 0.25 * (gsl_matrix_get(Matrix_copy, 0, 2) - gsl_matrix_get(Matrix_copy, 2, 0)) / gsl_vector_get(Quaternion_out, 2));
+            gsl_vector_set(Quaternion_out, 1, 0.25 * (gsl_matrix_get(Matrix_copy, 1, 0) - gsl_matrix_get(Matrix_copy, 0, 1)) / gsl_vector_get(Quaternion_out, 2));
+            gsl_vector_set(Quaternion_out, 3, 0.25 * (gsl_matrix_get(Matrix_copy, 2, 1) - gsl_matrix_get(Matrix_copy, 1, 2)) / gsl_vector_get(Quaternion_out, 2));
             break;
         case 3:
             gsl_vector_set(Quaternion_out, 3, 0.5 * sqrt(q_square_max));
-            gsl_vector_set(Quaternion_out, 0, 0.25 * (gsl_matrix_get(Matrix_in, 1, 0) - gsl_matrix_get(Matrix_in, 0, 1)) / gsl_vector_get(Quaternion_out, 3));
-            gsl_vector_set(Quaternion_out, 1, 0.25 * (gsl_matrix_get(Matrix_in, 2, 0) - gsl_matrix_get(Matrix_in, 0, 2)) / gsl_vector_get(Quaternion_out, 3));
-            gsl_vector_set(Quaternion_out, 2, 0.25 * (gsl_matrix_get(Matrix_in, 2, 1) - gsl_matrix_get(Matrix_in, 1, 2)) / gsl_vector_get(Quaternion_out, 3));
+            gsl_vector_set(Quaternion_out, 0, 0.25 * (gsl_matrix_get(Matrix_copy, 1, 0) - gsl_matrix_get(Matrix_copy, 0, 1)) / gsl_vector_get(Quaternion_out, 3));
+            gsl_vector_set(Quaternion_out, 1, 0.25 * (gsl_matrix_get(Matrix_copy, 2, 0) - gsl_matrix_get(Matrix_copy, 0, 2)) / gsl_vector_get(Quaternion_out, 3));
+            gsl_vector_set(Quaternion_out, 2, 0.25 * (gsl_matrix_get(Matrix_copy, 2, 1) - gsl_matrix_get(Matrix_copy, 1, 2)) / gsl_vector_get(Quaternion_out, 3));
             break; 
         default:
 
             break;
     }
     gsl_vector_free(q_square);
+    gsl_matrix_free(Matrix_copy);
     return 0;
 }
 

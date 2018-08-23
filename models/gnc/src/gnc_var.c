@@ -9,7 +9,7 @@ gsl_matrix *WEII;
 gsl_matrix *TBIC;
 gsl_matrix *TDCI;
 gsl_matrix *TEIC;
-gsl_matrix *TBD;
+gsl_matrix *TBDC;
 gsl_matrix *TBICI;
 gsl_matrix *TLI;
 
@@ -35,8 +35,12 @@ gsl_vector *TMP_old;
 gsl_vector *VBIIC_old;
 gsl_vector *POS_ERR;
 gsl_vector *GRAVGI;
-gsl_vector *TBDQ;
+gsl_vector *TBDCQ;
 gsl_vector *VBIIC_old_old;
+gsl_vector *PHI_C;
+gsl_vector *DELTA_VEL_C;
+gsl_vector *PHI_LOW_C;
+gsl_vector *PHI_HIGH_C;
 
 /* Double */
 double dbic;

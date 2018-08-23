@@ -482,15 +482,14 @@ int build_VBEB(double _alpha0x, double _beta0x, double _dvbe, gsl_vector *VBEB) 
 
 int INS_update(const double int_step, double *dvbec, unsigned int liftoff, double *alphacx, double *betacx
                 , double *alppcx, double *phipcx, double *loncx, double *latcx, double *altc, double *psivdcx, double *thtvdcx
-                , double *phibdc, double *thtbdc, double *psibdc
-                , gsl_vector *WBICB, gsl_vector *PHI, gsl_vector *DELTA_VEL
+                , double *phibdcx, double *thtbdcx, double *psibdcx
+                , gsl_vector *PHI, gsl_vector *DELTA_VEL
                 , gsl_vector *PHI_HIGH, gsl_vector *PHI_LOW, GPS_TIME gps, gsl_matrix *TEIC
-                , gsl_vector *SBIIC, gsl_vector *GRAVGI, gsl_matrix *TBIC, gsl_vector *SBEEC
+                , gsl_vector *SBIIC, gsl_vector *VBIIC, gsl_vector *VBIIC_old, gsl_vector *GRAVGI, gsl_matrix *TBIC, gsl_vector *SBEEC
                 , gsl_vector *VBEEC, gsl_matrix *WEII, gsl_matrix *TLI, gsl_matrix *TDCI
                 , gsl_matrix *TBICI, gsl_matrix *TBDC, gsl_vector *TBDCQ) {
-    gsl_vector *VBIIC_old, *VBIIC_tmp1, *VBIIC_tmp2, *VBEEC_tmp1, *VBEEC_tmp2, *VBECB, *VBECB_tmp, *VBECD, *VBECD_tmp;
+    gsl_vector *VBIIC_tmp1, *VBIIC_tmp2, *VBEEC_tmp1, *VBEEC_tmp2, *VBECB, *VBECB_tmp, *VBECD, *VBECD_tmp;
     gsl_matrix *TBIC_tmp1, *TBIC_tmp2;
-    VBIIC_old = gsl_vector_calloc(3);
     VBIIC_tmp1 = gsl_vector_calloc(3);
     VBIIC_tmp2 = gsl_vector_calloc(3);
     VBEEC_tmp1 = gsl_vector_calloc(3);
@@ -506,8 +505,6 @@ int INS_update(const double int_step, double *dvbec, unsigned int liftoff, doubl
     AccelHarmonic(SBIIC, INS_CS_JGM3, 20, 20, TEIC, GRAVGI);
     gsl_vector_memcpy(VBIIC_tmp2, GRAVGI);
 
-    gsl_vector_memcpy(VBIIC_old, VBIIC);  // VBIIC_old = VBIIC
-
     /* VBIIC += trans(TBIC) * DELTA_VEL + GRAVGI * int_step */
     gsl_blas_dgemv(CblasTrans, 1.0, TBIC, DELTA_VEL, 0.0, VBIIC_tmp1);
     gsl_blas_dscal(int_step, VBIIC_tmp2);
@@ -517,6 +514,7 @@ int INS_update(const double int_step, double *dvbec, unsigned int liftoff, doubl
     /* SBIIC += VBIIC_old * int_step */
     gsl_blas_dscal(int_step, VBIIC_old);
     gsl_vector_add(SBIIC, VBIIC_old);
+    gsl_vector_memcpy(VBIIC_old, VBIIC);  // VBIIC_old = VBIIC
 
     /* TBIC = build_321_rotation_matrix(PHI) * TBIC */
     build_321_rotation_matrix(PHI, TBIC_tmp1);
@@ -571,9 +569,12 @@ int INS_update(const double int_step, double *dvbec, unsigned int liftoff, doubl
     // computing Euler angles from INS
     gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, TBIC, TDCI, 0.0, TBDC);
     Matrix2Quaternion_C(TBDC, TBDCQ);
-    DCM_2_Euler_angle(TBDC, phibdc, thtbdc, psibdc);
+    DCM_2_Euler_angle(TBDC, phibdcx, thtbdcx, psibdcx);
 
-    gsl_vector_free(VBIIC_old);
+    *phibdcx *= __DEG;
+    *thtbdcx *= __DEG;
+    *psibdcx *= __DEG;
+
     gsl_vector_free(VBIIC_tmp1);
     gsl_vector_free(VBIIC_tmp2);
     gsl_vector_free(VBEEC_tmp1);
@@ -603,12 +604,12 @@ int load_angle(double yaw, double roll, double pitch, GPS_TIME gps_time) {
 
     calculate_INS_derived_TEI(gps_time, TEIC);
 
-    build_psi_tht_phi_TM_C(psibdcx * __RAD, thtbdcx * __RAD, phibdcx * __RAD, TBD);
+    build_psi_tht_phi_TM_C(psibdcx * __RAD, thtbdcx * __RAD, phibdcx * __RAD, TBDC);
     build_psi_tht_phi_TM_C(psibdcx * __RAD, thtbdcx * __RAD, phibdcx * __RAD, TLI);
 
     cad_tdi84(loncx * __RAD, latcx * __RAD, altc, TEIC, TDCI);
 
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, TBD, TDCI, 0.0, TBIC);
+    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, TBDC, TDCI, 0.0, TBIC);
     Matrix2Quaternion_C(TBIC, TBIC_Q);
     gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, TLI, TDCI, 0.0, TBICI);
 
@@ -623,7 +624,7 @@ int load_geodetic_velocity(double alpha0x, double beta0x, double dvbe) {
     VBIIC_tmp4 = gsl_vector_calloc(3);
 
     build_VBEB(alpha0x, beta0x, dvbe, VBEB);
-    gsl_blas_dgemv(CblasTrans, 1.0, TBD, VBEB, 0.0, VBECD);
+    gsl_blas_dgemv(CblasTrans, 1.0, TBDC, VBEB, 0.0, VBECD);
     cad_in_geo84(loncx * __RAD, latcx * __RAD, altc, TEIC, SBIIC);
 
     /** VBIIC calculate **/
@@ -634,11 +635,13 @@ int load_geodetic_velocity(double alpha0x, double beta0x, double dvbe) {
     gsl_blas_dgemv(CblasTrans, 1.0, TDCI, VBECD, 0.0, VBIIC_tmp1);
     gsl_vector_add(VBIIC, VBIIC_tmp1);
     gsl_vector_add(VBIIC, VBIIC_tmp2);
+    gsl_vector_memcpy(VBIIC_old, VBIIC);
 
     return 0;
 }
 
 int INS_init(GPS_TIME gps_time) {
+    INS_alloc();
     build_WEII(WEII);
     calculate_INS_derived_TEI(gps_time, TEIC);
     cad_in_geo84(loncx * __RAD, latcx * __RAD, altc, TEIC, SBIIC);
@@ -662,7 +665,7 @@ int INS_alloc() {
     TBIC = gsl_matrix_calloc(3, 3);
     TDCI = gsl_matrix_calloc(3, 3);
     TEIC = gsl_matrix_calloc(3, 3);
-    TBD = gsl_matrix_calloc(3, 3);
+    TBDC = gsl_matrix_calloc(3, 3);
     TBICI = gsl_matrix_calloc(3, 3);
     TLI = gsl_matrix_calloc(3, 3);
     /** Vector **/
@@ -687,8 +690,12 @@ int INS_alloc() {
     VBIIC_old = gsl_vector_calloc(3);
     POS_ERR = gsl_vector_calloc(3);
     GRAVGI = gsl_vector_calloc(3);
-    TBDQ = gsl_vector_calloc(4);
+    TBDCQ = gsl_vector_calloc(4);
     VBIIC_old_old = gsl_vector_calloc(3);
+    PHI_C = gsl_vector_calloc(3);
+    DELTA_VEL_C = gsl_vector_calloc(3);
+    PHI_LOW_C = gsl_vector_calloc(3);
+    PHI_HIGH_C = gsl_vector_calloc(3);
 
     return 0;
 }

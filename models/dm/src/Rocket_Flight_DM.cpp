@@ -49,7 +49,8 @@ Rocket_Flight_DM::Rocket_Flight_DM()
         VECTOR_INIT(ABEE_test, 3),
         MATRIX_INIT(TLI, 3, 3),
         VECTOR_INIT(LT_euler, 3),
-        VECTOR_INIT(TBLQ, 4) {
+        VECTOR_INIT(TBLQ, 4),
+        VECTOR_INIT(ABID, 3) {
             build_WEII();
         }
 
@@ -88,7 +89,8 @@ Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
         VECTOR_INIT(WBEB, 3),
         MATRIX_INIT(TLI, 3, 3),
         VECTOR_INIT(LT_euler, 3),
-        VECTOR_INIT(TBLQ, 4) {
+        VECTOR_INIT(TBLQ, 4),
+        VECTOR_INIT(ABID, 3) {
         }
 
 Rocket_Flight_DM& Rocket_Flight_DM::operator=(const Rocket_Flight_DM& other) {
@@ -573,6 +575,7 @@ void Rocket_Flight_DM::aux_calulate(arma::mat33 TEI, arma::mat33 TBI) {
     TBL = TBI * trans(TLI);
     LT_euler = euler_angle(TBL);
 
+    ABID = TDI * ABII;
     VBED = TDE * VBEE;
 }
 

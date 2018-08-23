@@ -295,6 +295,9 @@ class Rocket_Flight_DM {
     arma::vec TBLQ;
     double _TBLQ[4];
 
+    arma::vec ABID;
+    double _ABID[3];
+
     double dang_slosh_theta;
     double ang_slosh_theta;
     double dang_slosh_psi;

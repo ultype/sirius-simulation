@@ -326,7 +326,20 @@ int load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsi
     return 0;
 }
 
+int time_add(double in, GPS_TIME *gps) {
+    double temp = gps->SOW + in;
 
+    if (temp < 0.0) {
+        gps->week = gps->week - 1;
+        gps->SOW = SEC_PER_WEEK + temp;
+    } else if (temp >= SEC_PER_WEEK) {
+        gps->week = gps->week + 1;
+        gps->SOW = temp - SEC_PER_WEEK;
+    } else {
+        gps->SOW = temp;
+    }
+    return 0;
+}
 
 
 

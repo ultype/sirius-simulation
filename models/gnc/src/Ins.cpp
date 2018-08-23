@@ -301,8 +301,6 @@ void INS::load_angle(double yaw, double roll, double pitch) {
 
     calculate_INS_derived_TEI();
 
-    arma::mat33 TBD;
-
     TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
     TLI = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
 
@@ -316,12 +314,12 @@ void INS::load_angle(double yaw, double roll, double pitch) {
 void INS::load_geodetic_velocity(double alpha0x, double beta0x, double dvbe) {
     // building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
     arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
-    arma::mat33 TBD = build_psi_tht_phi_TM(psibdcx * RAD, thtbdcx * RAD, phibdcx * RAD);
     arma::mat33 TDI = cad::tdi84(loncx * RAD, latcx * RAD, altc, TEIC);
     // Geodetic velocity
     arma::mat VBED = trans(TBD) * VBEB;
     SBIIC = cad::in_geo84(loncx * RAD, latcx * RAD, altc, TEIC);
     VBIIC = trans(TDI) * VBED + trans(TEIC) * (WEII * TEIC * SBIIC);
+    VBIIC_old = VBIIC;
     // TESTV = VBIIC;
 }
 
@@ -612,25 +610,30 @@ void INS::update(double int_step) {
     // local variables
     double lonc(0), latc(0);
     arma::vec3 zo(arma::fill::zeros);
-
+    arma::vec3 PHI, PHI_HIGH, PHI_LOW, DELTA_VEL;
     // Gyro Measurement
-    arma::vec3 WBICB = grab_computed_WBIB();
-    arma::vec3 PHI = grab_PHI();
-    arma::vec3 DELTA_VEL = grab_DELTA_VEL();
-    arma::vec3 PHI_HIGH = grab_PHI_HIGH();
-    arma::vec3 PHI_LOW = grab_PHI_LOW();
+    // arma::vec3 WBICB = grab_computed_WBIB();
+    
+    if (ideal == 1) {
+        PHI = grab_PHI();
+    } else {;
+        PHI_HIGH = grab_PHI_HIGH();
+        PHI_LOW = grab_PHI_LOW();
+    }
+    DELTA_VEL = grab_DELTA_VEL();
+
 
     calculate_INS_derived_TEI();
     GRAVGI = AccelHarmonic(SBIIC, INS_CS_JGM3, 20, 20, TEIC);
 
-    if (testindex == 0) {
-        VBIIC_old = VBIIC;
-        testindex = 1;
-    } else {
+    // if (testindex == 0) {
+    //     VBIIC_old = VBIIC;
+    //     testindex = 1;
+    // } else {
         VBIIC += trans(TBIC) * DELTA_VEL + GRAVGI * int_step;
         SBIIC += VBIIC_old * int_step;
         VBIIC_old = VBIIC;
-    }
+    // }
     // computed transformation matrix
     if (ideal == 1) {
       TBIC = build_321_rotation_matrix(PHI) * TBIC;
@@ -709,6 +712,7 @@ arma::mat33 INS::get_TEIC() { return TEIC; }
 arma::vec4 INS::get_TBDQ() { return TBDQ; }
 arma::mat33 INS::get_TBD() { return TBD; }
 arma::mat33 INS::get_TBICI() { return TBICI; }
+arma::mat33 INS::get_TDCI() { return TDCI; }
 
 void INS::set_gps_correction(unsigned int index) { gpsupdate = index; }
 

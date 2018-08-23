@@ -51,7 +51,7 @@ int UTC_TIME_DOY_2_CALENDAR_DATE(uint32_t year_in, uint32_t doy_in, UTC_TIME *ou
 int UTC_CALENDAR_DATE_2_DOY(UTC_TIME *utc);
 int MJD_2_JD(double mjd, double *jd);
 int load_start_time(unsigned int Year, unsigned int DOY, unsigned int Hour, unsigned int Min, double Sec, UTC_TIME *utc_time, GPS_TIME *gps_time);
-
+int time_add(double in, GPS_TIME *gps);
 #ifdef __cplusplus
 }
 #endif

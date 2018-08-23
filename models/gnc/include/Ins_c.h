@@ -35,7 +35,7 @@ extern gsl_matrix *WEII;
 extern gsl_matrix *TBIC;
 extern gsl_matrix *TDCI;
 extern gsl_matrix *TEIC;
-extern gsl_matrix *TBD;
+extern gsl_matrix *TBDC;
 extern gsl_matrix *TBICI;
 extern gsl_matrix *TLI;
 
@@ -61,8 +61,12 @@ extern gsl_vector *TMP_old;
 extern gsl_vector *VBIIC_old;
 extern gsl_vector *POS_ERR;
 extern gsl_vector *GRAVGI;
-extern gsl_vector *TBDQ;
+extern gsl_vector *TBDCQ;
 extern gsl_vector *VBIIC_old_old;
+extern gsl_vector *PHI_C;
+extern gsl_vector *DELTA_VEL_C;
+extern gsl_vector *PHI_LOW_C;
+extern gsl_vector *PHI_HIGH_C;
 
 /* Double */
 extern double dbic;
@@ -115,9 +119,9 @@ extern "C" {
     int INS_update(const double int_step, double *dvbec, unsigned int liftoff, double *alphacx, double *betacx
                     , double *alppcx, double *phipcx, double *loncx, double *latcx, double *altc, double *psivdcx, double *thtvdcx
                     , double *phibdc, double *thtbdc, double *psibdc
-                    , gsl_vector *WBICB, gsl_vector *PHI, gsl_vector *DELTA_VEL
+                    , gsl_vector *PHI, gsl_vector *DELTA_VEL
                     , gsl_vector *PHI_HIGH, gsl_vector *PHI_LOW, GPS_TIME gps, gsl_matrix *TEIC
-                    , gsl_vector *SBIIC, gsl_vector *GRAVGI, gsl_matrix *TBIC, gsl_vector *SBEEC
+                    , gsl_vector *SBIIC, gsl_vector *VBIIC, gsl_vector *VBIIC_old, gsl_vector *GRAVGI, gsl_matrix *TBIC, gsl_vector *SBEEC
                     , gsl_vector *VBEEC, gsl_matrix *WEII, gsl_matrix *TLI, gsl_matrix *TDCI
                     , gsl_matrix *TBICI, gsl_matrix *TBDC, gsl_vector *TBDCQ);
     int INS_init(GPS_TIME gps_time);
