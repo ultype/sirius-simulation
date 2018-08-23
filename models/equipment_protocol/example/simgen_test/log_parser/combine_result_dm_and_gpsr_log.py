@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import csv
-import itertools
 import sys
 import re
 import math
 from parser_utility import *
 def main():
     lift_off_time = 120.0
-    csv_gpsr_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
-    csv_dm_fileobj = open('refine_log_nspo.csv', 'rbU')
+    csv_gpsr_fileobj = open('gpsr_s_nav_tlm.csv', "rt", encoding="utf-8")
+    csv_dm_fileobj = open('refine_log_nspo.csv', "rt", encoding="utf-8")
     out_file_name = ""
     if len(sys.argv) == 3:
         out_file_name = sys.argv[2] + "_"
@@ -38,7 +37,7 @@ def main():
     mean_length_square = 0
     mean_speed_square = 0
 
-    for dm_row, gpsr_row in itertools.izip(dm_arr, gpsr_arr):
+    for dm_row, gpsr_row in zip(dm_arr, gpsr_arr):
         iter_idx += 1
         sim_data_list = []
         if iter_idx <= 1:
@@ -47,7 +46,7 @@ def main():
         if float(dm_row[0]) == lift_off_time:
             start_flight_idx = iter_idx
     ###### DM Part ######
-        for x in xrange(0,8):
+        for x in range(0,8):
             sim_data_list.append(dm_row[x])
     # Calculate DM Length
         DM_Length = math.sqrt(float(dm_row[2])**2 + float(dm_row[3])**2  + float(dm_row[4])**2)
@@ -59,7 +58,7 @@ def main():
         DM_ABEE = math.sqrt(float(dm_row[8])**2 + float(dm_row[9])**2  + float(dm_row[10])**2)
         sim_data_list.append(DM_ABEE)
     ###### GPSR_TLM Part ######
-        for x in xrange(0,7):
+        for x in range(0,7):
             sim_data_list.append(gpsr_row[x])
     # Calculate GPSR_TLM Length
         GPSR_Length = math.sqrt(float(gpsr_row[1])**2 + float(gpsr_row[2])**2  + float(gpsr_row[3])**2)

@@ -7,8 +7,8 @@ def main():
     if len(sys.argv) > 0:
         log_nspo_csv_name = sys.argv[1]
 
-    input_gpsr_s_nav_fileobj = open('gpsr_s_nav_tlm.csv', 'rbU')
-    input_dm_nspo_fileobj = open(log_nspo_csv_name, 'rbU')
+    input_gpsr_s_nav_fileobj = open('gpsr_s_nav_tlm.csv', "rt", encoding="utf-8")
+    input_dm_nspo_fileobj = open(log_nspo_csv_name, "rt", encoding="utf-8")
     output_time_compare_fileobj = open('refine_log_nspo.csv', 'w')
     csvCursor = csv.writer(output_time_compare_fileobj)
 

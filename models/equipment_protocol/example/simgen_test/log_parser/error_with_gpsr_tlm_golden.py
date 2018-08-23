@@ -12,8 +12,8 @@ def main():
         lift_off_time = float(sys.argv[1])
     if len(sys.argv) == 2:
         lift_off_time = float(sys.argv[1])
-    csv_golden_fileobj = open('dm_golden_combine_result_dm_and_gpsr_log.csv', 'rbU')
-    csv_target_fileobj = open(target_name + 'combine_result_dm_and_gpsr_log.csv', 'rbU')
+    csv_golden_fileobj = open('dm_golden_combine_result_dm_and_gpsr_log.csv', "rt", encoding="utf-8")
+    csv_target_fileobj = open(target_name + 'combine_result_dm_and_gpsr_log.csv', "rt", encoding="utf-8")
 
     target_arr = csv.reader(csv_target_fileobj)
     golden_arr = csv.reader(csv_golden_fileobj)
