@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
             , ins.get_SBIIC()(1) - gsl_vector_get(SBIIC, 1), ins.get_SBIIC()(2) - gsl_vector_get(SBIIC, 2));
         printf("Error VX = %.14f, Error VY = %.14f, Error VZ = %.14f\n", ins.get_VBIIC()(0) - gsl_vector_get(VBIIC, 0)
             , ins.get_VBIIC()(1) - gsl_vector_get(VBIIC, 1), ins.get_VBIIC()(2) - gsl_vector_get(VBIIC, 2));
+        printf("Error GPS Week = %d, Error GPS SOW = %.14f\n", time->get_gpstime().get_week() - gpstime.week, time->get_gpstime().get_SOW() - gpstime.SOW);
         printf("--------------------\n");
     }
     
