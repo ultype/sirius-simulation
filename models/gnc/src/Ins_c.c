@@ -505,6 +505,11 @@ int INS_update(const double int_step, double *dvbec, unsigned int liftoff, doubl
     AccelHarmonic(SBIIC, INS_CS_JGM3, 20, 20, TEIC, GRAVGI);
     gsl_vector_memcpy(VBIIC_tmp2, GRAVGI);
 
+    /* TBIC = build_321_rotation_matrix(PHI) * TBIC */
+    build_321_rotation_matrix(PHI, TBIC_tmp1);
+    gsl_matrix_memcpy(TBIC_tmp2, TBIC);
+    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, TBIC_tmp1, TBIC_tmp2, 0.0, TBIC);
+
     /* VBIIC += trans(TBIC) * DELTA_VEL + GRAVGI * int_step */
     gsl_blas_dgemv(CblasTrans, 1.0, TBIC, DELTA_VEL, 0.0, VBIIC_tmp1);
     gsl_blas_dscal(int_step, VBIIC_tmp2);
@@ -515,11 +520,6 @@ int INS_update(const double int_step, double *dvbec, unsigned int liftoff, doubl
     gsl_blas_dscal(int_step, VBIIC_old);
     gsl_vector_add(SBIIC, VBIIC_old);
     gsl_vector_memcpy(VBIIC_old, VBIIC);  // VBIIC_old = VBIIC
-
-    /* TBIC = build_321_rotation_matrix(PHI) * TBIC */
-    build_321_rotation_matrix(PHI, TBIC_tmp1);
-    gsl_matrix_memcpy(TBIC_tmp2, TBIC);
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, TBIC_tmp1, TBIC_tmp2, 0.0, TBIC);
 
     /* SBEEC = TEIC * SBIIC */
     gsl_blas_dgemv(CblasNoTrans, 1.0, TEIC, SBIIC, 0.0, SBEEC);

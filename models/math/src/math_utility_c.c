@@ -1,5 +1,12 @@
 #include "math_utility_c.h"
 
+#define max(a,b)        ((a) > (b) ? (a) : (b))
+#define min(a,b)        ((a) < (b) ? (a) : (b))
+
+
+typedef unsigned int bool;
+#define false       0
+#define true        1
 /**
 *  Convert Cartesian coordinate system to Polar coordinate
 *  @param[in] cart : cartseian system vector
@@ -309,6 +316,149 @@ int sign(const double variable) {
         sign = 1;
 
     return sign;
+}
+
+
+/**
+ * Compute the (Moore-Penrose) pseudo-inverse of a matrix.
+ *
+ * If the singular value decomposition (SVD) of A = UΣVᵀ then the pseudoinverse A⁻¹ = VΣ⁻¹Uᵀ, where ᵀ indicates transpose and Σ⁻¹ is obtained by taking the reciprocal of each nonzero element on the diagonal, leaving zeros in place. Elements on the diagonal smaller than ``rcond`` times the largest singular value are considered zero.
+ *
+ * @parameter A     Input matrix. **WARNING**: the input matrix ``A`` is destroyed. However, it is still the responsibility of the caller to free it.
+ * @parameter rcond     A real number specifying the singular value threshold for inclusion. NumPy default for ``rcond`` is 1E-15.
+ *
+ * @returns A_pinv      Matrix containing the result. ``A_pinv`` is allocated in this function and it is the responsibility of the caller to free it.
+**/
+gsl_matrix* moore_penrose_pinv(gsl_matrix *A, const double rcond) {
+
+    gsl_matrix *V, *Sigma_pinv, *U, *A_pinv;
+    gsl_matrix *_tmp_mat = NULL;
+    gsl_vector *_tmp_vec;
+    gsl_vector *u;
+    double x, cutoff;
+    size_t i, j;
+    unsigned int n = A->size1;
+    unsigned int m = A->size2;
+    bool was_swapped = false;
+
+
+    if (m > n) {
+        /* libgsl SVD can only handle the case m <= n - transpose matrix */
+        was_swapped = true;
+        _tmp_mat = gsl_matrix_alloc(m, n);
+        gsl_matrix_transpose_memcpy(_tmp_mat, A);
+        A = _tmp_mat;
+        i = m;
+        m = n;
+        n = i;
+    }
+
+    /* do SVD */
+    V = gsl_matrix_alloc(m, m);
+    u = gsl_vector_alloc(m);
+    _tmp_vec = gsl_vector_alloc(m);
+    gsl_linalg_SV_decomp(A, V, u, _tmp_vec);
+    gsl_vector_free(_tmp_vec);
+
+    /* compute Σ⁻¹ */
+    Sigma_pinv = gsl_matrix_alloc(m, n);
+    gsl_matrix_set_zero(Sigma_pinv);
+    cutoff = rcond * gsl_vector_max(u);
+
+    for (i = 0; i < m; ++i) {
+        if (gsl_vector_get(u, i) > cutoff) {
+            x = 1. / gsl_vector_get(u, i);
+        }
+        else {
+            x = 0.;
+        }
+        gsl_matrix_set(Sigma_pinv, i, i, x);
+    }
+
+    /* libgsl SVD yields "thin" SVD - pad to full matrix by adding zeros */
+    U = gsl_matrix_alloc(n, n);
+    gsl_matrix_set_zero(U);
+
+    for (i = 0; i < n; ++i) {
+        for (j = 0; j < m; ++j) {
+            gsl_matrix_set(U, i, j, gsl_matrix_get(A, i, j));
+        }
+    }
+
+    if (_tmp_mat != NULL) {
+        gsl_matrix_free(_tmp_mat);
+    }
+
+    /* two dot products to obtain pseudoinverse */
+    _tmp_mat = gsl_matrix_alloc(m, n);
+    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1., V, Sigma_pinv, 0., _tmp_mat);
+
+    if (was_swapped) {
+        A_pinv = gsl_matrix_alloc(n, m);
+        gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1., U, _tmp_mat, 0., A_pinv);
+    }
+    else {
+        A_pinv = gsl_matrix_alloc(m, n);
+        gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1., _tmp_mat, U, 0., A_pinv);
+    }
+
+    gsl_matrix_free(_tmp_mat);
+    gsl_matrix_free(U);
+    gsl_matrix_free(Sigma_pinv);
+    gsl_vector_free(u);
+    gsl_matrix_free(V);
+
+    return A_pinv;
+}
+
+int euler_angle(gsl_matrix *TBD, gsl_vector *euler_ang) {
+    double psibdc, thtbdc, phibdc;
+    double cthtbd;
+
+    double mroll = 0;
+
+    double tbd13 = gsl_matrix_get(TBD, 0, 2);
+    double tbd11 = gsl_matrix_get(TBD, 0, 0);
+    double tbd33 = gsl_matrix_get(TBD, 2, 2);
+    double tbd12 = gsl_matrix_get(TBD, 0, 1);
+    double tbd23 = gsl_matrix_get(TBD, 1, 2);
+
+    // *geodetic Euler angles
+    // computed pitch angle: 'thtbdc'
+    // note: when |tbd13| >= 1, thtbdc = +- pi/2, but cos(thtbdc) is
+    // forced to be a small positive number to prevent division by zero
+    if (fabs(tbd13) < 1) {
+        thtbdc = asin(-tbd13);
+        cthtbd = cos(thtbdc);
+    } else {
+        thtbdc = ___PI / 2 * sign(-tbd13);
+        cthtbd = __EPS;
+    }
+    // computed yaw angle: 'psibdc'
+    double cpsi = tbd11 / cthtbd;
+    if (fabs(cpsi) > 1)
+        cpsi = 1 * sign(cpsi);
+    psibdc = acos(cpsi) * sign(tbd12);
+
+    // computed roll angle: 'phibdc'
+    double cphi = tbd33 / cthtbd;
+    if (fabs(cphi) > 1)
+        cphi = 1 * sign(cphi);
+
+    // selecting the Euler roll angle of flight mechanics (not for thtbdc=90 or
+    // =-90deg)
+    if (mroll == 0 || mroll == 1)
+        // roll feedback for right side up
+        phibdc = acos(cphi) * sign(tbd23);
+    else if (mroll == 2)
+        // roll feedback for inverted flight
+        phibdc = acos(-cphi) * sign(-tbd23);
+
+    gsl_vector_set(euler_ang, 0, phibdc);
+    gsl_vector_set(euler_ang, 1, thtbdc);
+    gsl_vector_set(euler_ang, 2, psibdc);
+
+    return 0;
 }
 
 

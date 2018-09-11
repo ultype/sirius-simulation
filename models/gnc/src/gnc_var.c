@@ -151,6 +151,16 @@ double aoaerror_smooth_old;
 double aoaerror_new;
 double aoaerror_out_old;
 double aoacmd;
+
+gsl_vector *IBBB0;
+gsl_vector *IBBB1;
+gsl_vector *IBBB2;
+gsl_vector *CONTROLCMD;
+gsl_vector *CMDQ;
+gsl_vector *TCMDQ;
+gsl_vector *delta_euler;
+gsl_vector *euler;
+gsl_vector *WBICBT;
 /*********************/
 
 

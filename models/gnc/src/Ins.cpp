@@ -626,15 +626,6 @@ void INS::update(double int_step) {
     calculate_INS_derived_TEI();
     GRAVGI = AccelHarmonic(SBIIC, INS_CS_JGM3, 20, 20, TEIC);
 
-    // if (testindex == 0) {
-    //     VBIIC_old = VBIIC;
-    //     testindex = 1;
-    // } else {
-        VBIIC += trans(TBIC) * DELTA_VEL + GRAVGI * int_step;
-        SBIIC += VBIIC_old * int_step;
-        VBIIC_old = VBIIC;
-    // }
-    // computed transformation matrix
     if (ideal == 1) {
       TBIC = build_321_rotation_matrix(PHI) * TBIC;
     } else {
@@ -642,6 +633,17 @@ void INS::update(double int_step) {
     }
 
     arma::mat33 TICB = trans(TBIC);
+
+    // if (testindex == 0) {
+    //     VBIIC_old = VBIIC;
+    //     testindex = 1;
+    // } else {
+    VBIIC += trans(TBIC) * DELTA_VEL + GRAVGI * int_step;
+    SBIIC += VBIIC_old * int_step;
+    VBIIC_old = VBIIC;
+    // }
+    // computed transformation matrix
+    
 
     // if (gpsupdate == 1) {
     //     GPS_update();

@@ -21,6 +21,7 @@ extern "C" {
 
 extern const double ___PI;
 extern const double __RAD;
+extern const double __EPS;
 
 int pol_from_cart_C(const gsl_vector *cart, gsl_vector *pol);
 int build_psivg_thtvg_TM_C(const double psivg, const double thtvg, gsl_matrix *AMAT);
@@ -34,7 +35,9 @@ int QuaternionMultiply_C(const gsl_vector *Quaternion_in1, const gsl_vector *Qua
 int Quaternion_rotation_C(const gsl_vector *Vector_in, const gsl_vector *Quaternion_in, gsl_vector *Vector_out);
 int build_321_rotation_matrix(const gsl_vector *angle, gsl_matrix *mat_out);
 int sign(const double variable);
+int euler_angle(gsl_matrix *TBD, gsl_vector *euler_ang);
 
+gsl_matrix* moore_penrose_pinv(gsl_matrix *A, const double rcond);
 gsl_matrix *skew_sym_C(const gsl_vector *vec);
 gsl_vector *Quaternion_conjugate_C(const gsl_vector *Quaternion_in);
 gsl_vector *QuaternionInverse_C(const gsl_vector *Quaternion_in);

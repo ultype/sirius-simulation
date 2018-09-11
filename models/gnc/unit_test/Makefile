@@ -28,6 +28,7 @@ MATH_CPP_SOURCES += $(SIRIUS_HOME)/models/math/src/time_utility.cpp
 MATH_CPP_SOURCES += $(SIRIUS_HOME)/models/math/src/integrate.cpp
 GNC_TEST_CPP_SOURCES += $(GNC_DIR)/unit_test/unit_test.cpp
 GNC_TEST_CPP_SOURCES += $(GNC_DIR)/src/Ins.cpp
+GNC_TEST_CPP_SOURCES += $(GNC_DIR)/src/Control.cpp
 ##### C Source #####
 MATH_C_SOURCE = $(SIRIUS_HOME)/models/math/src/math_utility_c.c
 MATH_C_SOURCE += $(SIRIUS_HOME)/models/math/src/time_utility_c.c
@@ -37,10 +38,9 @@ GNC_TEST_C_SOURCES = $(GNC_DIR)/src/Ins_c.c
 GNC_TEST_C_SOURCES += $(GNC_DIR)/src/gnc_var.c
 GNC_TEST_C_SOURCES += $(GNC_DIR)/src/dm_delta_ut.c
 ##### OBJECTS #####
-MATH_OBJECTS += $(patsubst %.cpp, %.o, $(MATH_TEST_CPP_SOURCES))
 MATH_OBJECTS += $(patsubst %.cpp, %.o, $(MATH_CPP_SOURCES))
 MATH_C_OBJECTS = $(patsubst %.c, %.o, $(MATH_C_SOURCE))
-GNC_OBJECTS = $(patsubst %.cpp, %.o, $(GNC_TEST_CPP_SOURCES))
+GNC_OBJECTS += $(patsubst %.cpp, %.o, $(GNC_TEST_CPP_SOURCES))
 GNC_OBJECTS += $(patsubst %.c, %.o, $(GNC_TEST_C_SOURCES))
 
 all: gnctest

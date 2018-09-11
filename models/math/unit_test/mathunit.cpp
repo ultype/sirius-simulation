@@ -19,6 +19,9 @@ int Quaternion2Euler_test();
 int Euler2Quaternion_test();
 int QuaternionMultiply_test();
 int QuaternionInverse_test();
+void print_matrix(const gsl_matrix *m);
+void print_vector (const gsl_vector * v);
+int moore_penrose_pinv_test();
 
 int main(int argc, char const *argv[]) {
     fprintf(stderr, "** Math function unit test **\n");
@@ -33,8 +36,28 @@ int main(int argc, char const *argv[]) {
     Quaternion2Euler_test();
     Euler2Quaternion_test();
     QuaternionInverse_test();
+    moore_penrose_pinv_test();
 
     return 0;
+}
+
+void print_matrix(const gsl_matrix *m) {
+    size_t i, j;
+
+    for (i = 0; i < m->size1; i++) {
+        for (j = 0; j < m->size2; j++) {
+            printf("%f\t", gsl_matrix_get(m, i, j));
+        }
+        printf("\n");
+    }
+}
+
+void print_vector (const gsl_vector * v) {
+    size_t i;
+
+    for (i = 0; i < v->size; i++) {
+        printf("%f\t", gsl_vector_get (v, i));
+    }
 }
 
 int Vector_Error(gsl_vector *vec_gsl, arma::vec3 vec_arma) {
@@ -327,6 +350,34 @@ int QuaternionInverse_test() {
 
     fprintf(stderr, "QuaternionInverse_C test : \n");
     Quaternion_Error(Vector_out_gsl, Vector_out_arma);
+
+    return 0;
+}
+
+int moore_penrose_pinv_test() {
+    const unsigned int N = 2;
+    const unsigned int M = 3;
+    const double rcond = 1E-15;
+
+
+    gsl_matrix *A = gsl_matrix_alloc(N, M);
+    gsl_matrix *A_pinv;
+
+    gsl_matrix_set(A, 0, 0, 1.);
+    gsl_matrix_set(A, 0, 1, 3.);
+    gsl_matrix_set(A, 0, 2, 5.);
+    gsl_matrix_set(A, 1, 0, 2.);
+    gsl_matrix_set(A, 1, 1, 4.);
+    gsl_matrix_set(A, 1, 2, 6.);
+
+    printf("A matrix:\n");
+    print_matrix(A);
+    A_pinv = moore_penrose_pinv(A, rcond);
+    printf("\nPseudoinverse of A:\n");
+    print_matrix(A_pinv);
+
+    gsl_matrix_free(A);
+    gsl_matrix_free(A_pinv);
 
     return 0;
 }
