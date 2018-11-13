@@ -303,9 +303,9 @@ int daq_ioctl_di_get_wallclock_time(daq_device_t *daq_dev, unsigned long arg)
 
     atomic_set(&daq_dev->is_wallclock_arrive, 1);
     curr_ptics = ktime_get();
-    m = curr_ptics.tv64 - daq_dev->prev_pps_tics.tv64;
-    n = curr_ptics.tv64 - daq_dev->curr_pps_tics.tv64;
-    cmd.time_tics = (1000000000LL * n)/(m-n) + daq_dev->curr_ideal_tics.tv64;
+    m = curr_ptics - daq_dev->prev_pps_tics;
+    n = curr_ptics - daq_dev->curr_pps_tics;
+    cmd.time_tics = (1000000000LL * n)/(m-n) + daq_dev->curr_ideal_tics;
     //  printk("<0>""ioctl %d pps %lld\n",daq_dev->pps_cnt , cmd.time_tics);
     if (unlikely(copy_to_user((int __user *)arg, &cmd, sizeof(struct ioctl_tispace_cmd)))){
       return -EFAULT;

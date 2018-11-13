@@ -81,15 +81,15 @@ irqreturn_t daq_irq_handler(int irq, void *dev_id)
 #if (TISPACE_CUSTOMIZED == 1)
     ktime_t isr_curr_tics = ktime_get();
     if (daq_dev->pps_cnt == 0) {
-        daq_dev->prev_pps_tics.tv64 = isr_curr_tics.tv64 - 1000000000LL;
+        daq_dev->prev_pps_tics = isr_curr_tics - 1000000000LL;
         daq_dev->curr_pps_tics = isr_curr_tics;
         daq_dev->curr_ideal_tics = isr_curr_tics;
     } else {
         daq_dev->prev_pps_tics = daq_dev->curr_pps_tics;
         daq_dev->curr_pps_tics = isr_curr_tics;
-        daq_dev->curr_ideal_tics.tv64 += 1000000000LL;
+        daq_dev->curr_ideal_tics += 1000000000LL;
     }
-    printk("<0>""isr %d pps tics %lld\n", daq_dev->pps_cnt, daq_dev->curr_pps_tics.tv64);
+    printk("<0>""isr %d pps tics %lld\n", daq_dev->pps_cnt, daq_dev->curr_pps_tics);
     daq_dev->pps_cnt++;
 
     if (wait_task != NULL) {
